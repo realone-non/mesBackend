@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:sqlserver://mes-dev.cyyxmbrc9eeg.ap-northeast-2.rds.amazonaws.com:1433;databaseName=MES_DEV;autoReconnect=true
-    username: sa
-    password: 123qweasd
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:mysql://mes-dev.cyyxmbrc9eeg.ap-northeast-2.rds.amazonaws.com:3306/mes-dev?serverTimezone=UTC&characterEncoding=UTF-8
+    username: admin
+    password: Silver01!#
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: create
