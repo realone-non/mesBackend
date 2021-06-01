@@ -11,22 +11,29 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name="MES_USER")
+@Entity(name="COM_COMPANY")
 @Data
-public class UserVo {
+public class CompanyVo {
     @Id
-    private String userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private UUID companyId;
 
     @Column (nullable = false)
     private String factoryCode;
     @Column (nullable = false)
-    private String userName;
-
+    private String companyName;
     @Column(nullable = false)
-    private String password;
-    private String telephone;
-    private String email;
-    private String description;
+    private String companyType;
+    private String companyNumber;
+    private String chargerName;
+    private String cellphoneNumber;
+    private String companyEmail;
+    private String companyTelNumber;
+    private String companyAddress;
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "companyImage", columnDefinition = "LONGBLOB")
+    private byte[] companyImage;
     private boolean isUse;
 
     @Column(nullable = false, updatable = false)

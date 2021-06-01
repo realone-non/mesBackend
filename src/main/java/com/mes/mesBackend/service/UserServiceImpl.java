@@ -5,6 +5,7 @@ import com.mes.mesBackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +27,19 @@ public class UserServiceImpl implements UserService{
     }
 
     public void Update(UserVo user){
+        Optional<UserVo> e = userRepository.findById(user.getUserId());
 
+        e.ifPresent(selectUser->{
+            selectUser.setDescription(user.getDescription());
+            selectUser.setFactoryCode(user.getFactoryCode());
+            selectUser.setEmail(user.getEmail());
+            selectUser.setUserName(user.getUserName());
+            selectUser.setPassword(user.getPassword());
+            selectUser.setTelephone(user.getTelephone());
+            selectUser.setModifiedDate(new Date(System.currentTimeMillis()));
+            selectUser.setModifyId(user.getUserId());
+            userRepository.save(selectUser);
+        });
     }
 
     public void Delete(String id){
