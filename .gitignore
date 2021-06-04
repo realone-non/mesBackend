@@ -38,3 +38,4 @@ out/
 mesBackend\
 application-credentials.yml
 application-aws.yml
+application-credentials.yml
