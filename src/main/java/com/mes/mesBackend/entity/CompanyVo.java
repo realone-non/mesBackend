@@ -41,6 +41,8 @@ public class CompanyVo {
     private byte[] companyImage;
     private boolean useYn = true;
 
+
+
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
