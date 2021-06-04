@@ -2,6 +2,7 @@ package com.mes.mesBackend.entity;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -15,7 +16,11 @@ import java.util.UUID;
 @Data
 public class CompanyVo {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.AUTO)
+    //@GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @GeneratedValue
+    @org.hibernate.annotations.Type(type="uuid-char")
+    //@Column(columnDefinition = "VARCHAR(32)")
     private UUID companyId;
 
     @Column (nullable = false)
@@ -34,7 +39,7 @@ public class CompanyVo {
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "companyImage", columnDefinition = "LONGBLOB")
     private byte[] companyImage;
-    private boolean isUse;
+    private boolean useYn = true;
 
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)

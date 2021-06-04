@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+mesBackend\
+application-credentials.yml
+application-aws.yml
