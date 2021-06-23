@@ -25,9 +25,16 @@ spring:
     console:
       enabled: true
   server:
-    port: 80
+    port: 8080
+    servelet:
+      session:
+        timeout: 30
+    ssl:
+      enabled: true
+
 
   servlet:
      multipart:
        max-file-size:10MB
        max-request-size:10MB
+

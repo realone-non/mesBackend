@@ -16,41 +16,42 @@ import java.util.UUID;
 @Data
 public class CompanyVo {
     @Id
-    //@GeneratedValue(strategy = GenerationType.AUTO)
-    //@GenericGenerator(name = "uuid2", strategy = "uuid2")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @org.hibernate.annotations.Type(type="uuid-char")
-    //@Column(columnDefinition = "VARCHAR(32)")
+    @Column(columnDefinition = "VARCHAR(32)", name = "COMPANY_ID")
     private UUID companyId;
 
-    @Column (nullable = false)
+    @Column (nullable = false, name = "FACTORY_CODE")
     private String factoryCode;
-    @Column (nullable = false)
+    @Column (nullable = false, name = "COMPANY_NAME")
     private String companyName;
-    @Column(nullable = false)
+    @Column (nullable = false, name = "COMPANY_TYPE")
     private String companyType;
+    @Column (name = "COMPANY_NUMBER")
     private String companyNumber;
+    @Column (name = "CHARGER")
     private String chargerName;
+    @Column (name = "PHONE_NUMBER")
     private String cellphoneNumber;
+    @Column (name = "EMAIL")
     private String companyEmail;
+    @Column (name = "COMPANY_TEL")
     private String companyTelNumber;
+    @Column (name = "COMPANY_ADDRESS")
     private String companyAddress;
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "companyImage", columnDefinition = "LONGBLOB")
-    private byte[] companyImage;
+    @Column (name = "IS_USE")
     private boolean useYn = true;
 
-
-
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false, name = "CREATE_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     private Date createdDate;
+    @Column(name = "CREATE_ID")
     private String createId;
-    @Column(nullable = false, updatable = true)
+    @Column(nullable = false, updatable = true, name = "MODIFY_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     @UpdateTimestamp
     private Date modifiedDate;
+    @Column(name = "MODIFY_ID")
     private String modifyId;
 }
