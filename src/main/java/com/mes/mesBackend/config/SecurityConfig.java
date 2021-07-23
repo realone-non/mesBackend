@@ -30,9 +30,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //auth.userDetailsService(memberService).passwordEncoder(passwordEncoder());
     }
 
+
     @Override
     public void configure(WebSecurity web){
         //이미지,자바스크립트,css 디렉토리 보안 설정
+        web.ignoring().antMatchers(
+                "/v3/api-docs",
+                "/v3/api-docs/**",
+                "/swagger-ui.html",
+                "/swagger-ui/**"
+                );
     }
 
     @Override

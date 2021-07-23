@@ -11,12 +11,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class MesBackendApplication {
 
 	public static void main(String[] args) {
-
-		Test test = new Test();
-		test.setData("test");
-		String data = test.getData();
-		System.out.println("data = " + data);
-
+		System.setProperty("server.port", "3000");
 		SpringApplication.run(MesBackendApplication.class, args);
 	}
 }
