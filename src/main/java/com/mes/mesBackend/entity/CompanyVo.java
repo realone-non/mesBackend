@@ -16,9 +16,10 @@ import java.util.UUID;
 @Data
 public class CompanyVo {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @org.hibernate.annotations.Type(type="uuid-char")
-    @Column(columnDefinition = "VARCHAR(32)", name = "COMPANY_ID")
+    @Type(type="uuid-char")
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(name = "COMPANY_ID", columnDefinition = "VARCHAR(36)")
     private UUID companyId;
 
     @Column (nullable = false, name = "FACTORY_CODE")
