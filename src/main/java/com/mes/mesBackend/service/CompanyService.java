@@ -1,14 +1,15 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.entity.CompanyVo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface CompanyService {
-    List<CompanyVo> FindAll();
-    CompanyVo Find(UUID id);
-    CompanyVo Update(UUID id, CompanyVo company);
-    void Delete(UUID id);
-    CompanyVo Save(CompanyVo company);
+    Page<CompanyVo> getCompanies(Pageable pageable);
+    CompanyVo getCompany(UUID id);
+    CompanyVo updateCompany(UUID id, CompanyVo company);
+    void deleteCompany(UUID id);
+    CompanyVo createCompany(CompanyVo company);
 }
