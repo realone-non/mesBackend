@@ -1,0 +1,1 @@
+web: java -jar mesBackend.jar -Xms2G -Xmx2G -Xss512k -XX:NewRatio=1 -XX:SurvivorRatio=6 -XX:+UseParallelGC -XX:+UseParallelOldGC -Dsun.net.inetaddr.ttl=0 -Dnetworkaddress.cache.ttl=0 -Dfile.encoding=UTF-8
