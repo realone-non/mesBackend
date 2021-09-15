@@ -49,10 +49,10 @@ public class CompanyVo {
     @Column(name = "ADDRESS")
     private String Address;
 
-    @Column(name = "IS_USE")
+    @Column(name = "USE_YN")
     private boolean useYn = true;
 
-    @Column(nullable = false, updatable = false, name = "CREATE_DATE")
+    @Column(nullable = false, updatable = false, name = "CREATED_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     private Date createdDate;
@@ -67,6 +67,4 @@ public class CompanyVo {
 
     @Column(name = "MODIFY_ID")
     private String modifyId;
-
-
 }

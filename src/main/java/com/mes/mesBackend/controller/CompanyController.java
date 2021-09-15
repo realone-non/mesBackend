@@ -42,14 +42,14 @@ public class CompanyController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody()
-    @ApiOperation(value = "거래처 생성", notes = "companyId는 빈값으로 넘겨야함")
+    @ApiOperation(value = "거래처 생성", notes = "id는 빈값으로 넘겨야함")
     public ResponseEntity<CompanyVo> createCompany(@RequestBody CompanyVo company){
         return new ResponseEntity<>(companyService.createCompany(company), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
     @ResponseBody()
-    @ApiOperation(value = "거래처 수정", notes = "cellphoneNumber만 변경 가능 / companyId는 빈값으로 넘겨야함")
+    @ApiOperation(value = "거래처 수정", notes = "cellphoneNumber만 변경 가능 / id는 빈값으로 넘겨야함")
     public ResponseEntity<CompanyVo> updateCompany(@PathVariable(value = "id") UUID id, @RequestBody CompanyVo company){
         return new ResponseEntity<>(companyService.updateCompany(id, company), HttpStatus.OK);
     }
