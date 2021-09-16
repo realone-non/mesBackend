@@ -28,7 +28,7 @@ spring:
     console:
       enabled: true
   server:
-    port : 8080
+    port : 8081
     servelet:
       session:
         timeout: 30
