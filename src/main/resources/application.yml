@@ -29,7 +29,8 @@ spring:
       enabled: true
   server:
     port : 8081
-#    context-path : /v3/api-docs/
+    context-path : /v2/api-docs/
+
     servelet:
       session:
         timeout: 30

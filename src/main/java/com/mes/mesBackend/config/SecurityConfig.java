@@ -1,6 +1,5 @@
 package com.mes.mesBackend.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -35,8 +34,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web){
         //이미지,자바스크립트,css 디렉토리 보안 설정
         web.ignoring().antMatchers(
-                "/v3/api-docs",
-                "/v3/api-docs/**",
+                "/v2/api-docs",
+                "/v2/api-docs/**",
                 "/swagger-ui.html",
                 "/swagger-ui/**"
                 );
