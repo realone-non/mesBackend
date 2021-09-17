@@ -33,6 +33,7 @@ spring:
     servelet:
       session:
         timeout: 30
+      context-path : /swagger-ui.html
     ssl:
       enabled: true
 
