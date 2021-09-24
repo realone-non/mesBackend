@@ -1,16 +1,13 @@
 package com.mes.mesBackend.entity;
 
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
-import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name="MES_USER")
+@Entity(name="MES_USERS")
 @Data
-public class UserVo {
+public class UserVo extends BaseTimeEntity{
     @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
     private Long id;
 
@@ -38,18 +35,8 @@ public class UserVo {
     @Column(name = "USE_YN")
     private boolean useYn;
 
-    @Column(nullable = false, updatable = false, name = "CREATED_DATE")
-    @Temporal(TemporalType.TIMESTAMP)
-    @CreationTimestamp
-    private Date createdDate;
-
     @Column(name = "CREATE_ID")
     private String createId;
-
-    @Column(nullable = false, name = "MODIFIED_DATE")
-    @Temporal(TemporalType.TIMESTAMP)
-    @UpdateTimestamp
-    private Date modifiedDate;
 
     @Column(name = "MODIFY_ID")
     private String modifyId;
