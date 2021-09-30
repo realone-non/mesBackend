@@ -1,15 +1,12 @@
 package com.mes.mesBackend.entity;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 // 거래처
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "CLIENTS")
 @Data
 public class Client extends BaseTimeEntity{
@@ -17,7 +14,7 @@ public class Client extends BaseTimeEntity{
     @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
     private Long id;
 
-    @Column(name = "CLIENT_CODE")
+    @Column(name = "CLIENT_CODE", nullable = false)
     private String clientCode;  // 거래처코드
 
     @Column(name = "NAME", nullable = false)
@@ -31,6 +28,9 @@ public class Client extends BaseTimeEntity{
 
     @Column(name = "BUSINESS_REG_NO", nullable = false, length = 10)
     private String businessNumber;  // 사업자등록번호
+
+    @Column(name = "BUSINESS_FILE")
+    private String businessFile;    // 사업자등록증
 
     @Column(name = "CEO_NAME", nullable = false, length = 5)
     private String ceoName;     // 대표자명

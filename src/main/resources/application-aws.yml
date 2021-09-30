@@ -5,7 +5,11 @@ cloud:
         bucket: mes-s3
     region:
       static: ap-northeast-2
-    stack:
-      auto: false
     credentials:
       instance-profile: true
+      access-key: AKIAQFOAKXS7NP26SOAC
+      secret-key: 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
+#      access-key: AKIAQFOAKXS7KT6DBZ6G
+#      secret-key: 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
+    stack:
+      auto: false

@@ -1,6 +1,5 @@
 package com.mes.mesBackend.entity;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
