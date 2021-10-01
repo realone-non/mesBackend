@@ -1,8 +1,7 @@
 spring:
-  profiles:
-    include:
-      - aws
-      - credentials
+#  profiles:
+#    include:
+#      - aws
   datasource:
     url: jdbc:mysql://mes-dev.cyyxmbrc9eeg.ap-northeast-2.rds.amazonaws.com:3306/mes-dev?serverTimezone=UTC&characterEncoding=UTF-8
     username: admin
@@ -48,3 +47,20 @@ spring:
 
   freemarker:
     check-template-location: false
+
+cloud:
+  aws:
+    credentials:
+      accessKey: AKIAQFOAKXS7ACQ2KTMD
+      secretKey: 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
+    region:
+      static: ap-northeast-2
+    bucketName: mes-develop
+    stack:
+      auto: false
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: ERROR

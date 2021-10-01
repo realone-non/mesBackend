@@ -6,7 +6,6 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.mes.mesBackend.helper.S3Uploader;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,25 +13,23 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Component
-@RequiredArgsConstructor
 public class S3Service implements S3Uploader {
 
-    private final AmazonS3 amazonS3;
+    @Autowired
+    AmazonS3 amazonS3;
 
-    @Value("${cloud.aws.s3.image.bucket}")
+    @Value("${cloud.aws.bucketName}")
     private String bucketName;
 
-    @Override
     public String upload(MultipartFile multipartFile, String dirName) throws IOException {
-        String localDateTime = LocalDateTime.now().toString();
-
-        String fileName = dirName + "/" + localDateTime;
+        String fileName = dirName + datePath();
 
         return putS3(multipartFile, fileName);
     }
-    @Override
+
     public String putS3(MultipartFile multipartFile, String fileName) throws IOException {
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(multipartFile.getContentType());
@@ -43,12 +40,17 @@ public class S3Service implements S3Uploader {
 
         amazonS3.putObject(putObjectRequest);
 
-        return amazonS3.getUrl(bucketName, fileName).toString(); // ==========================
+        return amazonS3.getUrl(bucketName, fileName).toString();
     }
 
-    @Override
-    public void delete(String fileUrl) throws IOException {
-        String fileName = "";
+
+    public void delete(String fileUrl) {
+        String fileName = fileUrl.substring(fileUrl.lastIndexOf("/")+1);
         amazonS3.deleteObject(new DeleteObjectRequest(bucketName, fileName));
+    }
+
+    private String datePath() {
+        String dateTimeFormat = "yyyyMMdd_HHmmss";
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormat));
     }
 }

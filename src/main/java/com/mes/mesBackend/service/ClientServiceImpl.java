@@ -7,6 +7,8 @@ import com.mes.mesBackend.entity.Client;
 import com.mes.mesBackend.repository.ClientRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,14 +31,14 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     ModelMapper modelMapper;
 
-    private Client findClientById(Long id) {
-        return clientRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("no such data"));
+    public Client findClientByIdAndUseYnTrue(Long id) {
+        return clientRepository.findByIdAndUseYnTrue(id);
     }
 
     // 거래처 생성
     public ClientResponse createClient(ClientRequest clientRequest) {
         Long businessTypeId = clientRequest.getBusinessTypeId();
-        BusinessType businessType = businessTypeService.findBusinessType(businessTypeId);
+        BusinessType businessType = businessTypeService.findBusinessTypeByIdAndUseYn(businessTypeId);
         Client client = clientRequestToClient(clientRequest);
         client.setType(businessType);
         Client saveClient = clientRepository.save(client);
@@ -45,35 +47,40 @@ public class ClientServiceImpl implements ClientService {
 
     // 거래처 조회
     public ClientResponse getClient(Long id) {
-        Client client = findClientById(id);
+        Client client = findClientByIdAndUseYnTrue(id);
         return clientToClientResponse(client);
     }
 
     // 거래처 리스트 조회
-    public List<ClientResponse> getClients() {
-        List<Client> clients = clientRepository.findAll();
-        return clientToListClientResponses(clients);
+    public Page<ClientResponse> getClients(Pageable pageable) {
+        Page<Client> clients = clientRepository.findAllByUseYnTrue(pageable);
+        return clientToPageClientResponses(clients);
     }
 
     // 거래처 수정
     public ClientResponse updateClient(Long id, ClientRequest clientRequest) {
         Client client = clientRequestToClient(clientRequest);
-        Client findClient = findClientById(id);
+        Client findClient = findClientByIdAndUseYnTrue(id);
         findClient.setName(client.getName());
         Client updateClient = clientRepository.save(findClient);
         return clientToClientResponse(updateClient);
     }
 
     // 사업자 등록증 파일 업로드
+    // client/거래처 명/파일명(날싸시간)
     public ClientResponse createBusinessFileToClient(Long id, MultipartFile businessFile) throws IOException {
-        Client client = findClientById(id);
-        client.setBusinessFile(s3Service.upload(businessFile, businessFile.getName()));
+        Client client = findClientByIdAndUseYnTrue(id);
+        String fileName = "client/" + client.getName() + "/";
+        client.setBusinessFile(s3Service.upload(businessFile, fileName));
+        clientRepository.save(client);
         return clientToClientResponse(client);
     }
 
     // 거래처 삭제
     public void deleteClient(Long id) {
-        clientRepository.deleteById(id);
+        Client client = findClientByIdAndUseYnTrue(id);
+        client.setUseYn(false);
+        clientRepository.save(client);
     }
 
     // Entity -> Response
@@ -92,5 +99,17 @@ public class ClientServiceImpl implements ClientService {
     // Request -> Entity
     private Client clientRequestToClient(ClientRequest clientRequest) {
         return modelMapper.map(clientRequest, Client.class);
+    }
+
+    // Page<Entity> -> Page<Response>
+    private Page<ClientResponse> clientToPageClientResponses(Page<Client> clients) {
+        return clients.map(client -> modelMapper.map(client, ClientResponse.class));
+    }
+
+    // 사업자 등록증 파일 삭제 (aws 권한 문제로 안됨)
+    private void deleteBusinessFileToClient(Long id) throws IOException {
+        Client client = findClientByIdAndUseYnTrue(id);
+        s3Service.delete(client.getBusinessFile());
+        client.setBusinessFile(null);
     }
 }

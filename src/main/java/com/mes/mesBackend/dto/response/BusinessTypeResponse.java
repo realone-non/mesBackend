@@ -8,5 +8,4 @@ import lombok.Setter;
 public class BusinessTypeResponse {
     Long id;
     String name;
-    boolean useYn;
 }

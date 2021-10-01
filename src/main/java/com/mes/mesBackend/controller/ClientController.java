@@ -15,12 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.List;
-
 @RestController
 @RequestMapping(value = "/clients")
-@Api(tags = {"client"})
+@Api(tags = "client")
 @RequiredArgsConstructor
 public class ClientController {
 
@@ -32,7 +29,12 @@ public class ClientController {
     @ResponseBody
     @ApiOperation(value = "거래처 생성")
     public ResponseEntity<ClientResponse> createClient(@RequestBody ClientRequest clientRequest){
-        return new ResponseEntity<>(clientService.createClient(clientRequest), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(clientService.createClient(clientRequest), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // 거래처 조회
@@ -40,32 +42,52 @@ public class ClientController {
     @ResponseBody
     @ApiOperation(value = "거래처 조회")
     public ResponseEntity<ClientResponse> getClient(@PathVariable Long id) {
-        return new ResponseEntity<>(clientService.getClient(id), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(clientService.getClient(id), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // 거래처 리스트 조회
     @GetMapping
     @ResponseBody
     @ApiOperation(value = "거래처 리스트 조회")
-    public ResponseEntity<List<ClientResponse>> getClients() {
-        return new ResponseEntity<>(clientService.getClients(), HttpStatus.OK);
+    public ResponseEntity<Page<ClientResponse>> getClients(Pageable pageable) {
+        try {
+            return new ResponseEntity<>(clientService.getClients(pageable), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // 거래처 수정
-    @PutMapping
+    @PutMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "거래처 수정")
     public ResponseEntity<ClientResponse> updateClient(@PathVariable Long id, @RequestBody ClientRequest clientRequest){
-        return new ResponseEntity<>(clientService.updateClient(id, clientRequest), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(clientService.updateClient(id, clientRequest), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // 거래처 삭제
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "거래처 삭제")
     public ResponseEntity deleteClient(@PathVariable Long id) {
-        clientService.deleteClient(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        try {
+            clientService.deleteClient(id);
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // 사업자 등록증 파일 업로드
@@ -75,7 +97,12 @@ public class ClientController {
     public ResponseEntity<ClientResponse> createBusinessFileToClient(
             @PathVariable Long id,
             @RequestPart MultipartFile businessFile
-    ) throws IOException {
-        return new ResponseEntity<>(clientService.createBusinessFileToClient(id, businessFile), HttpStatus.OK);
+    ) {
+        try {
+            return new ResponseEntity<>(clientService.createBusinessFileToClient(id, businessFile), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

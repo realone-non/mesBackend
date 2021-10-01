@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/users")
-@Api(tags = {"user"})
+@Api(tags = "user")
 @RequiredArgsConstructor
-public class HomeController {
+public class UserController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

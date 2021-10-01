@@ -38,5 +38,4 @@ public class ClientResponse {
     String testMethod;      // 검사방법
     String phoneNumber;     // 휴대폰번호
     String searchWord;      // 검색어
-    boolean useYn = true;  // 사용여부
 }

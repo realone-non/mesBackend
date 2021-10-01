@@ -6,6 +6,8 @@ import com.mes.mesBackend.entity.BusinessType;
 import com.mes.mesBackend.repository.BusinessTypeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,9 +22,8 @@ public class BusinessTypeServiceImpl implements BusinessTypeService {
     @Autowired
     ModelMapper modelMapper;
 
-    public BusinessType findBusinessType(Long id) {
-        return businessTypeRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("no such data"));
+    public BusinessType findBusinessTypeByIdAndUseYn(Long id) {
+        return businessTypeRepository.findByIdAndUseYnTrue(id);
     }
 
     // 업태 타입 생성
@@ -34,20 +35,20 @@ public class BusinessTypeServiceImpl implements BusinessTypeService {
 
     // 업태 타입 조회
     public BusinessTypeResponse getBusinessType(Long id) {
-        BusinessType businessType = findBusinessType(id);
+        BusinessType businessType = findBusinessTypeByIdAndUseYn(id);
         return businessToBusinessResponse(businessType);
     }
 
-    // 업태 타입 리스트 조회
-    public List<BusinessTypeResponse> getBusinessTypes() {
-        List<BusinessType> businessTypes = businessTypeRepository.findAll();
-        return businessToListBusinessResponse(businessTypes);
+    // 업체 타입 전체 조회
+    public Page<BusinessTypeResponse> getBusinessTypes(Pageable pageable) {
+        Page<BusinessType> businessTypes = businessTypeRepository.findAllByUseYnTrue(pageable);
+        return businessTypeToPageBusinessTypeResponses(businessTypes);
     }
 
     // 업태 타입 수정
     public BusinessTypeResponse updateBusinessType(Long id, BusinessTypeRequest businessTypeRequest) {
         BusinessType businessType = businessRequestToBusiness(businessTypeRequest);
-        BusinessType findBusinessType = findBusinessType(id);
+        BusinessType findBusinessType = findBusinessTypeByIdAndUseYn(id);
         findBusinessType.setName(businessType.getName());
         BusinessType updateBusinessType = businessTypeRepository.save(findBusinessType);
         return businessToBusinessResponse(updateBusinessType);
@@ -55,7 +56,9 @@ public class BusinessTypeServiceImpl implements BusinessTypeService {
 
     // 업태 삭제
     public void deleteBusinessType(Long id) {
-        businessTypeRepository.deleteById(id);
+        BusinessType businessType = findBusinessTypeByIdAndUseYn(id);
+        businessType.setUseYn(false);
+        businessTypeRepository.save(businessType);
     }
 
     // Entity -> Response
@@ -74,5 +77,10 @@ public class BusinessTypeServiceImpl implements BusinessTypeService {
     // Request -> Entity
     private BusinessType businessRequestToBusiness(BusinessTypeRequest businessTypeRequest) {
         return modelMapper.map(businessTypeRequest, BusinessType.class);
+    }
+
+    // Page<Entity> -> Page<Response>
+    private Page<BusinessTypeResponse> businessTypeToPageBusinessTypeResponses(Page<BusinessType> businessTypes) {
+        return businessTypes.map(businessType -> modelMapper.map(businessType, BusinessTypeResponse.class));
     }
 }

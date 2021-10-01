@@ -7,15 +7,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping(value = "/business-types")
-@Api(tags = {"business-type"})
+@Api(tags = "business-type")
 @RequiredArgsConstructor
 public class BusinessTypeController {
 
@@ -28,21 +28,36 @@ public class BusinessTypeController {
     public ResponseEntity<BusinessTypeResponse> createBusinessType(
             @RequestBody BusinessTypeRequest businessTypeRequest
     ) {
-        return new ResponseEntity<>(businessTypeService.createBusinessType(businessTypeRequest), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(businessTypeService.createBusinessType(businessTypeRequest), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "업태 조회")
     public ResponseEntity<BusinessTypeResponse> getBusinessType(@PathVariable(value = "id") Long id) {
-        return new ResponseEntity<>(businessTypeService.getBusinessType(id), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(businessTypeService.getBusinessType(id), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping
     @ResponseBody()
     @ApiOperation(value = "업태 리스트 조회")
-    public ResponseEntity<List<BusinessTypeResponse>> getBusinessTypes() {
-        return new ResponseEntity<>(businessTypeService.getBusinessTypes(), HttpStatus.OK);
+    public ResponseEntity<Page<BusinessTypeResponse>> getBusinessTypes(Pageable pageable) {
+        try {
+            return new ResponseEntity<>(businessTypeService.getBusinessTypes(pageable), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{id}")
@@ -52,14 +67,24 @@ public class BusinessTypeController {
             @PathVariable(value = "id") Long id,
             @RequestBody BusinessTypeRequest businessTypeRequest
     ) {
-        return new ResponseEntity<>(businessTypeService.updateBusinessType(id, businessTypeRequest), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(businessTypeService.updateBusinessType(id, businessTypeRequest), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DeleteMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "업태 삭제")
     public ResponseEntity<Void> deleteBusinessType(@PathVariable(value = "id") Long id) {
-        businessTypeService.deleteBusinessType(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        try {
+            businessTypeService.deleteBusinessType(id);
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
