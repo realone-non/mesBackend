@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 // 코드마스터 - 주코드
 @AllArgsConstructor
@@ -15,7 +16,7 @@ import javax.persistence.*;
 public class CodeMaster extends BaseTimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
-    private String id;    // 주코드
+    private Long id;    // 주코드 id
 
     @Column(name = "MAIN_CODE", nullable = false)
     private String mainCode;    // 주코드
@@ -44,6 +45,6 @@ public class CodeMaster extends BaseTimeEntity{
     @Column(name = "REF_INFO_5")
     private String refInfo5;   // 참조정보5
 
-    @ManyToOne @JoinColumn(name = "SUB_CODE_MASTERS_ID", nullable = false)
-    private SubCodeMaster subCodeMaster;    // 부코드
+//    @ManyToOne @JoinColumn(name = "SUB_CODE_MASTERS_ID", nullable = false)
+//    private SubCodeMaster subCodeMaster;    // 부코드
 }

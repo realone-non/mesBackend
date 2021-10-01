@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class SubCodeMaster extends BaseTimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
-    private String id;  // 부코드
+    private Long id;  // 부코드 id
 
     @Column(name = "SUB_CODE", nullable = false)
     private String subCode;  // 부코드
@@ -49,4 +49,7 @@ public class SubCodeMaster extends BaseTimeEntity{
 
     @Column(name = "USE_YN", nullable = false)
     private Boolean useYn = true;      //  사용여부
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL) @JoinColumn(name = "CODE_MASTER_ID", nullable = false)
+    private CodeMaster codeMaster;
 }
