@@ -21,7 +21,7 @@ public class Client extends BaseTimeEntity{
     private String name;    // 거래처명
 
     @Column(name = "SHORT_NAME", nullable = false)
-    private int shortName;      // 약어
+    private String shortName;      // 약어
 
     @Column(name = "CLIENT_TYPE", nullable = false)
     private String clientType;   // 거래처 유형
@@ -45,7 +45,7 @@ public class Client extends BaseTimeEntity{
     private String detailAddress;   // 상세주소
 
     @ManyToOne @JoinColumn(name = "BUSINESS_TYPES_ID", nullable = false)
-    private BusinessType type;      // 업태
+    private BusinessType businessType;      // 업태
 
     @Column(name = "ITEM")
     private String item;        // 업종
@@ -71,8 +71,8 @@ public class Client extends BaseTimeEntity{
     @Column(name = "PCCC")
     private String pccc;            // 통관고유번호
 
-    @Column(name = "COUNTRY_CODE")
-    private String countryCode;     // 국가코드
+    @ManyToOne @JoinColumn(name = "COUNTRY_CODE_ID")
+    private CountryCode countryCode;     // 국가코드
 
     @Column(name = "AREA")
     private String area;        // 지역

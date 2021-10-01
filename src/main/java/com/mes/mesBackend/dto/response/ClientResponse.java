@@ -1,6 +1,5 @@
 package com.mes.mesBackend.dto.response;
 
-import com.mes.mesBackend.entity.BusinessType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +9,7 @@ public class ClientResponse {
     Long id;
     String clientCode;  // 거래처코드
     String name;    // 거래처명
-    int shortName;      // 약어
+    String shortName;      // 약어
     String clientType;   // 거래처 유형
     String businessNumber;  // 사업자등록번호
     String businessFile;    // 사업자등록증
@@ -27,7 +26,7 @@ public class ClientResponse {
     String clientChargeName;  // 담당자 이름
     String tradeBusinessRegNo;  // 무역업등록번호
     String pccc;            // 통관고유번호
-    String countryCode;     // 국가코드
+    CountryCodeResponse countryCode;     // 국가코드
     String area;        // 지역
     String currencyUnit;    // 거래화폐단위
     String companyCharge;  // 회사담당자

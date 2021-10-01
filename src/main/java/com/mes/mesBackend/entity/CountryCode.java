@@ -7,14 +7,15 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-// 거래처 - 업태
+// 거래처 - 국가코드
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "BUSINESS_TYPES")
+@Entity(name = "COUNTRY_CODES")
 @Data
-public class BusinessType extends BaseTimeEntity {
+public class CountryCode extends BaseTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
     private Long id;
 
     @Column(name = "NAME", nullable = false)

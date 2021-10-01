@@ -2,7 +2,6 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.ClientRequest;
 import com.mes.mesBackend.dto.response.ClientResponse;
-import com.mes.mesBackend.entity.Client;
 import com.mes.mesBackend.service.ClientService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

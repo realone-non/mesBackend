@@ -4,6 +4,8 @@ import com.mes.mesBackend.dto.request.ClientRequest;
 import com.mes.mesBackend.dto.response.ClientResponse;
 import com.mes.mesBackend.entity.BusinessType;
 import com.mes.mesBackend.entity.Client;
+import com.mes.mesBackend.entity.CountryCode;
+import com.mes.mesBackend.helper.S3Service;
 import com.mes.mesBackend.repository.ClientRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class ClientServiceImpl implements ClientService {
     private BusinessTypeService businessTypeService;
 
     @Autowired
+    private CountryCodeService countryCodeService;
+
+    @Autowired
     private S3Service s3Service;
 
     @Autowired
@@ -38,10 +43,18 @@ public class ClientServiceImpl implements ClientService {
     // 거래처 생성
     public ClientResponse createClient(ClientRequest clientRequest) {
         Long businessTypeId = clientRequest.getBusinessTypeId();
+        Long countryCodeId = clientRequest.getCountryCodeId();
+
         BusinessType businessType = businessTypeService.findBusinessTypeByIdAndUseYn(businessTypeId);
+        CountryCode countryCode = countryCodeService.findCountryCodeByIdAndUseYn(countryCodeId);
+
         Client client = clientRequestToClient(clientRequest);
-        client.setType(businessType);
+
+        client.setBusinessType(businessType);
+        client.setCountryCode(countryCode);
+
         Client saveClient = clientRepository.save(client);
+
         return clientToClientResponse(saveClient);
     }
 
