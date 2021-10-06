@@ -38,4 +38,19 @@ public class HeaderController {
     public ResponseEntity<HeaderResponse> createHeader(@RequestBody HeaderRequest headerRequest) {
         return new ResponseEntity<>(headerService.createHeader(headerRequest), HttpStatus.OK);
     }
+
+    @PutMapping("/{id}")
+    @ResponseBody
+    @ApiOperation(value = "헤더 수정")
+    public ResponseEntity<HeaderResponse> updateHeader(@PathVariable Long id, @RequestBody HeaderRequest headerRequest) {
+        return new ResponseEntity<>(headerService.updateHeader(id, headerRequest), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    @ApiOperation(value = "헤더 삭제")
+    public ResponseEntity deleteHeader(@PathVariable Long id) {
+        headerService.deleteHeader(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
 }

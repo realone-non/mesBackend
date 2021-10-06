@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Entity(name = "HEADERS")
 public class Header {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "ID")
     private Long id;
 
     @Column(name = "HEADER")
