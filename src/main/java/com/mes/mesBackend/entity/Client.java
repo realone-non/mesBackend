@@ -32,7 +32,7 @@ public class Client extends BaseTimeEntity {
     @Column(name = "BUSINESS_FILE")
     private String businessFile;    // 사업자등록증
 
-    @Column(name = "CEO_NAME", nullable = false, length = 5)
+    @Column(name = "CEO_NAME", nullable = false)
     private String ceoName;     // 대표자명
 
     @Column(name = "POSTAL_CODE", nullable = false, length = 6)

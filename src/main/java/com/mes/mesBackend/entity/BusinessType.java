@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 // 거래처 - 업태
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "BUSINESS_TYPES")
 @Data
 public class BusinessType extends BaseTimeEntity {
