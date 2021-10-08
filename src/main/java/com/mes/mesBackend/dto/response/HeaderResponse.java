@@ -10,4 +10,5 @@ public class HeaderResponse {
     String controllerName;      // 컨트롤러 이름ㄴ
     String columnName;          // 컬럼명
     int seq;                    // 순서
+    boolean useYn;  // 사용여부
 }

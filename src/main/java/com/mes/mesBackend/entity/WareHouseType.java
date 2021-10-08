@@ -19,4 +19,7 @@ public class WareHouseType extends BaseTimeEntity{
 
     @Column(name = "NAME", nullable = false, length = 10)
     private String name;    // 창고유형
+
+    @Column(name = "DELETE_YN")
+    private boolean deleteYn = false;  // 삭제여부
 }

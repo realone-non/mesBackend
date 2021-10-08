@@ -50,6 +50,23 @@ public class SubCodeMaster extends BaseTimeEntity{
     @Column(name = "USE_YN", nullable = false)
     private Boolean useYn = true;      //  사용여부
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL) @JoinColumn(name = "CODE_MASTER_ID", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) @JoinColumn(name = "CODE_MASTER_ID", nullable = false)
     private CodeMaster codeMaster;
+
+    @Column(name = "DELETE_YN")
+    private boolean deleteYn = false;  // 삭제여부
+
+    // 수정매핑
+    public void put(SubCodeMaster newSubCodeMaster) {
+        setSubCode(newSubCodeMaster.subCode);
+        setCodeName(newSubCodeMaster.codeName);
+        setDefaultName(newSubCodeMaster.defaultName);
+        setRefInfo1(newSubCodeMaster.refInfo1);
+        setRefInfo2(newSubCodeMaster.refInfo2);
+        setRefInfo3(newSubCodeMaster.refInfo3);
+        setRefInfo4(newSubCodeMaster.refInfo4);
+        setRefInfo5(newSubCodeMaster.refInfo5);
+        setRefInfoDesc(newSubCodeMaster.refInfoDesc);
+        setOutputOrder(newSubCodeMaster.outputOrder);
+    }
 }

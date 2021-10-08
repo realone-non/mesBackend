@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-// 거래처 - 업태
+// 거래처 - 거래처 타입
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "BUSINESS_TYPES")
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@Entity(name = "CLIENT_TYPES")
 @Data
-public class BusinessType extends BaseTimeEntity {
+public class ClientType extends BaseTimeEntity  {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
     private Long id;
@@ -25,11 +25,4 @@ public class BusinessType extends BaseTimeEntity {
 
     @Column(name = "DELETE_YN")
     private boolean deleteYn = false;  // 삭제여부
-
-    // 수정 매핑
-    public void update(BusinessType newBusinessType) {
-        setName(newBusinessType.name);
-        setUseYn(newBusinessType.useYn);
-        setDeleteYn(newBusinessType.deleteYn);
-    }
 }

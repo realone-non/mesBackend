@@ -14,15 +14,15 @@ public class UserServiceImpl implements UserService{
 
     public Page<UserVo> getUsers(Pageable pageable) {
 //        Page<UserVo> users = userRepository.findAll(pageable);
-        return userRepository.findAllByUseYnTrue(pageable);
+        return userRepository.findAllByDeleteYnFalse(pageable);
     }
 
     public UserVo getUser(Long id){
-        return userRepository.findByIdAndUseYnTrue(id);
+        return userRepository.findByIdAndDeleteYnFalse(id);
     }
 
     public UserVo findByNickNameAndPassword(String nickName, String password) {
-        return userRepository.findByNickNameAndPasswordAndUseYnTrue(nickName, password);
+        return userRepository.findByNickNameAndPasswordAndDeleteYnFalse(nickName, password);
     }
 
     public UserVo updateUser(Long id, UserVo updateUser){
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService{
 
     public void deleteUser(Long id) {
         UserVo user = getUser(id);
-        user.setUseYn(false);
+        user.setDeleteYn(true);
         userRepository.save(user);
     }
 

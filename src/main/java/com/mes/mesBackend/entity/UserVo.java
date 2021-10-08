@@ -40,4 +40,7 @@ public class UserVo extends BaseTimeEntity{
 
     @Column(name = "MODIFY_ID")
     private String modifyId;
+
+    @Column(name = "DELETE_YN")
+    private boolean deleteYn = false;  // 삭제여부
 }

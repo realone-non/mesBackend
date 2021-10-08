@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CountryCodeResponse {
+public class ClientTypeResponse {
     Long id;
     String name;
     boolean useYn;  // 사용여부

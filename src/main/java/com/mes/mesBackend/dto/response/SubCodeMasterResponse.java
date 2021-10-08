@@ -17,4 +17,5 @@ public class SubCodeMasterResponse {
     String refInfo5;   // 참조정보5
     String refInfoDesc;    // 참조정보 설명
     int outputOrder;     // 출력순번
+    boolean useYn;  // 사용여부
 }

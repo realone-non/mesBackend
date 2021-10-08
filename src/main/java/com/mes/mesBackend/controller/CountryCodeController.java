@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/country-code")
+@RequestMapping(value = "/country-codes")
 @Api(tags = "country-code")
 @RequiredArgsConstructor
 public class CountryCodeController {
@@ -22,6 +22,7 @@ public class CountryCodeController {
     @Autowired
     CountryCodeService countryCodeService;
 
+    // 국가코드 생성
     @PostMapping
     @ResponseBody()
     @ApiOperation(value = "국가코드 생성")
@@ -36,6 +37,7 @@ public class CountryCodeController {
         }
     }
 
+    // 국가코드 단일 조회
     @GetMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "국가코드 조회")
@@ -48,9 +50,10 @@ public class CountryCodeController {
         }
     }
 
+//    국가코드 페이징 조회
     @GetMapping
     @ResponseBody()
-    @ApiOperation(value = "국가코드 리스트 조회")
+    @ApiOperation(value = "국가코드 페이징 조회")
     public ResponseEntity<Page<CountryCodeResponse>> getCountryCodes(Pageable pageable) {
         try {
             return new ResponseEntity<>(countryCodeService.getCountryCodes(pageable), HttpStatus.OK);
@@ -60,6 +63,7 @@ public class CountryCodeController {
         }
     }
 
+    // 국가코드 수정
     @PutMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "국가코드 수정")
@@ -75,6 +79,7 @@ public class CountryCodeController {
         }
     }
 
+    // 국가코드 삭제
     @DeleteMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "국가코드 삭제")

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserVo, Long> {
-    UserVo findByNickNameAndPasswordAndUseYnTrue(String nickName, String password);
-    Page<UserVo> findAllByUseYnTrue(Pageable pageable);
-    UserVo findByIdAndUseYnTrue(Long Id);
+    UserVo findByNickNameAndPasswordAndDeleteYnFalse(String nickName, String password);
+    Page<UserVo> findAllByDeleteYnFalse(Pageable pageable);
+    UserVo findByIdAndDeleteYnFalse(Long Id);
 }

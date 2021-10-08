@@ -38,7 +38,7 @@ public class BusinessTypeController {
 
     @GetMapping("/{id}")
     @ResponseBody()
-    @ApiOperation(value = "업태 조회")
+    @ApiOperation(value = "업태 단일 조회")
     public ResponseEntity<BusinessTypeResponse> getBusinessType(@PathVariable(value = "id") Long id) {
         try {
             return new ResponseEntity<>(businessTypeService.getBusinessType(id), HttpStatus.OK);
@@ -50,7 +50,7 @@ public class BusinessTypeController {
 
     @GetMapping
     @ResponseBody()
-    @ApiOperation(value = "업태 리스트 조회")
+    @ApiOperation(value = "업태 페이징 조회")
     public ResponseEntity<Page<BusinessTypeResponse>> getBusinessTypes(Pageable pageable) {
         try {
             return new ResponseEntity<>(businessTypeService.getBusinessTypes(pageable), HttpStatus.OK);

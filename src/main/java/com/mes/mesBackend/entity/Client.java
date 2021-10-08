@@ -9,7 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "CLIENTS")
 @Data
-public class Client extends BaseTimeEntity{
+public class Client extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
     private Long id;
@@ -23,8 +23,8 @@ public class Client extends BaseTimeEntity{
     @Column(name = "SHORT_NAME", nullable = false)
     private String shortName;      // 약어
 
-    @Column(name = "CLIENT_TYPE", nullable = false)
-    private String clientType;   // 거래처 유형
+    @ManyToOne @JoinColumn(name = "CLIENT_TYPES_ID", nullable = false)
+    private ClientType clientType;   // 거래처 유형
 
     @Column(name = "BUSINESS_REG_NO", nullable = false, length = 10)
     private String businessNumber;  // 사업자등록번호
@@ -104,6 +104,53 @@ public class Client extends BaseTimeEntity{
     @Column(name = "SEARCH_WORD")
     private String searchWord;      // 검색어
 
+    @Column(name = "DELETE_YN")
+    private boolean deleteYn = false;  // 삭제여부
+
     @Column(name = "USE_YN")
-    private boolean useYn = true;  // 사용여부
+    private boolean useYn = true;       // 사용여부
+
+    // 수정 매핑
+    public void put(Client newClient) {
+        setClientCode(newClient.clientCode);
+        setName(newClient.name);
+        setShortName(newClient.shortName);
+        setClientType(newClient.clientType);
+        setBusinessNumber(newClient.businessNumber);
+        setBusinessFile(newClient.businessFile);
+        setCeoName(newClient.ceoName);
+        setPostalCode(newClient.postalCode);
+        setAddress(newClient.address);
+        setDetailAddress(newClient.detailAddress);
+        setBusinessType(newClient.businessType);
+        setItem(newClient.item);
+        setTelNumber(newClient.telNumber);
+        setFaxNumber(newClient.faxNumber);
+        setHomePageUrl(newClient.homePageUrl);
+        setMail(newClient.mail);
+        setClientChargeName(newClient.clientChargeName);
+        setTradeBusinessRegNo(newClient.tradeBusinessRegNo);
+        setPccc(newClient.pccc);
+        setCountryCode(newClient.countryCode);
+        setArea(newClient.area);
+        setCurrencyUnit(newClient.currencyUnit);
+        setCompanyCharge(newClient.companyCharge);
+        setCompanyChargeDept(newClient.companyChargeDept);
+        setPaymentMethod(newClient.paymentMethod);
+        setPaymentDate(newClient.paymentDate);
+        setTransitMethod(newClient.transitMethod);
+        setTestMethod(newClient.testMethod);
+        setSearchWord(newClient.searchWord);
+        setUseYn(newClient.useYn);
+    }
+
+    public void putJoinTable(
+            BusinessType businessType,
+            CountryCode countryCode,
+            ClientType clientType
+    ) {
+        setBusinessType(businessType);
+        setCountryCode(countryCode);
+        setClientType(clientType);
+    }
 }

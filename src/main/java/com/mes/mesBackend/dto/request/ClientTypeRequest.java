@@ -1,12 +1,11 @@
-package com.mes.mesBackend.dto.response;
+package com.mes.mesBackend.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class CountryCodeResponse {
-    Long id;
+public class ClientTypeRequest {
     String name;
     boolean useYn;  // 사용여부
 }

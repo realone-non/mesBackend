@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class CountryCodeRequest {
     String name;
+    boolean useYn;  // 사용여부
 }

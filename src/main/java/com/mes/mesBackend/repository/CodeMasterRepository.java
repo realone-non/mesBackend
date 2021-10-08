@@ -4,8 +4,7 @@ import com.mes.mesBackend.entity.CodeMaster;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface CodeMasterRepository extends JpaRepository<CodeMaster, String> {
+public interface CodeMasterRepository extends JpaRepository<CodeMaster, Long>, CodeMasterRepositoryCustom {
+    CodeMaster findByIdAndDeleteYnFalse(Long id);
 }

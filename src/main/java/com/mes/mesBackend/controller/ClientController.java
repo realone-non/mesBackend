@@ -2,13 +2,16 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.ClientRequest;
 import com.mes.mesBackend.dto.response.ClientResponse;
+import com.mes.mesBackend.entity.ClientType;
 import com.mes.mesBackend.service.ClientService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,10 +39,10 @@ public class ClientController {
         }
     }
 
-    // 거래처 조회
+    // 거래처 단일 조회
     @GetMapping("/{id}")
     @ResponseBody
-    @ApiOperation(value = "거래처 조회")
+    @ApiOperation(value = "거래처 단일 조회")
     public ResponseEntity<ClientResponse> getClient(@PathVariable Long id) {
         try {
             return new ResponseEntity<>(clientService.getClient(id), HttpStatus.OK);
@@ -49,17 +52,17 @@ public class ClientController {
         }
     }
 
-    // 거래처 리스트 조회
+    // 거래처 조건 페이징 조회 (거래처 유형, 거래처 코드, 거래처 명)
     @GetMapping
     @ResponseBody
-    @ApiOperation(value = "거래처 리스트 조회")
-    public ResponseEntity<Page<ClientResponse>> getClients(Pageable pageable) {
-        try {
-            return new ResponseEntity<>(clientService.getClients(pageable), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @ApiOperation(value = "거래처 리스트 조회", notes = "검색조건 : 거래처 유형, 거래처 코드, 거래처 명")
+    public ResponseEntity<Page<ClientResponse>> getClients(
+            @RequestParam(required = false) Long clientType,
+            @RequestParam(required = false) String clientCode,
+            @RequestParam(required = false) String name,
+            @PageableDefault Pageable pageable
+    ) {
+        return new ResponseEntity<>(clientService.getClients(clientType, clientCode, name, pageable), HttpStatus.OK);
     }
 
     // 거래처 수정

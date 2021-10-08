@@ -10,4 +10,5 @@ public class HeaderRequest {
     String controllerName;
     String columnName;
     int seq;
+    boolean useYn;  // 사용여부
 }

@@ -18,4 +18,5 @@ public class CodeMasterResponse {
     String refInfo4;   // 참조정보4
     String refInfo5;   // 참조정보5
     List<SubCodeMasterResponse> subCodeMasterResponse;  // 서브코드
+    boolean useYn;  // 사용여부
 }

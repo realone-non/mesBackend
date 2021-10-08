@@ -40,4 +40,7 @@ public class WareHouse extends BaseTimeEntity{
 
     @Column(name = "USE_YN")
     private boolean useYn;      // 사용여부
+
+    @Column(name = "DELETE_YN")
+    private boolean deleteYn = false;  // 삭제여부
 }

@@ -22,8 +22,8 @@ public class BusinessTypeServiceImpl implements BusinessTypeService {
     @Autowired
     ModelMapper modelMapper;
 
-    public BusinessType findBusinessTypeByIdAndUseYn(Long id) {
-        return businessTypeRepository.findByIdAndUseYnTrue(id);
+    public BusinessType findBusinessTypeByIdAndDeleteYn(Long id) {
+        return businessTypeRepository.findByIdAndDeleteYnFalse(id);
     }
 
     // 업태 타입 생성
@@ -35,20 +35,20 @@ public class BusinessTypeServiceImpl implements BusinessTypeService {
 
     // 업태 타입 조회
     public BusinessTypeResponse getBusinessType(Long id) {
-        BusinessType businessType = findBusinessTypeByIdAndUseYn(id);
+        BusinessType businessType = findBusinessTypeByIdAndDeleteYn(id);
         return businessToBusinessResponse(businessType);
     }
 
     // 업체 타입 전체 조회
     public Page<BusinessTypeResponse> getBusinessTypes(Pageable pageable) {
-        Page<BusinessType> businessTypes = businessTypeRepository.findAllByUseYnTrue(pageable);
+        Page<BusinessType> businessTypes = businessTypeRepository.findAllByDeleteYnFalse(pageable);
         return businessTypeToPageBusinessTypeResponses(businessTypes);
     }
 
     // 업태 타입 수정
     public BusinessTypeResponse updateBusinessType(Long id, BusinessTypeRequest businessTypeRequest) {
         BusinessType businessType = businessRequestToBusiness(businessTypeRequest);
-        BusinessType findBusinessType = findBusinessTypeByIdAndUseYn(id);
+        BusinessType findBusinessType = findBusinessTypeByIdAndDeleteYn(id);
         findBusinessType.setName(businessType.getName());
         BusinessType updateBusinessType = businessTypeRepository.save(findBusinessType);
         return businessToBusinessResponse(updateBusinessType);
@@ -56,8 +56,8 @@ public class BusinessTypeServiceImpl implements BusinessTypeService {
 
     // 업태 삭제
     public void deleteBusinessType(Long id) {
-        BusinessType businessType = findBusinessTypeByIdAndUseYn(id);
-        businessType.setUseYn(false);
+        BusinessType businessType = findBusinessTypeByIdAndDeleteYn(id);
+        businessType.setDeleteYn(true);
         businessTypeRepository.save(businessType);
     }
 

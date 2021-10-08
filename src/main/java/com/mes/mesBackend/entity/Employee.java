@@ -46,4 +46,7 @@ public class Employee extends BaseTimeEntity{
 
     @Column(name = "USE_YN", nullable = false)
     private boolean useYn = true;  // 사용여부
+
+    @Column(name = "DELETE_YN")
+    private boolean deleteYn = false;  // 삭제여부
 }

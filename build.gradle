@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.5.0-RC1'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'com.mes'
@@ -51,11 +52,31 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.modelmapper/modelmapper
 	implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
 
-
-
-
+	implementation 'com.querydsl:querydsl-jpa'
 }
 
 test {
 	useJUnitPlatform()
 }
+
+//querydsl 추가 시작
+// 참고 https://velog.io/@aidenshin/Querydsl-Gradle-%EC%84%A4%EC%A0%95
+def querydslDir = "$buildDir/generated/querydsl" as Object
+
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+	main.java.srcDir querydslDir
+}
+
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+//querydsl 추가 끝

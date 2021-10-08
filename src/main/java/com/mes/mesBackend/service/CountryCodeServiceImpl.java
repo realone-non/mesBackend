@@ -22,8 +22,8 @@ public class CountryCodeServiceImpl implements CountryCodeService {
     @Autowired
     ModelMapper modelMapper;
 
-    public CountryCode findCountryCodeByIdAndUseYn(Long id) {
-        return countryCodeRepository.findByIdAndUseYnTrue(id);
+    public CountryCode findCountryCodeByIdAndDeleteYn(Long id) {
+        return countryCodeRepository.findByIdAndDeleteYnFalse(id);
     }
 
     // 국가코드 타입 생성
@@ -35,20 +35,20 @@ public class CountryCodeServiceImpl implements CountryCodeService {
 
     // 국가코드 타입 조회
     public CountryCodeResponse getCountryCode(Long id) {
-        CountryCode countryCode = findCountryCodeByIdAndUseYn(id);
+        CountryCode countryCode = findCountryCodeByIdAndDeleteYn(id);
         return countryCodeToCountryCodeResponse(countryCode);
     }
 
     // 업체 타입 전체 조회
     public Page<CountryCodeResponse> getCountryCodes(Pageable pageable) {
-        Page<CountryCode> countryCodes = countryCodeRepository.findAllByUseYnTrue(pageable);
+        Page<CountryCode> countryCodes = countryCodeRepository.findAllByDeleteYnFalse(pageable);
         return countryCodeToPageCountryCodeResponses(countryCodes);
     }
 
     // 국가코드 타입 수정
     public CountryCodeResponse updateCountryCode(Long id, CountryCodeRequest countryCodeRequest) {
         CountryCode countryCode = countryCodeRequestToCountryCode(countryCodeRequest);
-        CountryCode findCountryCode = findCountryCodeByIdAndUseYn(id);
+        CountryCode findCountryCode = findCountryCodeByIdAndDeleteYn(id);
         findCountryCode.setName(countryCode.getName());
         CountryCode updateCountryCode = countryCodeRepository.save(findCountryCode);
         return countryCodeToCountryCodeResponse(updateCountryCode);
@@ -56,8 +56,8 @@ public class CountryCodeServiceImpl implements CountryCodeService {
 
     // 국가코드 삭제
     public void deleteCountryCode(Long id) {
-        CountryCode countryCode = findCountryCodeByIdAndUseYn(id);
-        countryCode.setUseYn(false);
+        CountryCode countryCode = findCountryCodeByIdAndDeleteYn(id);
+        countryCode.setDeleteYn(true);
         countryCodeRepository.save(countryCode);
     }
 

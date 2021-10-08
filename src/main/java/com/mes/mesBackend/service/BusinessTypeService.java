@@ -23,5 +23,5 @@ public interface BusinessTypeService {
     // 업태 삭제
     void deleteBusinessType(Long id);
 
-    BusinessType findBusinessTypeByIdAndUseYn(Long id);
+    BusinessType findBusinessTypeByIdAndDeleteYn(Long id);
 }

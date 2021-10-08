@@ -49,9 +49,6 @@ public class CompanyVo extends BaseTimeEntity{
     @Column(name = "USE_YN")
     private boolean useYn = true;
 
-    @Column(name = "CREATE_ID")
-    private String createId;
-
-    @Column(name = "MODIFY_ID")
-    private String modifyId;
+    @Column(name = "DELETE_YN")
+    private boolean deleteYn = false;  // 삭제여부
 }

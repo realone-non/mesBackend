@@ -22,5 +22,5 @@ public interface CountryCodeService {
     // 국가코드 삭제
     void deleteCountryCode(Long id);
 
-    CountryCode findCountryCodeByIdAndUseYn(Long id);
+    CountryCode findCountryCodeByIdAndDeleteYn(Long id);
 }

@@ -3,6 +3,7 @@ package com.mes.mesBackend.service;
 import com.mes.mesBackend.dto.request.ClientRequest;
 import com.mes.mesBackend.dto.response.ClientResponse;
 import com.mes.mesBackend.entity.Client;
+import com.mes.mesBackend.entity.ClientType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,8 +18,8 @@ public interface ClientService {
     // 거래처 조회
     ClientResponse getClient(Long id);
 
-    // 거래처 리스트 조회
-    Page<ClientResponse> getClients(Pageable pageable);
+    // 거래처 조건 페이징 조회 (거래처 유형, 거래처 코드, 거래처 명)
+    Page<ClientResponse> getClients(Long type, String clientCode, String name, Pageable pageable);
 
     // 거래처 수정
     ClientResponse updateClient(Long id, ClientRequest clientRequest);
@@ -29,5 +30,5 @@ public interface ClientService {
     // 사업자 등록증 파일 업로드
     ClientResponse createBusinessFileToClient(Long id, MultipartFile businessFile) throws IOException;
 
-    Client findClientByIdAndUseYnTrue(Long id);
+    Client findClientByIdAndDeleteYnTrue(Long id);
 }

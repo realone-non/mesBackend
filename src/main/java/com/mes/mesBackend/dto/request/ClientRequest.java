@@ -9,7 +9,7 @@ public class ClientRequest {
     String clientCode;      // 거래처코드
     String name;    // 거래처명
     String shortName;      // 약어
-    String clientType;   // 거래처 유형
+    Long clientType;   // 거래처 유형
     String businessNumber;  // 사업자등록번호
     String businessFile;   // 사업자등록증
     String ceoName;    // 대표자명
@@ -22,7 +22,7 @@ public class ClientRequest {
     String faxNumber;   // fax번호 12자
     String homePageUrl; //  홈페이지 주소
     String mail;        // 메일
-    String clientChargeName;  // 담당자 이름
+    String clientChargeName;  // 거래처 담당자 명
     String tradeBusinessRegNo;  // 무역업등록번호
     String pccc;            // 통관고유번호
     Long countryCodeId;     // 국가코드 Id
@@ -35,4 +35,6 @@ public class ClientRequest {
     String transitMethod;   // 운송방법
     String testMethod;      // 검사방법
     String searchWord;      // 검색어
+    String phoneNumber;     // 휴대폰번호
+    boolean useYn;          // 사용여부
 }

@@ -10,7 +10,7 @@ public class ClientResponse {
     String clientCode;  // 거래처코드
     String name;    // 거래처명
     String shortName;      // 약어
-    String clientType;   // 거래처 유형
+    ClientTypeResponse clientType;   // 거래처 유형
     String businessNumber;  // 사업자등록번호
     String businessFile;    // 사업자등록증
     String ceoName;     // 대표자명
@@ -37,4 +37,5 @@ public class ClientResponse {
     String testMethod;      // 검사방법
     String phoneNumber;     // 휴대폰번호
     String searchWord;      // 검색어
+    boolean useYn;  // 사용여부
 }

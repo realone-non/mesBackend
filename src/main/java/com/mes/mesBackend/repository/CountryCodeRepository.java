@@ -6,6 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CountryCodeRepository extends JpaRepository<CountryCode, Long> {
-    CountryCode findByIdAndUseYnTrue(Long id);
-    Page<CountryCode> findAllByUseYnTrue(Pageable pageable);
+    CountryCode findByIdAndDeleteYnFalse(Long id);
+    Page<CountryCode> findAllByDeleteYnFalse(Pageable pageable);
 }
