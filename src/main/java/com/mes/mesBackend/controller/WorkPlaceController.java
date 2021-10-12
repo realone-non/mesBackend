@@ -38,13 +38,13 @@ public class WorkPlaceController {
         return new ResponseEntity<>(workPlaceService.getWorkPlace(id), HttpStatus.OK);
     }
 
-//    // 사업장 페이징 조회
-//    @GetMapping
-//    @ResponseBody()
-//    @ApiOperation(value = "사업장 페이징 조회")
-//    public ResponseEntity<Page<WorkPlaceResponse>> getWorkPlaces(Pageable pageable) {
-//        return new ResponseEntity<>(workPlaceService.getWorkPlaces(pageable), HttpStatus.OK);
-//    }
+    // 사업장 페이징 조회
+    @GetMapping
+    @ResponseBody()
+    @ApiOperation(value = "사업장 페이징 조회")
+    public ResponseEntity<Page<WorkPlaceResponse>> getWorkPlaces(Pageable pageable) {
+        return new ResponseEntity<>(workPlaceService.getWorkPlaces(pageable), HttpStatus.OK);
+    }
 
     // 사업장 수정
     @PutMapping("/{id}")
