@@ -34,4 +34,12 @@ public class Department extends BaseTimeEntity{
 
     @Column(name = "DELETE_YN")
     private boolean deleteYn = false;  // 삭제여부
+
+    public void put(Department newDepartment) {
+        setDeptCode(newDepartment.deptCode);
+        setDeptName(newDepartment.deptName);
+        setShortName(newDepartment.shortName);
+        setOrders(newDepartment.orders);
+        setUseYn(newDepartment.useYn);
+    }
 }
