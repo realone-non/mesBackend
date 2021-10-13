@@ -26,13 +26,12 @@ public class SubNavigation {
     @Column(name = "USE_YN")
     private boolean useYn;  // 사용여부
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "MAIN_NAVS_ID")
-    private MainNavigation mainNavigation = null;
+    private MainNavigation mainNavigation;
 
     public void put(SubNavigation newSubNavigation) {
         setName(newSubNavigation.name);
         setLevel(newSubNavigation.level);
-        setMainNavigation(newSubNavigation.mainNavigation);
     }
 }

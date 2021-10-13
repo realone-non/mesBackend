@@ -7,9 +7,9 @@ import com.mes.mesBackend.dto.response.CodeMasterResponse;
 import com.mes.mesBackend.dto.response.SubCodeMasterResponse;
 import com.mes.mesBackend.entity.CodeMaster;
 import com.mes.mesBackend.entity.SubCodeMaster;
+import com.mes.mesBackend.helper.Mapper;
 import com.mes.mesBackend.repository.CodeMasterRepository;
 import com.mes.mesBackend.repository.SubCodeMasterRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,19 +17,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CodeMasterServiceImpl implements CodeMasterService {
 
-    @Autowired
-    CodeMasterRepository codeMasterRepository;
-
-    @Autowired
-    SubCodeMasterRepository subCodeMasterRepository;
-
-    @Autowired
-    ModelMapper modelMapper;
+    @Autowired CodeMasterRepository codeMasterRepository;
+    @Autowired SubCodeMasterRepository subCodeMasterRepository;
+    @Autowired Mapper mapper;
 
     // 코드마스터 아이디로 조회
     private CodeMaster findByIdAndDeleteYnTrue(Long id) {
@@ -39,9 +33,9 @@ public class CodeMasterServiceImpl implements CodeMasterService {
     // 코드마스터 생성
     public CodeMasterResponse createCodeMaster(CodeMasterRequest codeMasterRequest) {
         List<SubCodeMasterRequest> subCodeMasterRequests = codeMasterRequest.getSubCodeMasterRequest();
-        CodeMaster codeMaster = codeMasterRequestToCodeMaster(codeMasterRequest);
+        CodeMaster codeMaster = mapper.toEntity(codeMasterRequest, CodeMaster.class);
         CodeMaster saveCodeMaster = codeMasterRepository.save(codeMaster);
-        CodeMasterResponse saveCodeMasterResponse = codeMasterToCodeMasterResponse(saveCodeMaster);
+        CodeMasterResponse saveCodeMasterResponse = mapper.toResponse(saveCodeMaster, CodeMasterResponse.class);
 
         // 부코드 생성
         List<SubCodeMasterResponse> subCodeMasterResponses =  createSubCodeMasters(subCodeMasterRequests, saveCodeMaster);
@@ -54,14 +48,13 @@ public class CodeMasterServiceImpl implements CodeMasterService {
         List<SubCodeMasterResponse> subCodeMasterResponses = new ArrayList<>();
 
         // request -> entity
-        List<SubCodeMaster> subCodeMasters = subCodeMasterRequests.stream().map(subCodeMasterRequest ->
-                modelMapper.map(subCodeMasterRequest, SubCodeMaster.class)).collect(Collectors.toList());
+        List<SubCodeMaster> subCodeMasters = mapper.toEntities(subCodeMasterRequests, SubCodeMaster.class);
 
         // 한개씩 생성
         for (SubCodeMaster subCodeMaster : subCodeMasters) {
             subCodeMaster.setCodeMaster(codeMaster);
             SubCodeMaster saveSubCodeMaster = subCodeMasterRepository.save(subCodeMaster);
-            subCodeMasterResponses.add(subCodeMasterToSubCodeMasterResponse(saveSubCodeMaster));
+            subCodeMasterResponses.add(mapper.toResponse(saveSubCodeMaster, SubCodeMasterResponse.class));
         }
         return subCodeMasterResponses;
     }
@@ -69,33 +62,33 @@ public class CodeMasterServiceImpl implements CodeMasterService {
     // 코드마스터 전체 조회 (검색조건 : 주코드, 코드명)
     public Page<CodeMasterResponse> getCodeMasters(String mainCode, String codeName, Pageable pageable) {
         Page<CodeMaster> codeMasters = codeMasterRepository.findByMainCodeAndCodeName(mainCode, codeName, pageable);
-        return codeMastersToCodeMasterResponses(codeMasters);
+        return mapper.toPageResponses(codeMasters, CodeMasterResponse.class);
     }
 
     // 부코드 마스터 조회
     public List<SubCodeMasterResponse> getSubCodeMasters(Long id) {
         CodeMaster codeMaster = findByIdAndDeleteYnTrue(id);
         List<SubCodeMaster> subCodeMasters = subCodeMasterRepository.findSubCodeMasterByCodeMasterAndDeleteYnFalse(codeMaster);
-        return subCodeMasterToSubCodeMasterResponses(subCodeMasters);
+        return mapper.toListResponses(subCodeMasters, SubCodeMasterResponse.class);
     }
 
     // 코드마스터 수정
     public CodeMasterResponse updateCodeMaster(Long id, CodeMasterUpdateRequest codeMasterUpdateRequest) {
-        CodeMaster newCodeMaster = modelMapper.map(codeMasterUpdateRequest, CodeMaster.class);
+        CodeMaster newCodeMaster = mapper.toEntity(codeMasterUpdateRequest, CodeMaster.class);
         CodeMaster findCodeMaster = findByIdAndDeleteYnTrue(id);
         // 수정매핑
         findCodeMaster.put(newCodeMaster);
         CodeMaster updateCodeMaster = codeMasterRepository.save(newCodeMaster);
-        return codeMasterToCodeMasterResponse(updateCodeMaster);
+        return mapper.toResponse(updateCodeMaster, CodeMasterResponse.class);
     }
 
     // 부코드마스터 수정
     public SubCodeMasterResponse updateSubCodeMaster(Long subCodeMasterId, SubCodeMasterRequest subCodeMasterRequest) {
-        SubCodeMaster newSubCodeMaster = modelMapper.map(subCodeMasterRequest, SubCodeMaster.class);
+        SubCodeMaster newSubCodeMaster = mapper.toEntity(subCodeMasterRequest, SubCodeMaster.class);
         SubCodeMaster findSubCodeMaster = subCodeMasterRepository.findByIdAndDeleteYnFalse(subCodeMasterId);
         // 수정매핑
         findSubCodeMaster.put(newSubCodeMaster);
-        return subCodeMasterToSubCodeMasterResponse(findSubCodeMaster);
+        return mapper.toResponse(findSubCodeMaster, SubCodeMasterResponse.class);
     }
 
     // 부코트마스터 삭제
@@ -120,41 +113,15 @@ public class CodeMasterServiceImpl implements CodeMasterService {
             SubCodeMasterRequest subCodeMasterRequest
     ) {
         CodeMaster codeMaster = findByIdAndDeleteYnTrue(codeMasterId);
-        SubCodeMaster subCodeMaster = modelMapper.map(subCodeMasterRequest, SubCodeMaster.class);
+        SubCodeMaster subCodeMaster = mapper.toEntity(subCodeMasterRequest, SubCodeMaster.class);
         subCodeMaster.setCodeMaster(codeMaster);
-        return subCodeMasterToSubCodeMasterResponse(subCodeMasterRepository.save(subCodeMaster));
+        return mapper.toResponse(subCodeMasterRepository.save(subCodeMaster), SubCodeMasterResponse.class);
     }
 
     // 코드마스터 단일 조회
     public CodeMasterResponse getCodeMaster(Long id) {
-        CodeMasterResponse codeMasterResponse = codeMasterToCodeMasterResponse(findByIdAndDeleteYnTrue(id));
+        CodeMasterResponse codeMasterResponse = mapper.toResponse(findByIdAndDeleteYnTrue(id), CodeMasterResponse.class);
         codeMasterResponse.setSubCodeMasterResponse(getSubCodeMasters(id));
         return codeMasterResponse;
-    }
-
-    // Entity -> Response 주코드
-    private CodeMasterResponse codeMasterToCodeMasterResponse(CodeMaster codeMaster) {
-        return modelMapper.map(codeMaster, CodeMasterResponse.class);
-    }
-
-    // Entity -> Response 부코드
-    private SubCodeMasterResponse subCodeMasterToSubCodeMasterResponse(SubCodeMaster subCodeMaster) {
-        return modelMapper.map(subCodeMaster, SubCodeMasterResponse.class);
-    }
-
-    // List<entity> -> List<Response>
-    private List<SubCodeMasterResponse> subCodeMasterToSubCodeMasterResponses(List<SubCodeMaster> subCodeMasters) {
-        return subCodeMasters.stream().map(subCodeMaster ->
-                        modelMapper.map(subCodeMaster, SubCodeMasterResponse.class)).collect(Collectors.toList());
-    }
-
-    // Request -> Entity
-    private CodeMaster codeMasterRequestToCodeMaster(CodeMasterRequest codeMasterRequest) {
-        return modelMapper.map(codeMasterRequest, CodeMaster.class);
-    }
-
-    // Page<Entity> -> Page<Response>
-    private Page<CodeMasterResponse> codeMastersToCodeMasterResponses(Page<CodeMaster> codeMasters) {
-        return codeMasters.map(codeMaster -> modelMapper.map(codeMaster, CodeMasterResponse.class));
     }
 }

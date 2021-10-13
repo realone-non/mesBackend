@@ -1,7 +1,11 @@
 package com.mes.mesBackend.controller;
 
-import com.mes.mesBackend.entity.MainNavigation;
-import com.mes.mesBackend.entity.SubNavigation;
+import com.mes.mesBackend.dto.request.DetailNavRequest;
+import com.mes.mesBackend.dto.request.MainNavRequest;
+import com.mes.mesBackend.dto.request.SubNavRequest;
+import com.mes.mesBackend.dto.response.DetailNavResponse;
+import com.mes.mesBackend.dto.response.MainNavResponse;
+import com.mes.mesBackend.dto.response.SubNavResponse;
 import com.mes.mesBackend.service.NavigationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,77 +18,127 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/navigations/main-nav")
-@Api(tags = "navigation/네비게이션")
+@RequestMapping("/navigations/main-navs")
+@Api(tags = "navigation")
 @RequiredArgsConstructor
 public class NavigationController {
 
     @Autowired
     NavigationService navigationService;
 
-    // 메인네비게이션바 조회
-    @GetMapping("/{name}")
+    // 메인네비게이션 조회
+    @GetMapping
     @ResponseBody
-    @ApiOperation(value = "메인네비게이션바 조회")
-    public ResponseEntity<List<MainNavigation>> getMainNavigations(@PathVariable(value = "name") String name) {
-        return new ResponseEntity<>(navigationService.getMainNavigations(name), HttpStatus.OK);
+    @ApiOperation(value = "메인네비게이션 전체 조회")
+    public ResponseEntity<List<MainNavResponse>> getMainNavigations() {
+        return new ResponseEntity<>(navigationService.getMainNavigations(), HttpStatus.OK);
     }
 
-    // 메인네비게이션바 생성
+    // 메인네비게이션 생성
     @PostMapping
     @ResponseBody
     @ApiOperation(value = "메인네비게이션바 생성")
-    public ResponseEntity<MainNavigation> createHeader(@RequestBody MainNavigation mainNavigation) {
-        return new ResponseEntity<>(navigationService.createMainNavigation(mainNavigation), HttpStatus.OK);
+    public ResponseEntity<MainNavResponse> createHeader(@RequestBody MainNavRequest mainNavRequest) {
+        return new ResponseEntity<>(navigationService.createMainNavigation(mainNavRequest), HttpStatus.OK);
     }
 
-    // 메인네비게이션바 수정
-    @PutMapping("/{id}")
+    // 메인네비게이션 수정
+    @PutMapping("/{main-nav-id}")
     @ResponseBody
-    @ApiOperation(value = "메인네비게이션바 수정")
-    public ResponseEntity<MainNavigation> updateMainNavigation(@PathVariable Long id, @RequestBody MainNavigation mainNavigation) {
-        return new ResponseEntity<>(navigationService.updateMainNavigation(id, mainNavigation), HttpStatus.OK);
+    @ApiOperation(value = "메인네비게이션 수정")
+    public ResponseEntity<MainNavResponse> updateMainNavigation(
+            @PathVariable(value = "main-nav-id") Long id,
+            @RequestBody MainNavRequest mainNavRequest
+    ) {
+        return new ResponseEntity<>(navigationService.updateMainNavigation(id, mainNavRequest), HttpStatus.OK);
     }
 
     // 메인네비게이션바 삭제
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{main-nav-id}")
     @ResponseBody
     @ApiOperation(value = "메인네비게이션바 삭제")
-    public ResponseEntity deleteMainNavigation(@PathVariable Long id) {
+    public ResponseEntity deleteMainNavigation(@PathVariable(value = "main-nav-id") Long id) {
         navigationService.deleteMainNavigation(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    // 서브네비게이션바 조회
-    @GetMapping("/sub-nav/{name}")
+    // 서브네비게이션바 전체 조회
+    @GetMapping("/{main-nav-id}/sub-navs")
     @ResponseBody
     @ApiOperation(value = "서브네비게이션바 조회")
-    public ResponseEntity<List<SubNavigation>> getSubNavigations(@PathVariable(value = "name") String name) {
-        return new ResponseEntity<>(navigationService.getSubNavigations(name), HttpStatus.OK);
+    public ResponseEntity<List<SubNavResponse>> getSubNavigations(@PathVariable(value = "main-nav-id") Long mainNavId) {
+        return new ResponseEntity<>(navigationService.getSubNavigations(mainNavId), HttpStatus.OK);
     }
 
     // 서브네비게이션바 생성
-    @PostMapping("/sub-nav")
+    @PostMapping("/{main-nav-id}/sub-navs")
     @ResponseBody
     @ApiOperation(value = "서브네비게이션바 생성")
-    public ResponseEntity<SubNavigation> createSubNavigation(@RequestBody SubNavigation subNavigation) {
-        return new ResponseEntity<>(navigationService.createSubNavigation(subNavigation), HttpStatus.OK);
+    public ResponseEntity<SubNavResponse> createSubNavigation(
+            @PathVariable(value = "main-nav-id") Long mainNavId,
+            @RequestBody SubNavRequest subNavRequest
+    ) {
+        return new ResponseEntity<>(navigationService.createSubNavigation(mainNavId, subNavRequest), HttpStatus.OK);
     }
 
     // 서브네비게이션바 수정
-    @PutMapping("/sub-nav/{id}")
+    @PutMapping("/sub-navs/{sub-nav-id}")
     @ResponseBody
     @ApiOperation(value = "서브네비게이션바 수정")
-    public ResponseEntity<SubNavigation> updateSubNavigation(@PathVariable Long id, @RequestBody SubNavigation subNavigation) {
-        return new ResponseEntity<>(navigationService.updateSubNavigation(id, subNavigation), HttpStatus.OK);
+    public ResponseEntity<SubNavResponse> updateSubNavigation(
+            @PathVariable(value = "sub-nav-id") Long id,
+            @RequestBody SubNavRequest subNavRequest
+    ) {
+        return new ResponseEntity<>(navigationService.updateSubNavigation(id, subNavRequest), HttpStatus.OK);
     }
 
     // 서브네비게이션바 삭제
-    @DeleteMapping("/sub-nav/{id}")
+    @DeleteMapping("/sub-navs/{id}")
     @ResponseBody
     @ApiOperation(value = "서브네비게이션바 삭제")
     public ResponseEntity deleteSubNavigation(@PathVariable Long id) {
         navigationService.deleteSubNavigation(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    // 디테일네비게이션 조회
+    @GetMapping("/sub-navs/{sub-nav-id}/detail-navs")
+    @ResponseBody
+    @ApiOperation(value = "디테일네비게이션 조회")
+    public ResponseEntity<List<DetailNavResponse>> getDetailNavigations(
+            @PathVariable(value = "sub-nav-id") Long subNavId
+    ) {
+        return new ResponseEntity<>(navigationService.getDetailNavigations(subNavId), HttpStatus.OK);
+    }
+
+    // 디테일네비게이션 생성
+    @PostMapping("/sub-navs/{sub-nav-id}/detail-navs")
+    @ResponseBody
+    @ApiOperation(value = "디테일네비게이션 생성")
+    public ResponseEntity<DetailNavResponse> createDetailNavigation(
+            @PathVariable(value = "sub-nav-id") Long subNavId,
+            @RequestBody DetailNavRequest detailNavRequest
+    ) {
+        return new ResponseEntity<>(navigationService.createDetailNavigation(subNavId, detailNavRequest), HttpStatus.OK);
+    }
+
+    // 디테일네비게이션 수정
+    @PutMapping("/sub-navs/detail-navs/{detail-nav-id}")
+    @ResponseBody
+    @ApiOperation(value = "디테일네비게이션 수정")
+    public ResponseEntity<DetailNavResponse> updateDetailNavigation(
+            @PathVariable(value = "detail-nav-id") Long detailNavId,
+            @RequestBody DetailNavRequest detailNavRequest
+    ) {
+        return new ResponseEntity<>(navigationService.updateDetailNavigation(detailNavId, detailNavRequest), HttpStatus.OK);
+    }
+
+    // 디테일네비게이션 삭제
+    @DeleteMapping("/sub-navs/detail-navs/{detail-nav-id}")
+    @ResponseBody
+    @ApiOperation(value = "디테일네비게이션 삭제")
+    public ResponseEntity deleteDetailNavigation(@PathVariable(value = "detail-nav-id") Long detailNavId) {
+        navigationService.deleteDetailNavigation(detailNavId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

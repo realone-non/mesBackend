@@ -27,4 +27,11 @@ public class Header {
 
     @Column(name = "SEQ")
     private int seq;        // 순서
+
+    public void put(Header newHeader) {
+        setHeader(newHeader.header);
+        setControllerName(newHeader.controllerName);
+        setColumnName(newHeader.columnName);
+        setSeq(newHeader.seq);
+    }
 }

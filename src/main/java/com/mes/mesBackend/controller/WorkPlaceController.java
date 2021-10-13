@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/work-places")
-@Api(tags = "work-place/(사업장 등록)")
+@Api(tags = "work-place")
 @RequiredArgsConstructor
 public class WorkPlaceController {
 

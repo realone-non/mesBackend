@@ -1,5 +1,6 @@
 package com.mes.mesBackend.entity;
 
+import com.mes.mesBackend.dto.response.DetailNavResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,4 +30,9 @@ public class DetailNavigation {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "SUB_NAVS_ID")
     private SubNavigation subNavigation;
+
+    public void put(DetailNavigation detailNavigation) {
+        setName(detailNavigation.name);
+        setLevel(detailNavigation.level);
+    }
 }

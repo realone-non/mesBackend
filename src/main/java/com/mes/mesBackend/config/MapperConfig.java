@@ -1,10 +1,10 @@
 package com.mes.mesBackend.config;
 
 import com.mes.mesBackend.dto.response.BusinessTypeResponse;
+import com.mes.mesBackend.dto.response.MainNavResponse;
+import com.mes.mesBackend.dto.response.SubNavResponse;
 import com.mes.mesBackend.dto.response.WorkPlaceResponse;
-import com.mes.mesBackend.entity.BusinessType;
-import com.mes.mesBackend.entity.WorkPlace;
-import com.mes.mesBackend.entity.WorkPlaceMapped;
+import com.mes.mesBackend.entity.*;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 public class MapperConfig {

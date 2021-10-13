@@ -3,6 +3,7 @@ package com.mes.mesBackend.service;
 import com.mes.mesBackend.dto.request.CountryCodeRequest;
 import com.mes.mesBackend.dto.response.CountryCodeResponse;
 import com.mes.mesBackend.entity.CountryCode;
+import com.mes.mesBackend.helper.Mapper;
 import com.mes.mesBackend.repository.CountryCodeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +17,9 @@ import java.util.stream.Collectors;
 @Service
 public class CountryCodeServiceImpl implements CountryCodeService {
 
-    @Autowired
-    private CountryCodeRepository countryCodeRepository;
+    @Autowired CountryCodeRepository countryCodeRepository;
 
-    @Autowired
-    ModelMapper modelMapper;
+    @Autowired Mapper mapper;
 
     public CountryCode findCountryCodeByIdAndDeleteYn(Long id) {
         return countryCodeRepository.findByIdAndDeleteYnFalse(id);
@@ -28,30 +27,29 @@ public class CountryCodeServiceImpl implements CountryCodeService {
 
     // 국가코드 타입 생성
     public CountryCodeResponse createCountryCode(CountryCodeRequest countryCodeRequest) {
-        CountryCode countryCode = countryCodeRequestToCountryCode(countryCodeRequest);
-        CountryCode saveCountryCode = countryCodeRepository.save(countryCode);
-        return countryCodeToCountryCodeResponse(saveCountryCode);
+        CountryCode countryCode = mapper.toEntity(countryCodeRequest, CountryCode.class);
+        return mapper.toResponse(countryCodeRepository.save(countryCode), CountryCodeResponse.class);
     }
 
     // 국가코드 타입 조회
     public CountryCodeResponse getCountryCode(Long id) {
         CountryCode countryCode = findCountryCodeByIdAndDeleteYn(id);
-        return countryCodeToCountryCodeResponse(countryCode);
+        return mapper.toResponse(countryCode, CountryCodeResponse.class);
     }
 
     // 업체 타입 전체 조회
     public Page<CountryCodeResponse> getCountryCodes(Pageable pageable) {
         Page<CountryCode> countryCodes = countryCodeRepository.findAllByDeleteYnFalse(pageable);
-        return countryCodeToPageCountryCodeResponses(countryCodes);
+        return mapper.toPageResponses(countryCodes, CountryCodeResponse.class);
     }
 
     // 국가코드 타입 수정
     public CountryCodeResponse updateCountryCode(Long id, CountryCodeRequest countryCodeRequest) {
-        CountryCode countryCode = countryCodeRequestToCountryCode(countryCodeRequest);
+        CountryCode countryCode = mapper.toEntity(countryCodeRequest, CountryCode.class);
         CountryCode findCountryCode = findCountryCodeByIdAndDeleteYn(id);
         findCountryCode.setName(countryCode.getName());
         CountryCode updateCountryCode = countryCodeRepository.save(findCountryCode);
-        return countryCodeToCountryCodeResponse(updateCountryCode);
+        return mapper.toResponse(updateCountryCode, CountryCodeResponse.class);
     }
 
     // 국가코드 삭제
@@ -59,28 +57,5 @@ public class CountryCodeServiceImpl implements CountryCodeService {
         CountryCode countryCode = findCountryCodeByIdAndDeleteYn(id);
         countryCode.setDeleteYn(true);
         countryCodeRepository.save(countryCode);
-    }
-
-    // Entity -> Response
-    private CountryCodeResponse countryCodeToCountryCodeResponse(CountryCode countryCode) {
-        return modelMapper.map(countryCode, CountryCodeResponse.class);
-    }
-
-    // List<entity> -> List<Response>
-    private List<CountryCodeResponse> countryCodeToListCountryCodeResponses(List<CountryCode> countryCodes) {
-        return countryCodes
-                .stream()
-                .map(countryCode ->
-                        modelMapper.map(countryCode, CountryCodeResponse.class)).collect(Collectors.toList());
-    }
-
-    // Request -> Entity
-    private CountryCode countryCodeRequestToCountryCode(CountryCodeRequest countryCodeRequest) {
-        return modelMapper.map(countryCodeRequest, CountryCode.class);
-    }
-
-    // Page<Entity> -> Page<Response>
-    private Page<CountryCodeResponse> countryCodeToPageCountryCodeResponses(Page<CountryCode> countryCodes) {
-        return countryCodes.map(countryCode -> modelMapper.map(countryCode, CountryCodeResponse.class));
     }
 }

@@ -1,32 +1,48 @@
 package com.mes.mesBackend.service;
 
-import com.mes.mesBackend.entity.MainNavigation;
-import com.mes.mesBackend.entity.SubNavigation;
+import com.mes.mesBackend.dto.request.DetailNavRequest;
+import com.mes.mesBackend.dto.request.MainNavRequest;
+import com.mes.mesBackend.dto.request.SubNavRequest;
+import com.mes.mesBackend.dto.response.DetailNavResponse;
+import com.mes.mesBackend.dto.response.MainNavResponse;
+import com.mes.mesBackend.dto.response.SubNavResponse;
 
 import java.util.List;
 
 public interface NavigationService {
     // 메인네비게이션바 조회
-    List<MainNavigation> getMainNavigations(String mainNavName);
+    List<MainNavResponse> getMainNavigations();
 
     // 메인네비게이션바 생성
-    MainNavigation createMainNavigation(MainNavigation mainNavigation);
+    MainNavResponse createMainNavigation(MainNavRequest mainNavRequest);
 
     // 메인네비게이션바 수정
-    MainNavigation updateMainNavigation(Long id, MainNavigation mainNavigation);
+    MainNavResponse updateMainNavigation(Long id, MainNavRequest mainNavRequest);
 
     // 메인네비게이션바 삭제
     void deleteMainNavigation(Long id);
 
     // 서브네비게이션바 전체 조회
-    List<SubNavigation> getSubNavigations(String subNavName);
+    List<SubNavResponse> getSubNavigations(Long mainNavId);
 
     // 서브네이게이션바 생성
-    SubNavigation createSubNavigation(SubNavigation subNavigation);
+    SubNavResponse createSubNavigation(Long mainNavId, SubNavRequest subNavRequest);
 
     // 서브네이게이션바 수정
-    SubNavigation updateSubNavigation(Long id, SubNavigation subNavigation);
+    SubNavResponse updateSubNavigation(Long id, SubNavRequest subNavRequest);
 
     // 서브네이게이션 삭제
     void deleteSubNavigation(Long id);
+
+    // 디테일네비게이션 조회
+    List<DetailNavResponse> getDetailNavigations(Long subNavId);
+
+    // 디테일네비게이션 생성
+    DetailNavResponse createDetailNavigation(Long subNavId, DetailNavRequest detailNavRequest);
+
+    // 디테일네비게이션 수정
+    DetailNavResponse updateDetailNavigation(Long detailNavId, DetailNavRequest detailNavRequest);
+
+    // 디테일네비게이션 삭제
+    void deleteDetailNavigation(Long detailNavId);
 }
