@@ -20,9 +20,9 @@ public class WorkPlaceMapped extends BaseTimeEntity {
     private Long id;
 
 //    /insertable = false, updatable = false
-    @ManyToOne @JoinColumn(name = "WORK_PLACES_ID")
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "WORK_PLACES_ID")
     private WorkPlace workPlace;
 
-    @ManyToOne @JoinColumn(name = "BUSINESS_TYPES_ID")
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "BUSINESS_TYPES_ID")
     private BusinessType businessType;
 }

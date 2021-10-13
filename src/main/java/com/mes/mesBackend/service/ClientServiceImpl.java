@@ -6,6 +6,7 @@ import com.mes.mesBackend.entity.BusinessType;
 import com.mes.mesBackend.entity.Client;
 import com.mes.mesBackend.entity.ClientType;
 import com.mes.mesBackend.entity.CountryCode;
+import com.mes.mesBackend.helper.Mapper;
 import com.mes.mesBackend.helper.S3Service;
 import com.mes.mesBackend.repository.ClientRepository;
 import org.modelmapper.ModelMapper;
@@ -38,7 +39,7 @@ public class ClientServiceImpl implements ClientService {
     private S3Service s3Service;
 
     @Autowired
-    ModelMapper modelMapper;
+    Mapper mapper;
 
     public Client findClientByIdAndDeleteYnTrue(Long id) {
         return clientRepository.findByIdAndDeleteYnFalse(id);
@@ -54,22 +55,18 @@ public class ClientServiceImpl implements ClientService {
         CountryCode countryCode = countryCodeService.findCountryCodeByIdAndDeleteYn(countryCodeId);
         ClientType clientType = clientTypeService.findClientTypeByIdAndDeleteYn(clientTypeId);
 
-        Client client = clientRequestToClient(clientRequest);
-
-//        client.setBusinessType(businessType);
-//        client.setCountryCode(countryCode);
-//        client.setClientType(clientType);
+        Client client = mapper.toEntity(clientRequest, Client.class);
 
         client.putJoinTable(businessType, countryCode, clientType);
         Client saveClient = clientRepository.save(client);
 
-        return clientToClientResponse(saveClient);
+        return mapper.toResponse(saveClient, ClientResponse.class);
     }
 
     // 거래처 조회
     public ClientResponse getClient(Long id) {
         Client client = findClientByIdAndDeleteYnTrue(id);
-        return clientToClientResponse(client);
+        return mapper.toResponse(client, ClientResponse.class);
     }
 
     // 거래처 조건 페이징 조회 (거래처 유형, 거래처 코드, 거래처 명)
@@ -80,12 +77,12 @@ public class ClientServiceImpl implements ClientService {
             Pageable pageable
     ) {
         Page<Client> clients = clientRepository.findByTypeAndCodeAndName(type, code, clientName, pageable);
-        return clientToPageClientResponses(clients);
+        return mapper.toPageResponses(clients, ClientResponse.class);
     }
 
     // 거래처 수정
     public ClientResponse updateClient(Long id, ClientRequest clientRequest) {
-        Client newClient = clientRequestToClient(clientRequest);
+        Client newClient = mapper.toEntity(clientRequest, Client.class);
         Client findClient = findClientByIdAndDeleteYnTrue(id);
 
         BusinessType findBusinessType = businessTypeService.findBusinessTypeByIdAndDeleteYn(clientRequest.getBusinessTypeId());
@@ -96,7 +93,7 @@ public class ClientServiceImpl implements ClientService {
         findClient.put(newClient);
 
         Client updateClient = clientRepository.save(findClient);
-        return clientToClientResponse(updateClient);
+        return mapper.toResponse(updateClient, ClientResponse.class);
     }
 
     // 사업자 등록증 파일 업로드
@@ -106,7 +103,7 @@ public class ClientServiceImpl implements ClientService {
         String fileName = "client/" + client.getClientCode() + "/";
         client.setBusinessFile(s3Service.upload(businessFile, fileName));
         clientRepository.save(client);
-        return clientToClientResponse(client);
+        return mapper.toResponse(client, ClientResponse.class);
     }
 
     // 거래처 삭제
@@ -114,29 +111,6 @@ public class ClientServiceImpl implements ClientService {
         Client client = findClientByIdAndDeleteYnTrue(id);
         client.setDeleteYn(true);
         clientRepository.save(client);
-    }
-
-    // Entity -> Response
-    private ClientResponse clientToClientResponse(Client client) {
-        return modelMapper.map(client, ClientResponse.class);
-    }
-
-    // List<entity> -> List<Response>
-    private List<ClientResponse> clientToListClientResponses(List<Client> clients) {
-        return clients
-                .stream()
-                .map(client ->
-                        modelMapper.map(client, ClientResponse.class)).collect(Collectors.toList());
-    }
-
-    // Request -> Entity
-    private Client clientRequestToClient(ClientRequest clientRequest) {
-        return modelMapper.map(clientRequest, Client.class);
-    }
-
-    // Page<Entity> -> Page<Response>
-    private Page<ClientResponse> clientToPageClientResponses(Page<Client> clients) {
-        return clients.map(client -> modelMapper.map(client, ClientResponse.class));
     }
 
     // 사업자 등록증 파일 삭제 (aws 권한 문제로 안됨)

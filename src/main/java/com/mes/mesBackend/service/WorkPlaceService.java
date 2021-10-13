@@ -14,7 +14,7 @@ public interface WorkPlaceService {
     WorkPlaceResponse getWorkPlace(Long id);
 
     // 사업장 페이징 조회
-//    Page<WorkPlaceResponse> getWorkPlaces(Pageable pageable);
+    Page<WorkPlaceResponse> getWorkPlaces(Pageable pageable);
 
     // 사업장 수정
     WorkPlaceResponse updateWorkPlace(Long id, WorkPlaceRequest workPlaceRequest);
