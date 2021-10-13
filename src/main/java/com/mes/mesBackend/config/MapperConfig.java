@@ -1,9 +1,6 @@
 package com.mes.mesBackend.config;
 
-import com.mes.mesBackend.dto.response.BusinessTypeResponse;
-import com.mes.mesBackend.dto.response.MainNavResponse;
-import com.mes.mesBackend.dto.response.SubNavResponse;
-import com.mes.mesBackend.dto.response.WorkPlaceResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -14,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Configuration
 public class MapperConfig {
@@ -24,6 +20,7 @@ public class MapperConfig {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         modelMapper.addConverter(toWorkPlaceResponseConvert);
+        modelMapper.addConverter(toFactoryResponseConvert);
         return modelMapper;
     }
 
@@ -43,6 +40,19 @@ public class MapperConfig {
             }
             workPlaceResponse.setType(businessTypeResponses);
             return workPlaceResponse;
+        }
+    };
+
+    // FactoryResponse workPlaceName 매핑
+    Converter<Factory, FactoryResponse> toFactoryResponseConvert = new Converter<Factory, FactoryResponse>() {
+        @Override
+        public FactoryResponse convert(MappingContext<Factory, FactoryResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            Factory factory = context.getSource();
+            FactoryResponse factoryResponse = modelMapper.map(factory, FactoryResponse.class);
+
+            factoryResponse.setWorkPlaceName(factory.getWorkPlace().getWorkPlaceName());
+            return factoryResponse;
         }
     };
 }

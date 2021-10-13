@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 // 사업장
@@ -14,7 +13,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "WORK_PLACES")
 @Data
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "ID")
 public class WorkPlace extends BaseTimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "ID")
@@ -78,7 +76,6 @@ public class WorkPlace extends BaseTimeEntity{
         setDetailAddress(newWorkPlace.detailAddress);
         setEngAddress1(newWorkPlace.engAddress1);
         setEngAddress2(newWorkPlace.engAddress2);
-//        setType(newWorkPlace.getType());
         setItem(newWorkPlace.item);
         setTelNumber(newWorkPlace.telNumber);
         setFaxNumber(newWorkPlace.faxNumber);
