@@ -21,6 +21,7 @@ public class MapperConfig {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         modelMapper.addConverter(toWorkPlaceResponseConvert);
         modelMapper.addConverter(toFactoryResponseConvert);
+        modelMapper.addConverter(toEmpResponseConvert);
         return modelMapper;
     }
 
@@ -53,6 +54,19 @@ public class MapperConfig {
 
             factoryResponse.setWorkPlaceName(factory.getWorkPlace().getWorkPlaceName());
             return factoryResponse;
+        }
+    };
+
+    // EmployeeResponse engNameAndPosition 영문이름+직위 매핑
+    Converter<Employee, EmployeeResponse> toEmpResponseConvert = new Converter<Employee, EmployeeResponse>() {
+        @Override
+        public EmployeeResponse convert(MappingContext<Employee, EmployeeResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            Employee employee = context.getSource();
+            EmployeeResponse employeeResponse = modelMapper.map(employee, EmployeeResponse.class);
+            employeeResponse.setDeptName(employee.getDepartment().getDeptName());
+            employeeResponse.setEngNameAndPosition(employee.getEngName() + " " + employee.getPosition());
+            return employeeResponse;
         }
     };
 }

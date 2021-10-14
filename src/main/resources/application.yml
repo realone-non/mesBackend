@@ -64,3 +64,11 @@ logging:
       amazonaws:
         util:
           EC2MetadataUtils: ERROR
+
+server:
+  error:
+    include-exception: false  # Response에 Exception을 표시할지
+    include-message: always   # Response에 Exception Message를 표시할지
+    include-stacktrace: on_param  # Response에 Stack Trace를 표시할지
+    whitelabel:
+      enabled: true   # 에러 발생 시 Spring 기본 에러 페이지 노출 여부

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 // 부서등록
 @RestController
-@RequestMapping(value = "/department")
+@RequestMapping(value = "/departments")
 @Api(tags = "department")
 @RequiredArgsConstructor
 public class DepartmentController {
