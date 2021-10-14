@@ -31,8 +31,12 @@ public class DetailNavigation {
     @JoinColumn(name = "SUB_NAVS_ID")
     private SubNavigation subNavigation;
 
+    @Column(name = "ORDERS")
+    private int orders;     // 출력순번
+
     public void put(DetailNavigation detailNavigation) {
         setName(detailNavigation.name);
         setLevel(detailNavigation.level);
+        setOrders(detailNavigation.orders);
     }
 }

@@ -11,4 +11,5 @@ public class SubNavResponse {
     Long id;
     String name;
     int level;
+    int orders;
 }

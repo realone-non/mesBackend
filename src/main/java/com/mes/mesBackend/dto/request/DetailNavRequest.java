@@ -9,4 +9,5 @@ public class DetailNavRequest {
     String name;
     int level;
     boolean useYn;
+    int orders;
 }

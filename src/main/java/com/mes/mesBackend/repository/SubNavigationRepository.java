@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SubNavigationRepository extends JpaRepository<SubNavigation, Long> {
-    List<SubNavigation> findSubNavigationsByUseYnTrue();
     SubNavigation findByIdAndUseYnTrue(Long id);
-    List<SubNavigation> findAllByMainNavigation(MainNavigation mainNavigation);
+    List<SubNavigation> findAllByMainNavigationAndUseYnTrueOrderByOrdersAsc(MainNavigation mainNavigation);
 }

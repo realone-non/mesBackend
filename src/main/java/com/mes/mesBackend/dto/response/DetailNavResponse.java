@@ -9,4 +9,5 @@ public class DetailNavResponse {
     Long id;
     String name;
     int level;
+    int orders;
 }

@@ -30,8 +30,12 @@ public class SubNavigation {
     @JoinColumn(name = "MAIN_NAVS_ID")
     private MainNavigation mainNavigation;
 
+    @Column(name = "ORDERS")
+    private int orders;     // 출력순번
+
     public void put(SubNavigation newSubNavigation) {
         setName(newSubNavigation.name);
         setLevel(newSubNavigation.level);
+        setOrders(newSubNavigation.orders);
     }
 }

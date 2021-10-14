@@ -9,7 +9,6 @@ import java.util.List;
 
 @Repository
 public interface DetailNavigationRepository extends JpaRepository<DetailNavigation, Long> {
-    DetailNavigation findDetailNavigationsByUseYnTrue();
-    List<DetailNavigation> findAllBySubNavigationAndUseYnTrue(SubNavigation subNavigation);
+    List<DetailNavigation> findAllBySubNavigationAndUseYnTrueOrderByOrdersAsc(SubNavigation subNavigation);
     DetailNavigation findByIdAndUseYnTrue(Long id);
 }

@@ -9,4 +9,5 @@ public class SubNavRequest {
     String name;
     int level;
     boolean useYn;
+    int orders;
 }

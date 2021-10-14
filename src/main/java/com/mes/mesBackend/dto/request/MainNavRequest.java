@@ -9,4 +9,5 @@ public class MainNavRequest {
     String name;
     int level;
     boolean useYn;
+    int orders;
 }

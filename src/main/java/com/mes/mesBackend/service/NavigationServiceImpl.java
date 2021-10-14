@@ -28,7 +28,7 @@ public class NavigationServiceImpl implements NavigationService {
 
     // 메인네비게이션바 조회
     public List<MainNavResponse> getMainNavigations() {
-        List<MainNavigation> mainNavigations = mainNavigationRepository.findMainNavigationsByUseYnTrue();
+        List<MainNavigation> mainNavigations = mainNavigationRepository.findAllByUseYnTrueOrderByOrdersAsc();
         return mapper.toListResponses(mainNavigations, MainNavResponse.class);
     }
 
@@ -58,7 +58,7 @@ public class NavigationServiceImpl implements NavigationService {
     // 서브네비게이션바 전체 조회
     public List<SubNavResponse> getSubNavigations(Long mainNavId) {
         MainNavigation mainNavigation = mainNavigationRepository.findByIdAndUseYnTrue(mainNavId);
-        List<SubNavigation> findSubNavigations = subNavigationRepository.findAllByMainNavigation(mainNavigation);
+        List<SubNavigation> findSubNavigations = subNavigationRepository.findAllByMainNavigationAndUseYnTrueOrderByOrdersAsc(mainNavigation);
         return mapper.toListResponses(findSubNavigations, SubNavResponse.class);
     }
 
@@ -90,7 +90,7 @@ public class NavigationServiceImpl implements NavigationService {
     // 디테일네비게이션 조회
     public List<DetailNavResponse> getDetailNavigations(Long subNavId) {
         SubNavigation subNavigation = subNavigationRepository.findByIdAndUseYnTrue(subNavId);
-        List<DetailNavigation> detailNavigations = detailNavigationRepository.findAllBySubNavigationAndUseYnTrue(subNavigation);
+        List<DetailNavigation> detailNavigations = detailNavigationRepository.findAllBySubNavigationAndUseYnTrueOrderByOrdersAsc(subNavigation);
         return mapper.toListResponses(detailNavigations, DetailNavResponse.class);
     }
 

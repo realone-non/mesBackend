@@ -1,14 +1,11 @@
 package com.mes.mesBackend.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,7 +17,7 @@ public class MainNavigation {
     @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "ID")
     private Long id;
 
-    @Column(name = "NAME")
+    @Column(name = "NAME", unique = true)
     private String name;
 
     @Column(name = "LEVEL")
@@ -29,13 +26,12 @@ public class MainNavigation {
     @Column(name = "USE_YN")
     private boolean useYn;  // 사용여부
 
-    // 다대일 양방향 매핑
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "mainNavigation", fetch = FetchType.EAGER)
-//    private List<SubNavigation> subNavigationList = new ArrayList<>();
+    @Column(name = "ORDERS", unique = true)
+    private int orders;     // 출력순번
 
     public void put(MainNavigation newMainNavigation) {
         setName(newMainNavigation.name);
         setLevel(newMainNavigation.level);
+        setOrders(newMainNavigation.orders);
     }
 }
