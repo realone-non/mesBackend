@@ -42,7 +42,7 @@ public class Item extends BaseTimeEntity {
     private UseType useType;            // 용도유형
 
     @OneToOne @JoinColumn(name = "ROUTINGS_ID")
-    private Routing routing;            // 라우팅
+    private Routing routing;            // 라우팅 (라우팅 명)
 
     @OneToOne @JoinColumn(name = "STOCK_UNITS_ID", nullable = false)
     private StockUnit stockUnit;        // 재고단위
@@ -56,13 +56,13 @@ public class Item extends BaseTimeEntity {
     @OneToOne @JoinColumn(name = "LOT_TYPES_ID", nullable = false)
     private LotType lotType;    // LOT유형
 
-    @OneToOne @JoinColumn(name = "TEST_TYPES_ID", nullable = false, insertable = false, updatable = false)
-    private TestType incomeTest;        // 수입검사
+    @OneToOne @JoinColumn(name = "INPUT_TEST")
+    private TestType inputTest;        // 수입검사
 
-    @OneToOne @JoinColumn(name = "TEST_TYPES_ID", nullable = false, insertable = false, updatable = false)
+    @OneToOne @JoinColumn(name = "PROCESS_TEST")
     private TestType processTest;       // 공정검사
 
-    @OneToOne @JoinColumn(name = "TEST_TYPES_ID", nullable = false, insertable = false, updatable = false)
+    @OneToOne @JoinColumn(name = "SHIPMENT_TEST")
     private TestType shipmentTest;      // 출하검사
 
     @Column(name = "WASTE_PRODUCT_LOT", nullable = false)

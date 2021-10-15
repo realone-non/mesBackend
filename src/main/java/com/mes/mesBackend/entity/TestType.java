@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-// 검사타입
+/*
+* 검사타입
+* ex) 수동검사, 자동검사
+* */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "TEST_TYPES")
