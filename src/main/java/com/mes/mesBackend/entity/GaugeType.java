@@ -7,18 +7,20 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-// 거래처 - 거래처 타입
+/*
+* GAUGE유형
+* */
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-@Entity(name = "CLIENT_TYPES")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity(name = "GAUGE_TYPES")
 @Data
-public class ClientType extends BaseTimeEntity {
-
-    @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+public class GaugeType extends BaseTimeEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
     private Long id;
 
-    @Column(name = "NAME", nullable = false)
-    private String name;
+    @Column(name = "GAUGE_TYPE")
+    private String gaugeType;   // GAUGE유형
 
     @Column(name = "USE_YN", nullable = false)
     private boolean useYn = true;  // 사용여부
