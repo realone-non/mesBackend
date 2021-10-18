@@ -38,12 +38,12 @@ public class CodeMasterRepositoryImpl implements CodeMasterRepositoryCustom {
     // 각 조건에 대해 null인지 판별 후 BooleanExpression 리턴
     // mainCode 검색
     private BooleanExpression isMainCodeContaining(String mainCode) {
-        return mainCode != null ? codeMaster.mainCode.contains(mainCode).and(isDeleteYnFalse()) : null;
+        return mainCode != null ? codeMaster.mainCode.contains(mainCode) : null;
     }
 
     // codeName 검색
     private BooleanExpression isCodeNameContaining(String codeName) {
-        return codeName != null ? codeMaster.codeName.contains(codeName).and(isDeleteYnFalse()) : null;
+        return codeName != null ? codeMaster.codeName.contains(codeName) : null;
     }
 
     // deleteYn false

@@ -31,7 +31,8 @@ public class ClientRepositoryImpl implements ClientRepositoryCustom {
                 .where(
                         isTypeContaining(type),
                         isCodeContaining(clientCode),
-                        isNameContaining(name)
+                        isNameContaining(name),
+                        isDeleteYnFalse()
                 )
                 .fetchResults();
         return new PageImpl<>(results.getResults(), pageable, results.getTotal());
@@ -40,17 +41,18 @@ public class ClientRepositoryImpl implements ClientRepositoryCustom {
     // 각 조건에 대해 null인지 판별 후 BooleanExpression 리턴
     // 거래처유형에 대한 검색조건
     private BooleanExpression isTypeContaining(Long type) {
-        return type != null ? client.clientType.id.eq(type).and(isDeleteYnFalse()) : null;
+        return type != null ? client.clientType.id.eq(type) : null;
+//        return type != null ? client.clientType.id.eq(type).and(isDeleteYnFalse()) : null;
     }
 
     // 거래처 코드에 대한 검색 조건
     private BooleanExpression isCodeContaining(String clientCode) {
-        return clientCode != null ? client.clientCode.contains(clientCode).and(isDeleteYnFalse()) : null;
+        return clientCode != null ? client.clientCode.contains(clientCode) : null;
     }
 
     // 거래처명에 대한 검색 조건
     private BooleanExpression isNameContaining(String name) {
-        return name != null ? client.name.contains(name).and(isDeleteYnFalse()) : null;
+        return name != null ? client.name.contains(name) : null;
     }
 
     // deleteYn false
