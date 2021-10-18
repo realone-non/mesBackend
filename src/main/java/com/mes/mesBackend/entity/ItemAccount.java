@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-// 품목계정
+/*
+* 품목계정
+* 품목계정 (원재료,부재료)
+* */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "ITEM_ACCOUNTS")
@@ -22,5 +25,8 @@ public class ItemAccount extends BaseTimeEntity {
 
     @Column(name = "USE_YN", nullable = false)
     private boolean useYn;
+
+    @Column(name = "DELETE_YN")
+    private boolean deleteYn = false;  // 삭제여부
 }
 

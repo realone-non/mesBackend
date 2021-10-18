@@ -7,7 +7,20 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-// 공장등록
+/*
+* 공장등록
+* 공장코드 (p10,p20)
+* 공장명 (본사,연구소)
+* 약어 (E)
+* 우편번호
+* 상세주소
+* 영문주소
+* 영문주소2
+* 전화번호
+* fax
+* LOT용 코드
+* 사업장
+* */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "FACTORIES")
