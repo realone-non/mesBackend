@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 // 품목등록
 @AllArgsConstructor
@@ -56,14 +57,18 @@ public class Item extends BaseTimeEntity {
     @OneToOne @JoinColumn(name = "LOT_TYPES_ID", nullable = false)
     private LotType lotType;    // LOT유형
 
-    @OneToOne @JoinColumn(name = "INPUT_TEST")
-    private TestType inputTest;        // 수입검사
+//    @OneToOne @JoinColumn(name = "INPUT_TEST")
+//    private TestType inputTest;        // 수입검사
+//
+//    @OneToOne @JoinColumn(name = "PROCESS_TEST")
+//    private TestType processTest;       // 공정검사
+//
+//    @OneToOne @JoinColumn(name = "SHIPMENT_TEST")
+//    private TestType shipmentTest;      // 출하검사
 
-    @OneToOne @JoinColumn(name = "PROCESS_TEST")
-    private TestType processTest;       // 공정검사
-
-    @OneToOne @JoinColumn(name = "SHIPMENT_TEST")
-    private TestType shipmentTest;      // 출하검사
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM_CHECK_CATEGORY")
+    private List<ItemCheckCategory> itemCheckCategory;
 
     @Column(name = "WASTE_PRODUCT_LOT", nullable = false)
     private boolean wasteProductLot;        // 폐기품 Lot 관리
