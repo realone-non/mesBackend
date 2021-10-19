@@ -38,7 +38,7 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     Mapper mapper;
 
-    public Client findClientByIdAndDeleteYnTrue(Long id) {
+    public Client findClientByIdAndDeleteYnFalse(Long id) {
         return clientRepository.findByIdAndDeleteYnFalse(id);
     }
 
@@ -62,7 +62,7 @@ public class ClientServiceImpl implements ClientService {
 
     // 거래처 조회
     public ClientResponse getClient(Long id) {
-        Client client = findClientByIdAndDeleteYnTrue(id);
+        Client client = findClientByIdAndDeleteYnFalse(id);
         return mapper.toResponse(client, ClientResponse.class);
     }
 
@@ -80,7 +80,7 @@ public class ClientServiceImpl implements ClientService {
     // 거래처 수정
     public ClientResponse updateClient(Long id, ClientRequest clientRequest) {
         Client newClient = mapper.toEntity(clientRequest, Client.class);
-        Client findClient = findClientByIdAndDeleteYnTrue(id);
+        Client findClient = findClientByIdAndDeleteYnFalse(id);
 
         BusinessType findBusinessType = businessTypeService.findBusinessTypeByIdAndDeleteYn(clientRequest.getBusinessType());
         ClientType findClientType = clientTypeService.findClientTypeByIdAndDeleteYn(clientRequest.getClientType());
@@ -96,7 +96,7 @@ public class ClientServiceImpl implements ClientService {
     // 사업자 등록증 파일 업로드
     // client/거래처 명/파일명(날싸시간)
     public ClientResponse createBusinessFileToClient(Long id, MultipartFile businessFile) throws IOException {
-        Client client = findClientByIdAndDeleteYnTrue(id);
+        Client client = findClientByIdAndDeleteYnFalse(id);
         String fileName = "client/" + client.getClientCode() + "/";
         client.setBusinessFile(s3Service.upload(businessFile, fileName));
         clientRepository.save(client);
@@ -105,14 +105,14 @@ public class ClientServiceImpl implements ClientService {
 
     // 거래처 삭제
     public void deleteClient(Long id) {
-        Client client = findClientByIdAndDeleteYnTrue(id);
+        Client client = findClientByIdAndDeleteYnFalse(id);
         client.setDeleteYn(true);
         clientRepository.save(client);
     }
 
     // 사업자 등록증 파일 삭제 (aws 권한 문제로 안됨)
     private void deleteBusinessFileToClient(Long id) throws IOException {
-        Client client = findClientByIdAndDeleteYnTrue(id);
+        Client client = findClientByIdAndDeleteYnFalse(id);
         s3Service.delete(client.getBusinessFile());
         client.setBusinessFile(null);
     }

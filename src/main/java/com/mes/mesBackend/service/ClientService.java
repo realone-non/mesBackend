@@ -30,5 +30,5 @@ public interface ClientService {
     // 사업자 등록증 파일 업로드
     ClientResponse createBusinessFileToClient(Long id, MultipartFile businessFile) throws IOException;
 
-    Client findClientByIdAndDeleteYnTrue(Long id);
+    Client findClientByIdAndDeleteYnFalse(Long id);
 }

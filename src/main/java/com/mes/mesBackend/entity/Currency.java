@@ -8,25 +8,24 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 /*
-* 품목계정
-* 품목계정 (원재료,부재료)
-* */
+ * 화폐
+ * 화폐 (KRW￦)
+ * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "ITEM_ACCOUNTS")
+@Entity(name = "CURRENCIES")
 @Data
-public class ItemAccount extends BaseTimeEntity {
+public class Currency extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
     private Long id;
 
-    @Column(name = "ACCOUNT", nullable = false)
-    private String account;
+    @Column(name = "CURRENCY", nullable = false)
+    private String currency;        // 화폐
 
-    @Column(name = "USE_YN", nullable = false)
-    private boolean useYn;
+    @Column(name = "USE_YN")
+    private boolean useYn = true;   // 사용여부
 
     @Column(name = "DELETE_YN")
     private boolean deleteYn = false;  // 삭제여부
 }
-

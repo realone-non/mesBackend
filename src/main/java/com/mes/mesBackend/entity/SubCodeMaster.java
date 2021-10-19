@@ -50,7 +50,8 @@ public class SubCodeMaster extends BaseTimeEntity{
     @Column(name = "USE_YN", nullable = false)
     private Boolean useYn = true;      //  사용여부
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) @JoinColumn(name = "CODE_MASTER_ID", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "CODE_MASTER_ID", nullable = false)
     private CodeMaster codeMaster;
 
     @Column(name = "DELETE_YN")

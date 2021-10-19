@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-// 검사기준
+/*
+* 검사기준
+* 검사기준 (품목확인)
+* */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "TEST_CRITERIAS")
