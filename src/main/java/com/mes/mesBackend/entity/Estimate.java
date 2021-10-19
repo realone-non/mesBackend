@@ -84,4 +84,7 @@ public class Estimate extends BaseTimeEntity {
 
     @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "FACTORIES_ID")
     private Factory factory;                // 공장
+
+    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "PI")
+    private Pi pi;              // P/I
 }
