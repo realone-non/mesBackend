@@ -6,19 +6,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-
+/*
+ * 품목별 검사항목 등록
+ * 검색: 공장,검사유형,품목그룹,품목계정
+ * 품번
+ * 품명
+ * 검사유형
+ * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "ITEM_CHECK_CATEGORIES")
 @Data
 public class ItemCheckCategory extends BaseTimeEntity {
-    /*
-    * 품목별 검사항목 등록
-    * 검색: 공장,검사유형,품목그룹,품목계정
-    * 품번
-    * 품명
-    * 검사유형
-    * */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "ID")
     private Long id;
@@ -27,7 +26,7 @@ public class ItemCheckCategory extends BaseTimeEntity {
     private Item item;      // 품번, 품명
 
     @OneToOne @JoinColumn(name = "CHECK_CATEGORY")
-    private CheckCategory checkCategory;    // 검사유형
+    private TestCategory checkCategory;    // 검사유형
 
     @OneToOne @JoinColumn(name = "TEST_TYPE")
     private TestType testType;              // 검사타입(자동검사,수동검사)

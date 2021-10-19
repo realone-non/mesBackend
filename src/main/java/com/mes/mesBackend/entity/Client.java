@@ -4,7 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
-// 거래처
+// 거래처등록
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "CLIENTS")

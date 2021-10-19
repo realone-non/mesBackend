@@ -6,10 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 /*
  * 라우팅 등록
- * 라우팅번호, 라우팅명, 사용 */
+ * 검색: 공장(드롭박스)
+ * 라우팅번호 (01,02,03)
+ * 라우팅명 (필터생산1,필터생산2,계측기)
+ * 사용
+ * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "ROUTINGS")
@@ -28,5 +33,11 @@ public class Routing extends BaseTimeEntity {
 
     @Column(name = "USE_YN", nullable = false)
     private boolean useYn;
+
+    @Column(name = "DELETE_YN")
+    private boolean deleteYn = false;  // 삭제여부
+
+    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "FACTORIES_ID")
+    private Factory factory;                // 공장
 }
 

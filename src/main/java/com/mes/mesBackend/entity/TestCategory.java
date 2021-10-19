@@ -9,13 +9,13 @@ import javax.persistence.*;
 
 /*
  * 검사 유형
- * 검사유형 : 수입검사, 공정검사, 출하검사
+ * 검사유형 (수입검사, 공정검사, 출하검사)
  * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "CHECK_CATEGORIES")
+@Entity(name = "TEST_CATEGORIES")
 @Data
-public class CheckCategory {
+public class TestCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "ID")
     private Long id;

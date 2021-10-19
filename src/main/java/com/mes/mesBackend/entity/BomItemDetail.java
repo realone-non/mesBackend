@@ -9,12 +9,13 @@ import javax.persistence.*;
 
 /*
  * BOM품목 정보 등록
+ * 검색: 품목계정(체크),품목그룹(체크),품목(검색창),하위품목(검색창)
  * 레벨 (1)
  * 품번 (CF00-00001-01)
  * 품명 (EMI FILTER [AF2-E001DB])
  * 제조사 (경일정밀)
  * 제조사품번 (C-AV2-E001DB-2)
- * 단위 (개,그램)
+ * 단위 (개,그램)                -> Unit
  * 수량 (1,0.1)
  * 구매처 ()
  * 위치 ()
@@ -46,8 +47,8 @@ public class BomItemDetail extends BaseTimeEntity {
     @Column(name = "MANUFACTURER_ITEM_NO")
     private String manufacturerItemNo;      //  제조사 품번
 
-    @Column(name = "UNIT", nullable = false)
-    private String unit;    // 단위
+    @OneToOne @JoinColumn(name = "UNIT_ID")
+    private Unit unit;    // 단위
 
     @Column(name = "AMOUNT")
     private int amount;     // 수량
