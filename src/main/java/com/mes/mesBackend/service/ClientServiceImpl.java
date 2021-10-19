@@ -9,7 +9,6 @@ import com.mes.mesBackend.entity.CountryCode;
 import com.mes.mesBackend.helper.Mapper;
 import com.mes.mesBackend.helper.S3Service;
 import com.mes.mesBackend.repository.ClientRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ClientServiceImpl implements ClientService {
@@ -47,8 +44,8 @@ public class ClientServiceImpl implements ClientService {
 
     // 거래처 생성
     public ClientResponse createClient(ClientRequest clientRequest) {
-        Long businessTypeId = clientRequest.getBusinessTypeId();
-        Long countryCodeId = clientRequest.getCountryCodeId();
+        Long businessTypeId = clientRequest.getBusinessType();
+        Long countryCodeId = clientRequest.getCountryCode();
         Long clientTypeId = clientRequest.getClientType();
 
         BusinessType businessType = businessTypeService.findBusinessTypeByIdAndDeleteYn(businessTypeId);
@@ -85,9 +82,9 @@ public class ClientServiceImpl implements ClientService {
         Client newClient = mapper.toEntity(clientRequest, Client.class);
         Client findClient = findClientByIdAndDeleteYnTrue(id);
 
-        BusinessType findBusinessType = businessTypeService.findBusinessTypeByIdAndDeleteYn(clientRequest.getBusinessTypeId());
+        BusinessType findBusinessType = businessTypeService.findBusinessTypeByIdAndDeleteYn(clientRequest.getBusinessType());
         ClientType findClientType = clientTypeService.findClientTypeByIdAndDeleteYn(clientRequest.getClientType());
-        CountryCode findCountryCode = countryCodeService.findCountryCodeByIdAndDeleteYn(clientRequest.getCountryCodeId());
+        CountryCode findCountryCode = countryCodeService.findCountryCodeByIdAndDeleteYn(clientRequest.getCountryCode());
 
         newClient.putJoinTable(findBusinessType, findCountryCode, findClientType);
         findClient.put(newClient);

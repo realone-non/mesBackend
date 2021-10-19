@@ -16,7 +16,7 @@ public class ClientRequest {
     String postalCode;      // 우편번호
     String address;     // 주소
     String detailAddress;   // 상세주소
-    Long businessTypeId;      // 업태 아이디
+    Long businessType;      // 업태 아이디
     String item;        // 업종
     String telNumber;   // 전화번호
     String faxNumber;   // fax번호 12자
@@ -25,7 +25,7 @@ public class ClientRequest {
     String clientChargeName;  // 거래처 담당자 명
     String tradeBusinessRegNo;  // 무역업등록번호
     String pccc;            // 통관고유번호
-    Long countryCodeId;     // 국가코드 Id
+    Long countryCode;     // 국가코드 Id
     String area;        // 지역
     String currencyUnit;    // 거래화폐단위
     String companyCharge;  // 회사담당자
