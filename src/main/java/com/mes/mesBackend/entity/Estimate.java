@@ -43,8 +43,8 @@ public class Estimate extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "CLIENT", nullable = false)
     private Client client;      // 거래처
 
-    @Column(name = "CHARGE", nullable = false)
-    private String charge;      // 담당자
+    @OneToOne @JoinColumn(name = "MANAGER", nullable = false)
+    private Manager manager;      // 담당자
 
     @Column(name = "ESTIMATE_DATE", nullable = false)
     private LocalDate estimateDate;     // 견적일자
