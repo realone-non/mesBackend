@@ -29,7 +29,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "DEVELOPMENTS")
 @Data
-public class Development {
+public class Development extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
     private Long id;
@@ -49,8 +49,8 @@ public class Development {
     @Column(name = "PERIOD_DATE")
     private LocalDate periodDate;       // 납기일자
 
-    @Column(name = "PROGRESS_STATE")
-    private String progressState;       // 진행상태
+    @OneToOne @JoinColumn(name = "DEVELOPMENT_STATE")
+    private DevelopmentState developmentState;       // 진행상태
 
     @Column(name = "DELIVER_AMOUNT")
     private int deliverAmount;          // 납품수량
