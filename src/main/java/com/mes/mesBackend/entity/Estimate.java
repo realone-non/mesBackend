@@ -34,57 +34,64 @@ import java.util.List;
 @Data
 public class Estimate extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '견적등록 고유아이디'")
     private Long id;
 
-    @Column(name = "ESTIMATE_NO", nullable = false, unique = true)
+    @Column(name = "ESTIMATE_NO", nullable = false, unique = true, columnDefinition = "bigint COMMENT '견적번호'")
     private String estimateNo;  // 견적번호
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "CLIENT", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CLIENT", nullable = false, columnDefinition = "bigint COMMENT '거래처'")
     private Client client;      // 거래처
 
-    @OneToOne @JoinColumn(name = "MANAGER", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MANAGER", nullable = false, columnDefinition = "bigint COMMENT '담당자'")
     private Manager manager;      // 담당자
 
-    @Column(name = "ESTIMATE_DATE", nullable = false)
+    @Column(name = "ESTIMATE_DATE", nullable = false, columnDefinition = "bigint COMMENT '견적일자'")
     private LocalDate estimateDate;     // 견적일자
 
-    @OneToOne @JoinColumn(name = "CURRENCY")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CURRENCY", columnDefinition = "bigint COMMENT '화폐'")
     private Currency currency;            // 화폐
 
-    @Column(name = "PERIOD")
+    @Column(name = "PERIOD", columnDefinition = "bigint COMMENT '납기'")
     private String period;              // 납기
 
-    @Column(name = "VALIDITY", nullable = false)
+    @Column(name = "VALIDITY", nullable = false, columnDefinition = "bigint COMMENT '유효기간'")
     private int validity;               // 유효기간
 
-    @Column(name = "PAY_CONDITION")
+    @Column(name = "PAY_CONDITION", columnDefinition = "bigint COMMENT '지불조건'")
     private String payCondition;        // 지불조건
 
-    @Column(name = "SURTAX")
+    @Column(name = "SURTAX", columnDefinition = "bigint COMMENT '부가세'")
     private String surtax;              // 부가세
 
-    @Column(name = "TRANSPORT_CONDITION")
+    @Column(name = "TRANSPORT_CONDITION", columnDefinition = "bigint COMMENT '운송조건'")
     private String transportCondition;      // 운송조건
 
-    @Column(name = "FORWADER")
+    @Column(name = "FORWADER", columnDefinition = "bigint COMMENT 'Forwader'")
     private String forwader;                // Forwader
 
-    @Column(name = "DESTINATION")
+    @Column(name = "DESTINATION", columnDefinition = "bigint COMMENT 'DESTINATION'")
     private String destination;             // DESTINATION
 
-    @OneToMany(fetch = FetchType.LAZY) @JoinColumn(name = "ESTIMATE_ITEM")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ESTIMATE_ITEM", columnDefinition = "bigint COMMENT '품목정보'")
     private List<EstimateItemList> estimateItemLists;       // 해당하는 품목정보
 
-    @Column(name = "USE_YN")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "FACTORIES_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FACTORIES_ID", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "PI")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PI", columnDefinition = "bigint COMMENT 'PI'")
     private Pi pi;              // P/I
 }

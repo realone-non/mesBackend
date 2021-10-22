@@ -17,15 +17,16 @@ import javax.persistence.*;
 @Data
 public class InstructionStatus extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '지시상태 고유아이디'")
     private Long id;
 
-    @Column(name = "INSTRUCTION_STATUS")
+    @Column(name = "INSTRUCTION_STATUS", columnDefinition = "bigint COMMENT '지시상태'")
     private String instructionStatus;       // 지시상태
 
-    @Column(name = "USE_YN")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

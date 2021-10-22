@@ -13,16 +13,17 @@ import javax.persistence.*;
 * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "TEST_CRITERIAS")
+@Entity(name = "TEST_CRITERIA")
 @Data
 public class TestCriteria extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '검사기준 고유아이디'")
     private Long id;
 
-    @Column(name = "TEST_CRITERIA", nullable = false)
+    @Column(name = "TEST_CRITERIA", nullable = false, columnDefinition = "bigint COMMENT '검사기준'")
     private String testCriteria;
 
-    @Column(name = "USE_YN", nullable = false)
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn;
 }

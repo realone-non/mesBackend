@@ -23,25 +23,27 @@ import javax.persistence.*;
 @Data
 public class OutSourcingProductionRawMaterialOutputInfo extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '외주생산 원재료 출고대상 정보 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "BOM_MASTER")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "BOM_MASTER", columnDefinition = "bigint COMMENT 'BomMaster'")
     private BomMaster bomMaster;        // BOM
 
-    @Column(name = "USE_AMOUNT")
+    @Column(name = "USE_AMOUNT", columnDefinition = "bigint COMMENT '소요량'")
     private int useAmount;              // 소요량
 
-    @Column(name = "LOSS_AMOUNT")
+    @Column(name = "LOSS_AMOUNT", columnDefinition = "bigint COMMENT '손실율'")
     private int lossAmount;            // 손실율
 
-    @Column(name = "OUTPUT_REQUEST_AMOUNT")
+    @Column(name = "OUTPUT_REQUEST_AMOUNT", columnDefinition = "bigint COMMENT '출고요청량'")
     private int outputRequestAmount;        // 출고요청량
 
-    @Column(name = "OUTPUT_AMOUNT")
+    @Column(name = "OUTPUT_AMOUNT", columnDefinition = "bigint COMMENT '출고량'")
     private int outputAmount;               // 출고량
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "OUT_SOURCING_PRODUCTION_REQUEST")
+    @JoinColumn(name = "OUT_SOURCING_PRODUCTION_REQUEST", columnDefinition = "bigint COMMENT '외주생산의뢰'")
     private OutSourcingProductionRequest outSourcingProductionRequest;
 }

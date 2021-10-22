@@ -26,48 +26,48 @@ import javax.persistence.*;
 @Data
 public class WorkCenterCheckTypeList extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '작업장별 세부 점검항목 고유아이디'")
     private Long id;
 
     // 다대일 단방향 매핑
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "WORK_CENTER_CHECK", nullable = false)
+    @JoinColumn(name = "WORK_CENTER_CHECK", nullable = false, columnDefinition = "bigint COMMENT '작업장별 점검항목'")
     private WorkCenterCheck workCenterCheck;    // 작업장별 점검항목
 
-    @Column(name = "CHECK_CODE", nullable = false, unique = true)
+    @Column(name = "CHECK_CODE", nullable = false, unique = true, columnDefinition = "bigint COMMENT '점검코드'")
     private int checkCode;      // 점검코드
 
-    @Column(name = "CHECK_CATEGORY", nullable = false)
+    @Column(name = "CHECK_CATEGORY", nullable = false, columnDefinition = "bigint COMMENT '점검항목'")
     private String checkCategory;   // 점검항목
 
-    @Column(name = "CHECK_CONTENT", nullable = false)
+    @Column(name = "CHECK_CONTENT", nullable = false, columnDefinition = "bigint COMMENT '점검내용'")
     private String checkContent;    // 점검내용
 
-    @Column(name = "CHECK_CRITERIA", nullable = false)
+    @Column(name = "CHECK_CRITERIA", nullable = false, columnDefinition = "bigint COMMENT '판정기준'")
     private String checkCriteria;        // 판정기준
 
-    @Column(name = "CHECK_METHOD", nullable = false)
+    @Column(name = "CHECK_METHOD", nullable = false, columnDefinition = "bigint COMMENT '판정방법'")
     private String checkMethod;        // 판정방법
 
-    @Column(name = "INPUT_TYPE", nullable = false)
+    @Column(name = "INPUT_TYPE", nullable = false, columnDefinition = "bigint COMMENT '입력방법'")
     private String inputType;       // 입력방법
 
-    @Column(name = "INPUT_NUMBER_FORMAT")
+    @Column(name = "INPUT_NUMBER_FORMAT", columnDefinition = "bigint COMMENT '숫자입력포맷'")
     private String inputNumberFormat;   // 숫자입력포맷
 
-    @Column(name = "USL")
+    @Column(name = "USL", columnDefinition = "bigint COMMENT '상한값'")
     private int usl;        // 상한값
 
-    @Column(name = "LSL")
+    @Column(name = "LSL", columnDefinition = "bigint COMMENT '하한값'")
     private int lsl;        // 하한값
 
-    @Column(name = "ORDERS", nullable = false)
+    @Column(name = "ORDERS", nullable = false, columnDefinition = "bigint COMMENT '표시순서'")
     private int orders;     // 표시순서
 
-    @Column(name = "USE_YN")
+    @Column(name = "USE_YN", columnDefinition = "bigint COMMENT '사용여부'", nullable = false)
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
-
 }

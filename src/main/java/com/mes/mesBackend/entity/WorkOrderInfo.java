@@ -35,63 +35,71 @@ import java.time.LocalDate;
 @Data
 public class WorkOrderInfo extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '작업지시 정보 고유아이디'")
     private Long id;
 
-    @Column(name = "ORDER_NO", nullable = false, unique = true)
+    @Column(name = "ORDER_NO", nullable = false, unique = true, columnDefinition = "bigint COMMENT '지시번호'")
     private String orderNo;             // 지시번호
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "WORK_PROCESS", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WORK_PROCESS", nullable = false, columnDefinition = "bigint COMMENT '작업공정'")
     private WorkProcess workProcess;        // 작업공정
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "WORK_LINE", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WORK_LINE", nullable = false, columnDefinition = "bigint COMMENT '작업라인'")
     private WorkLine workLine;              // 작업라인
 
-    @Column(name = "ORDER_AMOUNT", nullable = false)
+    @Column(name = "ORDER_AMOUNT", nullable = false, columnDefinition = "bigint COMMENT '지시수량'")
     private int orderAmount;                // 지시수량
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "MANAGER")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MANAGER", columnDefinition = "bigint COMMENT '생산담당자'")
     private Manager manager;                // 생산담당자
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "UNIT", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UNIT", nullable = false, columnDefinition = "bigint COMMENT '단위'")
     private Unit unit;                      // 단위
 
-    @Column(name = "READY_TIME")
+    @Column(name = "READY_TIME", columnDefinition = "bigint COMMENT '준비시간'")
     private Long readyTime;                 // 준비시간
 
-    @Column(name = "UHP")
+    @Column(name = "UHP", columnDefinition = "bigint COMMENT 'UPH'")
     private int uph;                        // UPH
 
-    @Column(name = "COST_TIME", nullable = false)
+    @Column(name = "COST_TIME", nullable = false, columnDefinition = "bigint COMMENT '소요시간'")
     private Long costTime;                  // 소요시간
 
-    @Column(name = "EXPECTED_DATE", nullable = false)
+    @Column(name = "EXPECTED_DATE", nullable = false, columnDefinition = "bigint COMMENT '작업예정일'")
     private LocalDate expectedDate;         // 작업예정일
 
-    @Column(name = "EXPECTED_TIME", nullable = false)
+    @Column(name = "EXPECTED_TIME", nullable = false, columnDefinition = "bigint COMMENT '예정시간'")
     private Long expectedTime;              // 예정시간
 
-    @Column(name = "ORDER_STATE",nullable = false)
+    @Column(name = "ORDER_STATE",nullable = false, columnDefinition = "bigint COMMENT '지시상태'")
     private String orderState;              // 지시상태
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "TEST_TYPE", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TEST_TYPE", nullable = false, columnDefinition = "bigint COMMENT '검사의뢰'")
     private TestType testType;              // 검사의뢰
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "TEST_PROCESS")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TEST_PROCESS", columnDefinition = "bigint COMMENT '검사유형'")
     private TestProcess testProcess;        // 검사유형
 
-    @Column(name = "LAST_PROCESS_YN", nullable = false)
+    @Column(name = "LAST_PROCESS_YN", nullable = false, columnDefinition = "bigint COMMENT '최종공정'")
     private boolean lastProcessYn;          // 최종공정
 
-    @Column(name = "PRODUCTION_AMOUNT")
+    @Column(name = "PRODUCTION_AMOUNT", columnDefinition = "bigint COMMENT '생산수량'")
     private int productionAmount;           // 생산수량
 
-    @Column(name = "INPUT_PEOPLE")
+    @Column(name = "INPUT_PEOPLE", columnDefinition = "bigint COMMENT '투입인원'")
     private int inputPeople;                // 투입인원
 
-    @Column(name = "NOTE")
+    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
     private String note;                    // 비고
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "WORK_ORDER")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WORK_ORDER", columnDefinition = "bigint COMMENT '작업지시 제조오더'")
     private WorkOrder workOrder;            // 작업지시 제조오더
 }

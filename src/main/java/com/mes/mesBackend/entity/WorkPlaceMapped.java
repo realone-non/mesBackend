@@ -12,15 +12,17 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Data
 @Entity(name = "WORK_PLACE_AND_BUSINESS_TYPE_MAPPEDS")
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "ID")
 public class WorkPlaceMapped extends BaseTimeEntity {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '사업장 업태 매핑 고유아이디'")
     private Long id;
 
-//    /insertable = false, updatable = false
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "WORK_PLACES_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WORK_PLACES_ID", columnDefinition = "bigint COMMENT '사업장'")
     private WorkPlace workPlace;
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "BUSINESS_TYPES_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "BUSINESS_TYPES_ID", columnDefinition = "bigint COMMENT '업태'")
     private BusinessType businessType;
 }

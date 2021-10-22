@@ -14,12 +14,13 @@ import javax.persistence.*;
 @Data
 public class UseType extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '용도유형 고유아이디'")
     private Long id;
 
-    @Column(name = "USE_TYPE", nullable = false)
+    @Column(name = "USE_TYPE", nullable = false, columnDefinition = "bigint COMMENT '용도유형'")
     private String useType;
 
-    @Column(name = "USE_YN", nullable = false)
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn;
 }

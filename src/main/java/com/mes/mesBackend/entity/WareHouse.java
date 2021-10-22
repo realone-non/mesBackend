@@ -25,19 +25,22 @@ import javax.persistence.*;
 @Data
 public class WareHouse extends BaseTimeEntity{
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '창고 등록 고유아이디'")
     private Long id;
 
-    @Column(name = "WARE_HOUSE_CODE", nullable = false)
+    @Column(name = "WARE_HOUSE_CODE", nullable = false, columnDefinition = "bigint COMMENT '창고코드'")
     private int wareHouseCode;  // 창고코드
 
-    @Column(name = "NAME")
+    @Column(name = "NAME", columnDefinition = "bigint COMMENT '창고명'")
     private String name;   // 창고명
 
-    @ManyToOne @JoinColumn(name = "WARE_HOUSE_TYPES_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WARE_HOUSE_TYPE", columnDefinition = "bigint COMMENT '창고유형'")
     private WareHouseType wareHouseType;    // 창고유형
 
-    @Column(name = "WARE_HOUSE_GROUP")
+    @Column(name = "WARE_HOUSE_GROUP", columnDefinition = "bigint COMMENT '창고그룹'")
     private String wareHouseGroup;   // 창고그룹
 
 //    @Column(name = "WORK_SHOP")
@@ -49,12 +52,13 @@ public class WareHouse extends BaseTimeEntity{
 //    @Column(name = "WORK_PROCESS")
 //    private String workProcess; // 작업공정
 
-    @Column(name = "USE_YN")
+    @Column(name = "USE_YN", columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn;      // 사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @OneToOne @JoinColumn(name = "FACTORY")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장 (검색)
 }

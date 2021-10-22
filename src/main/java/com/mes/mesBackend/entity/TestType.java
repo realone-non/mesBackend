@@ -17,12 +17,13 @@ import javax.persistence.*;
 @Data
 public class TestType extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '검사타입 고유아이디'")
     private Long id;
 
-    @Column(name = "TEST_TYPE", nullable = false)
+    @Column(name = "TEST_TYPE", nullable = false, columnDefinition = "bigint COMMENT '검사타입'")
     private String testType;
 
-    @Column(name = "USE_YN", nullable = false)
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn;
 }

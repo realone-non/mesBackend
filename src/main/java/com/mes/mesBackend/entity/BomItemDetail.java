@@ -1,9 +1,6 @@
 package com.mes.mesBackend.entity;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -32,52 +29,59 @@ import javax.persistence.*;
 @Data
 public class BomItemDetail extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT 'BOM품목 정보 등록 고유아이디'")
     private Long id;
 
-    @Column(name = "LEVEL")
+    @Column(name = "LEVEL", columnDefinition = "bigint COMMENT '레벨'")
     private Long level;     // 레벨
 
-    @Column(name = "DETAIL_ITEM_NO", nullable = false)
+    @Column(name = "DETAIL_ITEM_NO", nullable = false, columnDefinition = "bigint COMMENT '품번'")
     private String detailItemNo;    // 품번
 
-    @Column(name = "DETAIL_ITEM_NAME", nullable = false)
+    @Column(name = "DETAIL_ITEM_NAME", nullable = false, columnDefinition = "bigint COMMENT '품명'")
     private String detailItemName;  // 품명
 
-    @Column(name = "MANUFACTURER_ITEM_NO")
+    @Column(name = "MANUFACTURER_ITEM_NO", columnDefinition = "bigint COMMENT '제조사 품번'")
     private String manufacturerItemNo;      //  제조사 품번
 
-    @OneToOne @JoinColumn(name = "UNIT_ID")
+    @OneToOne
+    @JoinColumn(name = "UNIT", columnDefinition = "bigint COMMENT '단위'")
     private Unit unit;    // 단위
 
-    @Column(name = "AMOUNT")
+    @Column(name = "AMOUNT", columnDefinition = "bigint COMMENT '수량'")
     private int amount;     // 수량
 
-    @Column(name = "TO_BUY")
+    @Column(name = "TO_BUY", columnDefinition = "bigint COMMENT '구매처'")
     private String toBuy;       // 구매처
 
-    @Column(name = "LOCATION")
+    @Column(name = "LOCATION", columnDefinition = "bigint COMMENT '위치'")
     private String location;    // 위치
 
-    @Column(name = "UNIT_PRICE")
+    @Column(name = "UNIT_PRICE", columnDefinition = "bigint COMMENT '단가'")
     private int unitPrice;      // 단가
 
     // 일대다 단방향
-    @OneToOne @JoinColumn(name = "ITEM_ACCOUNTS_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM_ACCOUNTS", columnDefinition = "bigint COMMENT '품목계정'")
     private ItemAccount itemAccount;    // 품목계정
 
     // 일대다 단방향
-    @OneToOne @JoinColumn(name = "WORK_PROCESS_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '공정'")
     private WorkProcess workProcess;     // 공정
 
-    @Column(name = "USE_YN", nullable = false)
-    private boolean useYn;      // 사용
-
-    @Column(name = "NOTE")
+    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
     private String note;        // 비고
 
     // 다대일 단방향
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "BOM_MASTERS_ID")
+    @JoinColumn(name = "BOM_MASTERS_ID", columnDefinition = "bigint COMMENT 'BomMaster'")
     private BomMaster bomMaster;
+
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
+    private Boolean useYn = true;      //  사용여부
+
+    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
+    private boolean deleteYn = false;  // 삭제여부
 }

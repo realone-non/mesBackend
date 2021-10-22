@@ -17,18 +17,19 @@ import javax.persistence.*;
 @Data
 public class TestCategory {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '검사유형 고유아이디'")
     private Long id;
 
-    @Column(name = "CHECK_CATEGORY", nullable = false, unique = true)
+    @Column(name = "CHECK_CATEGORY", nullable = false, unique = true, columnDefinition = "bigint COMMENT '검사유형'")
     private String checkCategory;       // 검사유형
 
-    @Column(name = "TEST_TYPE", nullable = false)
+    @Column(name = "TEST_TYPE", nullable = false, columnDefinition = "bigint COMMENT '검사타입'")
     private String testType;
 
-    @Column(name = "USE_YN")
+    @Column(name = "USE_YN", columnDefinition = "bigint COMMENT '사용여부'", nullable = false)
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 }

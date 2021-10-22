@@ -25,27 +25,36 @@ import java.time.LocalDate;
 @Data
 public class DevelopmentFile extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '개발등록 파일 고유아이디'")
     private Long id;
 
-    @OneToOne @JoinColumn(name = "DEVELOPMENT_FILE_TYPE", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DEVELOPMENT_FILE_TYPE", nullable = false, columnDefinition = "bigint COMMENT '개발등록 파일 타입'")
     private DevelopmentFileType developmentFileType;        // 개발등록 파일 타입
 
-    @Column(name = "FILE_URL", nullable = false)
+    @Column(name = "FILE_URL", nullable = false, columnDefinition = "bigint COMMENT '파일 url'")
     private String fileUrl;         // 파일url
 
-    @Column(name = "REGISTERED")
+    @Column(name = "REGISTERED", columnDefinition = "bigint COMMENT '등록자'")
     private String registered;      // 등록자
 
-    @Column(name = "APPROVAL_DATE")
+    @Column(name = "APPROVAL_DATE", columnDefinition = "bigint COMMENT '승인일시'")
     private LocalDate approvalDate;     // 승인일시
 
-    @Column(name = "UPDATE_CONTENT")
+    @Column(name = "UPDATE_CONTENT", columnDefinition = "bigint COMMENT '변경내용'")
     private String updateContent;       // 변경내용
 
-    @Column(name = "VER")
+    @Column(name = "VER", columnDefinition = "bigint COMMENT 'VER'")
     private int ver;                    // VER
 
-    @ManyToOne @JoinColumn(name = "DEVELOPMENT", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DEVELOPMENT", nullable = false, columnDefinition = "bigint COMMENT '개발등록'")
     private Development development;                // 개발등록
+
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
+    private Boolean useYn = true;      //  사용여부
+
+    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
+    private boolean deleteYn = false;  // 삭제여부
 }

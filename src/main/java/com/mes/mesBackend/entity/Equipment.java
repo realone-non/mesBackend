@@ -33,57 +33,62 @@ import java.time.LocalDate;
 @Data
 public class Equipment extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '설비등록 고유아이디'")
     private Long id;
 
-    @Column(name = "EQUIPMENT_CODE", nullable = false, unique = true)
+    @Column(name = "EQUIPMENT_CODE", nullable = false, unique = true, columnDefinition = "bigint COMMENT '설비코드'")
     private String equipmentCode;        // 설비코드
 
-    @Column(name = "EQUIPMENT_NAME", nullable = false, unique = true)
+    @Column(name = "EQUIPMENT_NAME", nullable = false, unique = true, columnDefinition = "bigint COMMENT '설비명'")
     private String equipmentName;        // 설비명
 
-    @Column(name = "EQUIPMENT_TYPE")
+    @Column(name = "EQUIPMENT_TYPE", columnDefinition = "bigint COMMENT '설비유형'")
     private String equipmentType;        // 설비유형
 
-    @Column(name = "MODEL")
+    @Column(name = "MODEL", columnDefinition = "bigint COMMENT '규격모델'")
     private String model;               // 규격&모델
 
-    @Column(name = "PURCHASE_COMPANY")
+    @Column(name = "PURCHASE_COMPANY", columnDefinition = "bigint COMMENT '구매처'")
     private String purchaseCompany;     // 구매처
 
-    @Column(name = "PURCHASE_DATE")
+    @Column(name = "PURCHASE_DATE", columnDefinition = "bigint COMMENT '구매일자'")
     private String purchaseDate;        // 구매일자
 
-    @Column(name = "PURCHASE_AMOUNT")
+    @Column(name = "PURCHASE_AMOUNT", columnDefinition = "bigint COMMENT '구입금액'")
     private String purchaseAmount;      // 구입금액
 
-    @Column(name = "MAKER")
+    @Column(name = "MAKER", columnDefinition = "bigint COMMENT '생산업체명'")
     private String maker;               // 생산업체명
 
-    @Column(name = "SERIAL_NO")
+    @Column(name = "SERIAL_NO", columnDefinition = "bigint COMMENT '시리얼번호'")
     private String serialNo;            // 시리얼번호
 
-    @Column(name = "START_DATE")
+    @Column(name = "START_DATE", columnDefinition = "bigint COMMENT '생산개시일자'")
     private LocalDate startDate;        // 생산개시일자
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "WORK_CENTER_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WORK_CENTER", columnDefinition = "bigint COMMENT '작업장'")
     private WorkCenter workCenter;        // 작업장
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "WORK_PROCESS_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '작업공정'")
     private WorkProcess workProcess;        // 작업공정
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "WORK_LINE_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WORK_LINE", columnDefinition = "bigint COMMENT '작업라인'")
     private WorkLine workLine;              // 작업라인
 
-    @Column(name = "CHECK_CYCLE")
+    @Column(name = "CHECK_CYCLE", columnDefinition = "bigint COMMENT '점검주기'")
     private int checkCycle;             // 점검주기
 
-    @Column(name = "USE_YN")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "FACTORIES_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FACTORIY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 }

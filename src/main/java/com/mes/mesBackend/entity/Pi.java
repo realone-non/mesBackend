@@ -17,18 +17,19 @@ import javax.persistence.*;
 @Data
 public class Pi extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT 'PI 고유아이디'")
     private Long id;
 
-    @Column(name = "INVIOCE_NO")
+    @Column(name = "INVIOCE_NO", columnDefinition = "bigint COMMENT 'InvoiceNo'")
     private String invoiceNo;       // InvoiceNo
 
-    @Column(name = "CUSTOMER_PO_NO")
+    @Column(name = "CUSTOMER_PO_NO", columnDefinition = "bigint COMMENT 'customer PO NO'")
     private String customerPoNo;    // customer PO NO
 
-    @Column(name = "BILL_TO")
+    @Column(name = "BILL_TO", columnDefinition = "bigint COMMENT 'Bill To'")
     private String billTo;          // Bill To
 
-    @Column(name = "REMARKS")
+    @Column(name = "REMARKS", columnDefinition = "bigint COMMENT 'remarks'")
     private String remarks;         // Remarks
 }

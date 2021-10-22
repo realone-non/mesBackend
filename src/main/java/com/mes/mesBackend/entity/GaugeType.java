@@ -16,15 +16,16 @@ import javax.persistence.*;
 @Data
 public class GaugeType extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT 'GAUGE유형 고유아이디'")
     private Long id;
 
-    @Column(name = "GAUGE_TYPE")
+    @Column(name = "GAUGE_TYPE", columnDefinition = "bigint COMMENT 'GAUGE유형'")
     private String gaugeType;   // GAUGE유형
 
-    @Column(name = "USE_YN", nullable = false)
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn = true;  // 사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

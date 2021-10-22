@@ -26,50 +26,53 @@ import javax.persistence.*;
 @Entity(name = "FACTORIES")
 @Data
 public class Factory extends BaseTimeEntity {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '공장등록 고유아이디'")
     private Long id;
 
-    @Column(name = "FACTORY_CODE")
+    @Column(name = "FACTORY_CODE", columnDefinition = "bigint COMMENT '공장코드'")
     private String factoryCode;     // 공장코드
 
-    @Column(name = "FACTORY_NAME")
+    @Column(name = "FACTORY_NAME", columnDefinition = "bigint COMMENT '공장명'")
     private String factoryName;     // 공장명
 
-    @Column(name = "SHORT_NAME")
+    @Column(name = "SHORT_NAME", columnDefinition = "bigint COMMENT '약어'")
     private String shortName;       // 약어
 
-    @Column(name = "POSTAL_CODE")
+    @Column(name = "POSTAL_CODE", columnDefinition = "bigint COMMENT '우편번호'")
     private String postalCode;      // 우편번호
 
-    @Column(name = "ADDRESS")
+    @Column(name = "ADDRESS", columnDefinition = "bigint COMMENT '기본주소'")
     private String address;         // 기본주소
 
-    @Column(name = "DETAIL_ADDRESS")
+    @Column(name = "DETAIL_ADDRESS", columnDefinition = "bigint COMMENT '상세주소'")
     private String detailAddress;   // 상세주소
 
-    @Column(name = "ENG_ADDRESS_1")
+    @Column(name = "ENG_ADDRESS_1", columnDefinition = "bigint COMMENT '영문주소1'")
     private String engAddress1;     // 영문주소1
 
-    @Column(name = "ENG_ADDRESS_2")
+    @Column(name = "ENG_ADDRESS_2", columnDefinition = "bigint COMMENT '영문주소2'")
     private String engAddress2;     // 영문주소2
 
-    @Column(name = "TEL_NUMBER")
+    @Column(name = "TEL_NUMBER", columnDefinition = "bigint COMMENT '전화번호'")
     private String telNumber;       // 전화번호
 
-    @Column(name = "FAX_NUMBER")
+    @Column(name = "FAX_NUMBER", columnDefinition = "bigint COMMENT 'fax번호'")
     private String faxNumber;       // fax번호
 
-    @Column(name = "LOT_CODE")
+    @Column(name = "LOT_CODE", columnDefinition = "bigint COMMENT 'LOT용 코드'")
     private String lotCode;         // LOT용 코드
 
     // 1:1 단방향 매핑
-    @OneToOne @JoinColumn(name = "WORK_PLACES_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WORK_PLACES_ID", columnDefinition = "bigint COMMENT '사업장'")
     private WorkPlace workPlace;    // 사업장
 
-    @Column(name = "USE_YN")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
     public void put(Factory newFactory, WorkPlace newWorkPlace) {

@@ -48,48 +48,55 @@ import java.util.List;
 public class Item extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '품목 고유아이디'")
     private Long id;
 
-    @Column(name = "ITEM_NO", unique = true, nullable = false)
+    @Column(name = "ITEM_NO", unique = true, nullable = false, columnDefinition = "bigint COMMENT '품번'")
     private String itemNo;      // 품번
 
-    @Column(name = "ITEM_NAME", nullable = false)
+    @Column(name = "ITEM_NAME", nullable = false, columnDefinition = "bigint COMMENT '품명'")
     private String itemName;    // 품명
 
-    @Column(name = "STANDARD")
+    @Column(name = "STANDARD", columnDefinition = "bigint COMMENT '규격'")
     private String standard;    // 규격
 
     // 일대다 단방향
-    @OneToOne @JoinColumn(name = "ITEM_ACCOUNTS_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM_ACCOUNT", columnDefinition = "bigint COMMENT '품목계정'")
     private ItemAccount itemAccount;    // 품목계정
 
     // 일대다 단방향
-    @OneToOne @JoinColumn(name = "ITEM_GROUPS_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM_GROUP", columnDefinition = "bigint COMMENT '품목그룹'")
     private ItemGroup itemGroup;        // 품목그룹
 
-    @OneToOne @JoinColumn(name = "ITEM_FORMS_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM_FORM", columnDefinition = "bigint COMMENT '품목형태'")
     private ItemForm itemForm;          // 품목형태
 
-    @OneToOne @JoinColumn(name = "USE_TYPES_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USE_TYPE", columnDefinition = "bigint COMMENT '용도유형'")
     private UseType useType;            // 용도유형
 
-    @OneToOne @JoinColumn(name = "ROUTINGS_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ROUTING", columnDefinition = "bigint COMMENT '라우팅'")
     private Routing routing;            // 라우팅 (라우팅 명)
 
-    @OneToOne @JoinColumn(name = "UNIT_ID", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UNIT", nullable = false, columnDefinition = "bigint COMMENT '재고단위'")
     private Unit unit;        // 재고단위
 
-    @Column(name = "UHP", nullable = false)
+    @Column(name = "UHP", nullable = false, columnDefinition = "bigint COMMENT 'uhp'")
     private int uhp;            // uhp
 
-    @Column(name = "VALID_DAY", nullable = false)
+    @Column(name = "VALID_DAY", nullable = false, columnDefinition = "bigint COMMENT '유효일수'")
     private int validDay;       // 유효일수
 
-    @OneToOne @JoinColumn(name = "LOT_TYPES_ID", nullable = false)
+    @OneToOne @JoinColumn(name = "LOT_TYPES_ID", nullable = false, columnDefinition = "bigint COMMENT 'LOT유형'")
     private LotType lotType;    // LOT유형
 
-//    @OneToOne @JoinColumn(name = "INPUT_TEST")
+//    @OneToOne @JoinColumn(name = "INPUT_TEST", columnDefinition = "bigint COMMENT ''")
 //    private TestType inputTest;        // 수입검사
 //
 //    @OneToOne @JoinColumn(name = "PROCESS_TEST")
@@ -99,48 +106,51 @@ public class Item extends BaseTimeEntity {
 //    private TestType shipmentTest;      // 출하검사
 
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ITEM_CHECK_CATEGORY")
+    @JoinColumn(name = "ITEM_CHECK_CATEGORY", columnDefinition = "bigint COMMENT '품목별 검사항목'")
     private List<ItemCheckCategory> itemCheckCategory;
 
-    @Column(name = "WASTE_PRODUCT_LOT", nullable = false)
+    @Column(name = "WASTE_PRODUCT_LOT", nullable = false, columnDefinition = "bigint COMMENT '폐기품 LOT 관리'")
     private boolean wasteProductLot;        // 폐기품 Lot 관리
 
-    @Column(name = "DEVELOP_STATUS", nullable = false)
+    @Column(name = "DEVELOP_STATUS", nullable = false, columnDefinition = "bigint COMMENT '개발상태'")
     private DevelopStatus developStatus = DevelopStatus.BEFORE;  // 개발상태
 
-    @Column(name = "STOCK_CONTROL", nullable = false)
+    @Column(name = "STOCK_CONTROL", nullable = false, columnDefinition = "bigint COMMENT '재고관리'")
     private boolean stockControl;       // 재고관리
 
-    @Column(name = "INPUT_UNIT_PRICE")
+    @Column(name = "INPUT_UNIT_PRICE", columnDefinition = "bigint COMMENT '입고단가'")
     private int inputUnitPrice;         // 입고단가
 
-    @Column(name = "STORAGE_LOCATION")
+    @Column(name = "STORAGE_LOCATION", columnDefinition = "bigint COMMENT '저장위치'")
     private String storageLocation;    // 저장위치
 
-    @OneToOne @JoinColumn(name = "CLIENT_PART_NO")
-    private Client clientPartNo;        // 거래처품번
+    @OneToOne @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '거래처'")
+    private Client clientPartNo;        // 거래처
 
-    @Column(name = "MANUFACTURER_PART_NO")
+    @Column(name = "MANUFACTURER_PART_NO", columnDefinition = "bigint COMMENT '제조사'")
     private String manufacturerPartNo;        // 제조사품번
 
-    @Column(name = "MANUFACTURER")
+    @Column(name = "MANUFACTURER", columnDefinition = "bigint COMMENT '제조사'")
     private String Manufacturer;            // 제조사
 
-    @OneToOne @JoinColumn(name = "TEST_CRITERIAS_ID")
+    @OneToOne @JoinColumn(name = "TEST_CRITERIAS_ID", columnDefinition = "bigint COMMENT '검사기준'")
     private TestCriteria testCriteria;      // 검사기준
 
-    @OneToOne @JoinColumn(name = "TEST_PROCESSES_ID")
+    @OneToOne @JoinColumn(name = "TEST_PROCESSES_ID", columnDefinition = "bigint COMMENT '검사방법'")
     private TestProcess testProcess;        // 검사방법
 
-    @Column(name = "USE_YN", nullable = false)
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn;                      // 사용
 
-    @Column(name = "SEARCH_WORD")
+    @Column(name = "SEARCH_WORD", columnDefinition = "bigint COMMENT '검색어'")
     private String searchWord;          // 검색어
 
-    @Column(name = "AGING_MATERIAL")
-    private boolean agingMaterial;      // 시효성자재
+    @Column(name = "AGING_MATERIAL_Yn", columnDefinition = "bigint COMMENT '시효정자재 여부'")
+    private boolean agingMaterialYn;      // 시효성자재
 
-    @OneToOne @JoinColumn(name = "ITEM_FILES_ID")
+    @OneToOne @JoinColumn(name = "ITEM_FILES_ID", columnDefinition = "bigint COMMENT '파일'")
     private ItemFile itemFile;          // 파일
+
+    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
+    private boolean deleteYn = false;  // 삭제여부
 }

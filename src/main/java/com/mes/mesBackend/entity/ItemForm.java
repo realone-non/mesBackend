@@ -14,12 +14,13 @@ import javax.persistence.*;
 @Data
 public class ItemForm extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '품목형태 고유아이디'")
     private Long id;
 
-    @Column(name = "FORM", nullable = false)
+    @Column(name = "FORM", nullable = false, columnDefinition = "bigint COMMENT '품목형태'")
     private String form;
 
-    @Column(name = "USE_YN", nullable = false)
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn;
 }

@@ -31,24 +31,27 @@ import javax.persistence.*;
 @Data
 public class WorkOrder extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '작업지시 등록 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "PRODUCE_ORDER", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PRODUCE_ORDER", nullable = false, columnDefinition = "bigint COMMENT '제조오더'")
     private ProduceOrder produceOrder;      // 제조오더
 
-    @Column(name = "START_SERIAL_NO")
+    @Column(name = "START_SERIAL_NO", columnDefinition = "bigint COMMENT '시작 시리얼 번호'")
     private String startSerialNo;           // 시작 시리얼번호
 
-    @Column(name = "NOTE")
+    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
     private String note;                    // 비고
 
-    @Column(name = "USE_YN")
+    @Column(name = "USE_YN", columnDefinition = "bigint COMMENT '사용여부'", nullable = false)
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "FACTORIES_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 }

@@ -45,103 +45,108 @@ public class Client extends BaseTimeEntity {
     * 검색어 (홍콩대리점)
     * */
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '거래처 고유아이디'")
     private Long id;
 
-    @Column(name = "CLIENT_CODE", nullable = false)
+    @Column(name = "CLIENT_CODE", nullable = false, columnDefinition = "bigint COMMENT '거래처 코드'")
     private String clientCode;  // 거래처코드
 
-    @Column(name = "NAME", nullable = false)
+    @Column(name = "NAME", nullable = false, columnDefinition = "bigint COMMENT '거래처 명'")
     private String name;    // 거래처명
 
-    @Column(name = "SHORT_NAME", nullable = false)
+    @Column(name = "SHORT_NAME", nullable = false, columnDefinition = "bigint COMMENT '약어'")
     private String shortName;      // 약어
 
-    @ManyToOne @JoinColumn(name = "CLIENT_TYPES_ID", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "CLIENT_TYPE", nullable = false, columnDefinition = "bigint COMMENT '거래처 유형'")
     private ClientType clientType;   // 거래처 유형
 
-    @Column(name = "BUSINESS_REG_NO", nullable = false, length = 10)
+    @Column(name = "BUSINESS_REG_NO", nullable = false, columnDefinition = "bigint COMMENT '사업자등록번호'")
     private String businessNumber;  // 사업자등록번호
 
-    @Column(name = "BUSINESS_FILE")
+    @Column(name = "BUSINESS_FILE", columnDefinition = "bigint COMMENT '사업자등록증'")
     private String businessFile;    // 사업자등록증
 
-    @Column(name = "CEO_NAME", nullable = false)
+    @Column(name = "CEO_NAME", nullable = false, columnDefinition = "bigint COMMENT '대표자명'")
     private String ceoName;     // 대표자명
 
-    @Column(name = "POSTAL_CODE", nullable = false, length = 6)
+    @Column(name = "POSTAL_CODE", nullable = false, columnDefinition = "bigint COMMENT '우편번호'")
     private String postalCode;      // 우편번호
 
-    @Column(name = "ADDRESS", nullable = false)
+    @Column(name = "ADDRESS", nullable = false, columnDefinition = "bigint COMMENT '주소'")
     private String address;     // 주소
 
-    @Column(name = "DETAIL_ADDRESS")
+    @Column(name = "DETAIL_ADDRESS", columnDefinition = "bigint COMMENT '상세주소'")
     private String detailAddress;   // 상세주소
 
-    @ManyToOne @JoinColumn(name = "BUSINESS_TYPES_ID", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "BUSINESS_TYPE", nullable = false, columnDefinition = "bigint COMMENT '업태'")
     private BusinessType businessType;      // 업태
 
-    @Column(name = "ITEM")
+    @Column(name = "ITEM", columnDefinition = "bigint COMMENT '업종'")
     private String item;        // 업종
 
-    @Column(name = "TEL_NUMBER", nullable = false, length = 11)
+    @Column(name = "TEL_NUMBER", nullable = false, columnDefinition = "bigint COMMENT '전화번호'")
     private String telNumber;   // 전화번호
 
-    @Column(name = "FAX_NUMBER", length = 12)
+    @Column(name = "FAX_NUMBER", columnDefinition = "bigint COMMENT 'fax번호'")
     private String faxNumber;   // fax번호 12자
 
-    @Column(name = "HOME_PAGE_URL")
+    @Column(name = "HOME_PAGE_URL", columnDefinition = "bigint COMMENT '홈페이지 주소'")
     private String homePageUrl; //  홈페이지 주소
 
-    @Column(name = "MAIL", nullable = false)
+    @Column(name = "MAIL", nullable = false, columnDefinition = "bigint COMMENT '메일'")
     private String mail;        // 메일
 
-    @Column(name = "CLIENT_CHARGER_NAME")
+    @Column(name = "CLIENT_CHARGER_NAME", columnDefinition = "bigint COMMENT '거래처담당자명'")
     private String clientChargeName;  // 담당자 이름
 
-    @Column(name = "TRADE_BUSINESS_REG_NO")
+    @Column(name = "TRADE_BUSINESS_REG_NO", columnDefinition = "bigint COMMENT '무역업등록번호'")
     private String tradeBusinessRegNo;  // 무역업등록번호
 
-    @Column(name = "PCCC")
+    @Column(name = "PCCC", columnDefinition = "bigint COMMENT '통관고유번호'")
     private String pccc;            // 통관고유번호
 
-    @ManyToOne @JoinColumn(name = "COUNTRY_CODE_ID")
+    @ManyToOne
+    @JoinColumn(name = "COUNTRY_CODE", columnDefinition = "bigint COMMENT '국가코드'")
     private CountryCode countryCode;     // 국가코드
 
-    @Column(name = "AREA")
+    @Column(name = "AREA", columnDefinition = "bigint COMMENT '지역'")
     private String area;        // 지역
 
-    @Column(name = "CURRENCY_UNIT")
+    @Column(name = "CURRENCY_UNIT", columnDefinition = "bigint COMMENT '거래화폐단위'")
     private String currencyUnit;    // 거래화폐단위
 
-    @Column(name = "COMPANY_CHARGE")
+    @Column(name = "COMPANY_CHARGE", columnDefinition = "bigint COMMENT '회사담당자'")
     private String companyCharge;  // 회사담당자
 
-    @Column(name = "COMPANY_CHARGE_DEPT")
+    @Column(name = "COMPANY_CHARGE_DEPT", columnDefinition = "bigint COMMENT '회사담당부서'")
     private String companyChargeDept;  // 회사담당부서
 
-    @Column(name = "PAYMENT_METHOD")
+    @Column(name = "PAYMENT_METHOD", columnDefinition = "bigint COMMENT '대금결제방법'")
     private String paymentMethod;   // 대금결제방법
 
-    @Column(name = "PAYMENT_DATE")
+    @Column(name = "PAYMENT_DATE", columnDefinition = "bigint COMMENT '결제일자'")
     private String paymentDate;     // 결제일자
 
-    @Column(name = "TRANSIT_METHOD")
+    @Column(name = "TRANSIT_METHOD", columnDefinition = "bigint COMMENT '운송방법'")
     private String transitMethod;   // 운송방법
 
-    @Column(name = "TEST_METHOD")
+    @Column(name = "TEST_METHOD", columnDefinition = "bigint COMMENT '검사방법'")
     private String testMethod;      // 검사방법
 
-    @Column(name = "PHONE_NUMBER")
+    @Column(name = "PHONE_NUMBER", columnDefinition = "bigint COMMENT '휴대폰번호'")
     private String phoneNumber;     // 휴대폰번호
 
-    @Column(name = "SEARCH_WORD")
+    @Column(name = "SEARCH_WORD", columnDefinition = "bigint COMMENT '검색어'")
     private String searchWord;      // 검색어
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @Column(name = "USE_YN")
+    @Column(name = "USE_YN", columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn = true;       // 사용여부
 
     // 수정 매핑

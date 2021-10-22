@@ -27,39 +27,43 @@ import javax.persistence.*;
 @Data
 public class ProduceOrderDetail {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '제조오더 세부내역 고유아이디'")
     private Long id;
 
-    @OneToOne @JoinColumn(name = "ITEM", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM", nullable = false, columnDefinition = "bigint COMMENT '품목'")
     private Item item;      // 품목
 
-    @Column(name = "BOM_AMOUNT", nullable = false)
+    @Column(name = "BOM_AMOUNT", nullable = false, columnDefinition = "bigint COMMENT 'BOM수량'")
     private int bomAmount;      // BOM수량
 
-    @OneToOne @JoinColumn(name = "WORK_PROCESS", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WORK_PROCESS", nullable = false, columnDefinition = "bigint COMMENT '공정'")
     private WorkProcess workProcess;        // 투입공정
 
-    @Column(name = "RESERVATION_AMOUNT", nullable = false)
+    @Column(name = "RESERVATION_AMOUNT", nullable = false, columnDefinition = "bigint COMMENT '에약수량'")
     private int reservationAmount;          // 예약수량
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "UNIT")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UNIT", columnDefinition = "bigint COMMENT '단위'")
     private Unit Unit;                       // 오더단위
 
-    @Column(name = "INPUT_AMOUNT", nullable = false)
+    @Column(name = "INPUT_AMOUNT", nullable = false, columnDefinition = "bigint COMMENT '투입수량'")
     private int inputAmount;                // 투입수량
 
-    @Column(name = "NOTE")
+    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
     private String note;                    // 비고
 
-    @Column(name = "SEQ", nullable = false)
+    @Column(name = "SEQ", nullable = false, columnDefinition = "bigint COMMENT 'seq'")
     private int seq;                        // seq
 
-    @Column(name = "LEVEL", nullable = false)
+    @Column(name = "LEVEL", nullable = false, columnDefinition = "bigint COMMENT 'level'")
     private int level;                      // level
 
-    @Column(name = "USE_YN")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

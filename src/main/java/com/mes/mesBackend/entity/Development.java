@@ -31,39 +31,49 @@ import java.time.LocalDate;
 @Data
 public class Development extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '개발등록 고유아이디'")
     private Long id;
 
-    @OneToOne @JoinColumn(name = "CLIENT", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CLIENT", nullable = false, columnDefinition = "bigint COMMENT '거래처'")
     private Client client;      // 거래처
 
-    @OneToOne @JoinColumn(name = "ITEM", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM", nullable = false, columnDefinition = "bigint COMMENT '품목'")
     private Item item;          // 품목
 
-    @Column(name = "BUSINESS_NAME")
+    @Column(name = "BUSINESS_NAME", columnDefinition = "bigint COMMENT '사업명'")
     private String businessName;        // 사업명
 
-    @Column(name = "REQUEST_DATE")
+    @Column(name = "REQUEST_DATE", columnDefinition = "bigint COMMENT '의뢰일자'")
     private LocalDate requestDate;      // 의뢰일자
 
-    @Column(name = "PERIOD_DATE")
+    @Column(name = "PERIOD_DATE", columnDefinition = "bigint COMMENT '납기일자'")
     private LocalDate periodDate;       // 납기일자
 
-    @OneToOne @JoinColumn(name = "DEVELOPMENT_STATE")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DEVELOPMENT_STATE", columnDefinition = "bigint COMMENT '진행상태'")
     private DevelopmentState developmentState;       // 진행상태
 
-    @Column(name = "DELIVER_AMOUNT")
+    @Column(name = "DELIVER_AMOUNT", columnDefinition = "bigint COMMENT '납품수량'")
     private int deliverAmount;          // 납품수량
 
-    @Column(name = "CONNECTOR_YN")
+    @Column(name = "CONNECTOR_YN", columnDefinition = "bigint COMMENT '커넥터 사급여부'")
     private boolean connectorYn;     // 커넥터 사급여부
 
-    @Column(name = "MACHINE_MANAGER")
+    @Column(name = "MACHINE_MANAGER", columnDefinition = "bigint COMMENT '기구담당자'")
     private String machineManager;  // 기구담당자
 
-    @Column(name = "PCB_MAN0AGER")
+    @Column(name = "PCB_MAN0AGER", columnDefinition = "bigint COMMENT 'PCB담당자'")
     private String PcbManager;      // PCB담당자
 
-    @Column(name = "FILE_URL")
+    @Column(name = "FILE_URL", columnDefinition = "bigint COMMENT '수주파일'")
     private String fileUrl;         // 수주파일
+
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
+    private Boolean useYn = true;      //  사용여부
+
+    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
+    private boolean deleteYn = false;  // 삭제여부
 }

@@ -29,40 +29,44 @@ import java.time.LocalDate;
 @Data
 public class OutSourcingInput extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '외주입고 등록 고유아이디'")
     private Long id;
 
-    @Column(name = "PRODUCTION_REQEUST_NO", nullable = false)
+    @Column(name = "PRODUCTION_REQEUST_NO", nullable = false, columnDefinition = "bigint COMMENT '생산요청번호'")
     private String productionRequestNo;         // 생산요청번호
 
-    @Column(name = "INPUT_DATE", nullable = false)
+    @Column(name = "INPUT_DATE", nullable = false, columnDefinition = "bigint COMMENT '입고일시'")
     private LocalDate inputDate;                // 입고일시
 
-    @Column(name = "NO_INPUT_AMOUNT")
+    @Column(name = "NO_INPUT_AMOUNT", columnDefinition = "bigint COMMENT '미입고수량'")
     private int noInputAmount;                  // 미입고수량
 
-    @Column(name = "INPUT_AMOUNT")
+    @Column(name = "INPUT_AMOUNT", columnDefinition = "bigint COMMENT '입고수량'")
     private int inputAmount;                    // 입고수량
 
-    @OneToOne @JoinColumn(name = "INPUT_WARE_HOUSE")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "INPUT_WARE_HOUSE", columnDefinition = "bigint COMMENT '입고창고'")
     private WareHouse inputWareHouse;           // 입고창고
 
-    @OneToOne @JoinColumn(name = "TEST_REQUEST_TYPE")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TEST_REQUEST_TYPE", columnDefinition = "bigint COMMENT '검사의뢰유향'")
     private TestType testRequestType;                  // 검사의뢰유형
 
-    @Column(name = "NOTE")
+    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
     private String note;                        // 비고
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "OUT_SOURCING_PRODUCTION_REQUEST")
+    @JoinColumn(name = "OUT_SOURCING_PRODUCTION_REQUEST", columnDefinition = "bigint COMMENT '외주 생산 의뢰'")
     private OutSourcingProductionRequest outSourcingProductionRequest;      // 외주 생산 의뢰 등록
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "FACTORIES_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 
-    @Column(name = "USE_YN", nullable = false)
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn;
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

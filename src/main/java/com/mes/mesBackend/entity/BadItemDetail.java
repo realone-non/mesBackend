@@ -1,9 +1,6 @@
 package com.mes.mesBackend.entity;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 /*
@@ -19,19 +16,21 @@ import javax.persistence.*;
 @Data
 public class BadItemDetail extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID", columnDefinition = "COMMENT '불량항목 등록 세부 리스트 고유아이디'")
     private Long id;
 
     // 다대일 단방향 매핑
-    @ManyToOne @JoinColumn(name = "BAD_ITEM", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "BAD_ITEM", nullable = false, columnDefinition = "COMMENT '불량항목'")
     private BadItem badItem;    // 불량항목코드, 불량항목명
 
-    @Column(name = "ORDERS")
+    @Column(name = "ORDERS", columnDefinition = "COMMENT '순번'")
     private int orders;     // 순번
 
-    @Column(name = "USE_YN")
-    private boolean useYn = true;   // 사용여부
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "COMMENT '사용여부'")
+    private Boolean useYn = true;      //  사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", columnDefinition = "COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

@@ -14,23 +14,24 @@ import javax.persistence.*;
 public class SubNavigation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '서브 네비게이션'")
     private Long id;
 
-    @Column(name = "NAME")
+    @Column(name = "NAME", columnDefinition = "bigint COMMENT '네이게이션 명'")
     private String name;
 
-    @Column(name = "LEVEL")
+    @Column(name = "LEVEL", columnDefinition = "bigint COMMENT '유저레벨'")
     private int level;  // 유저 레벨
 
-    @Column(name = "USE_YN")
+    @Column(name = "USE_YN", columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn;  // 사용여부
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "MAIN_NAVS_ID")
+    @JoinColumn(name = "MAIN_NAVS_ID", columnDefinition = "bigint COMMENT '메인 네비게이션'")
     private MainNavigation mainNavigation;
 
-    @Column(name = "ORDERS")
+    @Column(name = "ORDERS", columnDefinition = "bigint COMMENT '출력순번'")
     private int orders;     // 출력순번
 
     public void put(SubNavigation newSubNavigation) {

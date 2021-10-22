@@ -14,12 +14,13 @@ import javax.persistence.*;
 @Data
 public class LotType extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT 'Lot유형 고유아이디'")
     private Long id;
 
-    @Column(name = "LOT_TYPE", nullable = false)
+    @Column(name = "LOT_TYPE", nullable = false, columnDefinition = "bigint COMMENT 'Lot 유형'")
     private String lotType;
 
-    @Column(name = "USE_YN", nullable = false)
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn;
 }

@@ -1,9 +1,6 @@
 package com.mes.mesBackend.entity;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -29,30 +26,35 @@ import java.time.LocalDate;
 @Data
 public class BomMaster extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT 'BOM등록 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "ITEM_NO")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM_NO", columnDefinition = "bigint COMMENT '품목'")
     private Item itemNo;            // 품번,품명,품목계정,제조사품번,개발상태
 
-    @Column(name = "BOM_NO")
+    @Column(name = "BOM_NO", columnDefinition = "bigint COMMENT 'BOM번호'")
     private Long bomNo;             // BOM번호
 
-    @Column(name = "START_DATE")
+    @Column(name = "START_DATE", columnDefinition = "bigint COMMENT '유효시작일'")
     private LocalDate startDate;    // 유효시작일
 
-    @Column(name = "END_DATE")
+    @Column(name = "END_DATE", columnDefinition = "bigint COMMENT '유효종료일'")
     private LocalDate endDate;      // 유효종료일
 
-    @Column(name = "DEVELOP_STATUS", nullable = false)
+    @Column(name = "DEVELOP_STATUS", nullable = false, columnDefinition = "bigint COMMENT '개발상태'")
     private DevelopStatus developStatus = DevelopStatus.BEFORE;  // 개발상태
 
-    @Column(name = "NOTE")
+    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
     private String note;            // 비고
 
-    @Column(name = "APPROVALDATE")
+    @Column(name = "APPROVALDATE", columnDefinition = "bigint COMMENT '승인일시'")
     private LocalDate approvalDate;     // 승인일시
 
-    @Column(name = "USE_YN", nullable = false)
-    private boolean useYn;
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
+    private Boolean useYn = true;      //  사용여부
+
+    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
+    private boolean deleteYn = false;  // 삭제여부
 }

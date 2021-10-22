@@ -16,18 +16,21 @@ import javax.persistence.*;
 @Data
 public class EstimateItemList extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '품목견적서 리스트 고유아이디'")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "ESTIMATE")
-    private Estimate estimate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ESTIMATE", columnDefinition = "bigint COMMENT '견적서'")
+    private Estimate estimate;      // 견적서
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "ITEM")
-    private Item item;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목'")
+    private Item item;          // 품목
 
-    @Column(name = "USE_YN")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

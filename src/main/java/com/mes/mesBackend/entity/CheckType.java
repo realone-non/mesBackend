@@ -1,9 +1,6 @@
 package com.mes.mesBackend.entity;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -17,15 +14,16 @@ import javax.persistence.*;
 @Data
 public class CheckType extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '점검유형 고유아이디'")
     private Long id;
 
-    @Column(name = "CHECK_TYPE")
+    @Column(name = "CHECK_TYPE", columnDefinition = "bigint COMMENT '점검유형'")
     private String checkType;       // 점검유형
 
-    @Column(name = "USE_YN")
-    private boolean useYn = true;   // 사용여부
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
+    private Boolean useYn = true;      //  사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

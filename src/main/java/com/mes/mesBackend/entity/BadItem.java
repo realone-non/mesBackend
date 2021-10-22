@@ -1,9 +1,6 @@
 package com.mes.mesBackend.entity;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -24,18 +21,19 @@ import javax.persistence.*;
 @Data
 public class BadItem extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID", columnDefinition = "COMMENT '불량항목 등록 고유아이디'")
     private Long id;
 
-    @Column(name = "BAD_ITEM_CODE", nullable = false, unique = true)
+    @Column(name = "BAD_ITEM_CODE", nullable = false, unique = true, columnDefinition = "COMMENT '불량항목코드'")
     private String badItemCode;     //  불량항목코드
 
-    @Column(name = "BAD_ITEM_NAME", nullable = false)
+    @Column(name = "BAD_ITEM_NAME", nullable = false, columnDefinition = "COMMENT '불량항목명'")
     private String badItemName;     // 불량항목명
 
-    @Column(name = "USE_YN")
-    private boolean useYn = true;   // 사용여부
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "COMMENT '사용여부'")
+    private Boolean useYn = true;      //  사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", columnDefinition = "COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

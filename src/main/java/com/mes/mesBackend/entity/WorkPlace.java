@@ -14,56 +14,57 @@ import java.util.List;
 @Entity(name = "WORK_PLACES")
 @Data
 public class WorkPlace extends BaseTimeEntity{
-
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "ID")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '사업장 고유아이디'")
     private Long id;
 
-    @Column(name = "WORK_PLACE_CODE", nullable = false)
+    @Column(name = "WORK_PLACE_CODE", nullable = false, columnDefinition = "bigint COMMENT '사업장 코드'")
     private String workPlaceCode;   // 사업장 코드
 
-    @Column(name = "WORK_PLACE_NAME", nullable = false)
+    @Column(name = "WORK_PLACE_NAME", nullable = false, columnDefinition = "bigint COMMENT '사업장명'")
     private String workPlaceName;   // 사업장명
 
-    @Column(name = "BUSINESS_REG_NO", nullable = false, length = 10)
+    @Column(name = "BUSINESS_REG_NO", nullable = false, columnDefinition = "bigint COMMENT '사업자등록번호'")
     private String businessRegNo;  // 사업자등록번호
 
-    @Column(name = "CEO_NAME", nullable = false)
+    @Column(name = "CEO_NAME", nullable = false, columnDefinition = "bigint COMMENT '대표자명'")
     private String ceoName;     // 대표자명
 
-    @Column(name = "POSTAL_CODE", nullable = false, length = 6)
+    @Column(name = "POSTAL_CODE", nullable = false, columnDefinition = "bigint COMMENT '우편번호'")
     private String postalCode;      // 우편번호
 
-    @Column(name = "ADDRESS", nullable = false)
+    @Column(name = "ADDRESS", nullable = false, columnDefinition = "bigint COMMENT '주소'")
     private String address;    // 주소
 
-    @Column(name = "DETAIL_ADDRESS")
+    @Column(name = "DETAIL_ADDRESS", columnDefinition = "bigint COMMENT '상세주소'")
     private String detailAddress;    // 상세주소
 
-    @Column(name = "ENG_ADDRESS_1")
+    @Column(name = "ENG_ADDRESS_1", columnDefinition = "bigint COMMENT '영문주소1'")
     private String engAddress1;     // 영문주소1
 
-    @Column(name = "ENG_ADDRESS_2")
+    @Column(name = "ENG_ADDRESS_2", columnDefinition = "bigint COMMENT '영문주소2'")
     private String engAddress2;    // 영문주소2
 
     @OneToMany(mappedBy = "workPlace", fetch = FetchType.LAZY)
     private List<WorkPlaceMapped> type;   // 업태
 
-    @Column(name = "ITEM")
+    @Column(name = "ITEM", columnDefinition = "bigint COMMENT '업종'")
     private String item;    // 업종
 
-    @Column(name = "TEL_NUMBER", nullable = false, length = 11)
+    @Column(name = "TEL_NUMBER", nullable = false, columnDefinition = "bigint COMMENT '전화번호'")
     private String telNumber;  // 전화번호 11자
 
-    @Column(name = "FAX_NUMBER", length = 12)
+    @Column(name = "FAX_NUMBER", columnDefinition = "bigint COMMENT 'fax번호'")
     private String faxNumber;   // fax번호 12자
 
-    @Column(name = "CORPORATE_CODE")
+    @Column(name = "CORPORATE_CODE", columnDefinition = "bigint COMMENT '법인코드'")
     private String corporateCode;   // 법인코드
 
-    @Column(name = "USE_YN", nullable = false)
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn = true;      // 사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
     public void put(WorkPlace newWorkPlace) {

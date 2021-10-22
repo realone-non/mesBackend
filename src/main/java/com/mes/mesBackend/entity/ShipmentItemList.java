@@ -30,45 +30,48 @@ import javax.persistence.*;
 @Data
 public class ShipmentItemList extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '출하등록 품목정보 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "CONTRACT", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CONTRACT", nullable = false, columnDefinition = "bigint COMMENT '수주'")
     private Contract contract;      // 수주
 
-    @Column(name = "NOT_SHIPPED_AMOUNT", nullable = false)
+    @Column(name = "NOT_SHIPPED_AMOUNT", nullable = false, columnDefinition = "bigint COMMENT '수주 미출하수량'")
     private int notShippedAmount;   // 수주미출하수량
 
-    @Column(name = "SHIPMENT_AMOUNT", nullable = false)
+    @Column(name = "SHIPMENT_AMOUNT", nullable = false, columnDefinition = "bigint COMMENT '출하수량'")
     private int shipmentAmount;     // 출하수량
 
-    @Column(name = "SHIPMENT_PRICE", nullable = false)
+    @Column(name = "SHIPMENT_PRICE", nullable = false, columnDefinition = "bigint COMMENT '출하금액'")
     private int shipmentPrice;      // 출하금액
 
-    @Column(name = "SHIPMENT_PRICE_WON", nullable = false)
+    @Column(name = "SHIPMENT_PRICE_WON", nullable = false, columnDefinition = "bigint COMMENT '출하금액(원화)'")
     private int shipmentPriceWon;   // 출하금액(원화)
 
-    @Column(name = "INVENTORY_AMOUNT", nullable = false)
+    @Column(name = "INVENTORY_AMOUNT", nullable = false, columnDefinition = "bigint COMMENT '재고수량'")
     private int inventoryAMOUNT;          // 재고수량
 
-    @Column(name = "PKGS")
+    @Column(name = "PKGS", columnDefinition = "bigint COMMENT 'PKGS'")
     private int pkgs;                // PKGS
 
-    @Column(name = "NW")
+    @Column(name = "NW", columnDefinition = "bigint COMMENT 'NW'")
     private int nw;                 // N/W(KG)
 
-    @Column(name = "GW")
+    @Column(name = "GW", columnDefinition = "bigint COMMENT 'GW'")
     private int gw;                 // G/W(KG)
 
-    @Column(name = "NOTE")
+    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
     private String note;            // 비고
 
-    @Column(name = "USE_YN")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "SHIPMENT")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SHIPMENT", columnDefinition = "bigint COMMENT '출하'")
     private Shipment shipment;          // 출하
 }

@@ -29,36 +29,39 @@ import java.time.LocalDate;
 @Data
 public class OutSourcingProductionRequest extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '외주 생산의뢰 등록 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "BOM_MASTER", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "BOM_MASTER", nullable = false, columnDefinition = "bigint COMMENT 'BomMaster'")
     private BomMaster bomMaster;        // BOM
 
-    @Column(name = "PRODUCTION_DATE")
+    @Column(name = "PRODUCTION_DATE", columnDefinition = "bigint COMMENT '생산요청일자'")
     private LocalDate productionDate;       // 생산요청일자
 
-    @Column(name = "PRODUCTION_AMOUNT")
+    @Column(name = "PRODUCTION_AMOUNT", columnDefinition = "bigint COMMENT '생산수량'")
     private int productionAmount;           // 생산수량
 
-    @Column(name = "MATERIAL_REQUEST_DATE")
+    @Column(name = "MATERIAL_REQUEST_DATE", columnDefinition = "bigint COMMENT '자제출고일자'")
     private LocalDate materialRequestDate;      // 자재출고일자
 
-    @Column(name = "PERIOD_DATE")
+    @Column(name = "PERIOD_DATE", columnDefinition = "bigint COMMENT '납기일시'")
     private LocalDate periodDate;               // 납기일시
 
-    @Column(name = "INPUT_TEST_YN")
+    @Column(name = "INPUT_TEST_YN", columnDefinition = "bigint COMMENT '수입검사여부'")
     private boolean inputTestYn;                // 수입검사여부
 
-    @Column(name = "NOTE")
+    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
     private String note;                        // 비고
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "FACTORIES_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 
-    @Column(name = "USE_YN", nullable = false)
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn;
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

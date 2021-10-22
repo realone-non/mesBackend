@@ -20,24 +20,25 @@ import java.util.List;
 @Entity(name = "ROUTINGS")
 @Data
 public class Routing extends BaseTimeEntity {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '라우팅 등록 고유아이디'")
     private Long id;
 
-    @Column(name = "ROUTING_NO", unique = true)
+    @Column(name = "ROUTING_NO", unique = true, columnDefinition = "bigint COMMENT '라우팅 번호'")
     private Long routingNo;     // 라우팅 번호
 
-    @Column(name = "ROUTING_NAME", nullable = false)
+    @Column(name = "ROUTING_NAME", nullable = false, columnDefinition = "bigint COMMENT '라우팅 명'")
     private String routingName;     // 라우팅 명
 
-    @Column(name = "USE_YN", nullable = false)
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn;
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "FACTORIES_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 }
 

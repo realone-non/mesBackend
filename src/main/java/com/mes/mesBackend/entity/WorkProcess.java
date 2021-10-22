@@ -23,27 +23,29 @@ import javax.persistence.*;
 @Data
 public class WorkProcess extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '작업공정 고유아이디'")
     private Long id;
 
-    @Column(name = "WORK_PROCESS_CODE", unique = true, nullable = false)
+    @Column(name = "WORK_PROCESS_CODE", unique = true, nullable = false, columnDefinition = "bigint COMMENT '작업공정 코드'")
     private String workProcessCode;     // 작업공정코드
 
-    @Column(name = "WORK_PROCESS_NAME", unique = true, nullable = false)
+    @Column(name = "WORK_PROCESS_NAME", unique = true, nullable = false, columnDefinition = "bigint COMMENT '작업공정명'")
     private String workProcessName;     // 작업공정명
 
-    @Column(name = "PROCESS_TEST", nullable = false)
+    @Column(name = "PROCESS_TEST", nullable = false, columnDefinition = "bigint COMMENT '공정검사'")
     private boolean processTest;        // 공정검사
 
-    @Column(name = "ORDERS", nullable = false, unique = true)
+    @Column(name = "ORDERS", nullable = false, unique = true, columnDefinition = "bigint COMMENT '공정순번'")
     private String orders;              // 공정순번
 
-    @Column(name = "USE_YN")
+    @Column(name = "USE_YN", columnDefinition = "bigint COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN")
+    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "FACTORIES_ID")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 }
