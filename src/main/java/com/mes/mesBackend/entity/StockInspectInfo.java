@@ -27,7 +27,7 @@ import javax.persistence.*;
 @Data
 public class StockInspectInfo extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '재고조사 정보 고유아이디'")
     private Long id;
 
@@ -35,15 +35,15 @@ public class StockInspectInfo extends BaseTimeEntity {
     @JoinColumn(name = "STOCK_INSPECT_REQUEST", columnDefinition = "bigint COMMENT '재고실사 의뢰 정보'")
     private StockInspectRequest stockInspectRequest;        // 재고실사 의뢰 정보
 
-    @Column(name = "DB_AMOUNT", columnDefinition = "bigint COMMENT 'DB수량'")
+    @Column(name = "DB_AMOUNT", columnDefinition = "int COMMENT 'DB수량'")
     private int dbAmount;       // DB수량
 
-    @Column(name = "INSPECT_AMOUNT", columnDefinition = "bigint COMMENT '실사수량'")
+    @Column(name = "INSPECT_AMOUNT", columnDefinition = "int COMMENT '실사수량'")
     private int inspectAmount;      // 실사수량
 
-    @Column(name = "APPROVAL", columnDefinition = "bigint COMMENT '승인자'")
+    @Column(name = "APPROVAL", columnDefinition = "varchar(255) COMMENT '승인자'")
     private String approval;            // 승인자
 
-    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
+    @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                // 비고
 }

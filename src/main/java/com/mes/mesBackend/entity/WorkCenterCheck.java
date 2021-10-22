@@ -31,9 +31,9 @@ public class WorkCenterCheck extends BaseTimeEntity {
     @JoinColumn(name = "CHECK_TYPE" ,nullable = false, columnDefinition = "bigint COMMENT '점검유형'")
     private CheckType checkType;        // 점검유형
 
-    @Column(name = "USE_YN", columnDefinition = "bigint COMMENT '사용여부'", nullable = false)
+    @Column(name = "USE_YN", columnDefinition = "bit(1) COMMENT '사용여부'", nullable = false)
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'",nullable = false)
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'",nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 }

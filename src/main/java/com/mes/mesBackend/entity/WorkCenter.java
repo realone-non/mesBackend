@@ -27,22 +27,22 @@ public class WorkCenter extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업장 등록 고유아이디'")
     private Long id;
 
-    @Column(name = "WORK_CENTER_CODE", columnDefinition = "bigint COMMENT '작업장 코드'")
+    @Column(name = "WORK_CENTER_CODE", columnDefinition = "varchar(255) COMMENT '작업장 코드'")
     private String workCenterCode;      // 작업장코드
 
-    @Column(name = "WORK_CENTER_NAME", columnDefinition = "bigint COMMENT '작업장명'")
+    @Column(name = "WORK_CENTER_NAME", columnDefinition = "varchar(255) COMMENT '작업장명'")
     private String workCenterName;      // 작업장명
 
-    @Column(name = "OUT_COMPANY", columnDefinition = "bigint COMMENT '외주사'")
+    @Column(name = "OUT_COMPANY", columnDefinition = "varchar(255) COMMENT '외주사'")
     private String outCompany;          // 외주사
 
-    @Column(name = "COST_CENTER", columnDefinition = "bigint COMMENT 'Cost Center'")
+    @Column(name = "COST_CENTER", columnDefinition = "varchar(255) COMMENT 'Cost Center'")
     private String costCenter;          // Cost Center
 
-    @Column(name = "USE_YN", columnDefinition = "bigint COMMENT '사용여부'")
+    @Column(name = "USE_YN", columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
     @OneToOne(fetch = FetchType.LAZY)

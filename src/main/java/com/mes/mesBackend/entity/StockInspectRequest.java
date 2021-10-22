@@ -22,22 +22,22 @@ import java.time.LocalDate;
 @Data
 public class StockInspectRequest extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '재고조사 의뢰정보 고유아이디'")
     private Long id;
 
     @Column(name = "REQUEST_NO",
             nullable = false,
             unique = true,
-            columnDefinition = "bigint COMMENT '요청번호'")
+            columnDefinition = "varchar(255) COMMENT '요청번호'")
     private String requestNo;       // 요청번호
 
     @Column(name = "INSPECT_DATE",
             nullable = false,
-            columnDefinition = "bigint COMMENT '실사일자'")
+            columnDefinition = "date COMMENT '실사일자'")
     private LocalDate inspectDate;      // 실사일자
 
-    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
+    @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                // 비고
 
     @Enumerated(EnumType.STRING)

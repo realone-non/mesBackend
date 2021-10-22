@@ -33,43 +33,43 @@ import java.time.LocalDate;
 @Data
 public class ProduceOrder extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '제조오더등록 고유아이디'")
     private Long id;
 
-    @Column(name = "PRODUCE_ORDER_NO", nullable = false, unique = true, columnDefinition = "bigint COMMENT '제조오더번호'")
+    @Column(name = "PRODUCE_ORDER_NO", nullable = false, unique = true, columnDefinition = "varchar(255) COMMENT '제조오더번호'")
     private String produceOrderNo;      // 제조오더번호
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CONTRACT", nullable = false, columnDefinition = "bigint COMMENT '수주'")
     private Contract contract;          // 수주
 
-    @Column(name = "START_DATE", columnDefinition = "bigint COMMENT '칙수예정일'")
+    @Column(name = "START_DATE", columnDefinition = "date COMMENT '칙수예정일'")
     private LocalDate startDate;        // 착수예정일
 
-    @Column(name = "END_DATE", columnDefinition = "bigint COMMENT '완료예정일'")
+    @Column(name = "END_DATE", columnDefinition = "date COMMENT '완료예정일'")
     private LocalDate endDate;          // 완료예정일
 
-    @Column(name = "CONTRACT_AMOUNT", columnDefinition = "bigint COMMENT '수주수량'")
+    @Column(name = "CONTRACT_AMOUNT", columnDefinition = "int COMMENT '수주수량'")
     private int contractAmount;         // 수주수량
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "INSTRUCTION_STATUS", columnDefinition = "bigint COMMENT '지시상태'")
     private InstructionStatus instructionStatus;    // 지시상태
 
-    @Column(name = "PRODUCE_TYPE", columnDefinition = "bigint COMMENT '수주유형'")
+    @Column(name = "PRODUCE_TYPE", columnDefinition = "varchar(255) COMMENT '수주유형'")
     private String produceType;         // 수주유형
 
-    @Column(name = "RATE", columnDefinition = "bigint COMMENT '보정율'")
+    @Column(name = "RATE", columnDefinition = "int COMMENT '보정율'")
     private int rate;                   // 보정율
 
-    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
+    @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                // 비고
 
-    @Column(name = "USE_YN", columnDefinition = "bigint COMMENT '사용여부'")
+    @Column(name = "USE_YN", columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
     @OneToOne(fetch = FetchType.LAZY)

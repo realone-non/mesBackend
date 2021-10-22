@@ -48,17 +48,17 @@ import java.util.List;
 public class Item extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '품목 고유아이디'")
     private Long id;
 
-    @Column(name = "ITEM_NO", unique = true, nullable = false, columnDefinition = "bigint COMMENT '품번'")
+    @Column(name = "ITEM_NO", unique = true, nullable = false, columnDefinition = "varchar(255) COMMENT '품번'")
     private String itemNo;      // 품번
 
-    @Column(name = "ITEM_NAME", nullable = false, columnDefinition = "bigint COMMENT '품명'")
+    @Column(name = "ITEM_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '품명'")
     private String itemName;    // 품명
 
-    @Column(name = "STANDARD", columnDefinition = "bigint COMMENT '규격'")
+    @Column(name = "STANDARD", columnDefinition = "varchar(255) COMMENT '규격'")
     private String standard;    // 규격
 
     // 일대다 단방향
@@ -87,16 +87,16 @@ public class Item extends BaseTimeEntity {
     @JoinColumn(name = "UNIT", nullable = false, columnDefinition = "bigint COMMENT '재고단위'")
     private Unit unit;        // 재고단위
 
-    @Column(name = "UHP", nullable = false, columnDefinition = "bigint COMMENT 'uhp'")
+    @Column(name = "UHP", nullable = false, columnDefinition = "int COMMENT 'uhp'")
     private int uhp;            // uhp
 
-    @Column(name = "VALID_DAY", nullable = false, columnDefinition = "bigint COMMENT '유효일수'")
+    @Column(name = "VALID_DAY", nullable = false, columnDefinition = "int COMMENT '유효일수'")
     private int validDay;       // 유효일수
 
     @OneToOne @JoinColumn(name = "LOT_TYPES_ID", nullable = false, columnDefinition = "bigint COMMENT 'LOT유형'")
     private LotType lotType;    // LOT유형
 
-//    @OneToOne @JoinColumn(name = "INPUT_TEST", columnDefinition = "bigint COMMENT ''")
+//    @OneToOne @JoinColumn(name = "INPUT_TEST", columnDefinition = "varchar(255) COMMENT ''")
 //    private TestType inputTest;        // 수입검사
 //
 //    @OneToOne @JoinColumn(name = "PROCESS_TEST")
@@ -109,48 +109,48 @@ public class Item extends BaseTimeEntity {
     @JoinColumn(name = "ITEM_CHECK_CATEGORY", columnDefinition = "bigint COMMENT '품목별 검사항목'")
     private List<ItemCheckCategory> itemCheckCategory;
 
-    @Column(name = "WASTE_PRODUCT_LOT", nullable = false, columnDefinition = "bigint COMMENT '폐기품 LOT 관리'")
+    @Column(name = "WASTE_PRODUCT_LOT", nullable = false, columnDefinition = "bit(1) COMMENT '폐기품 LOT 관리'")
     private boolean wasteProductLot;        // 폐기품 Lot 관리
 
     @Column(name = "DEVELOP_STATUS", nullable = false, columnDefinition = "bigint COMMENT '개발상태'")
     private DevelopStatus developStatus = DevelopStatus.BEFORE;  // 개발상태
 
-    @Column(name = "STOCK_CONTROL", nullable = false, columnDefinition = "bigint COMMENT '재고관리'")
+    @Column(name = "STOCK_CONTROL", nullable = false, columnDefinition = "bit(1) COMMENT '재고관리'")
     private boolean stockControl;       // 재고관리
 
-    @Column(name = "INPUT_UNIT_PRICE", columnDefinition = "bigint COMMENT '입고단가'")
+    @Column(name = "INPUT_UNIT_PRICE", columnDefinition = "int COMMENT '입고단가'")
     private int inputUnitPrice;         // 입고단가
 
-    @Column(name = "STORAGE_LOCATION", columnDefinition = "bigint COMMENT '저장위치'")
+    @Column(name = "STORAGE_LOCATION", columnDefinition = "varchar(255) COMMENT '저장위치'")
     private String storageLocation;    // 저장위치
 
     @OneToOne @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '거래처'")
     private Client clientPartNo;        // 거래처
 
-    @Column(name = "MANUFACTURER_PART_NO", columnDefinition = "bigint COMMENT '제조사'")
+    @Column(name = "MANUFACTURER_PART_NO", columnDefinition = "varchar(255) COMMENT '제조사'")
     private String manufacturerPartNo;        // 제조사품번
 
-    @Column(name = "MANUFACTURER", columnDefinition = "bigint COMMENT '제조사'")
+    @Column(name = "MANUFACTURER", columnDefinition = "varchar(255) COMMENT '제조사'")
     private String Manufacturer;            // 제조사
 
-    @OneToOne @JoinColumn(name = "TEST_CRITERIAS_ID", columnDefinition = "bigint COMMENT '검사기준'")
+    @OneToOne @JoinColumn(name = "TEST_CRITERIA", columnDefinition = "bigint COMMENT '검사기준'")
     private TestCriteria testCriteria;      // 검사기준
 
-    @OneToOne @JoinColumn(name = "TEST_PROCESSES_ID", columnDefinition = "bigint COMMENT '검사방법'")
+    @OneToOne @JoinColumn(name = "TEST_PROCESS", columnDefinition = "bigint COMMENT '검사방법'")
     private TestProcess testProcess;        // 검사방법
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn;                      // 사용
 
-    @Column(name = "SEARCH_WORD", columnDefinition = "bigint COMMENT '검색어'")
+    @Column(name = "SEARCH_WORD", columnDefinition = "varchar(255) COMMENT '검색어'")
     private String searchWord;          // 검색어
 
-    @Column(name = "AGING_MATERIAL_Yn", columnDefinition = "bigint COMMENT '시효정자재 여부'")
+    @Column(name = "AGING_MATERIAL_Yn", columnDefinition = "bit(1) COMMENT '시효정자재 여부'")
     private boolean agingMaterialYn;      // 시효성자재
 
-    @OneToOne @JoinColumn(name = "ITEM_FILES_ID", columnDefinition = "bigint COMMENT '파일'")
+    @OneToOne @JoinColumn(name = "ITEM_FILE", columnDefinition = "bigint COMMENT '파일'")
     private ItemFile itemFile;          // 파일
 
-    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

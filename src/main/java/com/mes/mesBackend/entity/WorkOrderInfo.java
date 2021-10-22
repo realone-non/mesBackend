@@ -35,11 +35,11 @@ import java.time.LocalDate;
 @Data
 public class WorkOrderInfo extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업지시 정보 고유아이디'")
     private Long id;
 
-    @Column(name = "ORDER_NO", nullable = false, unique = true, columnDefinition = "bigint COMMENT '지시번호'")
+    @Column(name = "ORDER_NO", nullable = false, unique = true, columnDefinition = "varchar(255) COMMENT '지시번호'")
     private String orderNo;             // 지시번호
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -50,7 +50,7 @@ public class WorkOrderInfo extends BaseTimeEntity {
     @JoinColumn(name = "WORK_LINE", nullable = false, columnDefinition = "bigint COMMENT '작업라인'")
     private WorkLine workLine;              // 작업라인
 
-    @Column(name = "ORDER_AMOUNT", nullable = false, columnDefinition = "bigint COMMENT '지시수량'")
+    @Column(name = "ORDER_AMOUNT", nullable = false, columnDefinition = "int COMMENT '지시수량'")
     private int orderAmount;                // 지시수량
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -64,19 +64,19 @@ public class WorkOrderInfo extends BaseTimeEntity {
     @Column(name = "READY_TIME", columnDefinition = "bigint COMMENT '준비시간'")
     private Long readyTime;                 // 준비시간
 
-    @Column(name = "UHP", columnDefinition = "bigint COMMENT 'UPH'")
+    @Column(name = "UHP", columnDefinition = "int COMMENT 'UPH'")
     private int uph;                        // UPH
 
     @Column(name = "COST_TIME", nullable = false, columnDefinition = "bigint COMMENT '소요시간'")
     private Long costTime;                  // 소요시간
 
-    @Column(name = "EXPECTED_DATE", nullable = false, columnDefinition = "bigint COMMENT '작업예정일'")
+    @Column(name = "EXPECTED_DATE", nullable = false, columnDefinition = "date COMMENT '작업예정일'")
     private LocalDate expectedDate;         // 작업예정일
 
     @Column(name = "EXPECTED_TIME", nullable = false, columnDefinition = "bigint COMMENT '예정시간'")
     private Long expectedTime;              // 예정시간
 
-    @Column(name = "ORDER_STATE",nullable = false, columnDefinition = "bigint COMMENT '지시상태'")
+    @Column(name = "ORDER_STATE",nullable = false, columnDefinition = "varchar(255) COMMENT '지시상태'")
     private String orderState;              // 지시상태
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -87,16 +87,16 @@ public class WorkOrderInfo extends BaseTimeEntity {
     @JoinColumn(name = "TEST_PROCESS", columnDefinition = "bigint COMMENT '검사유형'")
     private TestProcess testProcess;        // 검사유형
 
-    @Column(name = "LAST_PROCESS_YN", nullable = false, columnDefinition = "bigint COMMENT '최종공정'")
+    @Column(name = "LAST_PROCESS_YN", nullable = false, columnDefinition = "bit(1) COMMENT '최종공정'")
     private boolean lastProcessYn;          // 최종공정
 
-    @Column(name = "PRODUCTION_AMOUNT", columnDefinition = "bigint COMMENT '생산수량'")
+    @Column(name = "PRODUCTION_AMOUNT", columnDefinition = "int COMMENT '생산수량'")
     private int productionAmount;           // 생산수량
 
-    @Column(name = "INPUT_PEOPLE", columnDefinition = "bigint COMMENT '투입인원'")
+    @Column(name = "INPUT_PEOPLE", columnDefinition = "int COMMENT '투입인원'")
     private int inputPeople;                // 투입인원
 
-    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
+    @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                    // 비고
 
     @ManyToOne(fetch = FetchType.LAZY)

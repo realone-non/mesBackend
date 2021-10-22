@@ -21,9 +21,9 @@ public class TestCriteria extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '검사기준 고유아이디'")
     private Long id;
 
-    @Column(name = "TEST_CRITERIA", nullable = false, columnDefinition = "bigint COMMENT '검사기준'")
+    @Column(name = "TEST_CRITERIA", nullable = false, columnDefinition = "varchar(255) COMMENT '검사기준'")
     private String testCriteria;
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn;
 }

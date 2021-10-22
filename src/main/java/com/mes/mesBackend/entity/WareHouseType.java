@@ -14,13 +14,13 @@ import javax.persistence.*;
 @Data
 public class WareHouseType extends BaseTimeEntity{
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '창고유형 고유아이디'")
     private Long id;    // 창고유형 id
 
-    @Column(name = "NAME", nullable = false, columnDefinition = "bigint COMMENT '창고유형'")
+    @Column(name = "NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '창고유형'")
     private String name;    // 창고유형
 
-    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

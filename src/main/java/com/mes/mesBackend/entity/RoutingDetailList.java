@@ -27,11 +27,11 @@ import java.time.LocalDate;
 @Data
 public class RoutingDetailList extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '라우팅 상세등록 고유아이디'")
     private Long id;
 
-    @Column(name = "ORDERS", columnDefinition = "bigint COMMENT '작업순번'")
+    @Column(name = "ORDERS", columnDefinition = "int COMMENT '작업순번'")
     private int orders;     // 작업순번
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -54,13 +54,13 @@ public class RoutingDetailList extends BaseTimeEntity {
     @JoinColumn(name = "INPUT_WAREHOUSE", columnDefinition = "bigint COMMENT '입고창고'")
     private WareHouse inputWareHouse;               // 입고 창고 (창고 참고)
 
-    @Column(name = "IS_MAIN_PROCESS", columnDefinition = "bigint COMMENT '메인공정여부'")
+    @Column(name = "IS_MAIN_PROCESS", columnDefinition = "bit(1) COMMENT '메인공정여부'")
     private boolean isMainProcess;          // 메인공정 (예 아니오)
 
-    @Column(name = "IS_LAST_PROCESS", columnDefinition = "bigint COMMENT '최종공정여부'")
+    @Column(name = "IS_LAST_PROCESS", columnDefinition = "bit(1) COMMENT '최종공정여부'")
     private boolean isLastProcess;          // 최종공정 (예 아니고)
 
-    @Column(name = "WORK_START_DATE", columnDefinition = "bigint COMMENT '작업개시일'")
+    @Column(name = "WORK_START_DATE", columnDefinition = "date COMMENT '작업개시일'")
     private LocalDate workStartDate;            // 작업개시일
 
     // 다대일 단방향 매핑

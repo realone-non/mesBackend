@@ -21,22 +21,22 @@ import javax.persistence.*;
 @Data
 public class Invoice extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT 'Invoice 고유아이디'")
     private Long id;
 
-    @Column(name = "INVOICE_NO", columnDefinition = "bigint COMMENT 'Invoice'")
+    @Column(name = "INVOICE_NO", columnDefinition = "varchar(255) COMMENT 'Invoice'")
     private String invoiceNo;   // Invoice
 
-    @Column(name = "BILL_TO", columnDefinition = "bigint COMMENT 'Bill To'")
+    @Column(name = "BILL_TO", columnDefinition = "varchar(255) COMMENT 'Bill To'")
     private String billTo;      // Bill To
 
-    @Column(name = "DESTINATION", columnDefinition = "bigint COMMENT 'DESTINATION'")
+    @Column(name = "DESTINATION", columnDefinition = "varchar(255) COMMENT 'DESTINATION'")
     private String destination; // DESTINATION
 
-    @Column(name = "CUSTOMER_PO_NO", columnDefinition = "bigint COMMENT 'Customer PO No'")
+    @Column(name = "CUSTOMER_PO_NO", columnDefinition = "varchar(255) COMMENT 'Customer PO No'")
     private String customerPoNo;    // Customer PO No
 
-    @Column(name = "REMARKS", columnDefinition = "bigint COMMENT 'remarks'")
+    @Column(name = "REMARKS", columnDefinition = "varchar(255) COMMENT 'remarks'")
     private String remarks;     // remarks
 }

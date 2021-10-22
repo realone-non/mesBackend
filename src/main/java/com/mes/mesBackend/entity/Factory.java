@@ -27,41 +27,41 @@ import javax.persistence.*;
 @Data
 public class Factory extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '공장등록 고유아이디'")
     private Long id;
 
-    @Column(name = "FACTORY_CODE", columnDefinition = "bigint COMMENT '공장코드'")
+    @Column(name = "FACTORY_CODE", columnDefinition = "varchar(255) COMMENT '공장코드'")
     private String factoryCode;     // 공장코드
 
-    @Column(name = "FACTORY_NAME", columnDefinition = "bigint COMMENT '공장명'")
+    @Column(name = "FACTORY_NAME", columnDefinition = "varchar(255) COMMENT '공장명'")
     private String factoryName;     // 공장명
 
-    @Column(name = "SHORT_NAME", columnDefinition = "bigint COMMENT '약어'")
+    @Column(name = "SHORT_NAME", columnDefinition = "varchar(255) COMMENT '약어'")
     private String shortName;       // 약어
 
-    @Column(name = "POSTAL_CODE", columnDefinition = "bigint COMMENT '우편번호'")
+    @Column(name = "POSTAL_CODE", columnDefinition = "varchar(255) COMMENT '우편번호'")
     private String postalCode;      // 우편번호
 
-    @Column(name = "ADDRESS", columnDefinition = "bigint COMMENT '기본주소'")
+    @Column(name = "ADDRESS", columnDefinition = "varchar(255) COMMENT '기본주소'")
     private String address;         // 기본주소
 
-    @Column(name = "DETAIL_ADDRESS", columnDefinition = "bigint COMMENT '상세주소'")
+    @Column(name = "DETAIL_ADDRESS", columnDefinition = "varchar(255) COMMENT '상세주소'")
     private String detailAddress;   // 상세주소
 
-    @Column(name = "ENG_ADDRESS_1", columnDefinition = "bigint COMMENT '영문주소1'")
+    @Column(name = "ENG_ADDRESS_1", columnDefinition = "varchar(255) COMMENT '영문주소1'")
     private String engAddress1;     // 영문주소1
 
-    @Column(name = "ENG_ADDRESS_2", columnDefinition = "bigint COMMENT '영문주소2'")
+    @Column(name = "ENG_ADDRESS_2", columnDefinition = "varchar(255) COMMENT '영문주소2'")
     private String engAddress2;     // 영문주소2
 
-    @Column(name = "TEL_NUMBER", columnDefinition = "bigint COMMENT '전화번호'")
+    @Column(name = "TEL_NUMBER", columnDefinition = "varchar(255) COMMENT '전화번호'")
     private String telNumber;       // 전화번호
 
-    @Column(name = "FAX_NUMBER", columnDefinition = "bigint COMMENT 'fax번호'")
+    @Column(name = "FAX_NUMBER", columnDefinition = "varchar(255) COMMENT 'fax번호'")
     private String faxNumber;       // fax번호
 
-    @Column(name = "LOT_CODE", columnDefinition = "bigint COMMENT 'LOT용 코드'")
+    @Column(name = "LOT_CODE", columnDefinition = "varchar(255) COMMENT 'LOT용 코드'")
     private String lotCode;         // LOT용 코드
 
     // 1:1 단방향 매핑
@@ -69,10 +69,10 @@ public class Factory extends BaseTimeEntity {
     @JoinColumn(name = "WORK_PLACES_ID", columnDefinition = "bigint COMMENT '사업장'")
     private WorkPlace workPlace;    // 사업장
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
     public void put(Factory newFactory, WorkPlace newWorkPlace) {

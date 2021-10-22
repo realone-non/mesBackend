@@ -36,10 +36,10 @@ public class ItemCheckCategory extends BaseTimeEntity {
     private TestType testType;              // 검사타입(자동검사,수동검사)
     // 품목등록에서 검사유형,검사타입 다 보여야함
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
-    private Boolean useYn = true;      //  사용여부
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
+    private boolean useYn = true;      //  사용여부
 
-    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
     @OneToOne(fetch = FetchType.LAZY)

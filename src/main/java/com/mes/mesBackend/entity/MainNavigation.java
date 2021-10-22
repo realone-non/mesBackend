@@ -18,16 +18,16 @@ public class MainNavigation {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '메인 네비게이션 고유아이디'")
     private Long id;
 
-    @Column(name = "NAME", unique = true, columnDefinition = "bigint COMMENT '네비게이션 명'")
+    @Column(name = "NAME", unique = true, columnDefinition = "varchar(255) COMMENT '네비게이션 명'")
     private String name;
 
-    @Column(name = "LEVEL", columnDefinition = "bigint COMMENT '유저레벨'")
+    @Column(name = "LEVEL", columnDefinition = "int COMMENT '유저레벨'")
     private int level;  // 유저 레벨
 
-    @Column(name = "USE_YN", columnDefinition = "bigint COMMENT '사용여부'")
+    @Column(name = "USE_YN", columnDefinition = "bit(1) COMMENT '사용여부'", nullable = false)
     private boolean useYn;  // 사용여부
 
-    @Column(name = "ORDERS", unique = true, columnDefinition = "bigint COMMENT '출력순번'")
+    @Column(name = "ORDERS", unique = true, columnDefinition = "int COMMENT '출력순번'")
     private int orders;     // 출력순번
 
     public void put(MainNavigation newMainNavigation) {

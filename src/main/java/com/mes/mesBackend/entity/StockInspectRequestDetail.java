@@ -21,7 +21,7 @@ import javax.persistence.*;
 @Data
 public class StockInspectRequestDetail extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '재고조사 의뢰 상세 정보 고유아이디'")
     private Long id;
 

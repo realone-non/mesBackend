@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Data
 public class EstimateItemList extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '품목견적서 리스트 고유아이디'")
     private Long id;
 
@@ -28,9 +28,9 @@ public class EstimateItemList extends BaseTimeEntity {
     @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목'")
     private Item item;          // 품목
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

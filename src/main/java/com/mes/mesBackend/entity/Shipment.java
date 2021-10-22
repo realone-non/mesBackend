@@ -35,18 +35,18 @@ import java.time.LocalDate;
 @Data
 public class Shipment extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '출하등록 고유아이디'")
     private Long id;
 
-    @Column(name = "SHIPMENT_NO", nullable = false, unique = true, columnDefinition = "bigint COMMENT '출하번호'")
+    @Column(name = "SHIPMENT_NO", nullable = false, unique = true, columnDefinition = "varchar(255) COMMENT '출하번호'")
     private String shipmentNo;      // 출하번호
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CLIENT", nullable = false, columnDefinition = "bigint COMMENT '거래처'")
     private Client client;          // 거래처
 
-    @Column(name = "SHIPMENT_DATE", nullable = false, columnDefinition = "bigint COMMENT '출하일자'")
+    @Column(name = "SHIPMENT_DATE", nullable = false, columnDefinition = "date COMMENT '출하일자'")
     private LocalDate shipmentDate; // 출하일자
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -60,35 +60,35 @@ public class Shipment extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "CURRENCY", nullable = false, columnDefinition = "bigint COMMENT '화폐'")
     private Currency currency;      // 화폐
 
-    @Column(name = "EXCHANGE_RATE", nullable = false, columnDefinition = "bigint COMMENT '환율'")
+    @Column(name = "EXCHANGE_RATE", nullable = false, columnDefinition = "int COMMENT '환율'")
     private int exchangeRate;       // 환율
 
-    @Column(name = "CLIENT_MANAGER", columnDefinition = "bigint COMMENT '거래처 담당자'")
+    @Column(name = "CLIENT_MANAGER", columnDefinition = "varchar(255) COMMENT '거래처 담당자'")
     private String clientManager;   // 거래처담당자
 
-    @Column(name = "PAY_CONDITION", columnDefinition = "bigint COMMENT '결제조건'")
+    @Column(name = "PAY_CONDITION", columnDefinition = "varchar(255) COMMENT '결제조건'")
     private String payCondition;    // 결제조건
 
-    @Column(name = "SURTAX", nullable = false, columnDefinition = "bigint COMMENT '부가세적용'")
+    @Column(name = "SURTAX", nullable = false, columnDefinition = "varchar(255) COMMENT '부가세적용'")
     private String surtax;          // 부가세적용
 
-    @Column(name = "TRANSPORT_CONDITION", columnDefinition = "bigint COMMENT '운송조건'")
+    @Column(name = "TRANSPORT_CONDITION", columnDefinition = "varchar(255) COMMENT '운송조건'")
     private String transportCondition;      // 운송조건
 
-    @Column(name = "FORWADER", columnDefinition = "bigint COMMENT 'Forwader'")
+    @Column(name = "FORWADER", columnDefinition = "varchar(255) COMMENT 'Forwader'")
     private String forwader;        // Forwader
 
-    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
+    @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;            // 비고
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '창고'")
     private Factory factory;                // 공장
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
     @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "INVOICE", columnDefinition = "bigint COMMENT 'Invoice'")

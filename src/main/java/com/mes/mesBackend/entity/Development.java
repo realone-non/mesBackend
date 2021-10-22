@@ -31,7 +31,7 @@ import java.time.LocalDate;
 @Data
 public class Development extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '개발등록 고유아이디'")
     private Long id;
 
@@ -43,37 +43,37 @@ public class Development extends BaseTimeEntity {
     @JoinColumn(name = "ITEM", nullable = false, columnDefinition = "bigint COMMENT '품목'")
     private Item item;          // 품목
 
-    @Column(name = "BUSINESS_NAME", columnDefinition = "bigint COMMENT '사업명'")
+    @Column(name = "BUSINESS_NAME", columnDefinition = "varchar(255) COMMENT '사업명'")
     private String businessName;        // 사업명
 
-    @Column(name = "REQUEST_DATE", columnDefinition = "bigint COMMENT '의뢰일자'")
+    @Column(name = "REQUEST_DATE", columnDefinition = "date COMMENT '의뢰일자'")
     private LocalDate requestDate;      // 의뢰일자
 
-    @Column(name = "PERIOD_DATE", columnDefinition = "bigint COMMENT '납기일자'")
+    @Column(name = "PERIOD_DATE", columnDefinition = "date COMMENT '납기일자'")
     private LocalDate periodDate;       // 납기일자
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DEVELOPMENT_STATE", columnDefinition = "bigint COMMENT '진행상태'")
     private DevelopmentState developmentState;       // 진행상태
 
-    @Column(name = "DELIVER_AMOUNT", columnDefinition = "bigint COMMENT '납품수량'")
+    @Column(name = "DELIVER_AMOUNT", columnDefinition = "int COMMENT '납품수량'")
     private int deliverAmount;          // 납품수량
 
-    @Column(name = "CONNECTOR_YN", columnDefinition = "bigint COMMENT '커넥터 사급여부'")
+    @Column(name = "CONNECTOR_YN", columnDefinition = "bit(1) COMMENT '커넥터 사급여부'")
     private boolean connectorYn;     // 커넥터 사급여부
 
-    @Column(name = "MACHINE_MANAGER", columnDefinition = "bigint COMMENT '기구담당자'")
+    @Column(name = "MACHINE_MANAGER", columnDefinition = "varchar(255) COMMENT '기구담당자'")
     private String machineManager;  // 기구담당자
 
-    @Column(name = "PCB_MAN0AGER", columnDefinition = "bigint COMMENT 'PCB담당자'")
+    @Column(name = "PCB_MAN0AGER", columnDefinition = "varchar(255) COMMENT 'PCB담당자'")
     private String PcbManager;      // PCB담당자
 
-    @Column(name = "FILE_URL", columnDefinition = "bigint COMMENT '수주파일'")
+    @Column(name = "FILE_URL", columnDefinition = "varchar(255) COMMENT '수주파일'")
     private String fileUrl;         // 수주파일
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private Boolean useYn = true;      //  사용여부
 
-    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

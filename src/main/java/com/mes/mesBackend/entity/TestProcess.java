@@ -18,9 +18,9 @@ public class TestProcess extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '검사방법 고유아이디'")
     private Long id;
 
-    @Column(name = "TEST_PROCESS", nullable = false, columnDefinition = "bigint COMMENT '검사방법'")
+    @Column(name = "TEST_PROCESS", nullable = false, columnDefinition = "varchar(255) COMMENT '검사방법'")
     private String testProcess;
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn;
 }

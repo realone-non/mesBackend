@@ -16,10 +16,10 @@ import javax.persistence.*;
 @Data
 public class DevelopmentFileType extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '개발등록 파일타입'")
     private Long id;
 
-    @Column(name = "FILE_TYPE", columnDefinition = "bigint COMMENT '개발등록 파일타입'")
+    @Column(name = "FILE_TYPE", columnDefinition = "varchar(255) COMMENT '개발등록 파일타입'")
     private String fileType;        // 개발등록 파일타입
 }

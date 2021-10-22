@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Entity(name = "WORK_PLACE_AND_BUSINESS_TYPE_MAPPEDS")
 public class WorkPlaceMapped extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '사업장 업태 매핑 고유아이디'")
     private Long id;
 

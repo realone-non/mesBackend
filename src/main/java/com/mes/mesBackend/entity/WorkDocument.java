@@ -24,7 +24,7 @@ import javax.persistence.*;
 @Data
 public class WorkDocument extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업표준서 등록 고유아이디'")
     private Long id;
 
@@ -40,19 +40,19 @@ public class WorkDocument extends BaseTimeEntity {
     @JoinColumn(name = "BOM_MASTER", nullable = false, columnDefinition = "bigint COMMENT 'BomMaster'")
     private BomMaster bomMaster;            // 생산품번
 
-    @Column(name = "ORDERS", nullable = false, columnDefinition = "bigint COMMENT '순번'")
+    @Column(name = "ORDERS", nullable = false, columnDefinition = "int COMMENT '순번'")
     private int orders;                     // 순번
 
-    @Column(name = "FILE_NAME_URL", columnDefinition = "bigint COMMENT '파일명'")
+    @Column(name = "FILE_NAME_URL", columnDefinition = "varchar(255) COMMENT '파일명'")
     private String fileNameUrl;             // 파일명
 
-    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
+    @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                    // 비고
 
-    @Column(name = "USE_YN", columnDefinition = "bigint COMMENT '사용여부'")
+    @Column(name = "USE_YN", columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
     @OneToOne(fetch = FetchType.LAZY)

@@ -17,10 +17,10 @@ import javax.persistence.*;
 @Data
 public class DevelopmentState extends BaseTimeEntity{
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '개발등록 진행상태 고유아이디'")
     private Long id;
 
-    @Column(name = "STATE", nullable = false, columnDefinition = "bigint COMMENT '진행상태'")
+    @Column(name = "STATE", nullable = false, columnDefinition = "varchar(255) COMMENT '진행상태'")
     private String state;
 }

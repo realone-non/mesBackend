@@ -29,42 +29,42 @@ import java.time.LocalDate;
 @Data
 public class Measure extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '계측기 등록 고유아이디'")
     private Long id;
 
-    @Column(name = "GAUGE_CODE", nullable = false, unique = true, columnDefinition = "bigint COMMENT 'GAUGE코드'")
+    @Column(name = "GAUGE_CODE", nullable = false, unique = true, columnDefinition = "varchar(255) COMMENT 'GAUGE코드'")
     private String gaugeCode;       // GAUGE코드
 
-    @Column(name = "GAUGE_NAME", nullable = false, columnDefinition = "bigint COMMENT 'GAUGE명'")
+    @Column(name = "GAUGE_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT 'GAUGE명'")
     private String gaugeName;       // GAUGE명
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "GAUGE_TYPE", nullable = false, columnDefinition = "bigint COMMENT 'GAUGE유형'")
     private GaugeType gaugeType;       // GAUGE유형
 
-    @Column(name = "MODEL", nullable = false, columnDefinition = "bigint COMMENT '규격,모델'")
+    @Column(name = "MODEL", nullable = false, columnDefinition = "varchar(255) COMMENT '규격,모델'")
     private String model;           // 규격&모델
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DEPARTMENT", nullable = false, columnDefinition = "bigint COMMENT '부서'")
     private Department department;      // 사용부서
 
-    @Column(name = "PURCHASE_DATE", columnDefinition = "bigint COMMENT '구매일자'")
+    @Column(name = "PURCHASE_DATE", columnDefinition = "date COMMENT '구매일자'")
     private LocalDate purchaseDate;     // 구매일자
 
-    @Column(name = "MAKER", columnDefinition = "bigint COMMENT '생산업체명'")
+    @Column(name = "MAKER", columnDefinition = "varchar(255) COMMENT '생산업체명'")
     private String maker;               // 생산업체명
 
-    @Column(name = "CALIBRATION_CYCLE", columnDefinition = "bigint COMMENT '검교정주기'")
+    @Column(name = "CALIBRATION_CYCLE", columnDefinition = "int COMMENT '검교정주기'")
     private int calibrationCycle;      // 검교정주기
 
-    @Column(name = "CALIBRATION_LAST_DATE", columnDefinition = "bigint COMMENT '최종 검교정일자'")
+    @Column(name = "CALIBRATION_LAST_DATE", columnDefinition = "date COMMENT '최종 검교정일자'")
     private LocalDate calibrationLastDate;      // 최종 검교정일자
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bigint COMMENT '사용여부'")
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;  // 사용여부
 
-    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bigint COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

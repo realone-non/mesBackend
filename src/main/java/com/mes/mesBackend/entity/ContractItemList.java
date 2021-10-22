@@ -31,7 +31,7 @@ import java.time.LocalDate;
 @Data
 public class ContractItemList extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '수주 품목 리스트 고유아이디'")
     private Long id;
 
@@ -43,40 +43,40 @@ public class ContractItemList extends BaseTimeEntity {
     @JoinColumn(name = "UNIT", nullable = false, columnDefinition = "bigint COMMENT '수주단위'")
     private Unit unit;      // 수주단위
 
-    @Column(name = "AMOUNT", nullable = false, columnDefinition = "bigint COMMENT '수주수량'")
+    @Column(name = "AMOUNT", nullable = false, columnDefinition = "int COMMENT '수주수량'")
     private int amount;     // 수주수량
 
-    @Column(name = "UNIT_PRICE", nullable = false, columnDefinition = "bigint COMMENT '단가'")
-    private Long unitPrice;     // 단가
+    @Column(name = "UNIT_PRICE", nullable = false, columnDefinition = "int COMMENT '단가'")
+    private int unitPrice;     // 단가
 
-    @Column(name = "CONTRACT_PRICE", columnDefinition = "bigint COMMENT '수주금액'")
-    private Long contractPrice; // 수주금액
+    @Column(name = "CONTRACT_PRICE", columnDefinition = "int COMMENT '수주금액'")
+    private int contractPrice; // 수주금액
 
-    @Column(name = "CONTRACT_PRICE_WON", columnDefinition = "bigint COMMENT '수주금액(원화)'")
-    private Long contractPriceWon;      // 수주금액(원화)
+    @Column(name = "CONTRACT_PRICE_WON", columnDefinition = "int COMMENT '수주금액(원화)'")
+    private int contractPriceWon;      // 수주금액(원화)
 
-    @Column(name = "SURTAX", columnDefinition = "bigint COMMENT '부가세'")
-    private Long surtax;            // 부가세
+    @Column(name = "SURTAX", columnDefinition = "int COMMENT '부가세'")
+    private int surtax;            // 부가세
 
-    @Column(name = "CONTRACT_TYPE", columnDefinition = "bigint COMMENT '수주유형'")
+    @Column(name = "CONTRACT_TYPE", columnDefinition = "varchar(255) COMMENT '수주유형'")
     private String contractType;     // 수주유형
 
-    @Column(name = "PERIOD_DATE", columnDefinition = "bigint COMMENT '납기일자'")
+    @Column(name = "PERIOD_DATE", columnDefinition = "date COMMENT '납기일자'")
     private LocalDate periodDate;       // 납기일자
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CONTRACT", nullable = false, columnDefinition = "bigint COMMENT '수주'")
     private Contract contract;      // 수주
 
-    @Column(name = "STANDART_ITEM_NO", columnDefinition = "bigint COMMENT '규격화 품번'")
+    @Column(name = "STANDART_ITEM_NO", columnDefinition = "varchar(255) COMMENT '규격화 품번'")
     private String standardItemNo;      // 규격화 품번
 
-    @Column(name = "NOTE", columnDefinition = "bigint COMMENT '비고'")
+    @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;        // 비고
 
-    @Column(name = "USE_YN", columnDefinition = "bigint COMMENT '사용여부'")
+    @Column(name = "USE_YN", columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
-    @Column(name = "DELETE_YN", columnDefinition = "bigint COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 }

@@ -20,7 +20,7 @@ public class ItemInventoryAmount extends BaseTimeEntity {
     * 로트번호 --> 미구현
     * */
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '창고별 품목 재고 고유아이디'")
     private Long id;
 
@@ -32,9 +32,9 @@ public class ItemInventoryAmount extends BaseTimeEntity {
     @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '창고정보'")
     private WareHouse wareHouse;        // 창고
 
-    @Column(name = "AMOUNT", columnDefinition = "bigint COMMENT '창고별 품목 개수'")
+    @Column(name = "AMOUNT", columnDefinition = "int COMMENT '창고별 품목 개수'")
     private int amount;                 // 개수
 
-    @Column(name = "LOT_NO", columnDefinition = "bigint COMMENT 'LOT번호'")
+    @Column(name = "LOT_NO", columnDefinition = "varchar(255) COMMENT 'LOT 번호'")
     private String lotNo;               // lot번호
 }
