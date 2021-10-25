@@ -29,7 +29,8 @@ public class DevelopmentFile extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '개발등록 파일 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DEVELOPMENT_FILE_TYPE", nullable = false, columnDefinition = "bigint COMMENT '개발등록 파일 타입'")
     private DevelopmentFileType developmentFileType;        // 개발등록 파일 타입
 

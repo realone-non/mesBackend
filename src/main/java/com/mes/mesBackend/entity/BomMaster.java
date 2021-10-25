@@ -30,7 +30,8 @@ public class BomMaster extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT 'BOM등록 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM_NO", columnDefinition = "bigint COMMENT '품목'")
     private Item itemNo;            // 품번,품명,품목계정,제조사품번,개발상태
 

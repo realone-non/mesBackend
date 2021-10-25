@@ -35,11 +35,13 @@ public class Development extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '개발등록 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CLIENT", nullable = false, columnDefinition = "bigint COMMENT '거래처'")
     private Client client;      // 거래처
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM", nullable = false, columnDefinition = "bigint COMMENT '품목'")
     private Item item;          // 품목
 
@@ -52,7 +54,8 @@ public class Development extends BaseTimeEntity {
     @Column(name = "PERIOD_DATE", columnDefinition = "date COMMENT '납기일자'")
     private LocalDate periodDate;       // 납기일자
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DEVELOPMENT_STATE", columnDefinition = "bigint COMMENT '진행상태'")
     private DevelopmentState developmentState;       // 진행상태
 

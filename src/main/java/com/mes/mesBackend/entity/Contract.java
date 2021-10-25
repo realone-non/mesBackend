@@ -45,7 +45,8 @@ public class Contract extends BaseTimeEntity {
     @Column(name = "CONTRACT_NO", nullable = false, unique = true, columnDefinition = "varchar(255) COMMENT '수주번호'")
     private String contractNo;      // 수주번호
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CLIENT", nullable = false, columnDefinition = "bigint COMMENT '고객사'")
     private Client client;          // 고객사
 
@@ -61,18 +62,21 @@ public class Contract extends BaseTimeEntity {
     @Column(name = "CLIENT_ORDER_NO", columnDefinition = "varchar(255) COMMENT '고객발주번호'")
     private String clientOrderNo;       // 고객발주번호
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MANAGER", columnDefinition = "bigint COMMENT '담당자'")
     private Manager manager;              // 담당자
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CURRENCY", columnDefinition = "bigint COMMENT '화폐'")
     private Currency currency;          // 화폐
 
     @Column(name = "SURTAX", columnDefinition = "varchar(255) COMMENT '부가세 적용'")
     private String surtax;              // 부가세적용
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "OUTPUT_WAREHOUSE", columnDefinition = "bigint COMMENT '출고창고'")
     private WareHouse outputWareHouse;         // 출고창고
 
@@ -100,7 +104,8 @@ public class Contract extends BaseTimeEntity {
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                    // 비고
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 

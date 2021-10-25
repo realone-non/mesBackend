@@ -61,29 +61,33 @@ public class Item extends BaseTimeEntity {
     @Column(name = "STANDARD", columnDefinition = "varchar(255) COMMENT '규격'")
     private String standard;    // 규격
 
-    // 일대다 단방향
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM_ACCOUNT", columnDefinition = "bigint COMMENT '품목계정'")
     private ItemAccount itemAccount;    // 품목계정
 
-    // 일대다 단방향
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM_GROUP", columnDefinition = "bigint COMMENT '품목그룹'")
     private ItemGroup itemGroup;        // 품목그룹
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM_FORM", columnDefinition = "bigint COMMENT '품목형태'")
     private ItemForm itemForm;          // 품목형태
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USE_TYPE", columnDefinition = "bigint COMMENT '용도유형'")
     private UseType useType;            // 용도유형
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ROUTING", columnDefinition = "bigint COMMENT '라우팅'")
     private Routing routing;            // 라우팅 (라우팅 명)
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UNIT", nullable = false, columnDefinition = "bigint COMMENT '재고단위'")
     private Unit unit;        // 재고단위
 
@@ -93,7 +97,9 @@ public class Item extends BaseTimeEntity {
     @Column(name = "VALID_DAY", nullable = false, columnDefinition = "int COMMENT '유효일수'")
     private int validDay;       // 유효일수
 
-    @OneToOne @JoinColumn(name = "LOT_TYPES_ID", nullable = false, columnDefinition = "bigint COMMENT 'LOT유형'")
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "LOT_TYPES_ID", nullable = false, columnDefinition = "bigint COMMENT 'LOT유형'")
     private LotType lotType;    // LOT유형
 
 //    @OneToOne @JoinColumn(name = "INPUT_TEST", columnDefinition = "varchar(255) COMMENT ''")
@@ -124,7 +130,9 @@ public class Item extends BaseTimeEntity {
     @Column(name = "STORAGE_LOCATION", columnDefinition = "varchar(255) COMMENT '저장위치'")
     private String storageLocation;    // 저장위치
 
-    @OneToOne @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '거래처'")
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '거래처'")
     private Client clientPartNo;        // 거래처
 
     @Column(name = "MANUFACTURER_PART_NO", columnDefinition = "varchar(255) COMMENT '제조사'")
@@ -133,10 +141,14 @@ public class Item extends BaseTimeEntity {
     @Column(name = "MANUFACTURER", columnDefinition = "varchar(255) COMMENT '제조사'")
     private String Manufacturer;            // 제조사
 
-    @OneToOne @JoinColumn(name = "TEST_CRITERIA", columnDefinition = "bigint COMMENT '검사기준'")
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TEST_CRITERIA", columnDefinition = "bigint COMMENT '검사기준'")
     private TestCriteria testCriteria;      // 검사기준
 
-    @OneToOne @JoinColumn(name = "TEST_PROCESS", columnDefinition = "bigint COMMENT '검사방법'")
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TEST_PROCESS", columnDefinition = "bigint COMMENT '검사방법'")
     private TestProcess testProcess;        // 검사방법
 
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
@@ -148,7 +160,9 @@ public class Item extends BaseTimeEntity {
     @Column(name = "AGING_MATERIAL_Yn", columnDefinition = "bit(1) COMMENT '시효정자재 여부'")
     private boolean agingMaterialYn;      // 시효성자재
 
-    @OneToOne @JoinColumn(name = "ITEM_FILE", columnDefinition = "bigint COMMENT '파일'")
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM_FILE", columnDefinition = "bigint COMMENT '파일'")
     private ItemFile itemFile;          // 파일
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")

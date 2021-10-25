@@ -65,7 +65,8 @@ public class Factory extends BaseTimeEntity {
     private String lotCode;         // LOT용 코드
 
     // 1:1 단방향 매핑
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WORK_PLACES_ID", columnDefinition = "bigint COMMENT '사업장'")
     private WorkPlace workPlace;    // 사업장
 

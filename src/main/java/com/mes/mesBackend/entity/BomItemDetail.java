@@ -45,7 +45,7 @@ public class BomItemDetail extends BaseTimeEntity {
     @Column(name = "MANUFACTURER_ITEM_NO", columnDefinition = "varchar(255) COMMENT '제조사 품번'")
     private String manufacturerItemNo;      //  제조사 품번
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UNIT", columnDefinition = "bigint COMMENT '단위'")
     private Unit unit;    // 단위
 
@@ -61,13 +61,13 @@ public class BomItemDetail extends BaseTimeEntity {
     @Column(name = "UNIT_PRICE", columnDefinition = "int COMMENT '단가'")
     private int unitPrice;      // 단가
 
-    // 일대다 단방향
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM_ACCOUNTS", columnDefinition = "bigint COMMENT '품목계정'")
     private ItemAccount itemAccount;    // 품목계정
 
-    // 일대다 단방향
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '공정'")
     private WorkProcess workProcess;     // 공정
 

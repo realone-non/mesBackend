@@ -34,23 +34,26 @@ public class RoutingDetailList extends BaseTimeEntity {
     @Column(name = "ORDERS", columnDefinition = "int COMMENT '작업순번'")
     private int orders;     // 작업순번
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '작업공정'")
     private WorkProcess workProcess;     // 작업공정
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WORK_CENTER", columnDefinition = "bigint COMMENT '작업장'")
     private WorkCenter workPlace;       // 작업장
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TEST_TYPE", columnDefinition = "bigint COMMENT '검사유형'")
     private TestCategory testCategory;      // 검사유형
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RAW_MATERIAL_HOUSE", columnDefinition = "bigint COMMENT '원자재 창고'")
     private WareHouse rawMaterialWareHouse;        // 원자재 창고
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "INPUT_WAREHOUSE", columnDefinition = "bigint COMMENT '입고창고'")
     private WareHouse inputWareHouse;               // 입고 창고 (창고 참고)
 

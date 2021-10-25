@@ -59,6 +59,7 @@ public class Client extends BaseTimeEntity {
     @Column(name = "SHORT_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '약어'")
     private String shortName;      // 약어
 
+    // 다대일 단방향
     @ManyToOne
     @JoinColumn(name = "CLIENT_TYPE", nullable = false, columnDefinition = "bigint COMMENT '거래처 유형'")
     private ClientType clientType;   // 거래처 유형
@@ -81,6 +82,7 @@ public class Client extends BaseTimeEntity {
     @Column(name = "DETAIL_ADDRESS", columnDefinition = "varchar(255) COMMENT '상세주소'")
     private String detailAddress;   // 상세주소
 
+    // 다대일 단방향
     @ManyToOne
     @JoinColumn(name = "BUSINESS_TYPE", nullable = false, columnDefinition = "bigint COMMENT '업태'")
     private BusinessType businessType;      // 업태

@@ -45,22 +45,26 @@ public class OutSourcingInput extends BaseTimeEntity {
     @Column(name = "INPUT_AMOUNT", columnDefinition = "int COMMENT '입고수량'")
     private int inputAmount;                    // 입고수량
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "INPUT_WARE_HOUSE", columnDefinition = "bigint COMMENT '입고창고'")
     private WareHouse inputWareHouse;           // 입고창고
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TEST_REQUEST_TYPE", columnDefinition = "bigint COMMENT '검사의뢰유향'")
     private TestType testRequestType;                  // 검사의뢰유형
 
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                        // 비고
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "OUT_SOURCING_PRODUCTION_REQUEST", columnDefinition = "bigint COMMENT '외주 생산 의뢰'")
     private OutSourcingProductionRequest outSourcingProductionRequest;      // 외주 생산 의뢰 등록
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 

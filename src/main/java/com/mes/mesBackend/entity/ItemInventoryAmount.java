@@ -24,11 +24,13 @@ public class ItemInventoryAmount extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '창고별 품목 재고 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목정보'")
     private Item item;                  // 품목
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '창고정보'")
     private WareHouse wareHouse;        // 창고
 

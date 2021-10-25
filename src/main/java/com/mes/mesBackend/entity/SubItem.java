@@ -22,8 +22,7 @@ public class SubItem extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '대체품목등록 고유아이디'")
     private Long id;
 
-    // 일대일 단방향
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목'")
     private Item item;
 

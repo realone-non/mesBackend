@@ -27,7 +27,8 @@ public class OutSourcingProductionRawMaterialOutputInfo extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '외주생산 원재료 출고대상 정보 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BOM_MASTER", columnDefinition = "bigint COMMENT 'BomMaster'")
     private BomMaster bomMaster;        // BOM
 

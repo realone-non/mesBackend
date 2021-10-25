@@ -25,11 +25,11 @@ public class StockInspectRequestDetail extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '재고조사 의뢰 상세 정보 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '창고유형'")
     private WareHouse wareHouse;        // 창고유형
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목'")
     private Item item;                  // 품목
 

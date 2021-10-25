@@ -25,8 +25,8 @@ public class Employee extends BaseTimeEntity {
     @Column(name = "KOR_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '이름'")
     private String korName;    // 이름
 
-    // 1:1 단방향 매핑
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DEPARTMENTS_ID", nullable = false, columnDefinition = "bigint COMMENT '부서'")
     private Department department;  // 부서
 

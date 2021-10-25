@@ -34,11 +34,11 @@ public class WorkLine extends BaseTimeEntity {
     @Column(name = "WORK_LINE_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '작업라인명'")
     private String workLineName;    // 작업라인명
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WORK_CENTER", columnDefinition = "bigint COMMENT '작업장'")
     private WorkCenter workCenter;  // 작업장
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WARE_PROCESS", nullable = false, columnDefinition = "bigint COMMENT '작업공정'")
     private WorkProcess workProcess;        // 작업공정
 
@@ -54,7 +54,7 @@ public class WorkLine extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 }

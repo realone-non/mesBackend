@@ -38,7 +38,7 @@ public class ShipmentReturn extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '출하반품 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SHIPMENT_ITEM_LIST", columnDefinition = "bigint COMMENT '출하'")
     private Shipment shipmentItemList;              // 출하
 
@@ -51,14 +51,14 @@ public class ShipmentReturn extends BaseTimeEntity {
     @Column(name = "TEST_REQUEST_TYPE", columnDefinition = "varchar(255) COMMENT '검사의뢰유형'")
     private String testRequestType;         // 검사의뢰유형
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '입고창고'")
     private WareHouse wareHouse;            // 입고창고
 
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                    // 비고
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 

@@ -33,7 +33,8 @@ public class OutSourcingProductionRequest extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '외주 생산의뢰 등록 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BOM_MASTER", nullable = false, columnDefinition = "bigint COMMENT 'BomMaster'")
     private BomMaster bomMaster;        // BOM
 
@@ -55,7 +56,8 @@ public class OutSourcingProductionRequest extends BaseTimeEntity {
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                        // 비고
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 

@@ -23,15 +23,18 @@ public class ItemCheckCategory extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '품목별 검사항목 등록 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목'")
     private Item item;      // 품번, 품명
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHECK_CATEGORY", columnDefinition = "bigint COMMENT '검사유형'")
     private TestCategory checkCategory;    // 검사유형
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TEST_TYPE", columnDefinition = "bigint COMMENT '검사타입'")
     private TestType testType;              // 검사타입(자동검사,수동검사)
     // 품목등록에서 검사유형,검사타입 다 보여야함
@@ -42,7 +45,8 @@ public class ItemCheckCategory extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 }

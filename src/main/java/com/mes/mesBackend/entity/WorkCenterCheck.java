@@ -23,11 +23,11 @@ public class WorkCenterCheck extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업장별 점검항목 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WORK_CENTER", nullable = false, columnDefinition = "bigint COMMENT '작업장'")
     private WorkCenter workCenter;      // 작업장코드
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHECK_TYPE" ,nullable = false, columnDefinition = "bigint COMMENT '점검유형'")
     private CheckType checkType;        // 점검유형
 

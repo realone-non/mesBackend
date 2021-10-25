@@ -39,14 +39,16 @@ public class Measure extends BaseTimeEntity {
     @Column(name = "GAUGE_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT 'GAUGE명'")
     private String gaugeName;       // GAUGE명
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "GAUGE_TYPE", nullable = false, columnDefinition = "bigint COMMENT 'GAUGE유형'")
     private GaugeType gaugeType;       // GAUGE유형
 
     @Column(name = "MODEL", nullable = false, columnDefinition = "varchar(255) COMMENT '규격,모델'")
     private String model;           // 규격&모델
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DEPARTMENT", nullable = false, columnDefinition = "bigint COMMENT '부서'")
     private Department department;      // 사용부서
 

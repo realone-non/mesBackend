@@ -35,11 +35,13 @@ public class ContractItemList extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '수주 품목 리스트 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM", nullable = false, columnDefinition = "bigint COMMENT '품목'")
     private Item item;      // 품목
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UNIT", nullable = false, columnDefinition = "bigint COMMENT '수주단위'")
     private Unit unit;      // 수주단위
 
@@ -64,6 +66,7 @@ public class ContractItemList extends BaseTimeEntity {
     @Column(name = "PERIOD_DATE", columnDefinition = "date COMMENT '납기일자'")
     private LocalDate periodDate;       // 납기일자
 
+    // 다대일 단방향
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CONTRACT", nullable = false, columnDefinition = "bigint COMMENT '수주'")
     private Contract contract;      // 수주

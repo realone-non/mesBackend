@@ -44,7 +44,7 @@ public class StockInspectRequest extends BaseTimeEntity {
     @Column(name = "STOCK_INSPECT_TYPE", columnDefinition = "bigint COMMENT '재고실사 등록 타입'")
     private StockInspectType stockInspectType = StockInspectType.REQUEST_REGISTER;  // 재고실사 등록 타입
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 }

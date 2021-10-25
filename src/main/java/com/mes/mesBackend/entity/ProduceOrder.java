@@ -40,7 +40,8 @@ public class ProduceOrder extends BaseTimeEntity {
     @Column(name = "PRODUCE_ORDER_NO", nullable = false, unique = true, columnDefinition = "varchar(255) COMMENT '제조오더번호'")
     private String produceOrderNo;      // 제조오더번호
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CONTRACT", nullable = false, columnDefinition = "bigint COMMENT '수주'")
     private Contract contract;          // 수주
 
@@ -53,7 +54,8 @@ public class ProduceOrder extends BaseTimeEntity {
     @Column(name = "CONTRACT_AMOUNT", columnDefinition = "int COMMENT '수주수량'")
     private int contractAmount;         // 수주수량
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "INSTRUCTION_STATUS", columnDefinition = "bigint COMMENT '지시상태'")
     private InstructionStatus instructionStatus;    // 지시상태
 
@@ -72,7 +74,8 @@ public class ProduceOrder extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 }

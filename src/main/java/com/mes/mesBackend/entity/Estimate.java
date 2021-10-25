@@ -41,18 +41,21 @@ public class Estimate extends BaseTimeEntity {
     @Column(name = "ESTIMATE_NO", nullable = false, unique = true, columnDefinition = "varchar(255) COMMENT '견적번호'")
     private String estimateNo;  // 견적번호
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CLIENT", nullable = false, columnDefinition = "bigint COMMENT '거래처'")
     private Client client;      // 거래처
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MANAGER", nullable = false, columnDefinition = "bigint COMMENT '담당자'")
     private Manager manager;      // 담당자
 
     @Column(name = "ESTIMATE_DATE", nullable = false, columnDefinition = "date COMMENT '견적일자'")
     private LocalDate estimateDate;     // 견적일자
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CURRENCY", columnDefinition = "bigint COMMENT '화폐'")
     private Currency currency;            // 화폐
 
@@ -87,7 +90,8 @@ public class Estimate extends BaseTimeEntity {
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
     private Factory factory;                // 공장
 

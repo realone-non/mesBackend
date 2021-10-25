@@ -42,22 +42,22 @@ public class WorkOrderInfo extends BaseTimeEntity {
     @Column(name = "ORDER_NO", nullable = false, unique = true, columnDefinition = "varchar(255) COMMENT '지시번호'")
     private String orderNo;             // 지시번호
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WORK_PROCESS", nullable = false, columnDefinition = "bigint COMMENT '작업공정'")
     private WorkProcess workProcess;        // 작업공정
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WORK_LINE", nullable = false, columnDefinition = "bigint COMMENT '작업라인'")
     private WorkLine workLine;              // 작업라인
 
     @Column(name = "ORDER_AMOUNT", nullable = false, columnDefinition = "int COMMENT '지시수량'")
     private int orderAmount;                // 지시수량
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MANAGER", columnDefinition = "bigint COMMENT '생산담당자'")
     private Manager manager;                // 생산담당자
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UNIT", nullable = false, columnDefinition = "bigint COMMENT '단위'")
     private Unit unit;                      // 단위
 
@@ -79,11 +79,11 @@ public class WorkOrderInfo extends BaseTimeEntity {
     @Column(name = "ORDER_STATE",nullable = false, columnDefinition = "varchar(255) COMMENT '지시상태'")
     private String orderState;              // 지시상태
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TEST_TYPE", nullable = false, columnDefinition = "bigint COMMENT '검사의뢰'")
     private TestType testType;              // 검사의뢰
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TEST_PROCESS", columnDefinition = "bigint COMMENT '검사유형'")
     private TestProcess testProcess;        // 검사유형
 

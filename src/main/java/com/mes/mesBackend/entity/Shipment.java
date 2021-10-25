@@ -42,22 +42,23 @@ public class Shipment extends BaseTimeEntity {
     @Column(name = "SHIPMENT_NO", nullable = false, unique = true, columnDefinition = "varchar(255) COMMENT '출하번호'")
     private String shipmentNo;      // 출하번호
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CLIENT", nullable = false, columnDefinition = "bigint COMMENT '거래처'")
     private Client client;          // 거래처
 
     @Column(name = "SHIPMENT_DATE", nullable = false, columnDefinition = "date COMMENT '출하일자'")
     private LocalDate shipmentDate; // 출하일자
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MANAGER", columnDefinition = "bigint COMMENT '담당자'")
     private Manager manager;        // 담당자
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '창고'")
     private WareHouse wareHouse;    // 창고
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "CURRENCY", nullable = false, columnDefinition = "bigint COMMENT '화폐'")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CURRENCY", nullable = false, columnDefinition = "bigint COMMENT '화폐'")
     private Currency currency;      // 화폐
 
     @Column(name = "EXCHANGE_RATE", nullable = false, columnDefinition = "int COMMENT '환율'")
@@ -81,7 +82,7 @@ public class Shipment extends BaseTimeEntity {
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;            // 비고
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '창고'")
     private Factory factory;                // 공장
 
@@ -91,6 +92,7 @@ public class Shipment extends BaseTimeEntity {
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @OneToOne(fetch = FetchType.LAZY) @JoinColumn(name = "INVOICE", columnDefinition = "bigint COMMENT 'Invoice'")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "INVOICE", columnDefinition = "bigint COMMENT 'Invoice'")
     private Invoice invoice;        // Invoice
 }

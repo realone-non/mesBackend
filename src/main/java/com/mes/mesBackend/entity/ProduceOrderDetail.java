@@ -31,21 +31,24 @@ public class ProduceOrderDetail {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '제조오더 세부내역 고유아이디'")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM", nullable = false, columnDefinition = "bigint COMMENT '품목'")
     private Item item;      // 품목
 
     @Column(name = "BOM_AMOUNT", nullable = false, columnDefinition = "int COMMENT 'BOM수량'")
     private int bomAmount;      // BOM수량
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WORK_PROCESS", nullable = false, columnDefinition = "bigint COMMENT '공정'")
     private WorkProcess workProcess;        // 투입공정
 
     @Column(name = "RESERVATION_AMOUNT", nullable = false, columnDefinition = "int COMMENT '에약수량'")
     private int reservationAmount;          // 예약수량
 
-    @OneToOne(fetch = FetchType.LAZY)
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UNIT", columnDefinition = "bigint COMMENT '단위'")
     private Unit Unit;                       // 오더단위
 
