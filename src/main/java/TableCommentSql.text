@@ -75,6 +75,10 @@ alter table WORK_PLACES comment = '사업장';
 alter table WORK_PLACE_BUSINESS_TYPES comment = '사업장,업태 매핑 테이블';
 alter table WORK_PROCESSES comment = '작업공정 정보';
 
+alter table INPUT_TEST_REQUESTS comment = '부품수입검사 정보';
+alter table PURCHASE_CURRENTS comment = '구매현황';
+alter table PURCHASE_ORDERS comment = '구매발주 정보';
+alter table PURCHASE_ORDER_DETAILS comment = '구매발주 세부정보';
 
 select t.table_name,
        t.table_comment,

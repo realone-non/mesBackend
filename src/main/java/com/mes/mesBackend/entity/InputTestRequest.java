@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
  * 요청수량 (7)
  * 검사수량 (7)
  * 검사 타입 (의뢰, 진행, 완료)            -> InputTestState
+ * 외주여부
  * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -90,4 +91,7 @@ public class InputTestRequest extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "INPUT_TEST_STATE", columnDefinition = "varchar(255) COMMENT '부품수입검사 상태값'")
     private InputTestState inputTestState;      // 수입검사의뢰 상태값
+
+    @Column(name = "OUT_SOURCING_YN", columnDefinition = "bit(1) COMMENT '외주여부'")
+    private boolean outSourcingYn;              // 외주여부
 }
