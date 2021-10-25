@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 /*
- * 제조오더 등록
+ * 6-1. 제조오더 등록
  * 검색: 공장,품목그룹,품목,지시상태,제조오더번호,수주번호,착수예정일,자재납기일자
  * 제조오더번호 (2107080001)
  * 품번 (AA01-JT3-M020BC)                  -> Contract -> ContractItemList -> Item
