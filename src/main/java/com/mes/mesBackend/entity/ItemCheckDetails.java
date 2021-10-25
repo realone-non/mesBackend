@@ -29,9 +29,9 @@ import javax.persistence.*;
  * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@Entity(name = "ITEM_CHECK_DETAIL_LISTS")
+@Entity(name = "ITEM_CHECK_DETAILS")
 @Data
-public class ItemCheckDetailList extends BaseTimeEntity {
+public class ItemCheckDetails extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '품목별 검사항목 세부 고유아이디'")

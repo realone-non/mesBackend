@@ -26,9 +26,9 @@ import javax.persistence.*;
  * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "SHIPMENT_ITEM_LISTS")
+@Entity(name = "SHIPMENT_ITEMS")
 @Data
-public class ShipmentItemList extends BaseTimeEntity {
+public class ShipmentItems extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '출하등록 품목정보 고유아이디'")

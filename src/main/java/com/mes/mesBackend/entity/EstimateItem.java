@@ -12,9 +12,9 @@ import javax.persistence.*;
  * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "ESTIMATE_ITEM_LISTS")
+@Entity(name = "ESTIMATE_ITEMS")
 @Data
-public class EstimateItemList extends BaseTimeEntity {
+public class EstimateItem extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '품목견적서 리스트 고유아이디'")

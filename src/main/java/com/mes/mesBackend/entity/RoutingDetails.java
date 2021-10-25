@@ -23,9 +23,9 @@ import java.time.LocalDate;
  * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "ROUTING_DETAILS_LISTS")
+@Entity(name = "ROUTING_DETAILS")
 @Data
-public class RoutingDetailList extends BaseTimeEntity {
+public class RoutingDetails extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '라우팅 상세등록 고유아이디'")

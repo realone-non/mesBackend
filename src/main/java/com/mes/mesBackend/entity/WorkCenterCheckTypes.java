@@ -22,9 +22,9 @@ import javax.persistence.*;
  * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@Entity(name = "WORK_CENTER_CHECK_TYPE_LISTS")
+@Entity(name = "WORK_CENTER_CHECK_TYPES")
 @Data
-public class WorkCenterCheckTypeList extends BaseTimeEntity {
+public class WorkCenterCheckTypes extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업장별 세부 점검항목 고유아이디'")

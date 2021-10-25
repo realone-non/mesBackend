@@ -27,9 +27,9 @@ import java.time.LocalDate;
  * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "CONTRACT_ITEM_LISTS")
+@Entity(name = "CONTRACT_ITEMS")
 @Data
-public class ContractItemList extends BaseTimeEntity {
+public class ContractItem extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '수주 품목 리스트 고유아이디'")

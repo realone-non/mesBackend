@@ -11,7 +11,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Data
-@Entity(name = "WORK_PLACE_AND_BUSINESS_TYPE_MAPPEDS")
+@Entity(name = "WORK_PLACE_BUSINESS_TYPES")
 public class WorkPlaceMapped extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

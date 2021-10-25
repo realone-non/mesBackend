@@ -82,7 +82,7 @@ public class Estimate extends BaseTimeEntity {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "ESTIMATE_ITEM", columnDefinition = "bigint COMMENT '품목정보'")
-    private List<EstimateItemList> estimateItemLists;       // 해당하는 품목정보
+    private List<EstimateItem> estimateItemLists;       // 해당하는 품목정보
 
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
