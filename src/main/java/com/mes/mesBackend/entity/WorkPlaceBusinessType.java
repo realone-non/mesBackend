@@ -12,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Data
 @Entity(name = "WORK_PLACE_BUSINESS_TYPES")
-public class WorkPlaceMapped extends BaseTimeEntity {
+public class WorkPlaceBusinessType extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '사업장 업태 매핑 고유아이디'")

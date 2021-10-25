@@ -34,7 +34,7 @@ public class MapperConfig {
             WorkPlaceResponse workPlaceResponse = modelMapper.map(workPlace, WorkPlaceResponse.class);
             List<BusinessTypeResponse> businessTypeResponses = new ArrayList<>();
 
-            for (WorkPlaceMapped workPlaceMapped : workPlace.getType()) {
+            for (WorkPlaceBusinessType workPlaceMapped : workPlace.getType()) {
                 BusinessType businessType = workPlaceMapped.getBusinessType();
                 BusinessTypeResponse businessTypeResponse = modelMapper.map(businessType, BusinessTypeResponse.class);
                 businessTypeResponses.add(businessTypeResponse);

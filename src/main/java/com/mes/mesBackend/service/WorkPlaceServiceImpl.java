@@ -1,11 +1,10 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.WorkPlaceRequest;
-import com.mes.mesBackend.dto.response.BusinessTypeResponse;
 import com.mes.mesBackend.dto.response.WorkPlaceResponse;
 import com.mes.mesBackend.entity.BusinessType;
 import com.mes.mesBackend.entity.WorkPlace;
-import com.mes.mesBackend.entity.WorkPlaceMapped;
+import com.mes.mesBackend.entity.WorkPlaceBusinessType;
 import com.mes.mesBackend.helper.Mapper;
 import com.mes.mesBackend.repository.WorkPlaceMappedRepository;
 import com.mes.mesBackend.repository.WorkPlaceRepository;
@@ -37,7 +36,7 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
         WorkPlace saveWorkPlace = workPlaceRepository.save(workPlace);
 
         // create workPlaceMapped
-        List<WorkPlaceMapped> workPlaceMapped = createMapped(saveWorkPlace, getTypeIds);
+        List<WorkPlaceBusinessType> workPlaceMapped = createMapped(saveWorkPlace, getTypeIds);
 
         // workPlace에 workPlaceMapped 추가
         saveWorkPlace.setType(workPlaceMapped);
@@ -46,11 +45,11 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
     }
 
     // BusinessType mapped 생성
-    private List<WorkPlaceMapped> createMapped(WorkPlace workPlace, List<Long> businessTypeIds) {
-        List<WorkPlaceMapped> workPlaceMappeds = new ArrayList<>();
+    private List<WorkPlaceBusinessType> createMapped(WorkPlace workPlace, List<Long> businessTypeIds) {
+        List<WorkPlaceBusinessType> workPlaceMappeds = new ArrayList<>();
         for (Long businessTypeId : businessTypeIds) {
             BusinessType findBusinessType = businessTypeService.findBusinessTypeByIdAndDeleteYn(businessTypeId);
-            WorkPlaceMapped workPlaceMapped = new WorkPlaceMapped();
+            WorkPlaceBusinessType workPlaceMapped = new WorkPlaceBusinessType();
             // mapped 생성
             workPlaceMapped.setWorkPlace(workPlace);
             workPlaceMapped.setBusinessType(findBusinessType);

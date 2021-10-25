@@ -46,7 +46,7 @@ alter table PI comment = 'P/I';
 alter table PRODUCE_ORDERS comment = '제조오더 정보';
 alter table PRODUCE_ORDER_DETAIL comment = '제조오더 세부내역';
 alter table ROUTINGS comment = '라우팅 정보';
-alter table ROUTING_DETAILSS comment = '라우팅 상세 정보';
+alter table ROUTING_DETAILS comment = '라우팅 상세 정보';
 alter table SHIPMENTS comment = '출하정보';
 alter table SHIPMENT_ITEMS comment = '출하정보 품목정보';
 alter table SHIPMENT_RETURNS comment = '출하반품';
@@ -72,7 +72,7 @@ alter table WORK_LINES comment = '작업라인 정보';
 alter table WORK_ORDERS comment = '작업지시 정보';
 alter table WORK_ORDER_INFOS comment = '작업지시 정보';
 alter table WORK_PLACES comment = '사업장';
-alter table WORK_PLACE_AND_BUSINESS_TYPE_MAPPEDS comment = '사업장,업태 매핑 테이블';
+alter table WORK_PLACE_BUSINESS_TYPES comment = '사업장,업태 매핑 테이블';
 alter table WORK_PROCESSES comment = '작업공정 정보';
 
 

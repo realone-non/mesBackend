@@ -47,7 +47,7 @@ public class WorkPlace extends BaseTimeEntity{
     private String engAddress2;    // 영문주소2
 
     @OneToMany(mappedBy = "workPlace", fetch = FetchType.LAZY)
-    private List<WorkPlaceMapped> type;   // 업태
+    private List<WorkPlaceBusinessType> type;   // 업태
 
     @Column(name = "ITEM", columnDefinition = "varchar(255) COMMENT '업종'")
     private String item;    // 업종
