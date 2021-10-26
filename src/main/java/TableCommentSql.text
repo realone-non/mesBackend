@@ -80,6 +80,16 @@ alter table PURCHASE_CURRENTS comment = '구매현황';
 alter table PURCHASE_ORDERS comment = '구매발주 정보';
 alter table PURCHASE_ORDER_DETAILS comment = '구매발주 세부정보';
 
+alter table INCONGRUITIES comment = '부적합 정보';
+alter table PRODUCT_TESTS comment = '검사의뢰 정보';
+alter table PRODUCT_TEST_DETAILS comment = '제품검사 상세정보';
+
+alter table EQUIPMENT_BREAKDOWNS comment = '설비고장수리 내역 정보';
+alter table EQUIPMENT_BREAKDOWN_DETAILS comment = '수리항목,부품,작업자 정보';
+alter table EQUIPMENT_CHECKS comment = '설비 점검 실적 정보';
+alter table EQUIPMENT_CHECK_DETAILS comment ='설비 점검 세부 항목';
+alter table MEASURE_CALIBRATIONS comment ='계측기 검교정 실적 정보';
+
 select t.table_name,
        t.table_comment,
        c.column_comment,

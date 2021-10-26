@@ -43,10 +43,12 @@ public class Incongruity extends BaseTimeEntity {
     @Column(name = "REGISTRATION_DATE", columnDefinition = "date COMMENT '검사일시'")
     private LocalDate registrationDate;             // 검사일시
 
-    @Column(name = "TEST_CATEGORY", columnDefinition = "bigint COMMENT '검사유형'")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TEST_CATEGORY", columnDefinition = "bigint COMMENT '검사유형'")
     private TestCategory testCategory;              // 검사유형
 
-    @Column(name = "ITEM", columnDefinition = "bigint COMMENT '품목'")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목'")
     private Item item;          // 품목
 
     @Column(name = "TEST_NO", columnDefinition = "varchar(255) COMMENT '검사번호'")
@@ -68,7 +70,7 @@ public class Incongruity extends BaseTimeEntity {
     private String otherCostContent;        // 기타비용내역
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "DEPARTMENT", columnDefinition = "bigint COMMENT '부서'")
+    @JoinColumn(name = "DEPARTMENT", columnDefinition = "bigint COMMENT '부서'")
     private Department department;          // 처리부서명
 
     @Column(name = "MANAGER", columnDefinition = "varchar(255) COMMENT '처리담당자'")
