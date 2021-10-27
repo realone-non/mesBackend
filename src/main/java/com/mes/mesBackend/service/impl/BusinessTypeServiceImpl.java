@@ -20,6 +20,7 @@ public class BusinessTypeServiceImpl implements BusinessTypeService {
 
     @Autowired Mapper mapper;
 
+    // 삭제여부 false, 사용여부 true,false
     public BusinessType findBusinessTypeByIdAndDeleteYn(Long id) throws NotFoundException {
         BusinessType findBusinessType = businessTypeRepository.findByIdAndDeleteYnFalse(id);
         if (findBusinessType == null) {

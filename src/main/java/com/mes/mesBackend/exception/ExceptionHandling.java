@@ -15,6 +15,11 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(HttpStatus.BAD_REQUEST, notFoundException.getMessage());
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<HttpResponse> badRequestException(BadRequestException badRequestException) {
+        return createHttpResponse(HttpStatus.BAD_REQUEST, badRequestException.getMessage());
+    }
+
     // createHttpResponse
     private ResponseEntity<HttpResponse> createHttpResponse(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(), message), httpStatus);

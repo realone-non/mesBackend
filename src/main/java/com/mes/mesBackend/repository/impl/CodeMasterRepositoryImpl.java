@@ -1,7 +1,8 @@
-package com.mes.mesBackend.repository;
+package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.entity.CodeMaster;
 import com.mes.mesBackend.entity.QCodeMaster;
+import com.mes.mesBackend.repository.CodeMasterRepositoryCustom;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;

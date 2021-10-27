@@ -7,12 +7,21 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-// 단위 등록
+/*
+* 3-1-7. 단위등록
+* 단위코드
+* 단위명
+* 심볼
+* 기본단위
+* Base 대비 율
+* 소수점 자리 수
+* 사용
+* */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "UNITS")
 @Data
-public class Unit extends BaseTimeEntity{
+public class Unit extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '단위 등록 고유아이디'")
@@ -30,8 +39,8 @@ public class Unit extends BaseTimeEntity{
     @Column(name = "DEFAULT_UNIT", columnDefinition = "varchar(255) COMMENT '기본단위'")
     private String defaultUnit; // 기본단위
 
-    @Column(name = "BASE_SCALE", nullable = false, columnDefinition = "int COMMENT 'base 대비 율'")
-    private int baseScale;      // base대비 율
+    @Column(name = "BASE_SCALE", nullable = false, columnDefinition = "float COMMENT 'base 대비 율'")
+    private float baseScale;      // base대비 율
 
     @Column(name = "DECIMAL_POINT", nullable = false, columnDefinition = "int COMMENT '소수점자리수'")
     private int decimalPoint;   // 소수점자리수
@@ -41,4 +50,15 @@ public class Unit extends BaseTimeEntity{
 
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
+
+    // 수정 메서드
+    public void putUnit(Unit newUnit) {
+        setUnitCode(newUnit.unitCode);
+        setUnitCodeName(newUnit.unitCodeName);
+        setSymbol(newUnit.symbol);
+        setDefaultUnit(newUnit.defaultUnit);
+        setBaseScale(newUnit.baseScale);
+        setDecimalPoint(newUnit.decimalPoint);
+        setUseYn(newUnit.useYn);
+    }
 }

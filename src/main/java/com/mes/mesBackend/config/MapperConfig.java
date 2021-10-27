@@ -9,6 +9,7 @@ import org.modelmapper.spi.MappingContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class MapperConfig {
         modelMapper.addConverter(toWorkPlaceResponseConvert);
         modelMapper.addConverter(toFactoryResponseConvert);
         modelMapper.addConverter(toEmpResponseConvert);
+        modelMapper.addConverter(toUnitResponseConverter);
         return modelMapper;
     }
 
@@ -67,6 +69,19 @@ public class MapperConfig {
             employeeResponse.setDeptName(employee.getDepartment().getDeptName());
             employeeResponse.setEngNameAndPosition(employee.getEngName() + " " + employee.getPosition());
             return employeeResponse;
+        }
+    };
+
+    Converter<Unit, UnitResponse> toUnitResponseConverter = new Converter<Unit, UnitResponse>() {
+        @Override
+        public UnitResponse convert(MappingContext<Unit, UnitResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            Unit unit = context.getSource();
+            UnitResponse unitResponse = modelMapper.map(unit, UnitResponse.class);
+            DecimalFormat df = new DecimalFormat("0.000");
+            String result = df.format(unit.getBaseScale());
+            unitResponse.setBaseScale(result);
+            return unitResponse;
         }
     };
 }
