@@ -1,4 +1,4 @@
-package com.mes.mesBackend.service;
+package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.ClientRequest;
 import com.mes.mesBackend.dto.response.ClientResponse;
@@ -6,9 +6,14 @@ import com.mes.mesBackend.entity.BusinessType;
 import com.mes.mesBackend.entity.Client;
 import com.mes.mesBackend.entity.ClientType;
 import com.mes.mesBackend.entity.CountryCode;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.Mapper;
 import com.mes.mesBackend.helper.S3Service;
 import com.mes.mesBackend.repository.ClientRepository;
+import com.mes.mesBackend.service.BusinessTypeService;
+import com.mes.mesBackend.service.ClientService;
+import com.mes.mesBackend.service.ClientTypeService;
+import com.mes.mesBackend.service.CountryCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,12 +43,16 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     Mapper mapper;
 
-    public Client findClientByIdAndDeleteYnFalse(Long id) {
-        return clientRepository.findByIdAndDeleteYnFalse(id);
+    public Client findClientByIdAndDeleteYnFalse(Long id) throws NotFoundException {
+        Client findClient = clientRepository.findByIdAndDeleteYnFalse(id);
+        if (findClient == null) {
+            throw new NotFoundException("client does not exist. input client id: " + id);
+        }
+        return findClient;
     }
 
     // 거래처 생성
-    public ClientResponse createClient(ClientRequest clientRequest) {
+    public ClientResponse createClient(ClientRequest clientRequest) throws NotFoundException {
         Long businessTypeId = clientRequest.getBusinessType();
         Long countryCodeId = clientRequest.getCountryCode();
         Long clientTypeId = clientRequest.getClientType();
@@ -61,7 +70,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     // 거래처 조회
-    public ClientResponse getClient(Long id) {
+    public ClientResponse getClient(Long id) throws NotFoundException {
         Client client = findClientByIdAndDeleteYnFalse(id);
         return mapper.toResponse(client, ClientResponse.class);
     }
@@ -78,7 +87,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     // 거래처 수정
-    public ClientResponse updateClient(Long id, ClientRequest clientRequest) {
+    public ClientResponse updateClient(Long id, ClientRequest clientRequest) throws NotFoundException {
         Client newClient = mapper.toEntity(clientRequest, Client.class);
         Client findClient = findClientByIdAndDeleteYnFalse(id);
 
@@ -95,7 +104,7 @@ public class ClientServiceImpl implements ClientService {
 
     // 사업자 등록증 파일 업로드
     // client/거래처 명/파일명(날싸시간)
-    public ClientResponse createBusinessFileToClient(Long id, MultipartFile businessFile) throws IOException {
+    public ClientResponse createBusinessFileToClient(Long id, MultipartFile businessFile) throws IOException, NotFoundException {
         Client client = findClientByIdAndDeleteYnFalse(id);
         String fileName = "client/" + client.getClientCode() + "/";
         client.setBusinessFile(s3Service.upload(businessFile, fileName));
@@ -104,14 +113,14 @@ public class ClientServiceImpl implements ClientService {
     }
 
     // 거래처 삭제
-    public void deleteClient(Long id) {
+    public void deleteClient(Long id) throws NotFoundException {
         Client client = findClientByIdAndDeleteYnFalse(id);
         client.setDeleteYn(true);
         clientRepository.save(client);
     }
 
     // 사업자 등록증 파일 삭제 (aws 권한 문제로 안됨)
-    private void deleteBusinessFileToClient(Long id) throws IOException {
+    private void deleteBusinessFileToClient(Long id) throws IOException, NotFoundException {
         Client client = findClientByIdAndDeleteYnFalse(id);
         s3Service.delete(client.getBusinessFile());
         client.setBusinessFile(null);

@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.EmployeeRequest;
 import com.mes.mesBackend.dto.response.EmployeeResponse;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.EmployeeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +27,7 @@ public class EmployeeController {
     @PostMapping
     @ResponseBody
     @ApiOperation(value = "직원(작업자) 생성")
-    public ResponseEntity<EmployeeResponse> createEmployee(@RequestBody EmployeeRequest employeeRequest) {
+    public ResponseEntity<EmployeeResponse> createEmployee(@RequestBody EmployeeRequest employeeRequest) throws NotFoundException {
         return new ResponseEntity<>(employeeService.createEmployee(employeeRequest), HttpStatus.OK);
     }
 
@@ -34,7 +35,7 @@ public class EmployeeController {
     @GetMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "직원(작업자) 단일 조회")
-    public ResponseEntity<EmployeeResponse> getEmployee(@PathVariable Long id) {
+    public ResponseEntity<EmployeeResponse> getEmployee(@PathVariable Long id) throws NotFoundException {
         return new ResponseEntity<>(employeeService.getEmployee(id), HttpStatus.OK);
     }
 
@@ -53,14 +54,14 @@ public class EmployeeController {
     public ResponseEntity<EmployeeResponse> updateEmployee(
             @PathVariable(value = "id") Long id,
             @RequestBody EmployeeRequest employeeRequest
-    ) {
+    ) throws NotFoundException {
         return new ResponseEntity<>(employeeService.updateEmployee(id, employeeRequest), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "직원(작업자) 삭제")
-    public ResponseEntity deleteEmployee(@PathVariable(value = "id") Long id) {
+    public ResponseEntity deleteEmployee(@PathVariable(value = "id") Long id) throws NotFoundException {
         employeeService.deleteEmployee(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

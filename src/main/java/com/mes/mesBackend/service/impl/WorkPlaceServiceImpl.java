@@ -1,13 +1,16 @@
-package com.mes.mesBackend.service;
+package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.WorkPlaceRequest;
 import com.mes.mesBackend.dto.response.WorkPlaceResponse;
 import com.mes.mesBackend.entity.BusinessType;
 import com.mes.mesBackend.entity.WorkPlace;
 import com.mes.mesBackend.entity.WorkPlaceBusinessType;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.Mapper;
 import com.mes.mesBackend.repository.WorkPlaceMappedRepository;
 import com.mes.mesBackend.repository.WorkPlaceRepository;
+import com.mes.mesBackend.service.BusinessTypeService;
+import com.mes.mesBackend.service.WorkPlaceService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,8 +30,16 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
     @Autowired ModelMapper modelMapper;
     @Autowired Mapper mapper;
 
+
+    @Override
+    public WorkPlace findByIdAndDeleteYnFalse(Long id) throws NotFoundException {
+        WorkPlace findWorkPlace = workPlaceRepository.findByIdAndDeleteYnFalse(id);
+        if (findWorkPlace == null) throw new NotFoundException("workPlace does not exists. input id:" +id);
+        return findWorkPlace;
+    }
+
     // 사업장 생성
-    public WorkPlaceResponse createWorkPlace(WorkPlaceRequest workPlaceRequest) {
+    public WorkPlaceResponse createWorkPlace(WorkPlaceRequest workPlaceRequest) throws NotFoundException {
         List<Long> getTypeIds = workPlaceRequest.getType();
         WorkPlace workPlace = mapper.toEntity(workPlaceRequest, WorkPlace.class);
 
@@ -45,7 +56,7 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
     }
 
     // BusinessType mapped 생성
-    private List<WorkPlaceBusinessType> createMapped(WorkPlace workPlace, List<Long> businessTypeIds) {
+    private List<WorkPlaceBusinessType> createMapped(WorkPlace workPlace, List<Long> businessTypeIds) throws NotFoundException {
         List<WorkPlaceBusinessType> workPlaceMappeds = new ArrayList<>();
         for (Long businessTypeId : businessTypeIds) {
             BusinessType findBusinessType = businessTypeService.findBusinessTypeByIdAndDeleteYn(businessTypeId);
@@ -59,8 +70,8 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
     }
 
 //    // 사업장 단일 조회
-    public WorkPlaceResponse getWorkPlace(Long id) {
-        WorkPlace workPlace = workPlaceRepository.findByIdAndDeleteYnFalse(id);
+    public WorkPlaceResponse getWorkPlace(Long id) throws NotFoundException {
+        WorkPlace workPlace = findByIdAndDeleteYnFalse(id);
         return mapper.toResponse(workPlace, WorkPlaceResponse.class);
     }
 
@@ -76,9 +87,10 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
     }
 
     // 사업장 수정
-    public WorkPlaceResponse updateWorkPlace(Long id, WorkPlaceRequest workPlaceRequest) {
+    public WorkPlaceResponse updateWorkPlace(Long id, WorkPlaceRequest workPlaceRequest) throws NotFoundException {
         List<Long> newBusinessTypeIds = workPlaceRequest.getType();
-        WorkPlace findWorkPlace = workPlaceRepository.findByIdAndDeleteYnFalse(id);
+        WorkPlace findWorkPlace = findByIdAndDeleteYnFalse(id);
+
         // delete mapped
         deleteWorkPlaceMapped(findWorkPlace);
 
@@ -94,8 +106,8 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
     }
 
     // 사업장 삭제
-    public void deleteWorkPlace(Long id) {
-        WorkPlace workPlace = workPlaceRepository.findByIdAndDeleteYnFalse(id);
+    public void deleteWorkPlace(Long id) throws NotFoundException {
+        WorkPlace workPlace = findByIdAndDeleteYnFalse(id);
         workPlace.setDeleteYn(true);
         workPlaceRepository.save(workPlace);
     }

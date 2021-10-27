@@ -67,7 +67,7 @@ logging:
 
 server:
   error:
-    include-exception: false  # Response에 Exception을 표시할지
+    include-exception: true  # Response에 Exception을 표시할지
     include-message: always   # Response에 Exception Message를 표시할지
     include-stacktrace: on_param  # Response에 Stack Trace를 표시할지
     whitelabel:

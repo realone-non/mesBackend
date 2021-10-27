@@ -5,6 +5,7 @@ import com.mes.mesBackend.dto.request.CodeMasterUpdateRequest;
 import com.mes.mesBackend.dto.request.SubCodeMasterRequest;
 import com.mes.mesBackend.dto.response.CodeMasterResponse;
 import com.mes.mesBackend.dto.response.SubCodeMasterResponse;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.CodeMasterService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,7 +53,7 @@ public class CodeMasterController {
     @GetMapping("/{id}/sub-code-masters")
     @ResponseBody
     @ApiOperation(value = "부코드마스터 조회",notes = "해당 주코드에 해당하는 부코드 전체 조회")
-    public ResponseEntity<List<SubCodeMasterResponse>> getSubCodeMasters(@PathVariable Long id) {
+    public ResponseEntity<List<SubCodeMasterResponse>> getSubCodeMasters(@PathVariable Long id) throws NotFoundException {
         return new ResponseEntity<>(codeMasterService.getSubCodeMasters(id), HttpStatus.OK);
     }
 
@@ -63,7 +64,7 @@ public class CodeMasterController {
     public ResponseEntity<CodeMasterResponse> updateCodeMaster(
             @PathVariable Long id,
             @RequestBody CodeMasterUpdateRequest codeMasterUpdateRequest
-    ) {
+    ) throws NotFoundException {
         return new ResponseEntity<>(codeMasterService.updateCodeMaster(id, codeMasterUpdateRequest), HttpStatus.OK);
     }
 
@@ -91,7 +92,7 @@ public class CodeMasterController {
     @DeleteMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "코드마스터 삭제")
-    public ResponseEntity deleteCodeMaster(@PathVariable Long id) {
+    public ResponseEntity deleteCodeMaster(@PathVariable Long id) throws NotFoundException {
         codeMasterService.deleteCodeMaster(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
@@ -103,7 +104,7 @@ public class CodeMasterController {
     public ResponseEntity<SubCodeMasterResponse> createSubCodeMaster(
             @PathVariable(value = "id") Long codeMasterId,
             @RequestBody SubCodeMasterRequest subCodeMasterRequest
-    ) {
+    ) throws NotFoundException {
         return new ResponseEntity<>(codeMasterService.createSubCodeMaster(codeMasterId, subCodeMasterRequest), HttpStatus.OK);
     }
 
@@ -111,7 +112,7 @@ public class CodeMasterController {
     @GetMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "코드마스터 단일 조회")
-    public ResponseEntity<CodeMasterResponse> getCodeMaster(@PathVariable Long id) {
+    public ResponseEntity<CodeMasterResponse> getCodeMaster(@PathVariable Long id) throws NotFoundException {
         return new ResponseEntity<>(codeMasterService.getCodeMaster(id), HttpStatus.OK);
     }
 }

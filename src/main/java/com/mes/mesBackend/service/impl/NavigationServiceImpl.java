@@ -1,4 +1,4 @@
-package com.mes.mesBackend.service;
+package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.DetailNavRequest;
 import com.mes.mesBackend.dto.request.MainNavRequest;
@@ -13,6 +13,7 @@ import com.mes.mesBackend.helper.Mapper;
 import com.mes.mesBackend.repository.DetailNavigationRepository;
 import com.mes.mesBackend.repository.MainNavigationRepository;
 import com.mes.mesBackend.repository.SubNavigationRepository;
+import com.mes.mesBackend.service.NavigationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

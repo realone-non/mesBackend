@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.WorkPlaceRequest;
 import com.mes.mesBackend.dto.response.WorkPlaceResponse;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.WorkPlaceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +27,7 @@ public class WorkPlaceController {
     @PostMapping
     @ResponseBody
     @ApiOperation(value = "사업장 생성")
-    public ResponseEntity<WorkPlaceResponse> createWorkPlace(@RequestBody WorkPlaceRequest workPlaceRequest) {
+    public ResponseEntity<WorkPlaceResponse> createWorkPlace(@RequestBody WorkPlaceRequest workPlaceRequest) throws NotFoundException {
         return new ResponseEntity<>(workPlaceService.createWorkPlace(workPlaceRequest), HttpStatus.OK);
     }
 
@@ -34,7 +35,7 @@ public class WorkPlaceController {
     @GetMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "사업장 단일 조회")
-    public ResponseEntity<WorkPlaceResponse> getWorkPlace(@PathVariable Long id) {
+    public ResponseEntity<WorkPlaceResponse> getWorkPlace(@PathVariable Long id) throws NotFoundException {
         return new ResponseEntity<>(workPlaceService.getWorkPlace(id), HttpStatus.OK);
     }
 
@@ -53,14 +54,14 @@ public class WorkPlaceController {
     public ResponseEntity<WorkPlaceResponse> updateWorkPlace(
             @PathVariable(value = "id") Long id,
             @RequestBody WorkPlaceRequest workPlaceRequest
-    ) {
+    ) throws NotFoundException {
         return new ResponseEntity<>(workPlaceService.updateWorkPlace(id, workPlaceRequest), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "사업장 삭제")
-    public ResponseEntity deleteWorkPlace(@PathVariable(value = "id") Long id) {
+    public ResponseEntity deleteWorkPlace(@PathVariable(value = "id") Long id) throws NotFoundException {
         workPlaceService.deleteWorkPlace(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

@@ -3,6 +3,7 @@ package com.mes.mesBackend.service;
 import com.mes.mesBackend.dto.request.CountryCodeRequest;
 import com.mes.mesBackend.dto.response.CountryCodeResponse;
 import com.mes.mesBackend.entity.CountryCode;
+import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,16 +12,16 @@ public interface CountryCodeService {
     CountryCodeResponse createCountryCode(CountryCodeRequest countryCodeRequest);
 
     // 국가코드 타입 조회
-    CountryCodeResponse getCountryCode(Long id);
+    CountryCodeResponse getCountryCode(Long id) throws NotFoundException;
 
     // 국가코드 타입 전체 조회
     Page<CountryCodeResponse> getCountryCodes(Pageable pageable);
 
     // 국가코드 타입 수정
-    CountryCodeResponse updateCountryCode(Long id, CountryCodeRequest countryCodeRequest);
+    CountryCodeResponse updateCountryCode(Long id, CountryCodeRequest countryCodeRequest) throws NotFoundException;
 
     // 국가코드 삭제
-    void deleteCountryCode(Long id);
+    void deleteCountryCode(Long id) throws NotFoundException;
 
-    CountryCode findCountryCodeByIdAndDeleteYn(Long id);
+    CountryCode findCountryCodeByIdAndDeleteYn(Long id) throws NotFoundException;
 }

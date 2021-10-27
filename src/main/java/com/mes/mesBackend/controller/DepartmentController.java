@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.DepartmentRequest;
 import com.mes.mesBackend.dto.response.DepartmentResponse;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.DepartmentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,7 +35,7 @@ public class DepartmentController {
     @GetMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "부서 조회")
-    public ResponseEntity<DepartmentResponse> getDepartment(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<DepartmentResponse> getDepartment(@PathVariable(value = "id") Long id) throws NotFoundException {
         return new ResponseEntity<>(departmentService.getDepartment(id), HttpStatus.OK);
     }
 
@@ -53,7 +54,7 @@ public class DepartmentController {
     public ResponseEntity<DepartmentResponse> updateDepartment(
             @PathVariable Long id,
             @RequestBody DepartmentRequest departmentRequest
-    ) {
+    ) throws NotFoundException {
         return new ResponseEntity<>(departmentService.updateDepartment(id, departmentRequest), HttpStatus.OK);
     }
 
@@ -61,7 +62,7 @@ public class DepartmentController {
     @DeleteMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "부서 삭제")
-    public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) throws NotFoundException {
         departmentService.deleteDepartment(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

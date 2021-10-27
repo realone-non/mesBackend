@@ -1,14 +1,15 @@
-package com.mes.mesBackend.service;
+package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.entity.UserVo;
 import com.mes.mesBackend.repository.UserRepository;
+import com.mes.mesBackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 

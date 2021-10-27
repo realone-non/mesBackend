@@ -5,6 +5,7 @@ import com.mes.mesBackend.dto.request.CodeMasterUpdateRequest;
 import com.mes.mesBackend.dto.request.SubCodeMasterRequest;
 import com.mes.mesBackend.dto.response.CodeMasterResponse;
 import com.mes.mesBackend.dto.response.SubCodeMasterResponse;
+import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,10 +20,10 @@ public interface CodeMasterService {
     Page<CodeMasterResponse> getCodeMasters(String mainCode, String codeName, Pageable pageable);
 
     // 부코드 마스터 조회
-    List<SubCodeMasterResponse> getSubCodeMasters(Long id);
+    List<SubCodeMasterResponse> getSubCodeMasters(Long id) throws NotFoundException;
 
     // 코드마스터 수정
-    CodeMasterResponse updateCodeMaster(Long id, CodeMasterUpdateRequest codeMasterUpdateRequest);
+    CodeMasterResponse updateCodeMaster(Long id, CodeMasterUpdateRequest codeMasterUpdateRequest) throws NotFoundException;
 
     // 부코드마스터 수정
     SubCodeMasterResponse updateSubCodeMaster(Long subCodeMasterId, SubCodeMasterRequest subCodeMasterRequest);
@@ -31,10 +32,10 @@ public interface CodeMasterService {
     void deleteSubCodeMaster(Long id);
 
     // 코드마스터 삭제
-    void deleteCodeMaster(Long id);
+    void deleteCodeMaster(Long id) throws NotFoundException;
 
     // 부코드마스터 생성
-    SubCodeMasterResponse createSubCodeMaster(Long codeMasterId, SubCodeMasterRequest subCodeMasterRequest);
+    SubCodeMasterResponse createSubCodeMaster(Long codeMasterId, SubCodeMasterRequest subCodeMasterRequest) throws NotFoundException;
 
-    CodeMasterResponse getCodeMaster(Long id);
+    CodeMasterResponse getCodeMaster(Long id) throws NotFoundException;
 }

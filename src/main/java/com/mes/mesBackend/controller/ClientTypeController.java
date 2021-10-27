@@ -3,6 +3,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.ClientTypeRequest;
 import com.mes.mesBackend.dto.response.ClientTypeResponse;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.ClientTypeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,25 +31,15 @@ public class ClientTypeController {
     public ResponseEntity<ClientTypeResponse> createClientType(
             @RequestBody ClientTypeRequest clientTypeRequest
     ) {
-        try {
-            return new ResponseEntity<>(clientTypeService.createClientType(clientTypeRequest), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(clientTypeService.createClientType(clientTypeRequest), HttpStatus.OK);
     }
 
     // 거래처 유형 단일 조회
     @GetMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "거래처유형 조회")
-    public ResponseEntity<ClientTypeResponse> getClientType(@PathVariable(value = "id") Long id) {
-        try {
-            return new ResponseEntity<>(clientTypeService.getClientType(id), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<ClientTypeResponse> getClientType(@PathVariable(value = "id") Long id) throws NotFoundException {
+        return new ResponseEntity<>(clientTypeService.getClientType(id), HttpStatus.OK);
     }
 
     // 거래처 유형 페이징 조회
@@ -56,12 +47,7 @@ public class ClientTypeController {
     @ResponseBody()
     @ApiOperation(value = "거래처유형 페이징 조회")
     public ResponseEntity<Page<ClientTypeResponse>> getClientTypes(Pageable pageable) {
-        try {
-            return new ResponseEntity<>(clientTypeService.getClientTypes(pageable), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(clientTypeService.getClientTypes(pageable), HttpStatus.OK);
     }
 
     // 거래처 유형 수정
@@ -71,26 +57,16 @@ public class ClientTypeController {
     public ResponseEntity<ClientTypeResponse> updateClientType(
             @PathVariable(value = "id") Long id,
             @RequestBody ClientTypeRequest clientTypeRequest
-    ) {
-        try {
-            return new ResponseEntity<>(clientTypeService.updateClientType(id, clientTypeRequest), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    ) throws NotFoundException {
+        return new ResponseEntity<>(clientTypeService.updateClientType(id, clientTypeRequest), HttpStatus.OK);
     }
 
     // 거래처유형 삭제
     @DeleteMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "거래처유형 삭제")
-    public ResponseEntity<Void> deleteClientType(@PathVariable(value = "id") Long id) {
-        try {
-            clientTypeService.deleteClientType(id);
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Void> deleteClientType(@PathVariable(value = "id") Long id) throws NotFoundException {
+        clientTypeService.deleteClientType(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

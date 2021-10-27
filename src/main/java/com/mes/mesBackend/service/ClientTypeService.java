@@ -3,6 +3,7 @@ package com.mes.mesBackend.service;
 import com.mes.mesBackend.dto.request.ClientTypeRequest;
 import com.mes.mesBackend.dto.response.ClientTypeResponse;
 import com.mes.mesBackend.entity.ClientType;
+import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,16 +13,16 @@ public interface ClientTypeService {
     ClientTypeResponse createClientType(ClientTypeRequest clientTypeRequest);
 
     // 거래처유형 조회
-    ClientTypeResponse getClientType(Long id);
+    ClientTypeResponse getClientType(Long id) throws NotFoundException;
 
     // 거래처유형 전체 조회
     Page<ClientTypeResponse> getClientTypes(Pageable pageable);
 
     // 거래처유형 수정
-    ClientTypeResponse updateClientType(Long id, ClientTypeRequest clientTypeRequest);
+    ClientTypeResponse updateClientType(Long id, ClientTypeRequest clientTypeRequest) throws NotFoundException;
 
     // 거래처유형 삭제
-    void deleteClientType(Long id);
+    void deleteClientType(Long id) throws NotFoundException;
 
-    ClientType findClientTypeByIdAndDeleteYn(Long id);
+    ClientType findClientTypeByIdAndDeleteYn(Long id) throws NotFoundException;
 }

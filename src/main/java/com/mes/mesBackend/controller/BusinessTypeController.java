@@ -2,6 +2,8 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.BusinessTypeRequest;
 import com.mes.mesBackend.dto.response.BusinessTypeResponse;
+import com.mes.mesBackend.entity.HttpResponse;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.BusinessTypeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,25 +41,15 @@ public class BusinessTypeController {
     @GetMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "업태 단일 조회")
-    public ResponseEntity<BusinessTypeResponse> getBusinessType(@PathVariable(value = "id") Long id) {
-        try {
-            return new ResponseEntity<>(businessTypeService.getBusinessType(id), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<BusinessTypeResponse> getBusinessType(@PathVariable(value = "id") Long id) throws NotFoundException {
+        return new ResponseEntity<>(businessTypeService.getBusinessType(id), HttpStatus.OK);
     }
 
     @GetMapping
     @ResponseBody()
     @ApiOperation(value = "업태 페이징 조회")
     public ResponseEntity<Page<BusinessTypeResponse>> getBusinessTypes(Pageable pageable) {
-        try {
-            return new ResponseEntity<>(businessTypeService.getBusinessTypes(pageable), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(businessTypeService.getBusinessTypes(pageable), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
@@ -66,25 +58,15 @@ public class BusinessTypeController {
     public ResponseEntity<BusinessTypeResponse> updateBusinessType(
             @PathVariable(value = "id") Long id,
             @RequestBody BusinessTypeRequest businessTypeRequest
-    ) {
-        try {
-            return new ResponseEntity<>(businessTypeService.updateBusinessType(id, businessTypeRequest), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    ) throws NotFoundException {
+        return new ResponseEntity<>(businessTypeService.updateBusinessType(id, businessTypeRequest), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "업태 삭제")
-    public ResponseEntity<Void> deleteBusinessType(@PathVariable(value = "id") Long id) {
-        try {
-            businessTypeService.deleteBusinessType(id);
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Void> deleteBusinessType(@PathVariable(value = "id") Long id) throws NotFoundException {
+        businessTypeService.deleteBusinessType(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

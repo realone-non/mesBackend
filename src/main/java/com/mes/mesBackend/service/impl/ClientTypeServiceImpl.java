@@ -1,19 +1,16 @@
-package com.mes.mesBackend.service;
+package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.ClientTypeRequest;
-import com.mes.mesBackend.dto.response.ClientResponse;
 import com.mes.mesBackend.dto.response.ClientTypeResponse;
 import com.mes.mesBackend.entity.ClientType;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.Mapper;
 import com.mes.mesBackend.repository.ClientTypeRepository;
-import org.modelmapper.ModelMapper;
+import com.mes.mesBackend.service.ClientTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ClientTypeServiceImpl implements ClientTypeService {
@@ -24,8 +21,12 @@ public class ClientTypeServiceImpl implements ClientTypeService {
     @Autowired
     Mapper mapper;
 
-    public ClientType findClientTypeByIdAndDeleteYn(Long id) {
-        return clientTypeRepository.findByIdAndDeleteYnFalse(id);
+    public ClientType findClientTypeByIdAndDeleteYn(Long id) throws NotFoundException {
+        ClientType findClientType = clientTypeRepository.findByIdAndDeleteYnFalse(id);
+        if (findClientType == null) {
+            throw new NotFoundException("client type does not exist. input clientTypeId: " + id);
+        }
+        return findClientType;
     }
 
     // 거래처유형 생성
@@ -36,7 +37,7 @@ public class ClientTypeServiceImpl implements ClientTypeService {
     }
 
     // 거래처유형 조회
-    public ClientTypeResponse getClientType(Long id) {
+    public ClientTypeResponse getClientType(Long id) throws NotFoundException {
         ClientType clientType = findClientTypeByIdAndDeleteYn(id);
         return mapper.toResponse(clientType, ClientTypeResponse.class);
     }
@@ -48,7 +49,7 @@ public class ClientTypeServiceImpl implements ClientTypeService {
     }
 
     // 거래처유형 수정
-    public ClientTypeResponse updateClientType(Long id, ClientTypeRequest clientTypeRequest) {
+    public ClientTypeResponse updateClientType(Long id, ClientTypeRequest clientTypeRequest) throws NotFoundException {
         ClientType clientType = mapper.toEntity(clientTypeRequest, ClientType.class);
         ClientType findClientType = findClientTypeByIdAndDeleteYn(id);
         findClientType.setName(clientType.getName());
@@ -57,7 +58,7 @@ public class ClientTypeServiceImpl implements ClientTypeService {
     }
 
     // 거래처유형 삭제
-    public void deleteClientType(Long id) {
+    public void deleteClientType(Long id) throws NotFoundException {
         ClientType clientType = findClientTypeByIdAndDeleteYn(id);
         clientType.setDeleteYn(true);
         clientTypeRepository.save(clientType);

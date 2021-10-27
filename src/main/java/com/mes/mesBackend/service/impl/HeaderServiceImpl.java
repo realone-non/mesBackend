@@ -1,17 +1,15 @@
-package com.mes.mesBackend.service;
+package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.HeaderRequest;
 import com.mes.mesBackend.dto.response.HeaderResponse;
 import com.mes.mesBackend.entity.Header;
 import com.mes.mesBackend.helper.Mapper;
 import com.mes.mesBackend.repository.HeadersRepository;
-import org.modelmapper.ModelMapper;
+import com.mes.mesBackend.service.HeaderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class HeaderServiceImpl implements HeaderService {

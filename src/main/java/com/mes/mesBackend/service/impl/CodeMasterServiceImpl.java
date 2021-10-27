@@ -1,4 +1,4 @@
-package com.mes.mesBackend.service;
+package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.CodeMasterRequest;
 import com.mes.mesBackend.dto.request.CodeMasterUpdateRequest;
@@ -7,9 +7,11 @@ import com.mes.mesBackend.dto.response.CodeMasterResponse;
 import com.mes.mesBackend.dto.response.SubCodeMasterResponse;
 import com.mes.mesBackend.entity.CodeMaster;
 import com.mes.mesBackend.entity.SubCodeMaster;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.Mapper;
 import com.mes.mesBackend.repository.CodeMasterRepository;
 import com.mes.mesBackend.repository.SubCodeMasterRepository;
+import com.mes.mesBackend.service.CodeMasterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,8 +28,12 @@ public class CodeMasterServiceImpl implements CodeMasterService {
     @Autowired Mapper mapper;
 
     // 코드마스터 아이디로 조회
-    private CodeMaster findByIdAndDeleteYnTrue(Long id) {
-        return codeMasterRepository.findByIdAndDeleteYnFalse(id);
+    private CodeMaster findByIdAndDeleteYnTrue(Long id) throws NotFoundException {
+        CodeMaster findCodeMaster = codeMasterRepository.findByIdAndDeleteYnFalse(id);
+        if (findCodeMaster == null) {
+            throw new NotFoundException("codeMaster does not exists. input codeMasterId: " + id);
+        }
+        return findCodeMaster;
     }
 
     // 코드마스터 생성
@@ -66,14 +72,14 @@ public class CodeMasterServiceImpl implements CodeMasterService {
     }
 
     // 부코드 마스터 조회
-    public List<SubCodeMasterResponse> getSubCodeMasters(Long id) {
+    public List<SubCodeMasterResponse> getSubCodeMasters(Long id) throws NotFoundException {
         CodeMaster codeMaster = findByIdAndDeleteYnTrue(id);
         List<SubCodeMaster> subCodeMasters = subCodeMasterRepository.findSubCodeMasterByCodeMasterAndDeleteYnFalse(codeMaster);
         return mapper.toListResponses(subCodeMasters, SubCodeMasterResponse.class);
     }
 
     // 코드마스터 수정
-    public CodeMasterResponse updateCodeMaster(Long id, CodeMasterUpdateRequest codeMasterUpdateRequest) {
+    public CodeMasterResponse updateCodeMaster(Long id, CodeMasterUpdateRequest codeMasterUpdateRequest) throws NotFoundException {
         CodeMaster newCodeMaster = mapper.toEntity(codeMasterUpdateRequest, CodeMaster.class);
         CodeMaster findCodeMaster = findByIdAndDeleteYnTrue(id);
         // 수정매핑
@@ -98,7 +104,7 @@ public class CodeMasterServiceImpl implements CodeMasterService {
     }
 
     // 코드마스터 삭제
-    public void deleteCodeMaster(Long id) {
+    public void deleteCodeMaster(Long id) throws NotFoundException {
         CodeMaster codeMaster = findByIdAndDeleteYnTrue(id);
         List<SubCodeMaster> subCodeMasterList = subCodeMasterRepository.findSubCodeMasterByCodeMasterAndDeleteYnFalse(codeMaster);
         codeMaster.setDeleteYn(true);
@@ -111,7 +117,7 @@ public class CodeMasterServiceImpl implements CodeMasterService {
     public SubCodeMasterResponse createSubCodeMaster(
             Long codeMasterId,
             SubCodeMasterRequest subCodeMasterRequest
-    ) {
+    ) throws NotFoundException {
         CodeMaster codeMaster = findByIdAndDeleteYnTrue(codeMasterId);
         SubCodeMaster subCodeMaster = mapper.toEntity(subCodeMasterRequest, SubCodeMaster.class);
         subCodeMaster.setCodeMaster(codeMaster);
@@ -119,7 +125,7 @@ public class CodeMasterServiceImpl implements CodeMasterService {
     }
 
     // 코드마스터 단일 조회
-    public CodeMasterResponse getCodeMaster(Long id) {
+    public CodeMasterResponse getCodeMaster(Long id) throws NotFoundException {
         CodeMasterResponse codeMasterResponse = mapper.toResponse(findByIdAndDeleteYnTrue(id), CodeMasterResponse.class);
         codeMasterResponse.setSubCodeMasterResponse(getSubCodeMasters(id));
         return codeMasterResponse;

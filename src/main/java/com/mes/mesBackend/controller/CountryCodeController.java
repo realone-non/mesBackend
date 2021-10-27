@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.CountryCodeRequest;
 import com.mes.mesBackend.dto.response.CountryCodeResponse;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.CountryCodeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,25 +30,15 @@ public class CountryCodeController {
     public ResponseEntity<CountryCodeResponse> createCountryCode(
             @RequestBody CountryCodeRequest countryCodeRequest
     ) {
-        try {
-            return new ResponseEntity<>(countryCodeService.createCountryCode(countryCodeRequest), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(countryCodeService.createCountryCode(countryCodeRequest), HttpStatus.OK);
     }
 
     // 국가코드 단일 조회
     @GetMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "국가코드 조회")
-    public ResponseEntity<CountryCodeResponse> getCountryCode(@PathVariable(value = "id") Long id) {
-        try {
-            return new ResponseEntity<>(countryCodeService.getCountryCode(id), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<CountryCodeResponse> getCountryCode(@PathVariable(value = "id") Long id) throws NotFoundException {
+        return new ResponseEntity<>(countryCodeService.getCountryCode(id), HttpStatus.OK);
     }
 
 //    국가코드 페이징 조회
@@ -55,12 +46,7 @@ public class CountryCodeController {
     @ResponseBody()
     @ApiOperation(value = "국가코드 페이징 조회")
     public ResponseEntity<Page<CountryCodeResponse>> getCountryCodes(Pageable pageable) {
-        try {
-            return new ResponseEntity<>(countryCodeService.getCountryCodes(pageable), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity<>(countryCodeService.getCountryCodes(pageable), HttpStatus.OK);
     }
 
     // 국가코드 수정
@@ -70,26 +56,16 @@ public class CountryCodeController {
     public ResponseEntity<CountryCodeResponse> updateCountryCode(
             @PathVariable(value = "id") Long id,
             @RequestBody CountryCodeRequest countryCodeRequest
-    ) {
-        try {
-            return new ResponseEntity<>(countryCodeService.updateCountryCode(id, countryCodeRequest), HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    ) throws NotFoundException {
+        return new ResponseEntity<>(countryCodeService.updateCountryCode(id, countryCodeRequest), HttpStatus.OK);
     }
 
     // 국가코드 삭제
     @DeleteMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "국가코드 삭제")
-    public ResponseEntity<Void> deleteCountryCode(@PathVariable(value = "id") Long id) {
-        try {
-            countryCodeService.deleteCountryCode(id);
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Void> deleteCountryCode(@PathVariable(value = "id") Long id) throws NotFoundException {
+        countryCodeService.deleteCountryCode(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

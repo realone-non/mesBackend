@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.FactoryRequest;
 import com.mes.mesBackend.dto.response.FactoryResponse;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.FactoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +27,7 @@ public class FactoryController {
     @PostMapping
     @ResponseBody()
     @ApiOperation(value = "공장 생성")
-    public ResponseEntity<FactoryResponse> createFactory(@RequestBody FactoryRequest factoryRequest) {
+    public ResponseEntity<FactoryResponse> createFactory(@RequestBody FactoryRequest factoryRequest) throws NotFoundException {
         return new ResponseEntity<>(factoryService.createFactory(factoryRequest), HttpStatus.OK);
     }
 
@@ -34,7 +35,7 @@ public class FactoryController {
     @GetMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "공장 조회")
-    public ResponseEntity<FactoryResponse> getFactory(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<FactoryResponse> getFactory(@PathVariable(value = "id") Long id) throws NotFoundException {
         return new ResponseEntity<>(factoryService.getFactory(id), HttpStatus.OK);
     }
 
@@ -53,7 +54,7 @@ public class FactoryController {
     public ResponseEntity<FactoryResponse> updateFactory(
             @PathVariable Long id,
             @RequestBody FactoryRequest factoryRequest
-    ) {
+    ) throws NotFoundException {
         return new ResponseEntity<>(factoryService.updateFactory(id, factoryRequest), HttpStatus.OK);
     }
 
@@ -61,7 +62,7 @@ public class FactoryController {
     @DeleteMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "공장 삭제")
-    public ResponseEntity<Void> deleteFactory(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteFactory(@PathVariable Long id) throws NotFoundException {
         factoryService.deleteFactory(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

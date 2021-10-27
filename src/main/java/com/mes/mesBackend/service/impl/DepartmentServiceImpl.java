@@ -1,10 +1,12 @@
-package com.mes.mesBackend.service;
+package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.DepartmentRequest;
 import com.mes.mesBackend.dto.response.DepartmentResponse;
 import com.mes.mesBackend.entity.Department;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.Mapper;
 import com.mes.mesBackend.repository.DepartmentRepository;
+import com.mes.mesBackend.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +18,12 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Autowired DepartmentRepository departmentRepository;
     @Autowired Mapper mapper;
 
+    public Department findByIdAndDeleteYnFalse(Long id) throws NotFoundException {
+        Department findDepartment = departmentRepository.findByIdAndDeleteYnFalse(id);
+        if (findDepartment == null) throw new NotFoundException("department does not exists. input id : " + id);
+        return findDepartment;
+    }
+
     //부서 생성
     public DepartmentResponse createDepartment(DepartmentRequest departmentRequest) {
         Department department = mapper.toEntity(departmentRequest, Department.class);
@@ -24,8 +32,8 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     // 부서 조회
-    public DepartmentResponse getDepartment(Long id) {
-        Department department = departmentRepository.findByIdAndDeleteYnFalse(id);
+    public DepartmentResponse getDepartment(Long id) throws NotFoundException {
+        Department department = findByIdAndDeleteYnFalse(id);
         return mapper.toResponse(department, DepartmentResponse.class);
     }
 
@@ -36,17 +44,17 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     // 부서 수정
-    public DepartmentResponse updateDepartment(Long id, DepartmentRequest departmentRequest) {
+    public DepartmentResponse updateDepartment(Long id, DepartmentRequest departmentRequest) throws NotFoundException {
         Department newDepartment = mapper.toEntity(departmentRequest, Department.class);
-        Department findDepartment = departmentRepository.findByIdAndDeleteYnFalse(id);
+        Department findDepartment = findByIdAndDeleteYnFalse(id);
         findDepartment.put(newDepartment);
         Department updateDepartment = departmentRepository.save(findDepartment);
         return mapper.toResponse(updateDepartment, DepartmentResponse.class);
     }
 
     // 부서 삭제
-    public void deleteDepartment(Long id) {
-        Department department = departmentRepository.findByIdAndDeleteYnFalse(id);
+    public void deleteDepartment(Long id) throws NotFoundException {
+        Department department = findByIdAndDeleteYnFalse(id);
         department.setDeleteYn(true);
         departmentRepository.save(department);
     }
