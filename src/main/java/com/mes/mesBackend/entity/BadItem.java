@@ -18,7 +18,6 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "BAD_ITEMS")
-@Table
 @Data
 public class BadItem extends BaseTimeEntity {
     @Id

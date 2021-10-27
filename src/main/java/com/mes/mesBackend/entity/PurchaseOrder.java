@@ -91,8 +91,8 @@ public class PurchaseOrder extends BaseTimeEntity {
     @Column(name = "PAY_CONDITION", columnDefinition = "varchar(255) COMMENT '지불조건'")
     private String payCondition;            // 지불조건
 
-    @Column(name = "REQUESTED_SHIPPING", columnDefinition = "varchar(255) COMMENT 'Requested ShippIng(w)'")
-    private String requestedShipping;           // Requested ShippIng(w)
+    @Column(name = "REQUESTED_SHIPPING", columnDefinition = "varchar(255) COMMENT 'Requested Shipping(w)'")
+    private String requestedShipping;           // Requested Shipping(w)
 
     @Column(name = "SPECIAL_NOTE", columnDefinition = "varchar(255) COMMENT '특이사항'")
     private String specialNote;                 // 특이사항

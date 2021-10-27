@@ -8,16 +8,16 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 /*
- * 품목견적서 리스트 (견적서가 가지고 있는 품목정보)
+ * 품목견적서 세부정보 (견적서가 가지고 있는 품목정보)
  * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "ESTIMATE_ITEMS")
+@Entity(name = "ESTIMATE_ITEM_DETAILS")
 @Data
-public class EstimateItem extends BaseTimeEntity {
+public class EstimateItemDetail extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", columnDefinition = "bigint COMMENT '품목견적서 리스트 고유아이디'")
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '품목견적서 고유아이디'")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

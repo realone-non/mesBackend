@@ -53,14 +53,14 @@ public class ShipmentItems extends BaseTimeEntity {
     @Column(name = "INVENTORY_AMOUNT", nullable = false, columnDefinition = "int COMMENT '재고수량'")
     private int inventoryAMOUNT;          // 재고수량
 
-    @Column(name = "PKGS", columnDefinition = "int COMMENT 'PKGS'")
-    private int pkgs;                // PKGS
+    @Column(name = "PKGS", columnDefinition = "float COMMENT 'PKGS'")
+    private float pkgs;                // PKGS
 
-    @Column(name = "NW", columnDefinition = "int COMMENT 'NW'")
-    private int nw;                 // N/W(KG)
+    @Column(name = "NW", columnDefinition = "float COMMENT 'NW'")
+    private float nw;                 // N/W(KG)
 
-    @Column(name = "GW", columnDefinition = "int COMMENT 'GW'")
-    private int gw;                 // G/W(KG)
+    @Column(name = "GW", columnDefinition = "float COMMENT 'GW'")
+    private float gw;                 // G/W(KG)
 
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;            // 비고

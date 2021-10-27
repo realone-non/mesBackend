@@ -21,8 +21,8 @@ public class ItemFile extends BaseTimeEntity {
     @Column(name = "FILE_TYPE", columnDefinition = "varchar(255) COMMENT '파일유형'")
     private String fileType;        // 파일유형
 
-    @Column(name = "VER", columnDefinition = "int COMMENT 'VER'")
-    private int ver;            // VER
+    @Column(name = "VERSION", columnDefinition = "int COMMENT '파일버전'")
+    private int version;            // VER
 
     @Column(name = "FILE_URL",length = 400, columnDefinition = "varchar(255) COMMENT '첨부파일 url'")
     private String fileUrl;     // 첨부파일유알엘

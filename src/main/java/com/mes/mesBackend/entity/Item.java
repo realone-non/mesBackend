@@ -157,7 +157,7 @@ public class Item extends BaseTimeEntity {
     @Column(name = "SEARCH_WORD", columnDefinition = "varchar(255) COMMENT '검색어'")
     private String searchWord;          // 검색어
 
-    @Column(name = "AGING_MATERIAL_Yn", columnDefinition = "bit(1) COMMENT '시효정자재 여부'")
+    @Column(name = "AGING_MATERIAL_YN", columnDefinition = "bit(1) COMMENT '시효정자재 여부'")
     private boolean agingMaterialYn;      // 시효성자재
 
     // 다대일 단방향

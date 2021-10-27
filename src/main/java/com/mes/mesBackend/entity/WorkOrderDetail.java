@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 /*
- * 작업지시 정보
+ * 6-2. 작업지시 정보
  * 지시번호 (2107080001-0004)
  * 작업공정 (조립)                        -> WorkProcess
  * 작업라인 (외주라인(리버텍))               -> WorkLine
@@ -31,9 +31,9 @@ import java.time.LocalDate;
  * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "WORK_ORDER_INFOS")
+@Entity(name = "WORK_ORDER_DETAILS")
 @Data
-public class WorkOrderInfo extends BaseTimeEntity {
+public class WorkOrderDetail extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업지시 정보 고유아이디'")
