@@ -10,7 +10,7 @@ import javax.persistence.*;
 // 직원(작업자)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "EMPLOYEES")
+@Entity(name = "USERS")
 @Data
 public class Employee extends BaseTimeEntity {
 
@@ -21,6 +21,9 @@ public class Employee extends BaseTimeEntity {
 
     @Column(name = "EMP_CODE", nullable = false, columnDefinition = "varchar(255) COMMENT '사번'")
     private String empCode;     // 사번
+
+    @Column(name = "PASSWORD", nullable = false, columnDefinition = "varchar(255) COMMENT '비밀번호'")
+    private String passWord;        // 비번
 
     @Column(name = "KOR_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '이름'")
     private String korName;    // 이름
@@ -53,6 +56,9 @@ public class Employee extends BaseTimeEntity {
 
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
+
+    @Column(name = "LEVEL", columnDefinition = "int COMMENT '유저권한레벨'")
+    private int level;      // 유저 권한 레벨
 
     public void put(Employee newEmployee, Department newDepartment) {
         setEmpCode(newEmployee.empCode);

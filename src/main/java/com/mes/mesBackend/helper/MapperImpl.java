@@ -23,7 +23,7 @@ public class MapperImpl implements Mapper {
 
     @Override
     public <E, R> List<E> toEntities(List<R> sources, Class<? extends E> destinationType) {
-        return null;
+        return sources.stream().map(source -> modelMapper.map(sources, destinationType)).collect(Collectors.toList());
     }
 
     @Override

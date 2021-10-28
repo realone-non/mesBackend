@@ -1,9 +1,13 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.HeaderRequest;
+import com.mes.mesBackend.dto.response.GridOptionResponse;
 import com.mes.mesBackend.dto.response.HeaderResponse;
+import com.mes.mesBackend.entity.GridOption;
 import com.mes.mesBackend.entity.Header;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.Mapper;
+import com.mes.mesBackend.repository.GridOptionRepository;
 import com.mes.mesBackend.repository.HeadersRepository;
 import com.mes.mesBackend.service.HeaderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +22,27 @@ public class HeaderServiceImpl implements HeaderService {
     HeadersRepository headersRepository;
 
     @Autowired
+    GridOptionRepository gridOptionRepository;
+
+    @Autowired
     Mapper mapper;
 
     // header 조회
-    public List<HeaderResponse> getHeaders(String controllerName) {
+    public List<HeaderResponse> getHeaders(String controllerName, String userId) throws NotFoundException {
         List<Header> headers = headersRepository.findAllByControllerNameOrderBySeq(controllerName);
-        return mapper.toListResponses(headers, HeaderResponse.class);
+        List<HeaderResponse> headerResponses = mapper.toListResponses(headers, HeaderResponse.class);
+        for (HeaderResponse headerResponse : headerResponses) {
+            Long headerId = headerResponse.getId();
+            headerResponse.setGridOptionResponse(getGrid(headerId, userId, headerResponse));
+        }
+        return headerResponses;
+    }
+
+    // 그리드 정보 조회
+    private GridOptionResponse getGrid(Long headerId, String userId, HeaderResponse headerResponse) throws NotFoundException {
+        Header header = headersRepository.findById(headerId).orElseThrow(() -> new NotFoundException("0"));
+        GridOption gridResponse = gridOptionRepository.findByHeaderAndUserId(header, userId);
+        return mapper.toResponse(gridResponse, GridOptionResponse.class);
     }
 
     // 헤더 생성
@@ -48,5 +67,9 @@ public class HeaderServiceImpl implements HeaderService {
     // 헤더 삭제
     public void deleteHeader(Long id) {
         headersRepository.deleteById(id);
+    }
+
+    public Header findHeader(Long id) throws NotFoundException {
+        return headersRepository.findById(id).orElseThrow(() -> new NotFoundException("header does not exists. input id: "+ id));
     }
 }

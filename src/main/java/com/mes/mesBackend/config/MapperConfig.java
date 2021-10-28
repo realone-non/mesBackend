@@ -24,6 +24,7 @@ public class MapperConfig {
         modelMapper.addConverter(toFactoryResponseConvert);
         modelMapper.addConverter(toEmpResponseConvert);
         modelMapper.addConverter(toUnitResponseConverter);
+        modelMapper.addConverter(toGridResponseConvert);
         return modelMapper;
     }
 
@@ -72,6 +73,7 @@ public class MapperConfig {
         }
     };
 
+    // 소수점 3자리 까지 보이는 매핑
     Converter<Unit, UnitResponse> toUnitResponseConverter = new Converter<Unit, UnitResponse>() {
         @Override
         public UnitResponse convert(MappingContext<Unit, UnitResponse> context) {
@@ -82,6 +84,19 @@ public class MapperConfig {
             String result = df.format(unit.getBaseScale());
             unitResponse.setBaseScale(result);
             return unitResponse;
+        }
+    };
+
+    // grid
+    Converter<GridOption, GridOptionResponse> toGridResponseConvert = new Converter<GridOption, GridOptionResponse>() {
+        @Override
+        public GridOptionResponse convert(MappingContext<GridOption, GridOptionResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            GridOption gridOption = context.getSource();
+            GridOptionResponse gridOptionResponse = modelMapper.map(gridOption, GridOptionResponse.class);
+            String colName = gridOption.getHeader().getColumnName();
+            gridOptionResponse.setColId(colName);
+            return gridOptionResponse;
         }
     };
 }
