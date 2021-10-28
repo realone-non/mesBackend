@@ -11,6 +11,6 @@ public class HeaderResponse {
     String controllerName;      // 컨트롤러 이름
     String columnName;          // 컬럼명
     int seq;                    // 순서
-    boolean useYn;  // 사용여부
-    GridOptionResponse gridOptionResponse;      // 그리드 옵션
+//    boolean useYn;  // 사용여부?
+//    GridOptionResponse gridOptionResponse;      // 그리드 옵션
 }

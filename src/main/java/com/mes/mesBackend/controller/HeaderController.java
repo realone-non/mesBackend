@@ -25,14 +25,13 @@ public class HeaderController {
     HeaderService headerService;
 
     // 헤더조회
-    @GetMapping("/{controller-name}/{user-id}")
+    @GetMapping("/{controller-name}")
     @ResponseBody
     @ApiOperation(value = "헤더 조회")
     public ResponseEntity<List<HeaderResponse>> getHeaders(
-            @PathVariable(value = "controller-name") String controllerName,
-            @PathVariable(value = "user-id") String userId
+            @PathVariable(value = "controller-name") String controllerName
     ) throws NotFoundException {
-        return new ResponseEntity<>(headerService.getHeaders(controllerName, userId), HttpStatus.OK);
+        return new ResponseEntity<>(headerService.getHeaders(controllerName), HttpStatus.OK);
     }
 
     // 헤더생성

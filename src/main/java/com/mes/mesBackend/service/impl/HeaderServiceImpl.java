@@ -28,15 +28,21 @@ public class HeaderServiceImpl implements HeaderService {
     Mapper mapper;
 
     // header 조회
-    public List<HeaderResponse> getHeaders(String controllerName, String userId) throws NotFoundException {
+    public List<HeaderResponse> getHeaders(String controllerName) {
         List<Header> headers = headersRepository.findAllByControllerNameOrderBySeq(controllerName);
-        List<HeaderResponse> headerResponses = mapper.toListResponses(headers, HeaderResponse.class);
-        for (HeaderResponse headerResponse : headerResponses) {
-            Long headerId = headerResponse.getId();
-            headerResponse.setGridOptionResponse(getGrid(headerId, userId, headerResponse));
-        }
-        return headerResponses;
+        return  mapper.toListResponses(headers, HeaderResponse.class);
     }
+
+    // 망한거
+//    public List<HeaderResponse> getHeaders(String controllerName, String userId) throws NotFoundException {
+//        List<Header> headers = headersRepository.findAllByControllerNameOrderBySeq(controllerName);
+//        List<HeaderResponse> headerResponses = mapper.toListResponses(headers, HeaderResponse.class);
+//        for (HeaderResponse headerResponse : headerResponses) {
+//            Long headerId = headerResponse.getId();
+//            headerResponse.setGridOptionResponse(getGrid(headerId, userId, headerResponse));
+//        }
+//        return headerResponses;
+//    }
 
     // 그리드 정보 조회
     private GridOptionResponse getGrid(Long headerId, String userId, HeaderResponse headerResponse) throws NotFoundException {
