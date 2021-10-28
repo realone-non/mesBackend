@@ -1,5 +1,6 @@
 package com.mes.mesBackend.service.impl;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import com.mes.mesBackend.dto.request.HeaderRequest;
 import com.mes.mesBackend.dto.response.GridOptionResponse;
 import com.mes.mesBackend.dto.response.HeaderResponse;
@@ -28,8 +29,11 @@ public class HeaderServiceImpl implements HeaderService {
     Mapper mapper;
 
     // header 조회
-    public List<HeaderResponse> getHeaders(String controllerName) {
+    public List<HeaderResponse> getHeaders(String controllerName) throws NotFoundException {
         List<Header> headers = headersRepository.findAllByControllerNameOrderBySeq(controllerName);
+        System.out.println("==========================================");
+//        System.out.println("--------------" + findHeader(53L));
+        System.out.println("dddssdfsdfsdfdssddfs        ; "+gridOptionRepository.findById(39L));
         return  mapper.toListResponses(headers, HeaderResponse.class);
     }
 

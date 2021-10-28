@@ -53,7 +53,7 @@ public class GridOption {
     @Column(name = "WIDTH", columnDefinition = "varchar(255) COMMENT 'width'")
     private String width;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "HEADER", columnDefinition = "bigint COMMENT '헤더정보'")
     private Header header;
 }
