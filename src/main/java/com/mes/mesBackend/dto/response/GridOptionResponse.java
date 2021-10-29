@@ -6,7 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class GridOptionResponse {
-    Long id;
     String aggFunc;
     String colId;
     String flex;

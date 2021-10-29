@@ -1,10 +1,10 @@
-package com.mes.mesBackend.helper;
+package com.mes.mesBackend.mapper;
 
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-public interface Mapper {
+public interface ModelMapper {
 
 
     <E, R> E toEntity(R source, Class<? extends E> destinationType);

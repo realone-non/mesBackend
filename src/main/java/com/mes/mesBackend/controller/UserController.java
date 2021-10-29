@@ -1,7 +1,7 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.entity.UserVo;
-import com.mes.mesBackend.repository.UserRepository;
+import com.mes.mesBackend.repository.UserVoRepository;
 import com.mes.mesBackend.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,7 +29,7 @@ public class UserController {
     UserService userService;
 
     @Autowired
-    UserRepository userRepository;
+    UserVoRepository userRepository;
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     @ResponseBody

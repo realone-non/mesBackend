@@ -1,6 +1,8 @@
 package com.mes.mesBackend.service;
 
+import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.entity.UserVo;
+import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,4 +16,6 @@ public interface UserService {
     UserVo updateUser(Long id, UserVo user);
     void deleteUser(Long id);
     UserVo createUser(UserVo user);
+
+    User getUserOrThrow(Long id) throws NotFoundException;
 }

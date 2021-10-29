@@ -2,6 +2,7 @@ package com.mes.mesBackend.config;
 
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.mapper.MapperCustom;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -18,7 +19,7 @@ public class MapperConfig {
 
     @Bean
     public ModelMapper modelMapper() {
-        ModelMapper modelMapper = new ModelMapper();
+        ModelMapper modelMapper = new MapperCustom();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         modelMapper.addConverter(toWorkPlaceResponseConvert);
         modelMapper.addConverter(toFactoryResponseConvert);
@@ -61,14 +62,14 @@ public class MapperConfig {
     };
 
     // EmployeeResponse engNameAndPosition 영문이름+직위 매핑
-    Converter<Employee, EmployeeResponse> toEmpResponseConvert = new Converter<Employee, EmployeeResponse>() {
+    Converter<User, EmployeeResponse> toEmpResponseConvert = new Converter<User, EmployeeResponse>() {
         @Override
-        public EmployeeResponse convert(MappingContext<Employee, EmployeeResponse> context) {
+        public EmployeeResponse convert(MappingContext<User, EmployeeResponse> context) {
             ModelMapper modelMapper = new ModelMapper();
-            Employee employee = context.getSource();
-            EmployeeResponse employeeResponse = modelMapper.map(employee, EmployeeResponse.class);
-            employeeResponse.setDeptName(employee.getDepartment().getDeptName());
-            employeeResponse.setEngNameAndPosition(employee.getEngName() + " " + employee.getPosition());
+            User user = context.getSource();
+            EmployeeResponse employeeResponse = modelMapper.map(user, EmployeeResponse.class);
+            employeeResponse.setDeptName(user.getDepartment().getDeptName());
+            employeeResponse.setEngNameAndPosition(user.getEngName() + " " + user.getPosition());
             return employeeResponse;
         }
     };
@@ -87,16 +88,16 @@ public class MapperConfig {
         }
     };
 
-    // grid
+    // gridResponse의 colId 매핑
     Converter<GridOption, GridOptionResponse> toGridResponseConvert = new Converter<GridOption, GridOptionResponse>() {
         @Override
         public GridOptionResponse convert(MappingContext<GridOption, GridOptionResponse> context) {
             ModelMapper modelMapper = new ModelMapper();
             GridOption gridOption = context.getSource();
             GridOptionResponse gridOptionResponse = modelMapper.map(gridOption, GridOptionResponse.class);
-            String colName = gridOption.getHeader().getColumnName();
-            gridOptionResponse.setColId(colName);
+            gridOptionResponse.setColId(gridOption.getHeader().getColumnName());
             return gridOptionResponse;
         }
     };
+
 }

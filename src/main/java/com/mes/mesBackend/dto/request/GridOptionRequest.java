@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class GridOptionRequest {
     String aggFunc;
-    String colId;
+//    String colId;
     String flex;
     boolean hide;
     String pinned;

@@ -7,7 +7,7 @@ import com.mes.mesBackend.entity.Client;
 import com.mes.mesBackend.entity.ClientType;
 import com.mes.mesBackend.entity.CountryCode;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.Mapper;
+import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.helper.S3Service;
 import com.mes.mesBackend.repository.ClientRepository;
 import com.mes.mesBackend.service.BusinessTypeService;
@@ -41,7 +41,7 @@ public class ClientServiceImpl implements ClientService {
     private S3Service s3Service;
 
     @Autowired
-    Mapper mapper;
+    ModelMapper modelMapper;
 
     public Client findClientByIdAndDeleteYnFalse(Long id) throws NotFoundException {
         Client findClient = clientRepository.findByIdAndDeleteYnFalse(id);
@@ -61,18 +61,18 @@ public class ClientServiceImpl implements ClientService {
         CountryCode countryCode = countryCodeService.findCountryCodeByIdAndDeleteYn(countryCodeId);
         ClientType clientType = clientTypeService.findClientTypeByIdAndDeleteYn(clientTypeId);
 
-        Client client = mapper.toEntity(clientRequest, Client.class);
+        Client client = modelMapper.toEntity(clientRequest, Client.class);
 
         client.putJoinTable(businessType, countryCode, clientType);
         Client saveClient = clientRepository.save(client);
 
-        return mapper.toResponse(saveClient, ClientResponse.class);
+        return modelMapper.toResponse(saveClient, ClientResponse.class);
     }
 
     // 거래처 조회
     public ClientResponse getClient(Long id) throws NotFoundException {
         Client client = findClientByIdAndDeleteYnFalse(id);
-        return mapper.toResponse(client, ClientResponse.class);
+        return modelMapper.toResponse(client, ClientResponse.class);
     }
 
     // 거래처 조건 페이징 조회 (거래처 유형, 거래처 코드, 거래처 명)
@@ -83,12 +83,12 @@ public class ClientServiceImpl implements ClientService {
             Pageable pageable
     ) {
         Page<Client> clients = clientRepository.findByTypeAndCodeAndName(type, code, clientName, pageable);
-        return mapper.toPageResponses(clients, ClientResponse.class);
+        return modelMapper.toPageResponses(clients, ClientResponse.class);
     }
 
     // 거래처 수정
     public ClientResponse updateClient(Long id, ClientRequest clientRequest) throws NotFoundException {
-        Client newClient = mapper.toEntity(clientRequest, Client.class);
+        Client newClient = modelMapper.toEntity(clientRequest, Client.class);
         Client findClient = findClientByIdAndDeleteYnFalse(id);
 
         BusinessType findBusinessType = businessTypeService.findBusinessTypeByIdAndDeleteYn(clientRequest.getBusinessType());
@@ -99,7 +99,7 @@ public class ClientServiceImpl implements ClientService {
         findClient.put(newClient);
 
         Client updateClient = clientRepository.save(findClient);
-        return mapper.toResponse(updateClient, ClientResponse.class);
+        return modelMapper.toResponse(updateClient, ClientResponse.class);
     }
 
     // 사업자 등록증 파일 업로드
@@ -109,7 +109,7 @@ public class ClientServiceImpl implements ClientService {
         String fileName = "client/" + client.getClientCode() + "/";
         client.setBusinessFile(s3Service.upload(businessFile, fileName));
         clientRepository.save(client);
-        return mapper.toResponse(client, ClientResponse.class);
+        return modelMapper.toResponse(client, ClientResponse.class);
     }
 
     // 거래처 삭제

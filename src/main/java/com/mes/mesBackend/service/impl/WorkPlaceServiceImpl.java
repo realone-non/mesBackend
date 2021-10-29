@@ -6,12 +6,11 @@ import com.mes.mesBackend.entity.BusinessType;
 import com.mes.mesBackend.entity.WorkPlace;
 import com.mes.mesBackend.entity.WorkPlaceBusinessType;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.Mapper;
+import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.WorkPlaceMappedRepository;
 import com.mes.mesBackend.repository.WorkPlaceRepository;
 import com.mes.mesBackend.service.BusinessTypeService;
 import com.mes.mesBackend.service.WorkPlaceService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,8 +26,9 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
     @Autowired WorkPlaceRepository workPlaceRepository;
     @Autowired BusinessTypeService businessTypeService;
     @Autowired WorkPlaceMappedRepository workPlaceMappedRepository;
-    @Autowired ModelMapper modelMapper;
-    @Autowired Mapper mapper;
+
+    @Autowired
+    ModelMapper modelMapper;
 
 
     @Override
@@ -41,7 +41,7 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
     // 사업장 생성
     public WorkPlaceResponse createWorkPlace(WorkPlaceRequest workPlaceRequest) throws NotFoundException {
         List<Long> getTypeIds = workPlaceRequest.getType();
-        WorkPlace workPlace = mapper.toEntity(workPlaceRequest, WorkPlace.class);
+        WorkPlace workPlace = modelMapper.toEntity(workPlaceRequest, WorkPlace.class);
 
         // create workPlace
         WorkPlace saveWorkPlace = workPlaceRepository.save(workPlace);
@@ -52,7 +52,7 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
         // workPlace에 workPlaceMapped 추가
         saveWorkPlace.setType(workPlaceMapped);
         workPlaceRepository.save(saveWorkPlace);
-        return mapper.toResponse(saveWorkPlace, WorkPlaceResponse.class);
+        return modelMapper.toResponse(saveWorkPlace, WorkPlaceResponse.class);
     }
 
     // BusinessType mapped 생성
@@ -72,13 +72,13 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
 //    // 사업장 단일 조회
     public WorkPlaceResponse getWorkPlace(Long id) throws NotFoundException {
         WorkPlace workPlace = findByIdAndDeleteYnFalse(id);
-        return mapper.toResponse(workPlace, WorkPlaceResponse.class);
+        return modelMapper.toResponse(workPlace, WorkPlaceResponse.class);
     }
 
     // 사업장 페이징 조회
     public Page<WorkPlaceResponse> getWorkPlaces(Pageable pageable) {
         Page<WorkPlace> workPlaces = workPlaceRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(workPlaces, WorkPlaceResponse.class);
+        return modelMapper.toPageResponses(workPlaces, WorkPlaceResponse.class);
     }
 
     // workPlaceMapped 모두 삭제
@@ -95,14 +95,14 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
         deleteWorkPlaceMapped(findWorkPlace);
 
         // update workPlace
-        findWorkPlace.put(mapper.toEntity(workPlaceRequest, WorkPlace.class));
+        findWorkPlace.put(modelMapper.toEntity(workPlaceRequest, WorkPlace.class));
         WorkPlace newWorkPlace = workPlaceRepository.save(findWorkPlace);
 
         // create mapped
         newWorkPlace.setType(createMapped(findWorkPlace, newBusinessTypeIds));
         workPlaceRepository.save(newWorkPlace);
 
-        return mapper.toResponse(newWorkPlace, WorkPlaceResponse.class);
+        return modelMapper.toResponse(newWorkPlace, WorkPlaceResponse.class);
     }
 
     // 사업장 삭제

@@ -12,15 +12,15 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "USERS")
 @Data
-public class Employee extends BaseTimeEntity {
+public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '직원 고유아이디'")
     private Long id;
 
-    @Column(name = "EMP_CODE", nullable = false, columnDefinition = "varchar(255) COMMENT '사번'")
-    private String empCode;     // 사번
+    @Column(name = "USER_CODE", nullable = false, columnDefinition = "varchar(255) COMMENT '사번'")
+    private String userCode;     // 사번
 
     @Column(name = "PASSWORD", nullable = false, columnDefinition = "varchar(255) COMMENT '비밀번호'")
     private String passWord;        // 비번
@@ -60,16 +60,19 @@ public class Employee extends BaseTimeEntity {
     @Column(name = "LEVEL", columnDefinition = "int COMMENT '유저권한레벨'")
     private int level;      // 유저 권한 레벨
 
-    public void put(Employee newEmployee, Department newDepartment) {
-        setEmpCode(newEmployee.empCode);
-        setKorName(newEmployee.korName);
+    @Column(name = "DESCRIPTION", columnDefinition = "varchar(255) COMMENT '메모'")
+    private String description;
+
+    public void put(User newUser, Department newDepartment) {
+        setUserCode(newUser.userCode);
+        setKorName(newUser.korName);
         setDepartment(newDepartment);
-        setPosition(newEmployee.position);
-        setJop(newEmployee.jop);
-        setTelNumber(newEmployee.telNumber);
-        setEngName(newEmployee.engName);
-        setMail(newEmployee.mail);
-        setPhoneNumber(newEmployee.phoneNumber);
-        setUseYn(newEmployee.useYn);
+        setPosition(newUser.position);
+        setJop(newUser.jop);
+        setTelNumber(newUser.telNumber);
+        setEngName(newUser.engName);
+        setMail(newUser.mail);
+        setPhoneNumber(newUser.phoneNumber);
+        setUseYn(newUser.useYn);
     }
 }

@@ -1,4 +1,4 @@
-package com.mes.mesBackend.repository;
+package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.entity.CodeMaster;
 import org.springframework.data.domain.Page;

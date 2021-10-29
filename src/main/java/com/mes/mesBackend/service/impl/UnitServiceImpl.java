@@ -5,7 +5,7 @@ import com.mes.mesBackend.dto.response.UnitResponse;
 import com.mes.mesBackend.entity.Unit;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.Mapper;
+import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.UnitRepository;
 import com.mes.mesBackend.service.UnitService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,40 +19,40 @@ public class UnitServiceImpl implements UnitService {
     UnitRepository unitRepository;
 
     @Autowired
-    Mapper mapper;
+    ModelMapper modelMapper;
 
 
     // 생성
     @Override
     public UnitResponse createUnit(UnitRequest unitRequest) throws BadRequestException {
         checkBaseScale(unitRequest.getBaseScale());
-        Unit unit = mapper.toEntity(unitRequest, Unit.class);
+        Unit unit = modelMapper.toEntity(unitRequest, Unit.class);
         Unit saveUnit = unitRepository.save(unit);
-        return mapper.toResponse(saveUnit, UnitResponse.class);
+        return modelMapper.toResponse(saveUnit, UnitResponse.class);
     }
 
     // 단일조회
     @Override
     public UnitResponse getUnit(Long id) throws NotFoundException {
         Unit unit = findUnitOrThrow(id);
-        return mapper.toResponse(unit, UnitResponse.class);
+        return modelMapper.toResponse(unit, UnitResponse.class);
     }
 
     // 페이징조회
     @Override
     public Page<UnitResponse> getUnits(Pageable pageable) {
         Page<Unit> units = unitRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(units, UnitResponse.class );
+        return modelMapper.toPageResponses(units, UnitResponse.class );
     }
 
     // 수정
     @Override
     public UnitResponse updateUnit(Long id, UnitRequest unitRequest) throws NotFoundException {
-        Unit newUnit = mapper.toEntity(unitRequest, Unit.class);
+        Unit newUnit = modelMapper.toEntity(unitRequest, Unit.class);
         Unit findUnit = findUnitOrThrow(id);
         findUnit.putUnit(newUnit);
         Unit saveUnit = unitRepository.save(findUnit);
-        return mapper.toResponse(saveUnit, UnitResponse.class);
+        return modelMapper.toResponse(saveUnit, UnitResponse.class);
     }
 
     // 삭제

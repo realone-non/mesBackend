@@ -4,7 +4,7 @@ import com.mes.mesBackend.dto.request.BusinessTypeRequest;
 import com.mes.mesBackend.dto.response.BusinessTypeResponse;
 import com.mes.mesBackend.entity.BusinessType;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.Mapper;
+import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.BusinessTypeRepository;
 import com.mes.mesBackend.service.BusinessTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,8 @@ public class BusinessTypeServiceImpl implements BusinessTypeService {
     @Autowired
     private BusinessTypeRepository businessTypeRepository;
 
-    @Autowired Mapper mapper;
+    @Autowired
+    ModelMapper modelMapper;
 
     // 삭제여부 false, 사용여부 true,false
     public BusinessType findBusinessTypeByIdAndDeleteYn(Long id) throws NotFoundException {
@@ -31,30 +32,30 @@ public class BusinessTypeServiceImpl implements BusinessTypeService {
 
     // 업태 타입 생성
     public BusinessTypeResponse createBusinessType(BusinessTypeRequest businessTypeRequest) {
-        BusinessType businessType = mapper.toEntity(businessTypeRequest, BusinessType.class);
+        BusinessType businessType = modelMapper.toEntity(businessTypeRequest, BusinessType.class);
         BusinessType saveBusinessType = businessTypeRepository.save(businessType);
-        return mapper.toResponse(saveBusinessType, BusinessTypeResponse.class);
+        return modelMapper.toResponse(saveBusinessType, BusinessTypeResponse.class);
     }
 
     // 업태 타입 조회
     public BusinessTypeResponse getBusinessType(Long id) throws NotFoundException {
         BusinessType businessType = findBusinessTypeByIdAndDeleteYn(id);
-        return mapper.toResponse(businessType, BusinessTypeResponse.class);
+        return modelMapper.toResponse(businessType, BusinessTypeResponse.class);
     }
 
     // 업체 타입 전체 조회
     public Page<BusinessTypeResponse> getBusinessTypes(Pageable pageable) {
         Page<BusinessType> businessTypes = businessTypeRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(businessTypes, BusinessTypeResponse.class);
+        return modelMapper.toPageResponses(businessTypes, BusinessTypeResponse.class);
     }
 
     // 업태 타입 수정
     public BusinessTypeResponse updateBusinessType(Long id, BusinessTypeRequest businessTypeRequest) throws NotFoundException {
-        BusinessType businessType = mapper.toEntity(businessTypeRequest, BusinessType.class);
+        BusinessType businessType = modelMapper.toEntity(businessTypeRequest, BusinessType.class);
         BusinessType findBusinessType = findBusinessTypeByIdAndDeleteYn(id);
         findBusinessType.setName(businessType.getName());
         BusinessType updateBusinessType = businessTypeRepository.save(findBusinessType);
-        return mapper.toResponse(updateBusinessType, BusinessTypeResponse.class);
+        return modelMapper.toResponse(updateBusinessType, BusinessTypeResponse.class);
     }
 
     // 업태 삭제

@@ -2,7 +2,7 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.entity.CodeMaster;
 import com.mes.mesBackend.entity.QCodeMaster;
-import com.mes.mesBackend.repository.CodeMasterRepositoryCustom;
+import com.mes.mesBackend.repository.custom.CodeMasterRepositoryCustom;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -17,6 +17,7 @@ public class CodeMasterRepositoryImpl implements CodeMasterRepositoryCustom {
 
     @Autowired
     JPAQueryFactory jpaQueryFactory;
+
 
     final QCodeMaster codeMaster = QCodeMaster.codeMaster;
     // 코드 마스터 조회
