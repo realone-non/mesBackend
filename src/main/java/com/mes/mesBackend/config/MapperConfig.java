@@ -61,16 +61,17 @@ public class MapperConfig {
         }
     };
 
-    // EmployeeResponse engNameAndPosition 영문이름+직위 매핑
-    Converter<User, EmployeeResponse> toEmpResponseConvert = new Converter<User, EmployeeResponse>() {
+    // UserResponse engNameAndPosition 영문이름+직위 매핑
+    Converter<User, UserResponse> toEmpResponseConvert = new Converter<User, UserResponse>() {
         @Override
-        public EmployeeResponse convert(MappingContext<User, EmployeeResponse> context) {
+        public UserResponse convert(MappingContext<User, UserResponse> context) {
             ModelMapper modelMapper = new ModelMapper();
             User user = context.getSource();
-            EmployeeResponse employeeResponse = modelMapper.map(user, EmployeeResponse.class);
-            employeeResponse.setDeptName(user.getDepartment().getDeptName());
-            employeeResponse.setEngNameAndPosition(user.getEngName() + " " + user.getPosition());
-            return employeeResponse;
+            UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+//            userResponse.setDeptName(user.getDepartment().getDeptName());
+//            userResponse.setDepartment(user.getDepartment());
+            userResponse.setEngNameAndPosition(user.getEngName() + " " + user.getPosition());
+            return userResponse;
         }
     };
 

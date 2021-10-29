@@ -23,7 +23,7 @@ public class User extends BaseTimeEntity {
     private String userCode;     // 사번
 
     @Column(name = "PASSWORD", nullable = false, columnDefinition = "varchar(255) COMMENT '비밀번호'")
-    private String passWord;        // 비번
+    private String password;        // 비번
 
     @Column(name = "KOR_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '이름'")
     private String korName;    // 이름

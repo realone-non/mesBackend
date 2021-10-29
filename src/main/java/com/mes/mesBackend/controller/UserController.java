@@ -1,20 +1,17 @@
 package com.mes.mesBackend.controller;
 
-import com.mes.mesBackend.entity.UserVo;
-import com.mes.mesBackend.repository.UserVoRepository;
+import com.mes.mesBackend.dto.request.UserRequest;
+import com.mes.mesBackend.dto.response.UserResponse;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,60 +20,59 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     @Autowired
     UserService userService;
 
-    @Autowired
-    UserVoRepository userRepository;
-
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
-    @ResponseBody
-    @ApiOperation(value = "Login")
-    public ResponseEntity<UserVo> getLoginInfo(String nickName, String pass){
-        UserVo user = userService.findByNickNameAndPassword(nickName, pass);
-        if(ObjectUtils.isEmpty(user)){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        else{
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        }
-    }
-
+    // 직원(작업자) 생성
     @PostMapping
     @ResponseBody
-    @ApiOperation(value = "유저 생성")
-    public ResponseEntity<UserVo> createUser(@RequestBody UserVo user){
-        return new ResponseEntity<>(userService.createUser(user), HttpStatus.OK);
+    @ApiOperation(value = "직원(작업자) 생성")
+    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest userRequest) throws NotFoundException {
+        return new ResponseEntity<>(userService.createUser(userRequest), HttpStatus.OK);
     }
 
+    // 직원(작업자) 단일 조회
     @GetMapping("/{id}")
     @ResponseBody
-    @ApiOperation(value = "유저 조회")
-    public ResponseEntity<UserVo> getUser(@PathVariable Long id) {
+    @ApiOperation(value = "직원(작업자) 단일 조회")
+    public ResponseEntity<UserResponse> getUser(@PathVariable Long id) throws NotFoundException {
         return new ResponseEntity<>(userService.getUser(id), HttpStatus.OK);
     }
 
+    // 직원(작업자) 페이징 조회
+    @GetMapping
+    @ResponseBody()
+    @ApiOperation(value = "직원(작업자) 페이징 조회")
+    public ResponseEntity<Page<UserResponse>> getUsers(Pageable pageable) {
+        return new ResponseEntity<>(userService.getUsers(pageable), HttpStatus.OK);
+    }
+
+    // 직원(작업자) 수정
     @PutMapping("/{id}")
-    @ResponseBody
-    @ApiOperation(value = "유저 수정", notes = "userName만 수정 가능")
-    public ResponseEntity<UserVo> updateUser(@PathVariable Long id, @RequestBody UserVo user) {
-        return new ResponseEntity<>(userService.updateUser(id, user), HttpStatus.OK);
+    @ResponseBody()
+    @ApiOperation(value = "직원(작업자) 수정")
+    public ResponseEntity<UserResponse> updateUser(
+            @PathVariable(value = "id") Long id,
+            @RequestBody UserRequest userRequest
+    ) throws NotFoundException {
+        return new ResponseEntity<>(userService.updateUser(id, userRequest), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    @ResponseBody
-    @ApiOperation(value = "유저 삭제")
-    public ResponseEntity deleteUser(@PathVariable Long id) {
+    @ResponseBody()
+    @ApiOperation(value = "직원(작업자) 삭제")
+    public ResponseEntity deleteUser(@PathVariable(value = "id") Long id) throws NotFoundException {
         userService.deleteUser(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping
+    @GetMapping("/login")
     @ResponseBody
-    @ApiOperation(value = "유저 목록 조회")
-    public ResponseEntity<Page<UserVo>> getUsers(@PageableDefault Pageable pageable) {
-        return new ResponseEntity<>(userService.getUsers(pageable), HttpStatus.OK);
+    @ApiOperation(value = "로그인")
+    public ResponseEntity<UserResponse> getLoginInfo(
+            @RequestParam String userCode,
+            @RequestParam String password
+    ) throws NotFoundException {
+        return new ResponseEntity<>(userService.getLogin(userCode, password), HttpStatus.OK);
     }
 }
