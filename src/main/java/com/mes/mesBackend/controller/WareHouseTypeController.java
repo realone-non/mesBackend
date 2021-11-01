@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/ware-house-types")
-@Api(tags = "[구현중] ware-house-type")
+@Api(tags = "ware-house-type")
 @RequiredArgsConstructor
 public class WareHouseTypeController {
     @Autowired
