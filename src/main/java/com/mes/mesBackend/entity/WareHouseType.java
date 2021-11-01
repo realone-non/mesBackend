@@ -12,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "WARE_HOUSE_TYPES")
 @Data
-public class WareHouseType extends BaseTimeEntity{
+public class WareHouseType extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '창고유형 고유아이디'")
@@ -23,4 +23,14 @@ public class WareHouseType extends BaseTimeEntity{
 
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
+
+    // 수정메서드
+    public void put(WareHouseType newWareHouseType) {
+        setName(newWareHouseType.name);
+    }
+
+    // 삭제 메서드
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

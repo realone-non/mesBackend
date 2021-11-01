@@ -18,23 +18,24 @@ import javax.persistence.*;
 * 작업라인 / 일단 빼고 작업,
 * 작업공정 / 일단 빼고 작업,
 * 사용
+* 공장도 빼고 작업.
 * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "WARE_HOUSES")
 @Data
-public class WareHouse extends BaseTimeEntity{
+public class WareHouse extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '창고 등록 고유아이디'")
     private Long id;
 
-    @Column(name = "WARE_HOUSE_CODE", nullable = false, columnDefinition = "int COMMENT '창고코드'")
-    private int wareHouseCode;  // 창고코드
+    @Column(name = "WARE_HOUSE_CODE", nullable = false, columnDefinition = "varchar(255) COMMENT '창고코드'")
+    private String wareHouseCode;  // 창고코드
 
-    @Column(name = "NAME", columnDefinition = "varchar(255) COMMENT '창고명'")
-    private String name;   // 창고명
+    @Column(name = "WARE_HOUSE_NAME", columnDefinition = "varchar(255) COMMENT '창고명'")
+    private String wareHouseName;   // 창고명
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WARE_HOUSE_TYPE", columnDefinition = "bigint COMMENT '창고유형'")
@@ -58,7 +59,26 @@ public class WareHouse extends BaseTimeEntity{
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
-    private Factory factory;                // 공장 (검색)
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
+//    private Factory factory;                // 공장 (검색)
+
+    // 수정메서드
+    public void put(WareHouse newWareHouse, WareHouseType newWareHouseType) {
+        setWareHouseCode(newWareHouse.wareHouseCode);
+        setWareHouseName(newWareHouse.wareHouseName);
+        setWareHouseType(newWareHouseType);
+        setWareHouseGroup(newWareHouse.wareHouseGroup);
+        setUseYn(newWareHouse.useYn);
+    }
+
+    // wareHouseType 추가 매핑 매서드
+    public void addWareHouseType(WareHouseType wareHouseType) {
+        setWareHouseType(wareHouseType);
+    }
+
+    // 삭제 메서드
+    public void delete() {
+        setDeleteYn(true);
+    }
 }
