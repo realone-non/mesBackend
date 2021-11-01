@@ -12,7 +12,7 @@ public class ExceptionHandling implements ErrorController {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<HttpResponse> notFoundException(NotFoundException notFoundException) {
-        return createHttpResponse(HttpStatus.BAD_REQUEST, notFoundException.getMessage());
+        return createHttpResponse(HttpStatus.NOT_FOUND, notFoundException.getMessage());
     }
 
     @ExceptionHandler(BadRequestException.class)
