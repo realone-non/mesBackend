@@ -2,7 +2,6 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.WorkCenterRequest;
 import com.mes.mesBackend.dto.response.WorkCenterResponse;
-import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.WorkCenterService;
 import io.swagger.annotations.Api;
@@ -36,14 +35,13 @@ public class WorkCenterController {
     }
 
     // 작업장 단일 조회
-    @GetMapping("/{work-center-id}")
+    @GetMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "작업장 단일 조회")
     public ResponseEntity<WorkCenterResponse> getWorkCenter(
-            @RequestParam Long workCenterCodeId,
-            @PathVariable(value = "work-center-id") Long workCenterId
-    ) throws NotFoundException, BadRequestException {
-        return new ResponseEntity<>(workCenterService.getWorkCenter(workCenterCodeId, workCenterId), HttpStatus.OK);
+            @PathVariable Long id
+    ) throws NotFoundException {
+        return new ResponseEntity<>(workCenterService.getWorkCenter(id), HttpStatus.OK);
     }
 
     // 작업장 페이징 조회
@@ -55,26 +53,24 @@ public class WorkCenterController {
     }
 
     // 작업장 수정
-    @PutMapping("/{work-center-id}")
+    @PutMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "작업장 수정")
     public ResponseEntity<WorkCenterResponse> updateWorkCenter(
-            @RequestParam Long workCenterCodeId,
-            @PathVariable(value = "work-center-id") Long workCenterId,
+            @PathVariable Long id,
             @RequestBody WorkCenterRequest workCenterRequest
-    ) throws NotFoundException, BadRequestException {
-        return new ResponseEntity<>(workCenterService.updateWorkCenter(workCenterCodeId, workCenterId, workCenterRequest), HttpStatus.OK);
+    ) throws NotFoundException {
+        return new ResponseEntity<>(workCenterService.updateWorkCenter(id, workCenterRequest), HttpStatus.OK);
     }
 
     // 작업장 삭제
-    @DeleteMapping("/{work-center-id}")
+    @DeleteMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "작업장 삭제")
     public ResponseEntity<Void> deleteWorkCenter(
-            @RequestParam Long workCenterCodeId,
-            @PathVariable(value = "work-center-id") Long workCenterId
-    ) throws NotFoundException, BadRequestException {
-        workCenterService.deleteWorkCenter(workCenterCodeId, workCenterId);
+            @PathVariable Long id
+    ) throws NotFoundException {
+        workCenterService.deleteWorkCenter(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
