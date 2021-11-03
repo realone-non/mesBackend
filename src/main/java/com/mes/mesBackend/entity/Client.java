@@ -60,7 +60,7 @@ public class Client extends BaseTimeEntity {
     private String shortName;      // 약어
 
     // 다대일 단방향
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CLIENT_TYPE", nullable = false, columnDefinition = "bigint COMMENT '거래처 유형'")
     private ClientType clientType;   // 거래처 유형
 
@@ -83,7 +83,7 @@ public class Client extends BaseTimeEntity {
     private String detailAddress;   // 상세주소
 
     // 다대일 단방향
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BUSINESS_TYPE", nullable = false, columnDefinition = "bigint COMMENT '업태'")
     private BusinessType businessType;      // 업태
 
@@ -111,7 +111,7 @@ public class Client extends BaseTimeEntity {
     @Column(name = "PCCC", columnDefinition = "varchar(255) COMMENT '통관고유번호'")
     private String pccc;            // 통관고유번호
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "COUNTRY_CODE", columnDefinition = "bigint COMMENT '국가코드'")
     private CountryCode countryCode;     // 국가코드
 

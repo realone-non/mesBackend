@@ -43,7 +43,7 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     ModelMapper modelMapper;
 
-    public Client findClientByIdAndDeleteYnFalse(Long id) throws NotFoundException {
+    public Client getClientOrThrow(Long id) throws NotFoundException {
         Client findClient = clientRepository.findByIdAndDeleteYnFalse(id);
         if (findClient == null) {
             throw new NotFoundException("client does not exist. input client id: " + id);
@@ -59,7 +59,7 @@ public class ClientServiceImpl implements ClientService {
 
         BusinessType businessType = businessTypeService.findBusinessTypeByIdAndDeleteYn(businessTypeId);
         CountryCode countryCode = countryCodeService.findCountryCodeByIdAndDeleteYn(countryCodeId);
-        ClientType clientType = clientTypeService.findClientTypeByIdAndDeleteYn(clientTypeId);
+        ClientType clientType = clientTypeService.getClientTypeOrThrow(clientTypeId);
 
         Client client = modelMapper.toEntity(clientRequest, Client.class);
 
@@ -71,7 +71,7 @@ public class ClientServiceImpl implements ClientService {
 
     // 거래처 조회
     public ClientResponse getClient(Long id) throws NotFoundException {
-        Client client = findClientByIdAndDeleteYnFalse(id);
+        Client client = getClientOrThrow(id);
         return modelMapper.toResponse(client, ClientResponse.class);
     }
 
@@ -89,10 +89,10 @@ public class ClientServiceImpl implements ClientService {
     // 거래처 수정
     public ClientResponse updateClient(Long id, ClientRequest clientRequest) throws NotFoundException {
         Client newClient = modelMapper.toEntity(clientRequest, Client.class);
-        Client findClient = findClientByIdAndDeleteYnFalse(id);
+        Client findClient = getClientOrThrow(id);
 
         BusinessType findBusinessType = businessTypeService.findBusinessTypeByIdAndDeleteYn(clientRequest.getBusinessType());
-        ClientType findClientType = clientTypeService.findClientTypeByIdAndDeleteYn(clientRequest.getClientType());
+        ClientType findClientType = clientTypeService.getClientTypeOrThrow(clientRequest.getClientType());
         CountryCode findCountryCode = countryCodeService.findCountryCodeByIdAndDeleteYn(clientRequest.getCountryCode());
 
         newClient.putJoinTable(findBusinessType, findCountryCode, findClientType);
@@ -105,7 +105,7 @@ public class ClientServiceImpl implements ClientService {
     // 사업자 등록증 파일 업로드
     // client/거래처 명/파일명(날싸시간)
     public ClientResponse createBusinessFileToClient(Long id, MultipartFile businessFile) throws IOException, NotFoundException {
-        Client client = findClientByIdAndDeleteYnFalse(id);
+        Client client = getClientOrThrow(id);
         String fileName = "client/" + client.getClientCode() + "/";
         client.setBusinessFile(s3Service.upload(businessFile, fileName));
         clientRepository.save(client);
@@ -114,14 +114,14 @@ public class ClientServiceImpl implements ClientService {
 
     // 거래처 삭제
     public void deleteClient(Long id) throws NotFoundException {
-        Client client = findClientByIdAndDeleteYnFalse(id);
+        Client client = getClientOrThrow(id);
         client.setDeleteYn(true);
         clientRepository.save(client);
     }
 
     // 사업자 등록증 파일 삭제 (aws 권한 문제로 안됨)
     private void deleteBusinessFileToClient(Long id) throws IOException, NotFoundException {
-        Client client = findClientByIdAndDeleteYnFalse(id);
+        Client client = getClientOrThrow(id);
         s3Service.delete(client.getBusinessFile());
         client.setBusinessFile(null);
     }

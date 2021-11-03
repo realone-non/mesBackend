@@ -24,5 +24,5 @@ public interface ClientTypeService {
     // 거래처유형 삭제
     void deleteClientType(Long id) throws NotFoundException;
 
-    ClientType findClientTypeByIdAndDeleteYn(Long id) throws NotFoundException;
+    ClientType getClientTypeOrThrow(Long id) throws NotFoundException;
 }

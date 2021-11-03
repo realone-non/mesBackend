@@ -21,7 +21,7 @@ public class ClientTypeServiceImpl implements ClientTypeService {
     @Autowired
     ModelMapper modelMapper;
 
-    public ClientType findClientTypeByIdAndDeleteYn(Long id) throws NotFoundException {
+    public ClientType getClientTypeOrThrow(Long id) throws NotFoundException {
         ClientType findClientType = clientTypeRepository.findByIdAndDeleteYnFalse(id);
         if (findClientType == null) {
             throw new NotFoundException("client type does not exist. input clientTypeId: " + id);
@@ -38,7 +38,7 @@ public class ClientTypeServiceImpl implements ClientTypeService {
 
     // 거래처유형 조회
     public ClientTypeResponse getClientType(Long id) throws NotFoundException {
-        ClientType clientType = findClientTypeByIdAndDeleteYn(id);
+        ClientType clientType = getClientTypeOrThrow(id);
         return modelMapper.toResponse(clientType, ClientTypeResponse.class);
     }
 
@@ -51,7 +51,7 @@ public class ClientTypeServiceImpl implements ClientTypeService {
     // 거래처유형 수정
     public ClientTypeResponse updateClientType(Long id, ClientTypeRequest clientTypeRequest) throws NotFoundException {
         ClientType clientType = modelMapper.toEntity(clientTypeRequest, ClientType.class);
-        ClientType findClientType = findClientTypeByIdAndDeleteYn(id);
+        ClientType findClientType = getClientTypeOrThrow(id);
         findClientType.setName(clientType.getName());
         ClientType updateClientType = clientTypeRepository.save(findClientType);
         return modelMapper.toResponse(updateClientType, ClientTypeResponse.class);
@@ -59,7 +59,7 @@ public class ClientTypeServiceImpl implements ClientTypeService {
 
     // 거래처유형 삭제
     public void deleteClientType(Long id) throws NotFoundException {
-        ClientType clientType = findClientTypeByIdAndDeleteYn(id);
+        ClientType clientType = getClientTypeOrThrow(id);
         clientType.setDeleteYn(true);
         clientTypeRepository.save(clientType);
     }

@@ -2,7 +2,6 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.BusinessTypeRequest;
 import com.mes.mesBackend.dto.response.BusinessTypeResponse;
-import com.mes.mesBackend.entity.HttpResponse;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.BusinessTypeService;
 import io.swagger.annotations.Api;

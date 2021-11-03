@@ -17,7 +17,7 @@ alter table DEVELOPMENTS comment = '개발정보';
 alter table DEVELOPMENT_FILES comment = '개발정보 파일';
 alter table DEVELOPMENT_FILE_TYPES comment = '개발정보 파일타입';
 alter table DEVELOPMENT_STATES comment = '개발정보 진행상태';
-alter table EMPLOYEES comment = '직원(작업자)';
+alter table USERS comment = '직원(작업자)';
 alter table EQUIPMENTS comment = '설비 정보';
 alter table ESTIMATES comment = '견적정보';
 alter table ESTIMATE_ITEM_DETAILS comment = '품목견적서 세부 정보';
@@ -89,7 +89,7 @@ alter table MEASURE_CALIBRATIONS comment ='계측기 검교정 실적 정보';
 alter table LOT_MASTERS comment = 'Lot 마스터 정보';
 
 
-// 테이블명,테이블정보,column정보,column이름,type,null 정보 조회 쿼리
+# 테이블명,테이블정보,column정보,column이름,type,null 정보 조회 쿼리
 select t.table_name as "테이블 명",
        t.table_comment as "테이블 정보",
        c.column_comment as "Column 정보",
@@ -102,7 +102,7 @@ select t.table_name as "테이블 명",
  where t.table_schema = 'mes-dev'
  order by c.table_name asc;
 
-// 테이블명,테이블정보,end_point 조회 쿼리
+# 테이블명,테이블정보,end_point 조회 쿼리
 select
        t.TABLE_NAME as "테이블 명",
        t.TABLE_COMMENT as "테이블 정보",

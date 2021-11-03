@@ -1,16 +1,12 @@
-Main
+# Main
 INSERT INTO `mes-dev`.MAIN_NAVS (ID, LEVEL, NAME, ORDERS, USE_YN) VALUES (1, 0, '기준정보', 1, true);
-
-
-Sub
+-- Sub
 INSERT INTO `mes-dev`.SUB_NAVS (ID, LEVEL, NAME, ORDERS, USE_YN, MAIN_NAVS_ID) VALUES (1, 0, '공통정보', 1, true, 1);
 INSERT INTO `mes-dev`.SUB_NAVS (ID, LEVEL, NAME, ORDERS, USE_YN, MAIN_NAVS_ID) VALUES (2, 0, '품목정보', 2, true, 1);
 INSERT INTO `mes-dev`.SUB_NAVS (ID, LEVEL, NAME, ORDERS, USE_YN, MAIN_NAVS_ID) VALUES (3, 0, '생산정보', 3, true, 1);
 INSERT INTO `mes-dev`.SUB_NAVS (ID, LEVEL, NAME, ORDERS, USE_YN, MAIN_NAVS_ID) VALUES (4, 0, '품질정보', 4, true, 1);
 INSERT INTO `mes-dev`.SUB_NAVS (ID, LEVEL, NAME, ORDERS, USE_YN, MAIN_NAVS_ID) VALUES (5, 0, '설비정보', 5, true, 1);
-
-
-detail
+-- detail
 INSERT INTO `mes-dev`.DETAIL_NAVS (ID, LEVEL, NAME, ORDERS, USE_YN, SUB_NAVS_ID) VALUES (1, 0, '코드마스터 등록', 1, true, 1);
 INSERT INTO `mes-dev`.DETAIL_NAVS (ID, LEVEL, NAME, ORDERS, USE_YN, SUB_NAVS_ID) VALUES (2, 0, '사업장 등록', 2, true, 1);
 INSERT INTO `mes-dev`.DETAIL_NAVS (ID, LEVEL, NAME, ORDERS, USE_YN, SUB_NAVS_ID) VALUES (3, 0, '공장 등록', 3, true, 1);
