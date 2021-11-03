@@ -49,19 +49,9 @@ public class WorkCenterServiceImpl implements WorkCenterService {
 
     // 단일조회
     @Override
-    public WorkCenterResponse getWorkCenter(Long workCenterCodeId, Long workCenterId) throws NotFoundException, BadRequestException {
-        throwIfFindWorkCenterExistsWorkCenterCode(workCenterCodeId, workCenterId);
+    public WorkCenterResponse getWorkCenter(Long workCenterId) throws NotFoundException{
         WorkCenter workCenter = getWorkCenterOrThrow(workCenterId);
-
         return mapper.toResponse(workCenter, WorkCenterResponse.class);
-    }
-
-    // 입력한 workCenter의 workCenterCode와 입력한 workCenterCode와 다를때 예외
-    private void throwIfFindWorkCenterExistsWorkCenterCode(Long workCenterCodeId, Long workCenterId) throws BadRequestException, NotFoundException {
-        WorkCenter workCenter = getWorkCenterOrThrow(workCenterId);
-        WorkCenterCode workCenterCode = getWorkCenterCodeOrThrow(workCenterCodeId);
-        if (!workCenter.getWorkCenterCode().equals(workCenterCode))
-            throw new BadRequestException("workCenterCode must be equal workCenterCode in workCenter. input workCenterCodeId: " + workCenterCode.getId() + ", input workCenterId: " + workCenter.getId());
     }
 
     // 페이징조회
@@ -73,8 +63,7 @@ public class WorkCenterServiceImpl implements WorkCenterService {
 
     // 수정
     @Override
-    public WorkCenterResponse updateWorkCenter(Long workCenterCodeId, Long workCenterId, WorkCenterRequest workCenterRequest) throws NotFoundException, BadRequestException {
-        throwIfFindWorkCenterExistsWorkCenterCode(workCenterCodeId, workCenterId);
+    public WorkCenterResponse updateWorkCenter(Long workCenterId, WorkCenterRequest workCenterRequest) throws NotFoundException {
         WorkCenter findWorkCenter = getWorkCenterOrThrow(workCenterId);
         WorkCenterCode newWorkCenterCode = getWorkCenterCodeOrThrow(workCenterRequest.getWorkCenterCode());
         Client newClient = clientService.getClientOrThrow(workCenterRequest.getOutCompany());
@@ -86,8 +75,7 @@ public class WorkCenterServiceImpl implements WorkCenterService {
 
     // 삭제
     @Override
-    public void deleteWorkCenter(Long workCenterCodeId, Long workCenterId) throws NotFoundException, BadRequestException {
-        throwIfFindWorkCenterExistsWorkCenterCode(workCenterCodeId, workCenterId);
+    public void deleteWorkCenter(Long workCenterId) throws NotFoundException {
         WorkCenter workCenter = getWorkCenterOrThrow(workCenterId);
         workCenter.delete();
         workCenterRepository.save(workCenter);

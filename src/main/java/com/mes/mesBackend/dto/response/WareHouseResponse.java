@@ -9,7 +9,7 @@ public class WareHouseResponse {
     Long id;
     String wareHouseCode;  // 창고코드
     String wareHouseName;   // 창고명
-    WareHouseTypeResponse WareHouseType;
+    WareHouseTypeResponse wareHouseType;
     String wareHouseGroup;   // 창고그룹
     boolean useYn;      // 사용여부
 }

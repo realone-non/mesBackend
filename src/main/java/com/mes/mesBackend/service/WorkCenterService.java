@@ -18,16 +18,16 @@ public interface WorkCenterService {
     WorkCenterResponse createWorkCenter(WorkCenterRequest workCenterRequest) throws NotFoundException;
 
     // 작업장 단일 조회
-    WorkCenterResponse getWorkCenter(Long workCenterCodeId, Long workCenterId) throws NotFoundException, BadRequestException;
+    WorkCenterResponse getWorkCenter(Long workCenterId) throws NotFoundException;
 
     // 작업장 페이징조회
     Page<WorkCenterResponse> getWorkCenters(Pageable pageable);
 
     // 작업장 수정
-    WorkCenterResponse updateWorkCenter(Long workCenterCodeId, Long workCenterId, WorkCenterRequest workCenterRequest) throws NotFoundException, BadRequestException;
+    WorkCenterResponse updateWorkCenter(Long workCenterId, WorkCenterRequest workCenterRequest) throws NotFoundException;
 
     // 작업장 삭제
-    void deleteWorkCenter(Long workCenterCodeId, Long workCenterId) throws NotFoundException, BadRequestException;
+    void deleteWorkCenter(Long workCenterId) throws NotFoundException;
 
     // 작업장 조회 및 예외
     WorkCenter getWorkCenterOrThrow(Long id) throws NotFoundException;
