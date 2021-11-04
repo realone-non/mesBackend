@@ -21,9 +21,14 @@ public class CheckType extends BaseTimeEntity {
     @Column(name = "CHECK_TYPE", columnDefinition = "varchar(255) COMMENT '점검유형'")
     private String checkType;       // 점검유형
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
-    private Boolean useYn = true;      //  사용여부
-
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
+
+    public void put(CheckType newCheckType) {
+        setCheckType(newCheckType.checkType);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

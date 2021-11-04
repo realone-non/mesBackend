@@ -26,6 +26,7 @@ public class MapperConfig {
         modelMapper.addConverter(toEmpResponseConvert);
         modelMapper.addConverter(toUnitResponseConverter);
         modelMapper.addConverter(toGridResponseConvert);
+        modelMapper.addConverter(toWorkCenterCheckDetailResponseConvert);
         return modelMapper;
     }
 
@@ -98,6 +99,22 @@ public class MapperConfig {
             GridOptionResponse gridOptionResponse = modelMapper.map(gridOption, GridOptionResponse.class);
             gridOptionResponse.setColId(gridOption.getHeader().getColumnName());
             return gridOptionResponse;
+        }
+    };
+
+    // 작업장별 점검항목 세부 소수점 매핑
+    Converter<WorkCenterCheckDetail, WorkCenterCheckDetailResponse> toWorkCenterCheckDetailResponseConvert = new Converter<WorkCenterCheckDetail, WorkCenterCheckDetailResponse>() {
+        @Override
+        public WorkCenterCheckDetailResponse convert(MappingContext<WorkCenterCheckDetail, WorkCenterCheckDetailResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            WorkCenterCheckDetail workCenterCheckDetail = context.getSource();
+            WorkCenterCheckDetailResponse workCenterCheckDetailResponse = modelMapper.map(workCenterCheckDetail, WorkCenterCheckDetailResponse.class);
+            DecimalFormat df = new DecimalFormat("0.000");
+            String usl = df.format(workCenterCheckDetail.getUsl());
+            String lsl = df.format(workCenterCheckDetail.getLsl());
+            workCenterCheckDetailResponse.setUsl(usl);
+            workCenterCheckDetailResponse.setLsl(lsl);
+            return workCenterCheckDetailResponse;
         }
     };
 
