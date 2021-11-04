@@ -13,4 +13,11 @@ public class WorkCenterResponse {
     ClientNameResponse outCompany;     // 외주사(거래처)
     String costCenter;                 // Cost Center
     boolean useYn = true;              // 사용여부
+
+    @Getter
+    @Setter
+    public static class idAndName {
+        Long id;
+        String workCenterName;             // 작업장명
+    }
 }

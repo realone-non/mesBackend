@@ -28,8 +28,9 @@ public class WorkLine extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업라인 등록 고유아이디'")
     private Long id;
 
-    @Column(name = "WORK_LINE_CODE", nullable = false, unique = true, columnDefinition = "varchar(255) COMMENT '라인코드'")
-    private String workLineCode;   // 라인코드
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WORK_LINE_CODE", columnDefinition = "bigint COMMENT '라인코드'")
+    private WorkLineCode workLineCode;          // 라인코드
 
     @Column(name = "WORK_LINE_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '작업라인명'")
     private String workLineName;    // 작업라인명
@@ -38,12 +39,20 @@ public class WorkLine extends BaseTimeEntity {
     @JoinColumn(name = "WORK_CENTER", columnDefinition = "bigint COMMENT '작업장'")
     private WorkCenter workCenter;  // 작업장
 
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '원자재 창고'")
+//    private WareHouse wareHouse;        // 원자재 창고
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "WARE_PROCESS", nullable = false, columnDefinition = "bigint COMMENT '작업공정'")
+    @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '작업공정'")
     private WorkProcess workProcess;        // 작업공정
 
     @Column(name = "POP_START_FORMID", nullable = false, columnDefinition = "varchar(255) COMMENT 'POP 시작 FORMID'")
     private String popStartFormid;      // POP 시작 FORMID
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '외주사'")
+//    private Client client;              // 외주사
 
     @Column(name = "TIME", nullable = false, columnDefinition = "int COMMENT '일 가동시간'")
     private int time;       // 일 가동시간
@@ -54,7 +63,31 @@ public class WorkLine extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
-    private Factory factory;                // 공장
+
+    public void addMapping(
+            WorkLineCode workLineCode,
+            WorkCenter workCenter,
+            WorkProcess workProcess
+    ) {
+        setWorkLineCode(workLineCode);
+        setWorkCenter(workCenter);
+        setWorkProcess(workProcess);
+    }
+
+    public void put(
+            WorkLine newWorkLine,
+            WorkLineCode newWorkLineCode,
+            WorkCenter newWorkCenter,
+            WorkProcess newWorkProcess
+    ) {
+        addMapping(newWorkLineCode,newWorkCenter,newWorkProcess);
+        setWorkLineName(newWorkLine.workLineName);
+        setPopStartFormid(newWorkLine.popStartFormid);
+        setTime(newWorkLine.time);
+        setUseYn(newWorkLine.useYn);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

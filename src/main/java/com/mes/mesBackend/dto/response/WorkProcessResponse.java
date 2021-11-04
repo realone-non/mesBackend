@@ -12,4 +12,11 @@ public class WorkProcessResponse {
     boolean processTest;        // 공정검사
     int orders;              // 공정순번
     boolean useYn;              // 사용여부
+
+    @Getter
+    @Setter
+    public static class idAndName {
+        Long id;
+        String workProcessName;     // 작업공정명
+    }
 }
