@@ -22,21 +22,18 @@ import javax.persistence.*;
  * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@Entity(name = "WORK_CENTER_CHECK_TYPES")
+@Entity(name = "WORK_CENTER_CHECK_DETAILS")
 @Data
-public class WorkCenterCheckTypes extends BaseTimeEntity {
+public class WorkCenterCheckDetail extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업장별 세부 점검항목 고유아이디'")
     private Long id;
 
     // 다대일 단방향 매핑
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WORK_CENTER_CHECK", nullable = false, columnDefinition = "bigint COMMENT '작업장별 점검항목'")
     private WorkCenterCheck workCenterCheck;    // 작업장별 점검항목
-
-    @Column(name = "CHECK_CODE", nullable = false, unique = true, columnDefinition = "int COMMENT '점검코드'")
-    private int checkCode;      // 점검코드
 
     @Column(name = "CHECK_CATEGORY", nullable = false, columnDefinition = "varchar(255) COMMENT '점검항목'")
     private String checkCategory;   // 점검항목
@@ -56,11 +53,11 @@ public class WorkCenterCheckTypes extends BaseTimeEntity {
     @Column(name = "INPUT_NUMBER_FORMAT", columnDefinition = "varchar(255) COMMENT '숫자입력포맷'")
     private String inputNumberFormat;   // 숫자입력포맷
 
-    @Column(name = "USL", columnDefinition = "int COMMENT '상한값'")
-    private int usl;        // 상한값
+    @Column(name = "USL", columnDefinition = "float COMMENT '상한값'")
+    private float usl;        // 상한값
 
-    @Column(name = "LSL", columnDefinition = "int COMMENT '하한값'")
-    private int lsl;        // 하한값
+    @Column(name = "LSL", columnDefinition = "float COMMENT '하한값'")
+    private float lsl;        // 하한값
 
     @Column(name = "ORDERS", nullable = false, columnDefinition = "int COMMENT '표시순서'")
     private int orders;     // 표시순서
@@ -70,4 +67,25 @@ public class WorkCenterCheckTypes extends BaseTimeEntity {
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
+
+    public void add(WorkCenterCheck workCenterCheck) {
+        setWorkCenterCheck(workCenterCheck);
+    }
+
+    public void put(WorkCenterCheckDetail newWorkCenterCheckDetail) {
+        setCheckCategory(newWorkCenterCheckDetail.checkCategory);
+        setCheckContent(newWorkCenterCheckDetail.checkContent);
+        setCheckCriteria(newWorkCenterCheckDetail.checkCriteria);
+        setCheckMethod(newWorkCenterCheckDetail.checkMethod);
+        setInputType(newWorkCenterCheckDetail.inputType);
+        setInputNumberFormat(newWorkCenterCheckDetail.inputNumberFormat);
+        setUsl(newWorkCenterCheckDetail.usl);
+        setLsl(newWorkCenterCheckDetail.lsl);
+        setOrders(newWorkCenterCheckDetail.orders);
+        setUseYn(newWorkCenterCheckDetail.useYn);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }
