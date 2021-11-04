@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.request.CodeRequest;
 import com.mes.mesBackend.dto.request.WorkProcessRequest;
 import com.mes.mesBackend.dto.response.CodeResponse;
 import com.mes.mesBackend.dto.response.WorkProcessResponse;
+import com.mes.mesBackend.entity.WorkProcess;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,8 @@ public interface WorkProcessService {
 
     // 작업공정 수정
     WorkProcessResponse updateWorkProcess(Long workProcessId, WorkProcessRequest workProcessRequest) throws NotFoundException;
+
+    WorkProcess getWorkProcessOrThrow(Long id) throws NotFoundException;
 
     // 작업공정 삭제
     void deleteWorkProcess(Long workProcessId) throws NotFoundException;

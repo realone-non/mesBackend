@@ -106,7 +106,11 @@ public class WorkCenterServiceImpl implements WorkCenterService {
     @Override
     public WorkCenter getWorkCenterOrThrow(Long id) throws NotFoundException {
         WorkCenter workCenter = workCenterRepository.findByIdAndDeleteYnFalse(id);
-        if (workCenter == null) throw new NotFoundException("workCenter does not found. input id: " + id);
+        if (id == 0) {
+            return null;
+        } else if (workCenter == null) {
+            throw new NotFoundException("workCenter does not found. input id: " + id);
+        }
         return workCenter;
     }
 

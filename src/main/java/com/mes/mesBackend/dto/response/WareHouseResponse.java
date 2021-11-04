@@ -12,4 +12,11 @@ public class WareHouseResponse {
     WareHouseTypeResponse wareHouseType;
     String wareHouseGroup;   // 창고그룹
     boolean useYn;      // 사용여부
+
+    @Getter
+    @Setter
+    public static class idAndName {
+        Long id;
+        String wareHouseName;   // 창고명
+    }
 }
