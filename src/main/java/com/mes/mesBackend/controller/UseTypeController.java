@@ -16,8 +16,8 @@ import java.util.List;
 
 // 용도유형
 @RestController
-@RequestMapping(value = "/user-types")
-@Api(tags = "user-type")
+@RequestMapping(value = "/use-types")
+@Api(tags = "use-type")
 @RequiredArgsConstructor
 public class UseTypeController {
     @Autowired

@@ -21,6 +21,14 @@ public class LotType extends BaseTimeEntity {
     @Column(name = "LOT_TYPE", nullable = false, columnDefinition = "varchar(255) COMMENT 'Lot 유형'")
     private String lotType;
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
-    private boolean useYn;
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
+    private boolean deleteYn;
+
+    public void put(LotType newLotType) {
+        setLotType(newLotType.lotType);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }
