@@ -11,4 +11,11 @@ public class CodeResponse {
     String codeName;
     String description;
     boolean useYn;
+
+    @Getter
+    @Setter
+    public static class idAndCode {
+        Long id;
+        String code;
+    }
 }
