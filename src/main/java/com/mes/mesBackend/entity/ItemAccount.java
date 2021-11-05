@@ -24,10 +24,15 @@ public class ItemAccount extends BaseTimeEntity {
     @Column(name = "ACCOUNT", nullable = false, columnDefinition = "varchar(255) COMMENT '품목계정'")
     private String account;
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
-    private boolean useYn = true;      //  사용여부
-
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
+
+    public void put(ItemAccount newItemAccount) {
+        setAccount(newItemAccount.account);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }
 
