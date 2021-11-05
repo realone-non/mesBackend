@@ -6,6 +6,7 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.TestCriteriaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/test-criterias")
 @Api(tags = "test-criteria")
+@RequiredArgsConstructor
 public class TestCriteriaController {
     @Autowired
     TestCriteriaService testCriteriaService;
