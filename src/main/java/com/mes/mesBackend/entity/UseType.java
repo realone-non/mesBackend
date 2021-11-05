@@ -21,6 +21,13 @@ public class UseType extends BaseTimeEntity {
     @Column(name = "USE_TYPE", nullable = false, columnDefinition = "varchar(255) COMMENT '용도유형'")
     private String useType;
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
-    private boolean useYn;
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
+    private boolean deleteYn;
+
+    public void put(UseType newUseType) {
+        setUseType(newUseType.useType);
+    }
+    public void delete() {
+        setDeleteYn(true );
+    }
 }
