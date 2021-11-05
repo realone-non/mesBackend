@@ -18,7 +18,7 @@ import java.util.List;
 // 3-2-2. 그룹코드 등록
 @RestController
 @RequestMapping("/item-group-codes")
-@Api(tags = "[구현중]item-group-code")
+@Api(tags = "item-group-code")
 @RequiredArgsConstructor
 public class ItemGroupCodeController {
     @Autowired

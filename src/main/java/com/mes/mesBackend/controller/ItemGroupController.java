@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 // 3-2-2. 품목그룹 등록
 @RestController
 @RequestMapping("/item-groups")
-@Api(tags = "[구현중]item-group")
+@Api(tags = "item-group")
 @RequiredArgsConstructor
 public class ItemGroupController {
     @Autowired
