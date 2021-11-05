@@ -21,6 +21,14 @@ public class ItemForm extends BaseTimeEntity {
     @Column(name = "FORM", nullable = false, columnDefinition = "varchar(255) COMMENT '품목형태'")
     private String form;
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
-    private boolean useYn;
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
+    private boolean deleteYn;
+
+    public void delete() {
+        setDeleteYn(true);
+    }
+
+    public void put(ItemForm newItemForm) {
+        setForm(newItemForm.form);
+    }
 }
