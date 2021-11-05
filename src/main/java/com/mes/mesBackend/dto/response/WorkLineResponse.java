@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class WorkLineResponse {
     Long id;
-    CodeResponse workLineCode;              // 라인코드
+    CodeResponse.idAndCode workLineCode;              // 라인코드
     String workLineName;                    // 작업라인명
     WorkCenterResponse.idAndName workCenter;          // 작업장
 //    WareHouseResponse.idAndName wareHouse;            // 원자재 창고
