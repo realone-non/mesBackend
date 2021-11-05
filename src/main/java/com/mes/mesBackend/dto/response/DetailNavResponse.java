@@ -10,4 +10,5 @@ public class DetailNavResponse {
     String name;
     int level;
     int orders;
+    String path;
 }
