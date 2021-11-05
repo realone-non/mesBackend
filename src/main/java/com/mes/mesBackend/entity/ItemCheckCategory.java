@@ -33,10 +33,10 @@ public class ItemCheckCategory extends BaseTimeEntity {
     @JoinColumn(name = "CHECK_CATEGORY", columnDefinition = "bigint COMMENT '검사유형'")
     private TestCategory checkCategory;    // 검사유형
 
-    // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TEST_TYPE", columnDefinition = "bigint COMMENT '검사타입'")
-    private TestType testType;              // 검사타입(자동검사,수동검사)
+    // enum으로 대체
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TEST_TYPE", columnDefinition = "varchar(255) COMMENT '검사타입'")
+    private TestType testType = TestType.NO_TEST;              // 검사타입(자동검사,수동검사)
     // 품목등록에서 검사유형,검사타입 다 보여야함
 
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")

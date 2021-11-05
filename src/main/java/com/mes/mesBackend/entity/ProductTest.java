@@ -59,9 +59,10 @@ public class ProductTest extends BaseTimeEntity {
     @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '창고'")
     private WareHouse wareHouse;        // 창고
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TEST_TYPE", columnDefinition = "bigint COMMENT '요청유형'")
-    private TestType testType;          // 요청유형
+    // enum으로 대체
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TEST_TYPE", columnDefinition = "varchar(255) COMMENT '요청유형'")
+    private TestType testType = TestType.NO_TEST;          // 요청유형
 
     @Column(name = "REQUEST_DATE_TIME", columnDefinition = "datetime(6) COMMENT '요청일시'")
     private LocalDateTime requestDateTime;      // 요청일시

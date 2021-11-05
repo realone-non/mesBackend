@@ -50,10 +50,10 @@ public class OutSourcingInput extends BaseTimeEntity {
     @JoinColumn(name = "INPUT_WARE_HOUSE", columnDefinition = "bigint COMMENT '입고창고'")
     private WareHouse inputWareHouse;           // 입고창고
 
-    // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TEST_REQUEST_TYPE", columnDefinition = "bigint COMMENT '검사의뢰유향'")
-    private TestType testRequestType;                  // 검사의뢰유형
+    // enum으로 대체
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TEST_REQUEST_TYPE", columnDefinition = "varchar(255) COMMENT '검사의뢰유향'")
+    private TestType testRequestType = TestType.NO_TEST;                  // 검사의뢰유형
 
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                        // 비고

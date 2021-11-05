@@ -79,9 +79,10 @@ public class WorkOrderDetail extends BaseTimeEntity {
     @Column(name = "ORDER_STATE",nullable = false, columnDefinition = "varchar(255) COMMENT '지시상태'")
     private String orderState;              // 지시상태
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TEST_TYPE", nullable = false, columnDefinition = "bigint COMMENT '검사의뢰'")
-    private TestType testType;              // 검사의뢰
+    // emun
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TEST_TYPE", nullable = false, columnDefinition = "varchar(255) COMMENT '검사의뢰'")
+    private TestType testType = TestType.NO_TEST;              // 검사의뢰
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TEST_PROCESS", columnDefinition = "bigint COMMENT '검사유형'")

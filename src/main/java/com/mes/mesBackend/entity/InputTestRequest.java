@@ -78,9 +78,9 @@ public class InputTestRequest extends BaseTimeEntity {
     @Column(name = "REQUEST_DATE_TIME", columnDefinition = "datetime(6) COMMENT '요청일시'")
     private LocalDateTime requestDateTime;      // 요청일시
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "REQUEST_TYPE", columnDefinition = "bigint COMMENT '요청유형'")
-    private TestType requestType;                  // 요청유형
+    @Enumerated(EnumType.STRING)
+    @Column(name = "REQUEST_TYPE", columnDefinition = "varchar(255) COMMENT '요청유형'")
+    private TestType testType = TestType.NO_TEST;    // 요청유형
 
     @Column(name = "REQUEST_AMOUNT", columnDefinition = "int COMMENT '요청수량'")
     private int requestAmount;                      // 요청수량

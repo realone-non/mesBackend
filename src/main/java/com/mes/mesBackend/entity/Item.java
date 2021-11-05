@@ -102,22 +102,23 @@ public class Item extends BaseTimeEntity {
     @JoinColumn(name = "LOT_TYPES_ID", nullable = false, columnDefinition = "bigint COMMENT 'LOT유형'")
     private LotType lotType;    // LOT유형
 
-//    @OneToOne @JoinColumn(name = "INPUT_TEST", columnDefinition = "varchar(255) COMMENT ''")
-//    private TestType inputTest;        // 수입검사
-//
-//    @OneToOne @JoinColumn(name = "PROCESS_TEST")
-//    private TestType processTest;       // 공정검사
-//
-//    @OneToOne @JoinColumn(name = "SHIPMENT_TEST")
-//    private TestType shipmentTest;      // 출하검사
+    @Enumerated(EnumType.STRING)
+    @Column(name = "INPUT_TEST", columnDefinition = "varchar(255) COMMENT '수입검사'")
+    private TestType inputTest = TestType.NO_TEST;      // 수입검사
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ITEM_CHECK_CATEGORY", columnDefinition = "bigint COMMENT '품목별 검사항목'")
-    private List<ItemCheckCategory> itemCheckCategory;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "OUTPUT_TEST", columnDefinition = "varchar(255) COMMENT '출하검사'")
+    private TestType outputTest = TestType.NO_TEST;     // 출하검사
+
+//
+//    @OneToMany(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "ITEM_CHECK_CATEGORY", columnDefinition = "bigint COMMENT '품목별 검사항목'")
+//    private List<ItemCheckCategory> itemCheckCategory;
 
     @Column(name = "WASTE_PRODUCT_LOT", nullable = false, columnDefinition = "bit(1) COMMENT '폐기품 LOT 관리'")
     private boolean wasteProductLot;        // 폐기품 Lot 관리
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "DEVELOP_STATUS", nullable = false, columnDefinition = "bigint COMMENT '개발상태'")
     private DevelopStatus developStatus = DevelopStatus.BEFORE;  // 개발상태
 
@@ -130,16 +131,16 @@ public class Item extends BaseTimeEntity {
     @Column(name = "STORAGE_LOCATION", columnDefinition = "varchar(255) COMMENT '저장위치'")
     private String storageLocation;    // 저장위치
 
-    // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '거래처'")
-    private Client clientPartNo;        // 거래처
+    @Column(name = "CLIENT_ITEM_NO", columnDefinition = "varchar(255) COMMENT '거래처품번'")
+    private String clientItemNo;        // 거래처 품번
 
     @Column(name = "MANUFACTURER_PART_NO", columnDefinition = "varchar(255) COMMENT '제조사'")
     private String manufacturerPartNo;        // 제조사품번
 
-    @Column(name = "MANUFACTURER", columnDefinition = "varchar(255) COMMENT '제조사'")
-    private String Manufacturer;            // 제조사
+    // 다대일 단방향
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MANUFACTURER", columnDefinition = "bigint COMMENT '제조사'")
+    private Client Manufacturer;        // 거래처
 
     // 다대일 단방향
     @ManyToOne(fetch = FetchType.LAZY)

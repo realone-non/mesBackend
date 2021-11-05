@@ -77,9 +77,10 @@ public class PurchaseOrderDetail extends BaseTimeEntity {
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;            // 비고
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TEST_TYPE", columnDefinition = "bigint COMMENT '수입검사유형'")
-    private TestType testType;      // 수입검사유형
+    // enum으로 대체
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TEST_TYPE", columnDefinition = "varchar(255) COMMENT '수입검사유형'")
+    private TestType testType = TestType.NO_TEST;      // 수입검사유형
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PURCHASE_ORDER")
