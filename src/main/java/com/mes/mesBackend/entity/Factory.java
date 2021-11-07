@@ -64,7 +64,6 @@ public class Factory extends BaseTimeEntity {
     @Column(name = "LOT_CODE", columnDefinition = "varchar(255) COMMENT 'LOT용 코드'")
     private String lotCode;         // LOT용 코드
 
-    // 1:1 단방향 매핑
     // 다대일 단방향
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WORK_PLACES_ID", columnDefinition = "bigint COMMENT '사업장'")
@@ -90,4 +89,13 @@ public class Factory extends BaseTimeEntity {
         setLotCode(newFactory.lotCode);
         setWorkPlace(newWorkPlace);
     }
+
+    public void addJoin(WorkPlace workPlace) {
+        setWorkPlace(workPlace);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
+
 }

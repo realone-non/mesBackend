@@ -27,4 +27,13 @@ public class CountryCode extends BaseTimeEntity {
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
+
+    public void put(CountryCode newCountryCode) {
+        setName(newCountryCode.name);
+        setUseYn(newCountryCode.useYn);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

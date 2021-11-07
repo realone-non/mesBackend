@@ -2,15 +2,10 @@ package com.mes.mesBackend.repository;
 
 import com.mes.mesBackend.entity.WorkCenter;
 import com.mes.mesBackend.entity.WorkCenterCode;
-import org.hibernate.jdbc.Work;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.mes.mesBackend.repository.custom.JpaCustomRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface WorkCenterRepository extends JpaRepository<WorkCenter, Long> {
-    WorkCenter findByIdAndDeleteYnFalse(Long id);
-    Page<WorkCenter> findAllByDeleteYnFalse(Pageable pageable);
+public interface WorkCenterRepository extends JpaCustomRepository<WorkCenter, Long> {
     boolean existsAllByWorkCenterCodeAndDeleteYnFalse(WorkCenterCode workCenterCode);
 }

@@ -70,13 +70,11 @@ public class WorkProcessServiceImpl implements WorkProcessService {
     // 작업공정 조회 및 예외처리
     @Override
     public WorkProcess getWorkProcessOrThrow(Long id) throws NotFoundException {
-        WorkProcess workProcess = workProcessRepository.findByIdAndDeleteYnFalse(id);
         if (id == 0) {
             return null;
-        } else if (workProcess == null) {
-            throw new NotFoundException("workProcess does not exist. input id: " + id);
         }
-        return workProcess;
+        return workProcessRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(()-> new NotFoundException("workProcess does not exist. input id: " + id));
     }
 
     // 작업공정 삭제

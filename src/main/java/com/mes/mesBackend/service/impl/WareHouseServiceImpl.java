@@ -31,9 +31,9 @@ public class WareHouseServiceImpl implements WareHouseService {
     public WareHouseResponse createWareHouse(WareHouseRequest wareHouseRequest) throws NotFoundException {
         WareHouseType wareHouseType = wareHouseTypeService.getWareHouseTypeOrThrow(wareHouseRequest.getWareHouseType());
         WareHouse wareHouse = mapper.toEntity(wareHouseRequest, WareHouse.class);
-        wareHouse.addWareHouseType(wareHouseType);
-        WareHouse saveWareHouse = wareHouseRepository.save(wareHouse);
-        return mapper.toResponse(saveWareHouse, WareHouseResponse.class);
+        wareHouse.addJoin(wareHouseType);
+        wareHouseRepository.save(wareHouse);
+        return mapper.toResponse(wareHouse, WareHouseResponse.class);
     }
 
     // 조회
@@ -57,8 +57,8 @@ public class WareHouseServiceImpl implements WareHouseService {
         WareHouseType newWareHouseType = wareHouseTypeService.getWareHouseTypeOrThrow(wareHouseRequest.getWareHouseType());
         WareHouse newWareHouse = mapper.toEntity(wareHouseRequest, WareHouse.class);
         findWareHouse.put(newWareHouse, newWareHouseType);
-        WareHouse saveWareHouse = wareHouseRepository.save(findWareHouse);
-        return mapper.toResponse(saveWareHouse, WareHouseResponse.class);
+        wareHouseRepository.save(findWareHouse);
+        return mapper.toResponse(findWareHouse, WareHouseResponse.class);
     }
 
     // 삭제
@@ -71,8 +71,7 @@ public class WareHouseServiceImpl implements WareHouseService {
 
     @Override
     public WareHouse getWareHouseOrThrow(Long id) throws NotFoundException {
-        WareHouse findWareHouse = wareHouseRepository.findByIdAndDeleteYnFalse(id);
-        if (findWareHouse == null) throw new NotFoundException("wareHouse does not exists. input id: " + id);
-        return findWareHouse;
+        return wareHouseRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("wareHouse does not exists. input id: " + id));
     }
 }

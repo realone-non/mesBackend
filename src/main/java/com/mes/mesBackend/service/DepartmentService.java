@@ -24,5 +24,5 @@ public interface DepartmentService {
     // 부서 삭제
     void deleteDepartment(Long id) throws NotFoundException;
 
-    Department findByIdAndDeleteYnFalse(Long id) throws NotFoundException;
+    Department getDepartmentOrThrow(Long id) throws NotFoundException;
 }

@@ -2,12 +2,7 @@ package com.mes.mesBackend.repository;
 
 
 import com.mes.mesBackend.entity.Department;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.mes.mesBackend.repository.custom.JpaCustomRepository;
 
-public interface DepartmentRepository extends JpaRepository<Department, Long> {
-    Department findByIdAndDeleteYnFalse(Long id);
-    Page<Department> findAllByDeleteYnFalse(Pageable pageable);
-
+public interface DepartmentRepository extends JpaCustomRepository<Department, Long> {
 }

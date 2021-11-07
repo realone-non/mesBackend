@@ -29,12 +29,9 @@ public class CodeMasterServiceImpl implements CodeMasterService {
     ModelMapper modelMapper;
 
     // 코드마스터 아이디로 조회
-    private CodeMaster findByIdAndDeleteYnTrue(Long id) throws NotFoundException {
-        CodeMaster findCodeMaster = codeMasterRepository.findByIdAndDeleteYnFalse(id);
-        if (findCodeMaster == null) {
-            throw new NotFoundException("codeMaster does not exists. input codeMasterId: " + id);
-        }
-        return findCodeMaster;
+    private CodeMaster getCodeMasterOrThrow(Long id) throws NotFoundException {
+        return codeMasterRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("codeMaster does not exists. input codeMasterId: " + id));
     }
 
     // 코드마스터 생성
@@ -74,7 +71,7 @@ public class CodeMasterServiceImpl implements CodeMasterService {
 
     // 부코드 마스터 조회
     public List<SubCodeMasterResponse> getSubCodeMasters(Long id) throws NotFoundException {
-        CodeMaster codeMaster = findByIdAndDeleteYnTrue(id);
+        CodeMaster codeMaster = getCodeMasterOrThrow(id);
         List<SubCodeMaster> subCodeMasters = subCodeMasterRepository.findSubCodeMasterByCodeMasterAndDeleteYnFalse(codeMaster);
         return modelMapper.toListResponses(subCodeMasters, SubCodeMasterResponse.class);
     }
@@ -82,7 +79,7 @@ public class CodeMasterServiceImpl implements CodeMasterService {
     // 코드마스터 수정
     public CodeMasterResponse updateCodeMaster(Long id, CodeMasterUpdateRequest codeMasterUpdateRequest) throws NotFoundException {
         CodeMaster newCodeMaster = modelMapper.toEntity(codeMasterUpdateRequest, CodeMaster.class);
-        CodeMaster findCodeMaster = findByIdAndDeleteYnTrue(id);
+        CodeMaster findCodeMaster = getCodeMasterOrThrow(id);
         // 수정매핑
         findCodeMaster.put(newCodeMaster);
         CodeMaster updateCodeMaster = codeMasterRepository.save(newCodeMaster);
@@ -106,7 +103,7 @@ public class CodeMasterServiceImpl implements CodeMasterService {
 
     // 코드마스터 삭제
     public void deleteCodeMaster(Long id) throws NotFoundException {
-        CodeMaster codeMaster = findByIdAndDeleteYnTrue(id);
+        CodeMaster codeMaster = getCodeMasterOrThrow(id);
         List<SubCodeMaster> subCodeMasterList = subCodeMasterRepository.findSubCodeMasterByCodeMasterAndDeleteYnFalse(codeMaster);
         codeMaster.setDeleteYn(true);
         // 주코드에 해당하는 부코드 삭제
@@ -119,7 +116,7 @@ public class CodeMasterServiceImpl implements CodeMasterService {
             Long codeMasterId,
             SubCodeMasterRequest subCodeMasterRequest
     ) throws NotFoundException {
-        CodeMaster codeMaster = findByIdAndDeleteYnTrue(codeMasterId);
+        CodeMaster codeMaster = getCodeMasterOrThrow(codeMasterId);
         SubCodeMaster subCodeMaster = modelMapper.toEntity(subCodeMasterRequest, SubCodeMaster.class);
         subCodeMaster.setCodeMaster(codeMaster);
         return modelMapper.toResponse(subCodeMasterRepository.save(subCodeMaster), SubCodeMasterResponse.class);
@@ -127,7 +124,7 @@ public class CodeMasterServiceImpl implements CodeMasterService {
 
     // 코드마스터 단일 조회
     public CodeMasterResponse getCodeMaster(Long id) throws NotFoundException {
-        CodeMasterResponse codeMasterResponse = modelMapper.toResponse(findByIdAndDeleteYnTrue(id), CodeMasterResponse.class);
+        CodeMasterResponse codeMasterResponse = modelMapper.toResponse(getCodeMasterOrThrow(id), CodeMasterResponse.class);
         codeMasterResponse.setSubCodeMasterResponse(getSubCodeMasters(id));
         return codeMasterResponse;
     }

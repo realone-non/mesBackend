@@ -43,7 +43,7 @@ public class GridOptionServiceImpl implements GridOptionService {
             Long headerId, GridOptionRequest gridOptionRequest, Long userId
     ) throws NotFoundException {
         Header header = headerService.findHeader(headerId);
-        User user = userService.findUserOrThrow(userId);
+        User user = userService.getUserOrThrow(userId);
         GridOption gridOption = modelMapper.toEntity(gridOptionRequest, GridOption.class);
 
         boolean existsGrid = gridOptionRepository.existsByHeaderAndUserId(header, userId);

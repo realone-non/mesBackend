@@ -25,9 +25,13 @@ public class BusinessType extends BaseTimeEntity {
     private boolean deleteYn = false;  // 삭제여부
 
     // 수정 매핑
-    public void update(BusinessType newBusinessType) {
+    public void put(BusinessType newBusinessType) {
         setName(newBusinessType.name);
-        setUseYn(newBusinessType.getUseYn());
+        setUseYn(newBusinessType.useYn);
         setDeleteYn(newBusinessType.deleteYn);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
     }
 }

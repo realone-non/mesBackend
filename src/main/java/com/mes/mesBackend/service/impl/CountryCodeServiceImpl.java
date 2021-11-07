@@ -20,27 +20,25 @@ public class CountryCodeServiceImpl implements CountryCodeService {
     @Autowired
     ModelMapper modelMapper;
 
-    public CountryCode findCountryCodeByIdAndDeleteYn(Long id) throws NotFoundException {
-        CountryCode findCountryCode = countryCodeRepository.findByIdAndDeleteYnFalse(id);
-        if (findCountryCode == null) {
-            throw new NotFoundException("countryCode does not exists. input countryCodeId: " + id);
-        }
-        return findCountryCode;
+    public CountryCode getCountryCodeOrThrow(Long id) throws NotFoundException {
+        return countryCodeRepository
+                .findByIdAndDeleteYnFalse(id).orElseThrow(() -> new NotFoundException("countryCode does not exists. input countryCodeId: " + id));
     }
 
     // 국가코드 타입 생성
     public CountryCodeResponse createCountryCode(CountryCodeRequest countryCodeRequest) {
         CountryCode countryCode = modelMapper.toEntity(countryCodeRequest, CountryCode.class);
-        return modelMapper.toResponse(countryCodeRepository.save(countryCode), CountryCodeResponse.class);
+        countryCodeRepository.save(countryCode);
+        return modelMapper.toResponse(countryCode, CountryCodeResponse.class);
     }
 
     // 국가코드 타입 조회
     public CountryCodeResponse getCountryCode(Long id) throws NotFoundException {
-        CountryCode countryCode = findCountryCodeByIdAndDeleteYn(id);
+        CountryCode countryCode = getCountryCodeOrThrow(id);
         return modelMapper.toResponse(countryCode, CountryCodeResponse.class);
     }
 
-    // 업체 타입 전체 조회
+    // 국가코드 전체 조회
     public Page<CountryCodeResponse> getCountryCodes(Pageable pageable) {
         Page<CountryCode> countryCodes = countryCodeRepository.findAllByDeleteYnFalse(pageable);
         return modelMapper.toPageResponses(countryCodes, CountryCodeResponse.class);
@@ -48,17 +46,17 @@ public class CountryCodeServiceImpl implements CountryCodeService {
 
     // 국가코드 타입 수정
     public CountryCodeResponse updateCountryCode(Long id, CountryCodeRequest countryCodeRequest) throws NotFoundException {
-        CountryCode countryCode = modelMapper.toEntity(countryCodeRequest, CountryCode.class);
-        CountryCode findCountryCode = findCountryCodeByIdAndDeleteYn(id);
-        findCountryCode.setName(countryCode.getName());
-        CountryCode updateCountryCode = countryCodeRepository.save(findCountryCode);
-        return modelMapper.toResponse(updateCountryCode, CountryCodeResponse.class);
+        CountryCode newCountryCode = modelMapper.toEntity(countryCodeRequest, CountryCode.class);
+        CountryCode findCountryCode = getCountryCodeOrThrow(id);
+        findCountryCode.put(newCountryCode);
+        countryCodeRepository.save(findCountryCode);
+        return modelMapper.toResponse(findCountryCode, CountryCodeResponse.class);
     }
 
     // 국가코드 삭제
     public void deleteCountryCode(Long id) throws NotFoundException {
-        CountryCode countryCode = findCountryCodeByIdAndDeleteYn(id);
-        countryCode.setDeleteYn(true);
+        CountryCode countryCode = getCountryCodeOrThrow(id);
+        countryCode.delete();
         countryCodeRepository.save(countryCode);
     }
 }

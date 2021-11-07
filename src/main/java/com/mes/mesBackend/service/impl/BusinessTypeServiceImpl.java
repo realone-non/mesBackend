@@ -16,30 +16,27 @@ import org.springframework.stereotype.Service;
 public class BusinessTypeServiceImpl implements BusinessTypeService {
 
     @Autowired
-    private BusinessTypeRepository businessTypeRepository;
+    BusinessTypeRepository businessTypeRepository;
 
     @Autowired
     ModelMapper modelMapper;
 
     // 삭제여부 false, 사용여부 true,false
-    public BusinessType findBusinessTypeByIdAndDeleteYn(Long id) throws NotFoundException {
-        BusinessType findBusinessType = businessTypeRepository.findByIdAndDeleteYnFalse(id);
-        if (findBusinessType == null) {
-            throw new NotFoundException("business type does not exist. input businessTypeId: " + id);
-        }
-        return findBusinessType;
+    public BusinessType getBusinessTypeOrThrow(Long id) throws NotFoundException {
+        return businessTypeRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("business type does not exist. input businessTypeId: " + id));
     }
 
     // 업태 타입 생성
     public BusinessTypeResponse createBusinessType(BusinessTypeRequest businessTypeRequest) {
         BusinessType businessType = modelMapper.toEntity(businessTypeRequest, BusinessType.class);
-        BusinessType saveBusinessType = businessTypeRepository.save(businessType);
-        return modelMapper.toResponse(saveBusinessType, BusinessTypeResponse.class);
+        businessTypeRepository.save(businessType);
+        return modelMapper.toResponse(businessType, BusinessTypeResponse.class);
     }
 
     // 업태 타입 조회
     public BusinessTypeResponse getBusinessType(Long id) throws NotFoundException {
-        BusinessType businessType = findBusinessTypeByIdAndDeleteYn(id);
+        BusinessType businessType = getBusinessTypeOrThrow(id);
         return modelMapper.toResponse(businessType, BusinessTypeResponse.class);
     }
 
@@ -51,17 +48,17 @@ public class BusinessTypeServiceImpl implements BusinessTypeService {
 
     // 업태 타입 수정
     public BusinessTypeResponse updateBusinessType(Long id, BusinessTypeRequest businessTypeRequest) throws NotFoundException {
-        BusinessType businessType = modelMapper.toEntity(businessTypeRequest, BusinessType.class);
-        BusinessType findBusinessType = findBusinessTypeByIdAndDeleteYn(id);
-        findBusinessType.setName(businessType.getName());
-        BusinessType updateBusinessType = businessTypeRepository.save(findBusinessType);
-        return modelMapper.toResponse(updateBusinessType, BusinessTypeResponse.class);
+        BusinessType newBusinessType = modelMapper.toEntity(businessTypeRequest, BusinessType.class);
+        BusinessType findBusinessType = getBusinessTypeOrThrow(id);
+        findBusinessType.put(newBusinessType);
+        businessTypeRepository.save(findBusinessType);
+        return modelMapper.toResponse(findBusinessType, BusinessTypeResponse.class);
     }
 
     // 업태 삭제
     public void deleteBusinessType(Long id) throws NotFoundException {
-        BusinessType businessType = findBusinessTypeByIdAndDeleteYn(id);
-        businessType.setDeleteYn(true);
+        BusinessType businessType = getBusinessTypeOrThrow(id);
+        businessType.delete();
         businessTypeRepository.save(businessType);
     }
 }

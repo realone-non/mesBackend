@@ -38,4 +38,11 @@ public class ClientResponse {
     String phoneNumber;     // 휴대폰번호
     String searchWord;      // 검색어
     boolean useYn;  // 사용여부
+
+    @Getter
+    @Setter
+    public static class idAndName {
+        Long id;
+        String name;
+    }
 }

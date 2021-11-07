@@ -2,14 +2,10 @@ package com.mes.mesBackend.repository;
 
 import com.mes.mesBackend.entity.WorkProcess;
 import com.mes.mesBackend.entity.WorkProcessCode;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.mes.mesBackend.repository.custom.JpaCustomRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface WorkProcessRepository extends JpaRepository<WorkProcess, Long> {
-    Page<WorkProcess> findAllByDeleteYnFalse(Pageable pageable);
-    WorkProcess findByIdAndDeleteYnFalse(Long id);
+public interface WorkProcessRepository extends JpaCustomRepository<WorkProcess, Long> {
     boolean existsByWorkProcessCodeAndDeleteYnFalse(WorkProcessCode workProcessCode);
 }

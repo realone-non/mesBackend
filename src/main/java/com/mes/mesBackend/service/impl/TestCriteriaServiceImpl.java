@@ -62,8 +62,7 @@ public class TestCriteriaServiceImpl implements TestCriteriaService {
     // 검사기준 조회 및 예외
     @Override
     public TestCriteria getTestCriteriaOrThrow(Long id) throws NotFoundException {
-        TestCriteria testCriteria = testCriteriaRepository.findByIdAndDeleteYnFalse(id);
-        if (testCriteria == null) throw new NotFoundException("testCriteria does not exist. input id: " + id);
-        return testCriteria;
+        return testCriteriaRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("testCriteria does not exist. input id: " + id));
     }
 }

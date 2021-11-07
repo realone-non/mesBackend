@@ -24,5 +24,5 @@ public interface WorkPlaceService {
     // 사업장 삭제
     void deleteWorkPlace(Long id) throws NotFoundException;
 
-    WorkPlace findByIdAndDeleteYnFalse(Long id) throws NotFoundException;
+    WorkPlace getWorkPlaceOrThrow(Long id) throws NotFoundException;
 }

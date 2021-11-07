@@ -152,18 +152,22 @@ public class Client extends BaseTimeEntity {
     private boolean useYn = true;       // 사용여부
 
     // 수정 매핑
-    public void put(Client newClient) {
+    public void put(Client newClient,
+                    BusinessType newBusinessType,
+                    CountryCode newCountryCode,
+                    ClientType newClientType
+    ) {
         setClientCode(newClient.clientCode);
         setName(newClient.name);
         setShortName(newClient.shortName);
-        setClientType(newClient.clientType);
+        setClientType(newClientType);
         setBusinessNumber(newClient.businessNumber);
         setBusinessFile(newClient.businessFile);
         setCeoName(newClient.ceoName);
         setPostalCode(newClient.postalCode);
         setAddress(newClient.address);
         setDetailAddress(newClient.detailAddress);
-        setBusinessType(newClient.businessType);
+        setBusinessType(newBusinessType);
         setItem(newClient.item);
         setTelNumber(newClient.telNumber);
         setFaxNumber(newClient.faxNumber);
@@ -172,7 +176,7 @@ public class Client extends BaseTimeEntity {
         setClientChargeName(newClient.clientChargeName);
         setTradeBusinessRegNo(newClient.tradeBusinessRegNo);
         setPccc(newClient.pccc);
-        setCountryCode(newClient.countryCode);
+        setCountryCode(newCountryCode);
         setArea(newClient.area);
         setCurrencyUnit(newClient.currencyUnit);
         setCompanyCharge(newClient.companyCharge);
@@ -185,7 +189,7 @@ public class Client extends BaseTimeEntity {
         setUseYn(newClient.useYn);
     }
 
-    public void putJoinTable(
+    public void addJoin(
             BusinessType businessType,
             CountryCode countryCode,
             ClientType clientType
@@ -193,5 +197,9 @@ public class Client extends BaseTimeEntity {
         setBusinessType(businessType);
         setCountryCode(countryCode);
         setClientType(clientType);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
     }
 }

@@ -95,10 +95,8 @@ public class WorkLineServiceImpl implements WorkLineService {
     // 작업라인 조회 및 예외
     @Override
     public WorkLine getWorkLineOrThrow(Long id) throws NotFoundException {
-        WorkLine workLine = workLineRepository.findByIdAndDeleteYnFalse(id);
-        if (workLine == null)
-            throw new NotFoundException("workLine does not exist. input id: " + id);
-        return workLine;
+        return workLineRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("workLine does not exist. input id: " + id));
     }
 
 
