@@ -27,5 +27,5 @@ public interface UserService {
     // userLogin
     UserResponse getLogin(String userCode, String password) throws NotFoundException;
 
-    User findUserOrThrow(Long id) throws NotFoundException;
+    User getUserOrThrow(Long id) throws NotFoundException;
 }

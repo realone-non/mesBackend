@@ -32,10 +32,9 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
 
 
     @Override
-    public WorkPlace findByIdAndDeleteYnFalse(Long id) throws NotFoundException {
-        WorkPlace findWorkPlace = workPlaceRepository.findByIdAndDeleteYnFalse(id);
-        if (findWorkPlace == null) throw new NotFoundException("workPlace does not exists. input id:" +id);
-        return findWorkPlace;
+    public WorkPlace getWorkPlaceOrThrow(Long id) throws NotFoundException {
+        return workPlaceRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(()-> new NotFoundException("workPlace does not exists. input id:" + id));
     }
 
     // 사업장 생성
@@ -59,7 +58,7 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
     private List<WorkPlaceBusinessType> createMapped(WorkPlace workPlace, List<Long> businessTypeIds) throws NotFoundException {
         List<WorkPlaceBusinessType> workPlaceMappeds = new ArrayList<>();
         for (Long businessTypeId : businessTypeIds) {
-            BusinessType findBusinessType = businessTypeService.findBusinessTypeByIdAndDeleteYn(businessTypeId);
+            BusinessType findBusinessType = businessTypeService.getBusinessTypeOrThrow(businessTypeId);
             WorkPlaceBusinessType workPlaceMapped = new WorkPlaceBusinessType();
             // mapped 생성
             workPlaceMapped.setWorkPlace(workPlace);
@@ -71,7 +70,7 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
 
 //    // 사업장 단일 조회
     public WorkPlaceResponse getWorkPlace(Long id) throws NotFoundException {
-        WorkPlace workPlace = findByIdAndDeleteYnFalse(id);
+        WorkPlace workPlace = getWorkPlaceOrThrow(id);
         return modelMapper.toResponse(workPlace, WorkPlaceResponse.class);
     }
 
@@ -89,7 +88,7 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
     // 사업장 수정
     public WorkPlaceResponse updateWorkPlace(Long id, WorkPlaceRequest workPlaceRequest) throws NotFoundException {
         List<Long> newBusinessTypeIds = workPlaceRequest.getType();
-        WorkPlace findWorkPlace = findByIdAndDeleteYnFalse(id);
+        WorkPlace findWorkPlace = getWorkPlaceOrThrow(id);
 
         // delete mapped
         deleteWorkPlaceMapped(findWorkPlace);
@@ -107,8 +106,8 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
 
     // 사업장 삭제
     public void deleteWorkPlace(Long id) throws NotFoundException {
-        WorkPlace workPlace = findByIdAndDeleteYnFalse(id);
-        workPlace.setDeleteYn(true);
+        WorkPlace workPlace = getWorkPlaceOrThrow(id);
+        workPlace.delete();
         workPlaceRepository.save(workPlace);
     }
 }

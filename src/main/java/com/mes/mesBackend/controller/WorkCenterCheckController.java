@@ -63,7 +63,7 @@ public class WorkCenterCheckController {
     }
 
     // 작업장별 점검유형 수정
-    @PutMapping("/{work-center-check-id}")
+    @PatchMapping("/{work-center-check-id}")
     @ResponseBody
     @ApiOperation(
             value = "작업장별 점검유형 수정",
@@ -118,7 +118,7 @@ public class WorkCenterCheckController {
     }
 
     // 작업장별 점검유형 세부 수정
-    @PutMapping("/{work-center-check-id}/work-center-check-details/{work-center-check-detail-id}")
+    @PatchMapping("/{work-center-check-id}/work-center-check-details/{work-center-check-detail-id}")
     @ResponseBody
     @ApiOperation(value = "작업장별 점검유형 세부 수정")
     public ResponseEntity<WorkCenterCheckDetailResponse> updateWorkCenterCheckDetail(

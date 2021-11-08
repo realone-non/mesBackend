@@ -26,8 +26,8 @@ public class WareHouseTypeServiceImpl implements WareHouseTypeService {
     @Override
     public WareHouseTypeResponse createWareHouseType(WareHouseTypeRequest wareHouseTypeRequest) {
         WareHouseType wareHouseType = mapper.toEntity(wareHouseTypeRequest, WareHouseType.class);
-        WareHouseType saveWareHouseType = wareHouseTypeRepository.save(wareHouseType);
-        return mapper.toResponse(saveWareHouseType, WareHouseTypeResponse.class);
+        wareHouseTypeRepository.save(wareHouseType);
+        return mapper.toResponse(wareHouseType, WareHouseTypeResponse.class);
     }
 
     // 단일조회
@@ -50,8 +50,8 @@ public class WareHouseTypeServiceImpl implements WareHouseTypeService {
         WareHouseType findWareHouseType = getWareHouseTypeOrThrow(id);
         WareHouseType newWareHouseType = mapper.toEntity(wareHouseTypeRequest, WareHouseType.class);
         findWareHouseType.put(newWareHouseType);
-        WareHouseType saveWareHouseType = wareHouseTypeRepository.save(findWareHouseType);
-        return mapper.toResponse(saveWareHouseType, WareHouseTypeResponse.class);
+        wareHouseTypeRepository.save(findWareHouseType);
+        return mapper.toResponse(findWareHouseType, WareHouseTypeResponse.class);
     }
 
     // 삭제
@@ -65,8 +65,7 @@ public class WareHouseTypeServiceImpl implements WareHouseTypeService {
 
     @Override
     public WareHouseType getWareHouseTypeOrThrow(Long id) throws NotFoundException {
-        WareHouseType findWareHouseType = wareHouseTypeRepository.findByIdAndDeleteYnFalse(id);
-        if (findWareHouseType == null) throw new NotFoundException("wareHouseType does not exists. input id: " + id);
-        return findWareHouseType;
+        return wareHouseTypeRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("wareHouseType does not exists. input id: " + id));
     }
 }

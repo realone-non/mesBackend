@@ -26,6 +26,6 @@ public interface UnitService {
     void deleteUnit(Long id) throws NotFoundException;
 
     // 예외처리 단일조회
-    Unit findUnitOrThrow(Long id) throws NotFoundException;
+    Unit getUnitOrThrow(Long id) throws NotFoundException;
 
 }

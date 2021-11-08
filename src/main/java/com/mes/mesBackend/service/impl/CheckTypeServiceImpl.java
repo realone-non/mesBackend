@@ -37,9 +37,8 @@ public class CheckTypeServiceImpl implements CheckTypeService {
     // 점검유형 조회 및 예외
     @Override
     public CheckType getCheckTypeOrThrow(Long id) throws NotFoundException {
-        CheckType checkType = checkTypeRepository.findByIdAndDeleteYnFalse(id);
-        if (checkType == null) throw new NotFoundException("checkType does not exist. input id: " + id);
-        return checkType;
+        return checkTypeRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("checkType does not exist. input id: " + id));
     }
 
     // 점검유형 전체 조회
@@ -59,7 +58,7 @@ public class CheckTypeServiceImpl implements CheckTypeService {
         return mapper.toResponse(findCheckType, CheckTypeResponse.class);
     }
 
-    // 점검유형 삭제 api
+    // 점검유형 삭제
     @Override
     public void deleteCheckType(Long id) throws NotFoundException {
         CheckType checkType = getCheckTypeOrThrow(id);

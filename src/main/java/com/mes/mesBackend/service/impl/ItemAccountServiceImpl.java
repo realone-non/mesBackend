@@ -63,8 +63,7 @@ public class ItemAccountServiceImpl implements ItemAccountService {
     // 품목계정 조회 및 예외
     @Override
     public ItemAccount getItemAccountOrThrow(Long id) throws NotFoundException {
-        ItemAccount itemAccount = itemAccountRepository.findByIdAndDeleteYnFalse(id);
-        if (itemAccount == null) throw new NotFoundException("itemAccount does not exist. input id: " + id);
-        return itemAccount;
+        return itemAccountRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(()-> new NotFoundException("itemAccount does not exist. input id: " + id));
     }
 }

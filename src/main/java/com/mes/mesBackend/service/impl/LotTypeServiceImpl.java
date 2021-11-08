@@ -62,8 +62,7 @@ public class LotTypeServiceImpl implements LotTypeService {
     // Lot유형 조회 및 예외
     @Override
     public LotType getLotTypeOrThrow(Long id) throws NotFoundException {
-        LotType lotType = lotTypeRepository.findByIdAndDeleteYnFalse(id);
-        if (lotType == null) throw new NotFoundException("lotType does not exist. input id: " + id);
-        return lotType;
+        return lotTypeRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("lotType does not exist. input id: " + id));
     }
 }

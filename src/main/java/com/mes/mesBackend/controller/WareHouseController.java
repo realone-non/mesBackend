@@ -50,7 +50,7 @@ public class WareHouseController {
     }
 
     // 창고 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "창고 수정")
     public ResponseEntity<WareHouseResponse> updateWareHouse(

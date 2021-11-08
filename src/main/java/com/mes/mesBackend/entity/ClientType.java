@@ -27,4 +27,13 @@ public class ClientType extends BaseTimeEntity {
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
+
+    public void put(ClientType newClientType) {
+        setName(newClientType.name);
+        setUseYn(newClientType.useYn);
+    }
+
+    public void delete() {
+        setDeleteYn(deleteYn);
+    }
 }

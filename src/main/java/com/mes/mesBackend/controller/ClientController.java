@@ -59,7 +59,7 @@ public class ClientController {
     }
 
     // 거래처 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "거래처 수정")
     public ResponseEntity<ClientResponse> updateClient(@PathVariable Long id, @RequestBody ClientRequest clientRequest) throws NotFoundException {

@@ -75,9 +75,8 @@ public class ItemGroupServiceImpl implements ItemGroupService {
     // 품목그룹 조회 및 예외
     @Override
     public ItemGroup getItemGroupOrThrow(Long id) throws NotFoundException {
-        ItemGroup itemGroup = itemGroupRepository.findByIdAndDeleteYnFalse(id);
-        if (itemGroup == null) throw new NotFoundException("itemGroup does not exist. input id: " + id);
-        return itemGroup;
+        return itemGroupRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("itemGroup does not exist. input id: " + id));
     }
 
 
@@ -115,7 +114,7 @@ public class ItemGroupServiceImpl implements ItemGroupService {
                 .orElseThrow(() -> new NotFoundException("itemGroupCode does not exist. input id: " + id));
     }
 
-//    // itemGroupCode 삭제 시 itemGroup에 해당하는 itemGroupCode가 있으면 예외
+    // itemGroupCode 삭제 시 itemGroup에 해당하는 itemGroupCode가 있으면 예외
     private void throwIfItemGroupCodeExist(Long itemGroupCodeId) throws NotFoundException, BadRequestException {
         ItemGroupCode itemGroupCode = getItemGroupCodeOrThrow(itemGroupCodeId);
         boolean existByItemGroupCode = itemGroupRepository.existsByItemGroupCodeAndDeleteYnFalse(itemGroupCode);

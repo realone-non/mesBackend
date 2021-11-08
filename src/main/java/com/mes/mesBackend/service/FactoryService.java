@@ -24,5 +24,5 @@ public interface FactoryService {
     // 공장 삭제
     void deleteFactory(Long id) throws NotFoundException;
 
-    Factory findByIdAndDeleteYnFalse(Long id) throws NotFoundException;
+    Factory getFactoryOrThrow(Long id) throws NotFoundException;
 }

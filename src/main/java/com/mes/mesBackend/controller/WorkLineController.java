@@ -52,7 +52,7 @@ public class WorkLineController {
     }
 
     // 작업라인 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "작업라인 수정")
     public ResponseEntity<WorkLineResponse> updateWorkLine(

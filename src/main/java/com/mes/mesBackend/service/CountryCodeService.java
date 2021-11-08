@@ -23,5 +23,5 @@ public interface CountryCodeService {
     // 국가코드 삭제
     void deleteCountryCode(Long id) throws NotFoundException;
 
-    CountryCode findCountryCodeByIdAndDeleteYn(Long id) throws NotFoundException;
+    CountryCode getCountryCodeOrThrow(Long id) throws NotFoundException;
 }

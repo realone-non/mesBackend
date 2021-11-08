@@ -73,7 +73,7 @@ public class WareHouse extends BaseTimeEntity {
     }
 
     // wareHouseType 추가 매핑 매서드
-    public void addWareHouseType(WareHouseType wareHouseType) {
+    public void addJoin(WareHouseType wareHouseType) {
         setWareHouseType(wareHouseType);
     }
 

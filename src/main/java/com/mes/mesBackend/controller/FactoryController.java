@@ -48,7 +48,7 @@ public class FactoryController {
     }
 
     // 공장 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "공장 수정")
     public ResponseEntity<FactoryResponse> updateFactory(

@@ -63,8 +63,7 @@ public class ItemFormServiceImpl implements ItemFormService {
     // 품목형태 조회 및 예외
     @Override
     public ItemForm getItemFormOrThrow(Long id) throws NotFoundException {
-        ItemForm itemForm = itemFormRepository.findByIdAndDeleteYnFalse(id);
-        if (itemForm == null) throw new NotFoundException("itemForm does not exist. input id: " + id);
-        return itemForm;
+        return itemFormRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("itemForm does not exist. input id: " + id));
     }
 }

@@ -63,8 +63,7 @@ public class UseTypeServiceImpl implements UseTypeService {
     // 용도유형 조회 및 예외
     @Override
     public UseType getUseTypeOrThrow(Long id) throws NotFoundException {
-        UseType useType = useTypeRepository.findByIdAndDeleteYnFalse(id);
-        if (useType == null) throw new NotFoundException("useType does not exist. input id: " + id);
-        return useType;
+        return useTypeRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("useType does not exist. input id: " + id));
     }
 }

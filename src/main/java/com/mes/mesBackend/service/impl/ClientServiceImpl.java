@@ -44,29 +44,19 @@ public class ClientServiceImpl implements ClientService {
     ModelMapper modelMapper;
 
     public Client getClientOrThrow(Long id) throws NotFoundException {
-        Client findClient = clientRepository.findByIdAndDeleteYnFalse(id);
-        if (findClient == null) {
-            throw new NotFoundException("client does not exist. input client id: " + id);
-        }
-        return findClient;
+        return clientRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("client does not exist. input client id: " + id));
     }
 
     // 거래처 생성
     public ClientResponse createClient(ClientRequest clientRequest) throws NotFoundException {
-        Long businessTypeId = clientRequest.getBusinessType();
-        Long countryCodeId = clientRequest.getCountryCode();
-        Long clientTypeId = clientRequest.getClientType();
-
-        BusinessType businessType = businessTypeService.findBusinessTypeByIdAndDeleteYn(businessTypeId);
-        CountryCode countryCode = countryCodeService.findCountryCodeByIdAndDeleteYn(countryCodeId);
-        ClientType clientType = clientTypeService.getClientTypeOrThrow(clientTypeId);
+        BusinessType businessType = businessTypeService.getBusinessTypeOrThrow(clientRequest.getBusinessType());
+        CountryCode countryCode = countryCodeService.getCountryCodeOrThrow(clientRequest.getCountryCode());
+        ClientType clientType = clientTypeService.getClientTypeOrThrow(clientRequest.getClientType());
 
         Client client = modelMapper.toEntity(clientRequest, Client.class);
-
-        client.putJoinTable(businessType, countryCode, clientType);
-        Client saveClient = clientRepository.save(client);
-
-        return modelMapper.toResponse(saveClient, ClientResponse.class);
+        client.addJoin(businessType, countryCode, clientType);
+        return modelMapper.toResponse(client, ClientResponse.class);
     }
 
     // 거래처 조회
@@ -91,15 +81,13 @@ public class ClientServiceImpl implements ClientService {
         Client newClient = modelMapper.toEntity(clientRequest, Client.class);
         Client findClient = getClientOrThrow(id);
 
-        BusinessType findBusinessType = businessTypeService.findBusinessTypeByIdAndDeleteYn(clientRequest.getBusinessType());
-        ClientType findClientType = clientTypeService.getClientTypeOrThrow(clientRequest.getClientType());
-        CountryCode findCountryCode = countryCodeService.findCountryCodeByIdAndDeleteYn(clientRequest.getCountryCode());
+        BusinessType newBusinessType = businessTypeService.getBusinessTypeOrThrow(clientRequest.getBusinessType());
+        ClientType newClientType = clientTypeService.getClientTypeOrThrow(clientRequest.getClientType());
+        CountryCode newCountryCode = countryCodeService.getCountryCodeOrThrow(clientRequest.getCountryCode());
 
-        newClient.putJoinTable(findBusinessType, findCountryCode, findClientType);
-        findClient.put(newClient);
-
-        Client updateClient = clientRepository.save(findClient);
-        return modelMapper.toResponse(updateClient, ClientResponse.class);
+        findClient.put(newClient, newBusinessType, newCountryCode, newClientType);
+        clientRepository.save(findClient);
+        return modelMapper.toResponse(findClient, ClientResponse.class);
     }
 
     // 사업자 등록증 파일 업로드
@@ -115,7 +103,7 @@ public class ClientServiceImpl implements ClientService {
     // 거래처 삭제
     public void deleteClient(Long id) throws NotFoundException {
         Client client = getClientOrThrow(id);
-        client.setDeleteYn(true);
+        client.delete();
         clientRepository.save(client);
     }
 

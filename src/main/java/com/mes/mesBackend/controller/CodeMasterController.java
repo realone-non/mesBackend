@@ -58,7 +58,7 @@ public class CodeMasterController {
     }
 
     // 코드마스터 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "코드마스터 수정")
     public ResponseEntity<CodeMasterResponse> updateCodeMaster(
@@ -69,7 +69,7 @@ public class CodeMasterController {
     }
 
     // 부코드마스터 수정
-    @PutMapping("/sub-code-masters/{id}")
+    @PatchMapping("/sub-code-masters/{id}")
     @ResponseBody
     @ApiOperation(value = "부코드마스터 수정")
     public ResponseEntity<SubCodeMasterResponse> updateSubCodeMaster(

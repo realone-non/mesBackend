@@ -1,13 +1,9 @@
 package com.mes.mesBackend.repository;
 
 import com.mes.mesBackend.entity.ItemForm;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.mes.mesBackend.repository.custom.JpaCustomRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface ItemFormRepository extends JpaRepository<ItemForm, Long> {
-    List<ItemForm> findAllByDeleteYnFalse();
-    ItemForm findByIdAndDeleteYnFalse(Long id);
+public interface ItemFormRepository extends JpaCustomRepository<ItemForm, Long> {
 }

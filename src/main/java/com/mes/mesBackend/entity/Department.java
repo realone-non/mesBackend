@@ -44,4 +44,8 @@ public class Department extends BaseTimeEntity{
         setOrders(newDepartment.orders);
         setUseYn(newDepartment.useYn);
     }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

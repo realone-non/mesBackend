@@ -83,4 +83,8 @@ public class WorkPlace extends BaseTimeEntity{
         setCorporateCode(newWorkPlace.corporateCode);
         setUseYn(newWorkPlace.useYn);
     }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

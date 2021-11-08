@@ -22,18 +22,15 @@ public class ClientTypeServiceImpl implements ClientTypeService {
     ModelMapper modelMapper;
 
     public ClientType getClientTypeOrThrow(Long id) throws NotFoundException {
-        ClientType findClientType = clientTypeRepository.findByIdAndDeleteYnFalse(id);
-        if (findClientType == null) {
-            throw new NotFoundException("client type does not exist. input clientTypeId: " + id);
-        }
-        return findClientType;
+        return clientTypeRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("client type does not exist. input clientTypeId: " + id));
     }
 
     // 거래처유형 생성
     public ClientTypeResponse createClientType(ClientTypeRequest clientTypeRequest) {
         ClientType clientType = modelMapper.toEntity(clientTypeRequest, ClientType.class);
-        ClientType saveClientType = clientTypeRepository.save(clientType);
-        return modelMapper.toResponse(saveClientType, ClientTypeResponse.class);
+        clientTypeRepository.save(clientType);
+        return modelMapper.toResponse(clientType, ClientTypeResponse.class);
     }
 
     // 거래처유형 조회
@@ -50,17 +47,17 @@ public class ClientTypeServiceImpl implements ClientTypeService {
 
     // 거래처유형 수정
     public ClientTypeResponse updateClientType(Long id, ClientTypeRequest clientTypeRequest) throws NotFoundException {
-        ClientType clientType = modelMapper.toEntity(clientTypeRequest, ClientType.class);
+        ClientType newClientType = modelMapper.toEntity(clientTypeRequest, ClientType.class);
         ClientType findClientType = getClientTypeOrThrow(id);
-        findClientType.setName(clientType.getName());
-        ClientType updateClientType = clientTypeRepository.save(findClientType);
-        return modelMapper.toResponse(updateClientType, ClientTypeResponse.class);
+        findClientType.put(newClientType);
+        clientTypeRepository.save(findClientType);
+        return modelMapper.toResponse(findClientType, ClientTypeResponse.class);
     }
 
     // 거래처유형 삭제
     public void deleteClientType(Long id) throws NotFoundException {
         ClientType clientType = getClientTypeOrThrow(id);
-        clientType.setDeleteYn(true);
+        clientType.delete();
         clientTypeRepository.save(clientType);
     }
 }

@@ -63,8 +63,7 @@ public class TestProcessServiceImpl implements TestProcessService {
     // 검사방법 조회 및 예외
     @Override
     public TestProcess getTestProcessOrThrow(Long id) throws NotFoundException {
-        TestProcess testProcess = testProcessRepository.findByIdAndDeleteYnFalse(id);
-        if (testProcess == null) throw new NotFoundException("testProcess does not exist. input id: " + id);
-        return testProcess;
+        return testProcessRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("testProcess does not exist. input id: " + id));
     }
 }

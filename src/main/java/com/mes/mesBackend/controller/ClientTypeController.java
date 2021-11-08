@@ -51,7 +51,7 @@ public class ClientTypeController {
     }
 
     // 거래처 유형 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "거래처유형 수정")
     public ResponseEntity<ClientTypeResponse> updateClientType(

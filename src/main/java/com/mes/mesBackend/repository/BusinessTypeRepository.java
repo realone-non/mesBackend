@@ -1,14 +1,9 @@
 package com.mes.mesBackend.repository;
 
 import com.mes.mesBackend.entity.BusinessType;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.mes.mesBackend.repository.custom.JpaCustomRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BusinessTypeRepository extends JpaRepository<BusinessType, Long> {
-    Page<BusinessType> findAllByDeleteYnFalse(Pageable pageable);
-    BusinessType findByIdAndDeleteYnFalse(Long id);
-
+public interface BusinessTypeRepository extends JpaCustomRepository<BusinessType, Long> {
 }

@@ -42,7 +42,7 @@ public class HeaderController {
         return new ResponseEntity<>(headerService.createHeader(headerRequest), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "헤더 수정")
     public ResponseEntity<HeaderResponse> updateHeader(@PathVariable Long id, @RequestBody HeaderRequest headerRequest) {

@@ -105,13 +105,11 @@ public class WorkCenterServiceImpl implements WorkCenterService {
     // 조회 및 예외처리
     @Override
     public WorkCenter getWorkCenterOrThrow(Long id) throws NotFoundException {
-        WorkCenter workCenter = workCenterRepository.findByIdAndDeleteYnFalse(id);
         if (id == 0) {
             return null;
-        } else if (workCenter == null) {
-            throw new NotFoundException("workCenter does not found. input id: " + id);
         }
-        return workCenter;
+        return workCenterRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("workCenter does not found. input id: " + id));
     }
 
     // 단일조회

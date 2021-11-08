@@ -55,9 +55,8 @@ public class WorkCenterCheckServiceImpl implements WorkCenterCheckService {
 
     // 작업장별 점검유형 조회 및 예외
     private WorkCenterCheck getWorkCenterCheckOrThrow(Long id) throws NotFoundException {
-        WorkCenterCheck workCenterCheck = workCenterCheckRepository.findByIdAndDeleteYnFalse(id);
-        if (workCenterCheck == null) throw new NotFoundException("workCenterCheck does not exist. input id: " + id);
-        return workCenterCheck;
+        return workCenterCheckRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("workCenterCheck does not exist. input id: " + id));
     }
 
     // 작업장별 점검유형 페이징 조회/ 검색: 작업장, 점검유형
@@ -143,9 +142,8 @@ public class WorkCenterCheckServiceImpl implements WorkCenterCheckService {
 
     // 작업장별 점검유형 세부 조회 및 예외
     private WorkCenterCheckDetail getWorkCenterDetailOrThrow(Long id) throws NotFoundException {
-        WorkCenterCheckDetail workCenterCheckDetail = workCenterCheckDetailRepository.findByIdAndDeleteYnFalse(id);
-        if (workCenterCheckDetail == null) throw new NotFoundException("workCenterDetail does not exist. input id: " + id);
-        return workCenterCheckDetail;
+        return workCenterCheckDetailRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(()-> new NotFoundException("workCenterDetail does not exist. input id: " + id));
     }
 
     // 작업장별 점검유형 세부 리스트 조회(작업장 점검유형에 해당하는 모든 세부)

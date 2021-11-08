@@ -49,7 +49,7 @@ public class CheckTypeController {
     }
 
     // 점검유형 수정 api
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "점검유형 수정")
     public ResponseEntity<CheckTypeResponse> updateCheckType(

@@ -27,14 +27,14 @@ public class UnitServiceImpl implements UnitService {
     public UnitResponse createUnit(UnitRequest unitRequest) throws BadRequestException {
         checkBaseScale(unitRequest.getBaseScale());
         Unit unit = modelMapper.toEntity(unitRequest, Unit.class);
-        Unit saveUnit = unitRepository.save(unit);
-        return modelMapper.toResponse(saveUnit, UnitResponse.class);
+        unitRepository.save(unit);
+        return modelMapper.toResponse(unit, UnitResponse.class);
     }
 
     // 단일조회
     @Override
     public UnitResponse getUnit(Long id) throws NotFoundException {
-        Unit unit = findUnitOrThrow(id);
+        Unit unit = getUnitOrThrow(id);
         return modelMapper.toResponse(unit, UnitResponse.class);
     }
 
@@ -49,26 +49,25 @@ public class UnitServiceImpl implements UnitService {
     @Override
     public UnitResponse updateUnit(Long id, UnitRequest unitRequest) throws NotFoundException {
         Unit newUnit = modelMapper.toEntity(unitRequest, Unit.class);
-        Unit findUnit = findUnitOrThrow(id);
+        Unit findUnit = getUnitOrThrow(id);
         findUnit.putUnit(newUnit);
-        Unit saveUnit = unitRepository.save(findUnit);
-        return modelMapper.toResponse(saveUnit, UnitResponse.class);
+        unitRepository.save(findUnit);
+        return modelMapper.toResponse(findUnit, UnitResponse.class);
     }
 
     // 삭제
     @Override
     public void deleteUnit(Long id) throws NotFoundException {
-        Unit unit = findUnitOrThrow(id);
-        unit.setDeleteYn(true);
+        Unit unit = getUnitOrThrow(id);
+        unit.delete();
         unitRepository.save(unit);
     }
 
     // 예외처리 단일조회
     @Override
-    public Unit findUnitOrThrow(Long id) throws NotFoundException {
-        Unit findUnit = unitRepository.findByIdAndDeleteYnFalse(id);
-        if (findUnit == null) throw new NotFoundException("unit does not exists. input id: " + id);
-        return findUnit;
+    public Unit getUnitOrThrow(Long id) throws NotFoundException {
+        return unitRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("unit does not exists. input id: " + id));
     }
 
     // baseScale 소수점 자리수 검증

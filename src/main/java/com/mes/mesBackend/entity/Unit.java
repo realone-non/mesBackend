@@ -61,4 +61,8 @@ public class Unit extends BaseTimeEntity {
         setDecimalPoint(newUnit.decimalPoint);
         setUseYn(newUnit.useYn);
     }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

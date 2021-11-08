@@ -24,5 +24,5 @@ public interface BusinessTypeService {
     // 업태 삭제
     void deleteBusinessType(Long id) throws NotFoundException;
 
-    BusinessType findBusinessTypeByIdAndDeleteYn(Long id) throws NotFoundException;
+    BusinessType getBusinessTypeOrThrow(Long id) throws NotFoundException;
 }

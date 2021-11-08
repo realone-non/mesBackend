@@ -23,24 +23,23 @@ public class FactoryServiceImpl implements FactoryService {
     ModelMapper modelMapper;
 
     @Override
-    public Factory findByIdAndDeleteYnFalse(Long id) throws NotFoundException {
-        Factory findFactory = factoryRepository.findByIdAndDeleteYnFalse(id);
-        if (findFactory == null) throw new NotFoundException("factory does not exists. input id: " + id);
-        return findFactory;
+    public Factory getFactoryOrThrow(Long id) throws NotFoundException {
+        return factoryRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("factory does not exists. input id: " + id));
     }
 
     // 공장 생성
     public FactoryResponse createFactory(FactoryRequest factoryRequest) throws NotFoundException {
-        WorkPlace workPlace = workPlaceService.findByIdAndDeleteYnFalse(factoryRequest.getWorkPlaceId());
+        WorkPlace workPlace = workPlaceService.getWorkPlaceOrThrow(factoryRequest.getWorkPlaceId());
         Factory factory = modelMapper.toEntity(factoryRequest, Factory.class);
-        factory.setWorkPlace(workPlace);
-        Factory saveFactory = factoryRepository.save(factory);
-        return modelMapper.toResponse(saveFactory, FactoryResponse.class);
+        factory.addJoin(workPlace);
+        factoryRepository.save(factory);
+        return modelMapper.toResponse(factory, FactoryResponse.class);
     }
 
     // 공장 조회
     public FactoryResponse getFactory(Long id) throws NotFoundException {
-        Factory factory = findByIdAndDeleteYnFalse(id);
+        Factory factory = getFactoryOrThrow(id);
         return modelMapper.toResponse(factory, FactoryResponse.class);
     }
 
@@ -52,18 +51,18 @@ public class FactoryServiceImpl implements FactoryService {
 
     // 공장 수정
     public FactoryResponse updateFactory(Long id, FactoryRequest factoryRequest) throws NotFoundException {
+        WorkPlace newWorkPlace = workPlaceService.getWorkPlaceOrThrow(factoryRequest.getWorkPlaceId());
         Factory newFactory = modelMapper.toEntity(factoryRequest, Factory.class);
-        WorkPlace workPlace = workPlaceService.findByIdAndDeleteYnFalse(factoryRequest.getWorkPlaceId());
-        Factory findFactory = findByIdAndDeleteYnFalse(id);
-        findFactory.put(newFactory, workPlace);
-        Factory updateFactory = factoryRepository.save(findFactory);
-        return modelMapper.toResponse(updateFactory, FactoryResponse.class);
+        Factory findFactory = getFactoryOrThrow(id);
+        findFactory.put(newFactory, newWorkPlace);
+        factoryRepository.save(findFactory);
+        return modelMapper.toResponse(findFactory, FactoryResponse.class);
     }
 
     // 공장 삭제
     public void deleteFactory(Long id) throws NotFoundException {
-        Factory factory = findByIdAndDeleteYnFalse(id);
-        factory.setDeleteYn(true);
+        Factory factory = getFactoryOrThrow(id);
+        factory.delete();
         factoryRepository.save(factory);
     }
 }

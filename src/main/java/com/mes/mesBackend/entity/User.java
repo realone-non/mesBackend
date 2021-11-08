@@ -75,4 +75,12 @@ public class User extends BaseTimeEntity {
         setPhoneNumber(newUser.phoneNumber);
         setUseYn(newUser.useYn);
     }
+
+    public void addJoin(Department department) {
+        setDepartment(department);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

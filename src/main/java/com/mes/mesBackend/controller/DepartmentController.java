@@ -48,7 +48,7 @@ public class DepartmentController {
     }
 
     // 부서 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "부서 수정")
     public ResponseEntity<DepartmentResponse> updateDepartment(
