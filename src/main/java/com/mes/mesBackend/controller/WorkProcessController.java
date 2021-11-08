@@ -53,7 +53,7 @@ public class WorkProcessController {
     }
 
     // 작업공정 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "작업공정 수정")
     public ResponseEntity<WorkProcessResponse> updateWorkProcess(

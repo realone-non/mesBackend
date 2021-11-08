@@ -50,7 +50,7 @@ public class LotTypeController {
     }
 
     // LOT 유형 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "LOT 유형 수정")
     public ResponseEntity<LotTypeResponse> updateLotType(

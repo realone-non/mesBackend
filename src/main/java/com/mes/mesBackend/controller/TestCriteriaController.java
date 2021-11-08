@@ -50,7 +50,7 @@ public class TestCriteriaController {
     }
 
     // 검사기준 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "검사기준 수정")
     public ResponseEntity<TestCriteriaResponse> updateTestCriteria(

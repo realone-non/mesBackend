@@ -52,7 +52,7 @@ public class ItemGroupController {
     }
 
     // 품목그룹 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "품목그룹 수정")
     public ResponseEntity<ItemGroupResponse> updateItemGroup(

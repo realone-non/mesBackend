@@ -51,7 +51,7 @@ public class UnitController {
     }
 
     // 단위 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "단위 수정")
     public ResponseEntity<UnitResponse> updateUnit(

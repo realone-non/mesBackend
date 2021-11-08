@@ -49,7 +49,7 @@ public class WareHouseTypeController {
     }
 
     // 창고유형 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "창고유형 수정")
     public ResponseEntity<WareHouseTypeResponse> updateWareHouseType(

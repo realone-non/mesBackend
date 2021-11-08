@@ -43,7 +43,7 @@ public class NavigationController {
     }
 
     // 메인네비게이션 수정
-    @PutMapping("/{main-nav-id}")
+    @PatchMapping("/{main-nav-id}")
     @ResponseBody
     @ApiOperation(value = "메인네비게이션 수정")
     public ResponseEntity<MainNavResponse> updateMainNavigation(
@@ -82,7 +82,7 @@ public class NavigationController {
     }
 
     // 서브네비게이션바 수정
-    @PutMapping("/sub-navs/{sub-nav-id}")
+    @PatchMapping("/sub-navs/{sub-nav-id}")
     @ResponseBody
     @ApiOperation(value = "서브네비게이션바 수정")
     public ResponseEntity<SubNavResponse> updateSubNavigation(
@@ -123,7 +123,7 @@ public class NavigationController {
     }
 
     // 디테일네비게이션 수정
-    @PutMapping("/sub-navs/detail-navs/{detail-nav-id}")
+    @PatchMapping("/sub-navs/detail-navs/{detail-nav-id}")
     @ResponseBody
     @ApiOperation(value = "디테일네비게이션 수정")
     public ResponseEntity<DetailNavResponse> updateDetailNavigation(

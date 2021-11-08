@@ -51,7 +51,7 @@ public class BusinessTypeController {
         return new ResponseEntity<>(businessTypeService.getBusinessTypes(pageable), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "업태 수정")
     public ResponseEntity<BusinessTypeResponse> updateBusinessType(

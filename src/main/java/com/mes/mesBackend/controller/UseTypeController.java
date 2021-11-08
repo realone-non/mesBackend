@@ -50,7 +50,7 @@ public class UseTypeController {
     }
 
     // 용도유형 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "용도유형 수정")
     public ResponseEntity<UseTypeResponse> updateUseType(

@@ -48,7 +48,7 @@ public class ItemFormController {
     }
 
     // 품목형태 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "품목형태 수정")
     public ResponseEntity<ItemFormResponse> updateItemForm(

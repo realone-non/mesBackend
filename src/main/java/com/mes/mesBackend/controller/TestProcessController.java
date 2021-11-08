@@ -50,7 +50,7 @@ public class TestProcessController {
     }
 
     // 검사방법 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "검사방법 수정")
     public ResponseEntity<TestProcessResponse> updateTestProcess(

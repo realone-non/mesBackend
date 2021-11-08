@@ -48,7 +48,7 @@ public class WorkPlaceController {
     }
 
     // 사업장 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "사업장 수정")
     public ResponseEntity<WorkPlaceResponse> updateWorkPlace(

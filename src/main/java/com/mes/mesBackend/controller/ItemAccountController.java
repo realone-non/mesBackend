@@ -50,7 +50,7 @@ public class ItemAccountController {
     }
 
     // 품목계정 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "품목계정 수정")
     public ResponseEntity<ItemAccountResponse> updateItemAccount(

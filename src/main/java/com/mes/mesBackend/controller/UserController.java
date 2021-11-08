@@ -48,7 +48,7 @@ public class UserController {
     }
 
     // 직원(작업자) 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "직원(작업자) 수정")
     public ResponseEntity<UserResponse> updateUser(

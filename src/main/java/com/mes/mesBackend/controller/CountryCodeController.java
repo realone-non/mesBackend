@@ -50,7 +50,7 @@ public class CountryCodeController {
     }
 
     // 국가코드 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "국가코드 수정")
     public ResponseEntity<CountryCodeResponse> updateCountryCode(

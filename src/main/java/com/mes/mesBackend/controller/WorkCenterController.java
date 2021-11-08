@@ -53,7 +53,7 @@ public class WorkCenterController {
     }
 
     // 작업장 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "작업장 수정")
     public ResponseEntity<WorkCenterResponse> updateWorkCenter(
