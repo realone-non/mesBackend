@@ -6,7 +6,7 @@ public enum TestType {
 
     /*
     * 자동검사: AUTOMATIC_TEST
-    * 수입검사: MANUAL_TEST
+    * 수동검사: MANUAL_TEST
     * 검사없음: NO_TEST
     * */
 }

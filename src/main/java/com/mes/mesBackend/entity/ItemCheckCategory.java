@@ -28,10 +28,10 @@ public class ItemCheckCategory extends BaseTimeEntity {
     @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목'")
     private Item item;      // 품번, 품명
 
-    // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CHECK_CATEGORY", columnDefinition = "bigint COMMENT '검사유형'")
-    private TestCategory checkCategory;    // 검사유형
+    // enum으로 대체
+    @Enumerated(EnumType.STRING)
+    @Column(name = "CHECK_CATEGORY", columnDefinition = "varchar(255) COMMENT '검사유형'")
+    private TestCategory checkCategory = TestCategory.INPUT_TEST;    // 검사유형
 
     // enum으로 대체
     @Enumerated(EnumType.STRING)

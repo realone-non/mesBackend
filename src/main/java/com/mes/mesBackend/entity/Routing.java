@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 /*
  * 라우팅 등록
@@ -37,9 +36,14 @@ public class Routing extends BaseTimeEntity {
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
-    private Factory factory;                // 공장
+    public void update(Routing newRouting) {
+        setRoutingNo(newRouting.routingNo);
+        setRoutingName(newRouting.routingName);
+        setUseYn(newRouting.useYn);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }
 

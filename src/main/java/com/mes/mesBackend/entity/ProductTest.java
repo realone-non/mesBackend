@@ -41,9 +41,10 @@ public class ProductTest extends BaseTimeEntity {
     @Column(name = "CHECK_YN", columnDefinition = "bit(1) COMMENT '선택'")
     private boolean checkYn;        // 선택
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TEST_CATEGORY", columnDefinition = "bigint COMMENT '검사유형'")
-    private TestCategory testCategory;      // 검사유형
+    // enum으로ㅓ 대체
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TEST_CATEGORY", columnDefinition = "varchar(255) COMMENT '검사유형'")
+    private TestCategory testCategory = TestCategory.INPUT_TEST;      // 검사유형
 
     @Column(name = "LOT_NO", columnDefinition = "varchar(255) COMMENT '검사유형'")
     private String lotNo;       // LOT 번호

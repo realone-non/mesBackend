@@ -43,9 +43,10 @@ public class Incongruity extends BaseTimeEntity {
     @Column(name = "REGISTRATION_DATE", columnDefinition = "date COMMENT '검사일시'")
     private LocalDate registrationDate;             // 검사일시
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TEST_CATEGORY", columnDefinition = "bigint COMMENT '검사유형'")
-    private TestCategory testCategory;              // 검사유형
+    // enum으로 대체
+    @Enumerated(EnumType.STRING)
+    @Column(name = "TEST_CATEGORY", columnDefinition = "varchar(255) COMMENT '검사유형'")
+    private TestCategory testCategory = TestCategory.INPUT_TEST;              // 검사유형
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목'")
