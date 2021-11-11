@@ -30,7 +30,7 @@ public class ClientResponse {
     String clientChargeName;  // 담당자 이름
     String tradeBusinessRegNo;  // 무역업등록번호
     String pccc;            // 통관고유번호
-//    CountryCodeResponse countryCode;     // 국가코드
+    CountryCodeResponse countryCode;     // 국가코드
     String area;        // 지역
     String currencyUnit;    // 거래화폐단위
     String companyCharge;  // 회사담당자
