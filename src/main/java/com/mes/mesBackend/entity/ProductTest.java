@@ -1,5 +1,8 @@
 package com.mes.mesBackend.entity;
 
+import com.mes.mesBackend.entity.enumeration.ProductTestState;
+import com.mes.mesBackend.entity.enumeration.TestCategory;
+import com.mes.mesBackend.entity.enumeration.TestType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

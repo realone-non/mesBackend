@@ -3,6 +3,7 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.ClientRequest;
 import com.mes.mesBackend.dto.response.ClientResponse;
 import com.mes.mesBackend.entity.ClientType;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.ClientService;
 import io.swagger.annotations.Api;
@@ -82,7 +83,7 @@ public class ClientController {
     public ResponseEntity<ClientResponse> createBusinessFileToClient(
             @PathVariable Long id,
             @RequestPart MultipartFile businessFile
-    ) throws NotFoundException, IOException {
+    ) throws NotFoundException, IOException, BadRequestException {
         return new ResponseEntity<>(clientService.createBusinessFileToClient(id, businessFile), HttpStatus.OK);
     }
 }

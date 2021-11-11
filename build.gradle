@@ -53,6 +53,12 @@ dependencies {
 	implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
 
 	implementation 'com.querydsl:querydsl-jpa'
+
+	// 파일 확장자 라이브러리 Commons-io
+	implementation group: 'org.apache.commons', name: 'commons-io', version: '1.3.2'
+
+	// Bean Validation
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 }
 
 test {

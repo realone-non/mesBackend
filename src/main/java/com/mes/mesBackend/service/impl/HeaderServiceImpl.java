@@ -36,24 +36,6 @@ public class HeaderServiceImpl implements HeaderService {
         return  modelMapper.toListResponses(headers, HeaderResponse.class);
     }
 
-    // 망한거
-//    public List<HeaderResponse> getHeaders(String controllerName, String userId) throws NotFoundException {
-//        List<Header> headers = headersRepository.findAllByControllerNameOrderBySeq(controllerName);
-//        List<HeaderResponse> headerResponses = mapper.toListResponses(headers, HeaderResponse.class);
-//        for (HeaderResponse headerResponse : headerResponses) {
-//            Long headerId = headerResponse.getId();
-//            headerResponse.setGridOptionResponse(getGrid(headerId, userId, headerResponse));
-//        }
-//        return headerResponses;
-//    }
-
-//    // 그리드 정보 조회
-//    private GridOptionResponse getGrid(Long headerId, String userId, HeaderResponse headerResponse) throws NotFoundException {
-//        Header header = headersRepository.findById(headerId).orElseThrow(() -> new NotFoundException("0"));
-//        GridOption gridResponse = gridOptionRepository.findByHeaderAndUserId(header, userId);
-//        return modelMapper.toResponse(gridResponse, GridOptionResponse.class);
-//    }
-
     // 헤더 생성
     public HeaderResponse createHeader(HeaderRequest headerRequest) {
         Header header = modelMapper.toEntity(headerRequest, Header.class);

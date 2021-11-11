@@ -1,4 +1,4 @@
-package com.mes.mesBackend.entity;
+package com.mes.mesBackend.entity.enumeration;
 
 public enum PurchaseState {
     // 구매요청, 발주, 구매완료, 입고완료, 반품등록, 반품완료

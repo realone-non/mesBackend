@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 // 품목 그룹 등록
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "ITEM_GROUPS")
 @Data
 public class ItemGroup extends BaseTimeEntity {

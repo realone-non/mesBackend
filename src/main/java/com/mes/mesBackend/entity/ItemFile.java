@@ -27,6 +27,33 @@ public class ItemFile extends BaseTimeEntity {
     @Column(name = "FILE_URL",length = 400, columnDefinition = "varchar(255) COMMENT '첨부파일 url'")
     private String fileUrl;     // 첨부파일유알엘
 
-    @Column(name = "REGISTERED", columnDefinition = "varchar(255) COMMENT '등록자'")
-    private String registered;      // 등록자
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER", columnDefinition = "bigint COMMENT '등록자'", nullable = false)
+    private User user;      // 등록자
+
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
+    private boolean deleteYn;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목'")
+    private Item item;
+
+    public void addFileUrl(String fileUrl, String fileType) {
+        setFileUrl(fileUrl);
+        setFileType(fileType);
+    }
+
+    public void update(ItemFile newItemFile, User newUser) {
+        setVersion(newItemFile.version);
+        setUser(newUser);
+    }
+
+    public void add(User user, Item item) {
+        setUser(user);
+        setItem(item);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

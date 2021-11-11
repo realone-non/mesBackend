@@ -1,10 +1,14 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 @Getter
 @Setter
+@JsonInclude(NON_NULL)
 public class UserResponse {
     Long id;
     String userCode;     // 사번
@@ -20,4 +24,10 @@ public class UserResponse {
     int level;          // 유저권한레벨
     String description;
 
+    @Getter
+    @Setter
+    public static class idAndKorName {
+        Long id;
+        String korName;
+    }
 }

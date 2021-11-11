@@ -1,4 +1,4 @@
-package com.mes.mesBackend.entity;
+package com.mes.mesBackend.entity.enumeration;
 
 /*
  * 재고실사 등록 타입

@@ -34,6 +34,7 @@ public class MapperImpl implements ModelMapper {
 
     @Override
     public <E, R> Page<R> toPageResponses(Page<E> sources, Class<? extends R> destinationType) {
+        modelMapper.getConfiguration().setSkipNullEnabled(false);
         return sources.map(source -> modelMapper.map(source, destinationType));
     }
 

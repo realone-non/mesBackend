@@ -1,5 +1,6 @@
 package com.mes.mesBackend.entity;
 
+import com.mes.mesBackend.entity.enumeration.StockInspectType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
