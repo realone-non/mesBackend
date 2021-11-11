@@ -1,4 +1,4 @@
-package com.mes.mesBackend.entity;
+package com.mes.mesBackend.entity.enumeration;
 
 public enum TestCategory {
     INPUT_TEST, PROCESS_TEST, OUTPUT_TEST

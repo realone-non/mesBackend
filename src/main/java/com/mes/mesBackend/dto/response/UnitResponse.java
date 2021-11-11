@@ -14,4 +14,11 @@ public class UnitResponse {
     String baseScale;                   // base 대비 율
     int decimalPoint;                // 소수점자리수
     boolean useYn = true;            // 사용여부
+
+    @Getter
+    @Setter
+    public static class idAndName {
+        Long id;
+        String unitCodeName;
+    }
 }

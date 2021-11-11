@@ -6,6 +6,7 @@ import com.mes.mesBackend.entity.BusinessType;
 import com.mes.mesBackend.entity.Client;
 import com.mes.mesBackend.entity.ClientType;
 import com.mes.mesBackend.entity.CountryCode;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.helper.S3Service;
@@ -26,19 +27,19 @@ import java.io.IOException;
 public class ClientServiceImpl implements ClientService {
 
     @Autowired
-    private ClientRepository clientRepository;
+    ClientRepository clientRepository;
 
     @Autowired
-    private BusinessTypeService businessTypeService;
+    BusinessTypeService businessTypeService;
 
     @Autowired
-    private ClientTypeService clientTypeService;
+    ClientTypeService clientTypeService;
 
     @Autowired
-    private CountryCodeService countryCodeService;
+    CountryCodeService countryCodeService;
 
     @Autowired
-    private S3Service s3Service;
+    S3Service s3Service;
 
     @Autowired
     ModelMapper modelMapper;
@@ -92,7 +93,7 @@ public class ClientServiceImpl implements ClientService {
 
     // 사업자 등록증 파일 업로드
     // client/거래처 명/파일명(날싸시간)
-    public ClientResponse createBusinessFileToClient(Long id, MultipartFile businessFile) throws IOException, NotFoundException {
+    public ClientResponse createBusinessFileToClient(Long id, MultipartFile businessFile) throws IOException, NotFoundException, BadRequestException {
         Client client = getClientOrThrow(id);
         String fileName = "client/" + client.getClientCode() + "/";
         client.setBusinessFile(s3Service.upload(businessFile, fileName));

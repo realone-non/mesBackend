@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.request.ClientRequest;
 import com.mes.mesBackend.dto.response.ClientResponse;
 import com.mes.mesBackend.entity.Client;
 import com.mes.mesBackend.entity.ClientType;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,7 @@ public interface ClientService {
     void deleteClient(Long id) throws NotFoundException;
 
     // 사업자 등록증 파일 업로드
-    ClientResponse createBusinessFileToClient(Long id, MultipartFile businessFile) throws IOException, NotFoundException;
+    ClientResponse createBusinessFileToClient(Long id, MultipartFile businessFile) throws IOException, NotFoundException, BadRequestException;
 
     Client getClientOrThrow(Long id) throws NotFoundException;
 }

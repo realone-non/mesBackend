@@ -1,7 +1,6 @@
 package com.mes.mesBackend.dto.request;
 
-import com.mes.mesBackend.entity.TestCategory;
-import com.mes.mesBackend.entity.WareHouse;
+import com.mes.mesBackend.entity.enumeration.TestCategory;
 import lombok.Getter;
 import lombok.Setter;
 

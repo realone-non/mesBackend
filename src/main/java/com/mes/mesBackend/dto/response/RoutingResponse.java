@@ -10,4 +10,11 @@ public class RoutingResponse {
     Long routingNo;     // 라우팅 번호
     String routingName;     // 라우팅 명
     boolean useYn;
+
+    @Getter
+    @Setter
+    public static class idAndName {
+        Long id;
+        String routingName;
+    }
 }

@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.mes.mesBackend.exception.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,15 @@ public class S3Service implements S3Uploader {
     @Value("${cloud.aws.bucketName}")
     private String bucketName;
 
-    public String upload(MultipartFile multipartFile, String dirName) throws IOException {
+    public String upload(MultipartFile multipartFile, String dirName) throws IOException, BadRequestException {
+        if (multipartFile.isEmpty()) {
+            throw new BadRequestException("file is empty");
+        }
+
+        if (multipartFile.getOriginalFilename() == null) {
+            throw new BadRequestException("originalFileName is null");
+        }
+
         String fileName = dirName + datePath();
 
         return putS3(multipartFile, fileName);

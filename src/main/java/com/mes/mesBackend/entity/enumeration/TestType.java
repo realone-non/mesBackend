@@ -1,4 +1,4 @@
-package com.mes.mesBackend.entity;
+package com.mes.mesBackend.entity.enumeration;
 
 // 자동검사, 수입검사, 검사없음
 public enum TestType {

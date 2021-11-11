@@ -1,4 +1,4 @@
-package com.mes.mesBackend.entity;
+package com.mes.mesBackend.exception;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,6 +24,10 @@ public class HttpResponse {
         this.httpStatus = httpStatus;
         this.reason = reason;
         this.message = message;
+    }
+
+    public static HttpResponse of(HttpStatus httpStatus, String message) {
+        return new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(), message);
     }
 }
 

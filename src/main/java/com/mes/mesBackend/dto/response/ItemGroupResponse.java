@@ -13,4 +13,11 @@ public class ItemGroupResponse {
     String defaultName;         // 기본어명
     int orders;              // 순번
     boolean useYn;
+
+    @Getter
+    @Setter
+    public static class idAndGroupName {
+        Long id;
+        String groupName;
+    }
 }

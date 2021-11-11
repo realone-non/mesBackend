@@ -1,8 +1,5 @@
 package com.mes.mesBackend.dto.response;
 
-import com.mes.mesBackend.entity.WareHouse;
-import com.mes.mesBackend.entity.WorkCenter;
-import com.mes.mesBackend.entity.WorkProcess;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,4 +18,5 @@ public class RoutingDetailResponse {
     boolean mainProcessYn;          // 메인공정 (예 아니오)
     boolean lastProcessYn;          // 최종공정 (예 아니고)
     LocalDate workStartDate;            // 작업개시일
+    boolean useYn;
 }

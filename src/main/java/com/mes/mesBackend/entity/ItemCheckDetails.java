@@ -39,7 +39,7 @@ public class ItemCheckDetails extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM_CHECK_CATEGORY", columnDefinition = "bigint COMMENT '품목별 검사항목'")
-    private ItemCheckCategory itemCheckCategory;    // 품목별 검사항목 등록 고유아이디
+    private ItemCheck itemCheckCategory;    // 품목별 검사항목 등록 고유아이디
 
     @Column(name = "CONDITION_CODE", columnDefinition = "varchar(255) COMMENT '조건코드'")
     private String conditionCode;       // 조건코드

@@ -3,14 +3,16 @@ package com.mes.mesBackend.config;
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.mapper.MapperCustom;
-import org.modelmapper.Converter;
-import org.modelmapper.ModelMapper;
+import org.modelmapper.*;
 import org.modelmapper.convention.MatchingStrategies;
+import org.modelmapper.convention.NamingConventions;
 import org.modelmapper.spi.MappingContext;
+import org.modelmapper.spi.MatchingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.text.DecimalFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,14 +21,20 @@ public class MapperConfig {
 
     @Bean
     public ModelMapper modelMapper() {
-        ModelMapper modelMapper = new MapperCustom();
+        MapperCustom modelMapper = new MapperCustom();
+
+//        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setSkipNullEnabled(true);
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         modelMapper.addConverter(toWorkPlaceResponseConvert);
         modelMapper.addConverter(toFactoryResponseConvert);
         modelMapper.addConverter(toEmpResponseConvert);
         modelMapper.addConverter(toUnitResponseConverter);
         modelMapper.addConverter(toGridResponseConvert);
         modelMapper.addConverter(toWorkCenterCheckDetailResponseConvert);
+        modelMapper.addConverter(toItemFileResponseConvert);
+
         return modelMapper;
     }
 
@@ -118,4 +126,27 @@ public class MapperConfig {
         }
     };
 
+    // 품목파일 날짜 포맷
+    Converter<ItemFile, ItemFileResponse> toItemFileResponseConvert = new Converter<ItemFile, ItemFileResponse>() {
+        @Override
+        public ItemFileResponse convert(MappingContext<ItemFile, ItemFileResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            ItemFile itemFile = context.getSource();
+            ItemFileResponse itemFileResponse = modelMapper.map(itemFile, ItemFileResponse.class);
+            itemFileResponse.setCreatedDate(itemFile.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            return itemFileResponse;
+        }
+    };
+
+    // string blank condition
+    Condition<?, ?> isStringBlank = new AbstractCondition<Object, Object>() {
+        @Override
+        public boolean applies(MappingContext<Object, Object> context) {
+            if(context.getSource() instanceof String) {
+                return null!=context.getSource() && !"".equals(context.getSource());
+            } else {
+                return context.getSource() != null;
+            }
+        }
+    };
 }

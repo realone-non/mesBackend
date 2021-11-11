@@ -20,4 +20,10 @@ public class UserResponse {
     int level;          // 유저권한레벨
     String description;
 
+    @Getter
+    @Setter
+    public static class idAndKorName {
+        Long id;
+        String korName;
+    }
 }
