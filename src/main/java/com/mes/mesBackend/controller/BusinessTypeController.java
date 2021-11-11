@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/business-types")
 @Api(tags = "business-type")
@@ -27,7 +29,7 @@ public class BusinessTypeController {
     @ResponseBody()
     @ApiOperation(value = "업태 생성")
     public ResponseEntity<BusinessTypeResponse> createBusinessType(
-            @RequestBody BusinessTypeRequest businessTypeRequest
+            @RequestBody @Valid BusinessTypeRequest businessTypeRequest
     ) {
         try {
             return new ResponseEntity<>(businessTypeService.createBusinessType(businessTypeRequest), HttpStatus.OK);
@@ -56,7 +58,7 @@ public class BusinessTypeController {
     @ApiOperation(value = "업태 수정")
     public ResponseEntity<BusinessTypeResponse> updateBusinessType(
             @PathVariable(value = "id") Long id,
-            @RequestBody BusinessTypeRequest businessTypeRequest
+            @RequestBody @Valid BusinessTypeRequest businessTypeRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(businessTypeService.updateBusinessType(id, businessTypeRequest), HttpStatus.OK);
     }

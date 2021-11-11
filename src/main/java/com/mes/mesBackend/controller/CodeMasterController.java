@@ -20,10 +20,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping(value = "/code-masters")
-@Api(tags = "code-master")
-@RequiredArgsConstructor
+//@RestController
+//@RequestMapping(value = "/code-masters")
+//@Api(tags = "code-master")
+//@RequiredArgsConstructor
 public class CodeMasterController {
 
     @Autowired

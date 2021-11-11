@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/client-types")
 @Api(tags = "client-type")
@@ -29,7 +31,7 @@ public class ClientTypeController {
     @ResponseBody()
     @ApiOperation(value = "거래처유형 생성")
     public ResponseEntity<ClientTypeResponse> createClientType(
-            @RequestBody ClientTypeRequest clientTypeRequest
+            @RequestBody @Valid ClientTypeRequest clientTypeRequest
     ) {
         return new ResponseEntity<>(clientTypeService.createClientType(clientTypeRequest), HttpStatus.OK);
     }
@@ -56,7 +58,7 @@ public class ClientTypeController {
     @ApiOperation(value = "거래처유형 수정")
     public ResponseEntity<ClientTypeResponse> updateClientType(
             @PathVariable(value = "id") Long id,
-            @RequestBody ClientTypeRequest clientTypeRequest
+            @RequestBody @Valid ClientTypeRequest clientTypeRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(clientTypeService.updateClientType(id, clientTypeRequest), HttpStatus.OK);
     }

@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/country-codes")
 @Api(tags = "country-code")
@@ -28,7 +30,7 @@ public class CountryCodeController {
     @ResponseBody()
     @ApiOperation(value = "국가코드 생성")
     public ResponseEntity<CountryCodeResponse> createCountryCode(
-            @RequestBody CountryCodeRequest countryCodeRequest
+            @RequestBody @Valid CountryCodeRequest countryCodeRequest
     ) {
         return new ResponseEntity<>(countryCodeService.createCountryCode(countryCodeRequest), HttpStatus.OK);
     }
@@ -55,7 +57,7 @@ public class CountryCodeController {
     @ApiOperation(value = "국가코드 수정")
     public ResponseEntity<CountryCodeResponse> updateCountryCode(
             @PathVariable(value = "id") Long id,
-            @RequestBody CountryCodeRequest countryCodeRequest
+            @RequestBody @Valid CountryCodeRequest countryCodeRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(countryCodeService.updateCountryCode(id, countryCodeRequest), HttpStatus.OK);
     }
