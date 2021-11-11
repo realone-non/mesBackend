@@ -12,4 +12,5 @@ public class MainNavResponse {
     String name;
     int level;
     int orders;
+    String icon;
 }
