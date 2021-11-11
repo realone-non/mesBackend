@@ -26,7 +26,7 @@ import java.util.List;
 // 3-2-1. 품목 등록
 @RestController
 @RequestMapping(value = "/items")
-@Api(tags = "[구현중] item")
+@Api(tags = "item")
 @RequiredArgsConstructor
 public class ItemController {
     @Autowired
@@ -34,8 +34,17 @@ public class ItemController {
 
     // 품목 생성
     @PostMapping
-    @ResponseBody()
-    @ApiOperation(value = "품목 생성")
+    @ResponseBody
+    @ApiOperation(
+            value = "품목 생성",
+            notes = "not Null field:\nitemNo, itemName, itemAccount, unit, uhp, validDay, " +
+            "lotType, inputTest, outputTest, wasteProductLot, developStatus, stockControl, " +
+                    "inputUnitPrice, storageLocation, manufacturerPartNo, manufacturer, useYn " +
+                    "inputTestType, outputTestType:\n" +
+                    "자동검사: AUTOMATIC_TEST, 수동검사: MANUAL_TEST, 검사없음: NO_TEST\n" +
+                    "developStatus:\n" +
+                    "미개발: BEFORE, 개발중: PROCEEDING, 개발완료: COMPLETION"
+    )
     public ResponseEntity<ItemResponse> createItem(
             @Valid @RequestBody ItemRequest itemRequest
     ) throws NotFoundException {
@@ -71,7 +80,7 @@ public class ItemController {
     @ApiOperation(value = "품목 수정")
     public ResponseEntity<ItemResponse> updateItem(
             @PathVariable(value = "id") Long id,
-            @RequestBody ItemRequest itemRequest
+            @RequestBody @Valid ItemRequest itemRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(itemService.updateItem(id, itemRequest), HttpStatus.OK);
     }
@@ -91,7 +100,7 @@ public class ItemController {
     @ApiOperation(value = "품목 파일 정보 생성")
     public ResponseEntity<ItemFileResponse> createItemFileInfo(
             @PathVariable(value = "item-id") Long itemId,
-            @RequestBody ItemFileRequest itemFileRequest
+            @RequestBody @Valid ItemFileRequest itemFileRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(itemService.createItemFileInfo(itemId, itemFileRequest), HttpStatus.OK);
     }
@@ -99,7 +108,7 @@ public class ItemController {
     // 파일 생성
     @PutMapping("/{item-id}/item-files/{item-file-id}")
     @ResponseBody
-    @ApiOperation(value = "품목 단일 파일 생성")
+    @ApiOperation(value = "품목 파일 생성")
     public ResponseEntity<ItemFileResponse> createItemFile(
             @PathVariable(value = "item-id") Long itemId,
             @PathVariable(value = "item-file-id") Long itemFileId,
@@ -125,7 +134,7 @@ public class ItemController {
     public ResponseEntity<ItemFileResponse> updateItemFileInfo(
             @PathVariable(value = "item-id") Long itemId,
             @PathVariable(value = "item-file-id") Long itemFileId,
-            @RequestBody ItemFileRequest itemFileRequest
+            @RequestBody @Valid ItemFileRequest itemFileRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(itemService.updateItemFileInfo(itemId, itemFileId, itemFileRequest), HttpStatus.OK);
     }

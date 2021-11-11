@@ -1,10 +1,14 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 @Getter
 @Setter
+@JsonInclude(NON_NULL)
 public class UnitResponse {
     Long id;                         // 단위 고유아이디
     String unitCode;                 // 단위코드

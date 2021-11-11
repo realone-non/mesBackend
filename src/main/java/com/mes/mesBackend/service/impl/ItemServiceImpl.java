@@ -67,7 +67,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemResponse createItem(ItemRequest itemRequest) throws NotFoundException {
         ItemAccount itemAccount = itemAccountService.getItemAccountOrThrow(itemRequest.getItemAccount());
-
         ItemGroup itemGroup = itemRequest.getItemGroup() != null ? itemGroupService.getItemGroupOrThrow(itemRequest.getItemGroup()) : null;
         ItemForm itemForm = itemRequest.getItemForm() != null ? itemFormService.getItemFormOrThrow(itemRequest.getItemForm()) : null;
         UseType useType = itemRequest.getUseType() != null ? useTypeService.getUseTypeOrThrow(itemRequest.getUseType()) : null;
@@ -83,16 +82,7 @@ public class ItemServiceImpl implements ItemService {
         item.addJoin(itemAccount, itemGroup, itemForm, useType, routing, unit, lotType, manufacturer, testCriteria, testProcess);
 
         itemRepository.save(item);
-//        ItemForm itemform= new ItemForm(0L, "", false);
-//        item.setItemForm(itemform);
-
-//        ItemResponse itemResponse = mapper.toResponse(item, ItemResponse.class);
-//        ItemForm itemForm1 = new ItemForm();
-//        ItemFormResponse itemFormResponse = mapper.toResponse(itemForm1, ItemFormResponse.class);
-//        itemResponse.setItemForm(itemFormResponse);
-//        return itemResponse;
-        ItemResponse itemResponse = mapper.toResponse(item, ItemResponse.class);
-        return itemResponse;
+        return mapper.toResponse(item, ItemResponse.class);
     }
 
     // 품목 단일 조회
@@ -122,19 +112,19 @@ public class ItemServiceImpl implements ItemService {
         Item findItem = getItemOrThrow(id);
 
         ItemAccount newItemAccount = itemAccountService.getItemAccountOrThrow(itemRequest.getItemAccount());
-        ItemGroup newItemGroup = itemGroupService.getItemGroupOrThrow(itemRequest.getItemGroup());
-        ItemForm newItemForm = itemFormService.getItemFormOrThrow(itemRequest.getItemForm());
-        UseType newUseType = useTypeService.getUseTypeOrThrow(itemRequest.getUseType());
-        Routing newRouting = routingService.getRoutingOrThrow(itemRequest.getRouting());
+        ItemGroup newItemGroup = itemRequest.getItemGroup() != null ? itemGroupService.getItemGroupOrThrow(itemRequest.getItemGroup()) : null;
+        ItemForm newItemForm = itemRequest.getItemForm() != null ? itemFormService.getItemFormOrThrow(itemRequest.getItemForm()) : null;
+        UseType newUseType = itemRequest.getUseType() != null ? useTypeService.getUseTypeOrThrow(itemRequest.getUseType()) : null;
+        Routing newRouting = itemRequest.getRouting() != null ? routingService.getRoutingOrThrow(itemRequest.getRouting()) : null;
         Unit newUnit = unitService.getUnitOrThrow(itemRequest.getUnit());
         LotType newLotType = lotTypeService.getLotTypeOrThrow(itemRequest.getLotType());
-        Client newClient = clientService.getClientOrThrow(itemRequest.getManufacturer());
-        TestCriteria newTestCriteria = testCriteriaService.getTestCriteriaOrThrow(itemRequest.getTestCriteria());
-        TestProcess newTestProcess = testProcessService.getTestProcessOrThrow(itemRequest.getTestProcess());
+        Client newManufacturer = clientService.getClientOrThrow(itemRequest.getManufacturer());
+        TestCriteria newTestCriteria = itemRequest.getTestCriteria() != null ? testCriteriaService.getTestCriteriaOrThrow(itemRequest.getTestCriteria()) : null;
+        TestProcess newTestProcess = itemRequest.getTestProcess() != null ? testProcessService.getTestProcessOrThrow(itemRequest.getTestProcess()) : null;
 
         Item newItem = mapper.toEntity(itemRequest, Item.class);
 
-        findItem.update(newItem, newItemAccount, newItemGroup, newItemForm, newUseType, newRouting, newUnit, newLotType, newClient, newTestCriteria, newTestProcess);
+        findItem.update(newItem, newItemAccount, newItemGroup, newItemForm, newUseType, newRouting, newUnit, newLotType, newManufacturer, newTestCriteria, newTestProcess);
         itemRepository.save(findItem);
         return mapper.toResponse(findItem, ItemResponse.class);
     }
@@ -163,8 +153,8 @@ public class ItemServiceImpl implements ItemService {
     // 파일 정보 생성
     @Override
     public ItemFileResponse createItemFileInfo(Long itemId, ItemFileRequest itemFileRequest) throws NotFoundException {
-        Item item = getItemOrThrow(itemId);
         ItemFile itemFile = mapper.toEntity(itemFileRequest, ItemFile.class);
+        Item item = getItemOrThrow(itemId);
         User user = userService.getUserOrThrow(itemFileRequest.getUser());
         itemFile.add(user, item);
         itemFileRepository.save(itemFile);

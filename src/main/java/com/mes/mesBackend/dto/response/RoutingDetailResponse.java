@@ -1,12 +1,16 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 @Getter
 @Setter
+@JsonInclude(NON_NULL)
 public class RoutingDetailResponse {
     Long id;
     int orders;     // 작업순번

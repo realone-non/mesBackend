@@ -24,9 +24,9 @@ public class MapperConfig {
         MapperCustom modelMapper = new MapperCustom();
 
 //        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration().setSkipNullEnabled(true);
+//        modelMapper.getConfiguration().setSkipNullEnabled(true);
+//        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         modelMapper.addConverter(toWorkPlaceResponseConvert);
         modelMapper.addConverter(toFactoryResponseConvert);
         modelMapper.addConverter(toEmpResponseConvert);
@@ -135,18 +135,6 @@ public class MapperConfig {
             ItemFileResponse itemFileResponse = modelMapper.map(itemFile, ItemFileResponse.class);
             itemFileResponse.setCreatedDate(itemFile.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             return itemFileResponse;
-        }
-    };
-
-    // string blank condition
-    Condition<?, ?> isStringBlank = new AbstractCondition<Object, Object>() {
-        @Override
-        public boolean applies(MappingContext<Object, Object> context) {
-            if(context.getSource() instanceof String) {
-                return null!=context.getSource() && !"".equals(context.getSource());
-            } else {
-                return context.getSource() != null;
-            }
         }
     };
 }

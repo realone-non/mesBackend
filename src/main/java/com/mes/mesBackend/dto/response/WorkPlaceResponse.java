@@ -1,12 +1,16 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 @Getter
 @Setter
+@JsonInclude(NON_NULL)
 public class WorkPlaceResponse {
     Long id;
     String workPlaceCode;   // 사업장 코드
