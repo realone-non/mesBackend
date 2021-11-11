@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
@@ -33,8 +34,12 @@ public class ClientController {
     // 거래처 생성
     @PostMapping
     @ResponseBody
-    @ApiOperation(value = "거래처 생성")
-    public ResponseEntity<ClientResponse> createClient(@RequestBody ClientRequest clientRequest) throws NotFoundException {
+    @ApiOperation(
+            value = "거래처 생성",
+            notes = "not null field:\n" +
+                    "clientCode, name, clientType, businessNumber, ceoName, useYn"
+    )
+    public ResponseEntity<ClientResponse> createClient(@RequestBody @Valid ClientRequest clientRequest) throws NotFoundException {
         return new ResponseEntity<>(clientService.createClient(clientRequest), HttpStatus.OK);
     }
 
