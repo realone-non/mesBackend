@@ -30,6 +30,9 @@ public class MainNavigation {
     @Column(name = "ORDERS", unique = true, columnDefinition = "int COMMENT '출력순번'")
     private int orders;     // 출력순번
 
+    @Column(name = "ICON", columnDefinition = "varchar(255) COMMENT '아이콘 클래스명'")
+    private String icon;     // 아이콘
+
     public void put(MainNavigation newMainNavigation) {
         setName(newMainNavigation.name);
         setLevel(newMainNavigation.level);
