@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 // 3-3-3. 작업라인 코드 등록
@@ -29,7 +30,7 @@ public class WorkLineCodeController {
     @ResponseBody
     @ApiOperation(value = "라인코드 생성")
     public ResponseEntity<CodeResponse> createWorkLineCode(
-            @RequestBody CodeRequest codeRequest
+            @RequestBody @Valid CodeRequest codeRequest
     ) {
         return new ResponseEntity<>(workLineCodeService.createWorkLineCode(codeRequest), HttpStatus.OK);
     }

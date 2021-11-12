@@ -10,9 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 // 공장 등록
 @RestController
@@ -27,7 +30,9 @@ public class FactoryController {
     @PostMapping
     @ResponseBody()
     @ApiOperation(value = "공장 생성")
-    public ResponseEntity<FactoryResponse> createFactory(@RequestBody FactoryRequest factoryRequest) throws NotFoundException {
+    public ResponseEntity<FactoryResponse> createFactory(
+            @RequestBody @Valid FactoryRequest factoryRequest
+    ) throws NotFoundException {
         return new ResponseEntity<>(factoryService.createFactory(factoryRequest), HttpStatus.OK);
     }
 
@@ -35,7 +40,7 @@ public class FactoryController {
     @GetMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "공장 조회")
-    public ResponseEntity<FactoryResponse> getFactory(@PathVariable(value = "id") Long id) throws NotFoundException {
+    public ResponseEntity<FactoryResponse> getFactory(@PathVariable Long id) throws NotFoundException {
         return new ResponseEntity<>(factoryService.getFactory(id), HttpStatus.OK);
     }
 
@@ -43,7 +48,7 @@ public class FactoryController {
     @GetMapping
     @ResponseBody()
     @ApiOperation(value = "공장 페이징 조회")
-    public ResponseEntity<Page<FactoryResponse>> getFactories(Pageable pageable) {
+    public ResponseEntity<Page<FactoryResponse>> getFactories(@PageableDefault Pageable pageable) {
         return new ResponseEntity<>(factoryService.getFactories(pageable), HttpStatus.OK);
     }
 
@@ -53,7 +58,7 @@ public class FactoryController {
     @ApiOperation(value = "공장 수정")
     public ResponseEntity<FactoryResponse> updateFactory(
             @PathVariable Long id,
-            @RequestBody FactoryRequest factoryRequest
+            @RequestBody @Valid FactoryRequest factoryRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(factoryService.updateFactory(id, factoryRequest), HttpStatus.OK);
     }

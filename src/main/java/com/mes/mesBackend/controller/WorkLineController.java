@@ -10,9 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 // 3-3-3. 작업라인 등록
 @RestController
@@ -28,7 +31,7 @@ public class WorkLineController {
     @ResponseBody()
     @ApiOperation(value = "작업라인 생성")
     public ResponseEntity<WorkLineResponse> createWorkLine(
-            @RequestBody WorkLineRequest workLineRequest
+            @RequestBody @Valid WorkLineRequest workLineRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(workLineService.createWorkLine(workLineRequest), HttpStatus.OK);
     }
@@ -47,7 +50,7 @@ public class WorkLineController {
     @GetMapping
     @ResponseBody()
     @ApiOperation(value = "작업라인 페이징 조회")
-    public ResponseEntity<Page<WorkLineResponse>> getWorkLines(Pageable pageable) {
+    public ResponseEntity<Page<WorkLineResponse>> getWorkLines(@PageableDefault Pageable pageable) {
         return new ResponseEntity<>(workLineService.getWorkLines(pageable), HttpStatus.OK);
     }
 
@@ -57,7 +60,7 @@ public class WorkLineController {
     @ApiOperation(value = "작업라인 수정")
     public ResponseEntity<WorkLineResponse> updateWorkLine(
             @PathVariable Long id,
-            @RequestBody WorkLineRequest workLineRequest
+            @RequestBody @Valid WorkLineRequest workLineRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(workLineService.updateWorkLine(id, workLineRequest), HttpStatus.OK);
     }

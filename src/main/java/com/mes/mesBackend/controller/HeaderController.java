@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -38,14 +39,17 @@ public class HeaderController {
     @PostMapping
     @ResponseBody
     @ApiOperation(value = "헤더 생성")
-    public ResponseEntity<HeaderResponse> createHeader(@RequestBody HeaderRequest headerRequest) {
+    public ResponseEntity<HeaderResponse> createHeader(@RequestBody @Valid HeaderRequest headerRequest) {
         return new ResponseEntity<>(headerService.createHeader(headerRequest), HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "헤더 수정")
-    public ResponseEntity<HeaderResponse> updateHeader(@PathVariable Long id, @RequestBody HeaderRequest headerRequest) {
+    public ResponseEntity<HeaderResponse> updateHeader(
+            @PathVariable Long id,
+            @RequestBody @Valid HeaderRequest headerRequest
+    ) {
         return new ResponseEntity<>(headerService.updateHeader(id, headerRequest), HttpStatus.OK);
     }
 

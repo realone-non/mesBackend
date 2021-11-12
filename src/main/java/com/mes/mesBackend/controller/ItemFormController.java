@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 // 품목형태
@@ -18,6 +19,7 @@ import java.util.List;
 @RequestMapping(value = "/item-forms")
 @Api(tags = "item-form")
 public class ItemFormController {
+
     @Autowired
     ItemFormService itemFormService;
 
@@ -26,7 +28,7 @@ public class ItemFormController {
     @ResponseBody
     @ApiOperation(value = "품목형태 생성")
     public ResponseEntity<ItemFormResponse> createItemForm(
-            @RequestBody ItemFormRequest itemFormRequest
+            @RequestBody @Valid ItemFormRequest itemFormRequest
     ) {
         return new ResponseEntity<>(itemFormService.createItemForm(itemFormRequest), HttpStatus.OK);
     }
@@ -53,7 +55,7 @@ public class ItemFormController {
     @ApiOperation(value = "품목형태 수정")
     public ResponseEntity<ItemFormResponse> updateItemForm(
             @PathVariable Long id,
-            @RequestBody ItemFormRequest itemFormRequest
+            @RequestBody @Valid ItemFormRequest itemFormRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(itemFormService.updateItemForm(id, itemFormRequest), HttpStatus.OK);
     }

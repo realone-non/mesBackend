@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 // 품목계정
@@ -28,7 +29,7 @@ public class ItemAccountController {
     @ResponseBody
     @ApiOperation(value = "품목계정 생성")
     public ResponseEntity<ItemAccountResponse> createItemAccount(
-            @RequestBody ItemAccountRequest itemAccountRequest
+            @RequestBody @Valid ItemAccountRequest itemAccountRequest
     ) {
         return new ResponseEntity<>(itemAccountService.createItemAccount(itemAccountRequest), HttpStatus.OK);
     }
@@ -55,7 +56,7 @@ public class ItemAccountController {
     @ApiOperation(value = "품목계정 수정")
     public ResponseEntity<ItemAccountResponse> updateItemAccount(
             @PathVariable Long id,
-            @RequestBody ItemAccountRequest itemAccountRequest
+            @RequestBody @Valid ItemAccountRequest itemAccountRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(itemAccountService.updateItemAccount(id, itemAccountRequest), HttpStatus.OK);
     }
@@ -64,9 +65,7 @@ public class ItemAccountController {
     @DeleteMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "품목계정 삭제")
-    public ResponseEntity deleteItemAccount(
-            @PathVariable Long id
-    ) throws NotFoundException {
+    public ResponseEntity deleteItemAccount(@PathVariable Long id) throws NotFoundException {
         itemAccountService.deleteItemAccount(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

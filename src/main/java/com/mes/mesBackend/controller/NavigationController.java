@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -38,7 +39,7 @@ public class NavigationController {
     @PostMapping
     @ResponseBody
     @ApiOperation(value = "메인네비게이션바 생성")
-    public ResponseEntity<MainNavResponse> createHeader(@RequestBody MainNavRequest mainNavRequest) {
+    public ResponseEntity<MainNavResponse> createHeader(@RequestBody @Valid MainNavRequest mainNavRequest) {
         return new ResponseEntity<>(navigationService.createMainNavigation(mainNavRequest), HttpStatus.OK);
     }
 
@@ -48,7 +49,7 @@ public class NavigationController {
     @ApiOperation(value = "메인네비게이션 수정")
     public ResponseEntity<MainNavResponse> updateMainNavigation(
             @PathVariable(value = "main-nav-id") Long id,
-            @RequestBody MainNavRequest mainNavRequest
+            @RequestBody @Valid MainNavRequest mainNavRequest
     ) {
         return new ResponseEntity<>(navigationService.updateMainNavigation(id, mainNavRequest), HttpStatus.OK);
     }
@@ -76,7 +77,7 @@ public class NavigationController {
     @ApiOperation(value = "서브네비게이션바 생성")
     public ResponseEntity<SubNavResponse> createSubNavigation(
             @PathVariable(value = "main-nav-id") Long mainNavId,
-            @RequestBody SubNavRequest subNavRequest
+            @RequestBody @Valid SubNavRequest subNavRequest
     ) {
         return new ResponseEntity<>(navigationService.createSubNavigation(mainNavId, subNavRequest), HttpStatus.OK);
     }
@@ -87,7 +88,7 @@ public class NavigationController {
     @ApiOperation(value = "서브네비게이션바 수정")
     public ResponseEntity<SubNavResponse> updateSubNavigation(
             @PathVariable(value = "sub-nav-id") Long id,
-            @RequestBody SubNavRequest subNavRequest
+            @RequestBody @Valid SubNavRequest subNavRequest
     ) {
         return new ResponseEntity<>(navigationService.updateSubNavigation(id, subNavRequest), HttpStatus.OK);
     }
@@ -117,7 +118,7 @@ public class NavigationController {
     @ApiOperation(value = "디테일네비게이션 생성")
     public ResponseEntity<DetailNavResponse> createDetailNavigation(
             @PathVariable(value = "sub-nav-id") Long subNavId,
-            @RequestBody DetailNavRequest detailNavRequest
+            @RequestBody @Valid DetailNavRequest detailNavRequest
     ) {
         return new ResponseEntity<>(navigationService.createDetailNavigation(subNavId, detailNavRequest), HttpStatus.OK);
     }
@@ -128,7 +129,7 @@ public class NavigationController {
     @ApiOperation(value = "디테일네비게이션 수정")
     public ResponseEntity<DetailNavResponse> updateDetailNavigation(
             @PathVariable(value = "detail-nav-id") Long detailNavId,
-            @RequestBody DetailNavRequest detailNavRequest
+            @RequestBody @Valid DetailNavRequest detailNavRequest
     ) {
         return new ResponseEntity<>(navigationService.updateDetailNavigation(detailNavId, detailNavRequest), HttpStatus.OK);
     }

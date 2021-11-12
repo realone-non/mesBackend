@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 // 3-2-2. 그룹코드 등록
@@ -29,7 +30,7 @@ public class ItemGroupCodeController {
     @ResponseBody
     @ApiOperation(value = "그룹코드 생성")
     public ResponseEntity<CodeResponse> createItemGroupCode(
-            @RequestBody CodeRequest codeRequest
+            @RequestBody @Valid CodeRequest codeRequest
     ) {
         return new ResponseEntity<>(itemGroupCodeService.createItemGroupCode(codeRequest), HttpStatus.OK);
     }

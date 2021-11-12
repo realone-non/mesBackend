@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 // 검사기준
@@ -28,7 +29,7 @@ public class TestCriteriaController {
     @ResponseBody
     @ApiOperation(value = "검사기준 생성")
     public ResponseEntity<TestCriteriaResponse> createTestCriteria(
-            @RequestBody TestCriteriaRequest testCriteriaRequest
+            @RequestBody @Valid TestCriteriaRequest testCriteriaRequest
     ) {
         return new ResponseEntity<>(testCriteriaService.createTestCriteria(testCriteriaRequest), HttpStatus.OK);
     }
@@ -55,7 +56,7 @@ public class TestCriteriaController {
     @ApiOperation(value = "검사기준 수정")
     public ResponseEntity<TestCriteriaResponse> updateTestCriteria(
             @PathVariable Long id,
-            @RequestBody TestCriteriaRequest testCriteriaRequest
+            @RequestBody @Valid TestCriteriaRequest testCriteriaRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(testCriteriaService.updateTestCriteria(id, testCriteriaRequest), HttpStatus.OK);
     }

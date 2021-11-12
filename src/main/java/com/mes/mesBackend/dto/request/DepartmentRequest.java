@@ -30,6 +30,7 @@ public class DepartmentRequest {
     String shortName;
 
     @ApiModelProperty(value = "순번 NOT NULL")
+    @Min(value = ID_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     int orders;
 

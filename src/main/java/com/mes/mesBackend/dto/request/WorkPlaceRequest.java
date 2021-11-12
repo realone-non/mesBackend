@@ -42,7 +42,7 @@ public class WorkPlaceRequest {
     @ApiModelProperty(value = "영문주소2")
     String engAddress2;    // 영문주소2
 
-    @ApiModelProperty(value = "업태")
+    @ApiModelProperty(value = "업태 ids")
     List<Long> type;  // 업태
 
     @ApiModelProperty(value = "업종")

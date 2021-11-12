@@ -29,22 +29,14 @@ import java.util.List;
 @Api(tags = "item")
 @RequiredArgsConstructor
 public class ItemController {
+
     @Autowired
     ItemService itemService;
 
     // 품목 생성
     @PostMapping
     @ResponseBody
-    @ApiOperation(
-            value = "품목 생성",
-            notes = "not Null field:\nitemNo, itemName, itemAccount, unit, uhp, validDay, " +
-            "lotType, inputTest, outputTest, wasteProductLot, developStatus, stockControl, " +
-                    "inputUnitPrice, storageLocation, manufacturerPartNo, manufacturer, useYn " +
-                    "inputTestType, outputTestType:\n" +
-                    "자동검사: AUTOMATIC_TEST, 수동검사: MANUAL_TEST, 검사없음: NO_TEST\n" +
-                    "developStatus:\n" +
-                    "미개발: BEFORE, 개발중: PROCEEDING, 개발완료: COMPLETION"
-    )
+    @ApiOperation(value = "품목 생성")
     public ResponseEntity<ItemResponse> createItem(
             @Valid @RequestBody ItemRequest itemRequest
     ) throws NotFoundException {
@@ -52,16 +44,16 @@ public class ItemController {
     }
 
     // 품목 단일 조회
-    @GetMapping("/{id}")
+    @GetMapping("/{item-id}")
     @ResponseBody()
     @ApiOperation(value = "품목 조회")
-    public ResponseEntity<ItemResponse> getItem(@PathVariable(value = "id") Long id) throws NotFoundException {
+    public ResponseEntity<ItemResponse> getItem(@PathVariable(value = "item-id") Long id) throws NotFoundException {
         return new ResponseEntity<>(itemService.getItem(id), HttpStatus.OK);
     }
 
     // 품목 페이징 조회
     @GetMapping
-    @ResponseBody()
+    @ResponseBody
     @ApiOperation(value = "품목 페이징 조회", notes = "검색조건: 품목그룹, 품목계정, 품번, 품명, 검색어")
     public ResponseEntity<Page<ItemResponse>> getItems(
             @RequestParam(required = false) Long itemGroupId,
@@ -75,21 +67,21 @@ public class ItemController {
     }
 
     // 품목 수정
-    @PatchMapping("/{id}")
+    @PatchMapping("/{item-id}")
     @ResponseBody()
     @ApiOperation(value = "품목 수정")
     public ResponseEntity<ItemResponse> updateItem(
-            @PathVariable(value = "id") Long id,
+            @PathVariable(value = "item-id") Long id,
             @RequestBody @Valid ItemRequest itemRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(itemService.updateItem(id, itemRequest), HttpStatus.OK);
     }
 
     // 품목 삭제
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{item-id}")
     @ResponseBody()
     @ApiOperation(value = "품목 삭제")
-    public ResponseEntity<Void> deleteItem(@PathVariable(value = "id") Long id) throws NotFoundException {
+    public ResponseEntity<Void> deleteItem(@PathVariable(value = "item-id") Long id) throws NotFoundException {
         itemService.deleteItem(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

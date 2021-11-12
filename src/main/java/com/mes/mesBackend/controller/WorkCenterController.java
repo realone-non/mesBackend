@@ -10,9 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 // 3-3-1. 작업장 등록
 @RestController
@@ -29,7 +32,7 @@ public class WorkCenterController {
     @ResponseBody()
     @ApiOperation(value = "작업장 생성")
     public ResponseEntity<WorkCenterResponse> createWorkCenter(
-            @RequestBody WorkCenterRequest workCenterRequest
+            @RequestBody @Valid WorkCenterRequest workCenterRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(workCenterService.createWorkCenter(workCenterRequest), HttpStatus.OK);
     }
@@ -48,7 +51,7 @@ public class WorkCenterController {
     @GetMapping
     @ResponseBody()
     @ApiOperation(value = "작업장 페이징 조회")
-    public ResponseEntity<Page<WorkCenterResponse>> getWorkCenters(Pageable pageable) {
+    public ResponseEntity<Page<WorkCenterResponse>> getWorkCenters(@PageableDefault Pageable pageable) {
         return new ResponseEntity<>(workCenterService.getWorkCenters(pageable), HttpStatus.OK);
     }
 
@@ -58,7 +61,7 @@ public class WorkCenterController {
     @ApiOperation(value = "작업장 수정")
     public ResponseEntity<WorkCenterResponse> updateWorkCenter(
             @PathVariable Long id,
-            @RequestBody WorkCenterRequest workCenterRequest
+            @RequestBody @Valid WorkCenterRequest workCenterRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(workCenterService.updateWorkCenter(id, workCenterRequest), HttpStatus.OK);
     }

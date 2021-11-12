@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 // 점검유형 (일, 월, 분기 등등)
@@ -28,7 +29,9 @@ public class CheckTypeController {
     @PostMapping
     @ResponseBody
     @ApiOperation(value = "점검유형 생성")
-    public ResponseEntity<CheckTypeResponse> createCheckType(@RequestBody CheckTypeRequest checkTypeRequest) {
+    public ResponseEntity<CheckTypeResponse> createCheckType(
+            @RequestBody @Valid CheckTypeRequest checkTypeRequest
+    ) {
         return new ResponseEntity<>(checkTypeService.createCheckType(checkTypeRequest), HttpStatus.OK);
     }
 
@@ -54,7 +57,7 @@ public class CheckTypeController {
     @ApiOperation(value = "점검유형 수정")
     public ResponseEntity<CheckTypeResponse> updateCheckType(
             @PathVariable Long id,
-            @RequestBody CheckTypeRequest checkTypeRequest
+            @RequestBody @Valid CheckTypeRequest checkTypeRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(checkTypeService.updateCheckType(id, checkTypeRequest), HttpStatus.OK);
     }

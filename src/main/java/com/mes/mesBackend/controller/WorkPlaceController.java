@@ -10,9 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/work-places")
@@ -27,7 +30,9 @@ public class WorkPlaceController {
     @PostMapping
     @ResponseBody
     @ApiOperation(value = "사업장 생성")
-    public ResponseEntity<WorkPlaceResponse> createWorkPlace(@RequestBody WorkPlaceRequest workPlaceRequest) throws NotFoundException {
+    public ResponseEntity<WorkPlaceResponse> createWorkPlace(
+            @RequestBody @Valid WorkPlaceRequest workPlaceRequest
+    ) throws NotFoundException {
         return new ResponseEntity<>(workPlaceService.createWorkPlace(workPlaceRequest), HttpStatus.OK);
     }
 
@@ -43,7 +48,7 @@ public class WorkPlaceController {
     @GetMapping
     @ResponseBody()
     @ApiOperation(value = "사업장 페이징 조회")
-    public ResponseEntity<Page<WorkPlaceResponse>> getWorkPlaces(Pageable pageable) {
+    public ResponseEntity<Page<WorkPlaceResponse>> getWorkPlaces(@PageableDefault Pageable pageable) {
         return new ResponseEntity<>(workPlaceService.getWorkPlaces(pageable), HttpStatus.OK);
     }
 
@@ -52,8 +57,8 @@ public class WorkPlaceController {
     @ResponseBody()
     @ApiOperation(value = "사업장 수정")
     public ResponseEntity<WorkPlaceResponse> updateWorkPlace(
-            @PathVariable(value = "id") Long id,
-            @RequestBody WorkPlaceRequest workPlaceRequest
+            @PathVariable Long id,
+            @RequestBody @Valid WorkPlaceRequest workPlaceRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(workPlaceService.updateWorkPlace(id, workPlaceRequest), HttpStatus.OK);
     }
@@ -61,7 +66,7 @@ public class WorkPlaceController {
     @DeleteMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "사업장 삭제")
-    public ResponseEntity deleteWorkPlace(@PathVariable(value = "id") Long id) throws NotFoundException {
+    public ResponseEntity deleteWorkPlace(@PathVariable Long id) throws NotFoundException {
         workPlaceService.deleteWorkPlace(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

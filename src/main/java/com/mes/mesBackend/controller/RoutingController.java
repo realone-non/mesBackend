@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 // 3-2-5. 라우팅 등록
@@ -33,16 +34,20 @@ public class RoutingController {
     @PostMapping
     @ResponseBody
     @ApiOperation(value = "라우팅 생성")
-    public ResponseEntity<RoutingResponse> createRouting(@RequestBody RoutingRequest routingRequest) {
-        return new ResponseEntity<RoutingResponse>(routingService.createRouting(routingRequest), HttpStatus.OK);
+    public ResponseEntity<RoutingResponse> createRouting(
+            @RequestBody @Valid RoutingRequest routingRequest
+    ) {
+        return new ResponseEntity<>(routingService.createRouting(routingRequest), HttpStatus.OK);
     }
 
     // 라우팅 단일 조회
     @GetMapping("/{routing-id}")
     @ResponseBody
     @ApiOperation(value = "라우팅 단일 조회")
-    public ResponseEntity<RoutingResponse> getRouting(@PathVariable(value = "routing-id") Long id) throws NotFoundException {
-        return new ResponseEntity<RoutingResponse>(routingService.getRouting(id), HttpStatus.OK);
+    public ResponseEntity<RoutingResponse> getRouting(
+            @PathVariable(value = "routing-id") Long id
+    ) throws NotFoundException {
+        return new ResponseEntity<>(routingService.getRouting(id), HttpStatus.OK);
     }
 
     // 라우팅 페이징 조회
@@ -50,7 +55,7 @@ public class RoutingController {
     @ResponseBody
     @ApiOperation(value = "라우팅 페이징 조회")
     public ResponseEntity<Page<RoutingResponse>> getRoutings(@PageableDefault Pageable pageable) {
-        return new ResponseEntity<Page<RoutingResponse>>(routingService.getRoutings(pageable), HttpStatus.OK);
+        return new ResponseEntity<>(routingService.getRoutings(pageable), HttpStatus.OK);
     }
 
     // 라우팅 수정
@@ -59,9 +64,9 @@ public class RoutingController {
     @ApiOperation(value = "라우팅 수정")
     public ResponseEntity<RoutingResponse> updateRouting(
             @PathVariable(value = "routing-id") Long id,
-            @RequestBody RoutingRequest routingRequest
+            @RequestBody @Valid RoutingRequest routingRequest
     ) throws NotFoundException {
-        return new ResponseEntity<RoutingResponse>(routingService.updateRouting(id, routingRequest), HttpStatus.OK);
+        return new ResponseEntity<>(routingService.updateRouting(id, routingRequest), HttpStatus.OK);
     }
 
     // 라우팅 삭제
@@ -79,9 +84,9 @@ public class RoutingController {
     @ApiOperation(value = "라우팅 디테일 생성")
     public ResponseEntity<RoutingDetailResponse> createRoutingDetail(
             @PathVariable(value = "routing-id") Long routingId,
-            @RequestBody RoutingDetailRequest routingDetailRequest
+            @RequestBody @Valid RoutingDetailRequest routingDetailRequest
     ) throws NotFoundException {
-        return new ResponseEntity<RoutingDetailResponse>(routingService.createRoutingDetails(routingId, routingDetailRequest), HttpStatus.OK);
+        return new ResponseEntity<>(routingService.createRoutingDetails(routingId, routingDetailRequest), HttpStatus.OK);
     }
 
     // 라우팅 디테일 리스트 조회
@@ -91,7 +96,7 @@ public class RoutingController {
     public ResponseEntity<List<RoutingDetailResponse>> getRoutingDetails(
             @PathVariable(value = "routing-id") Long routingId
     ) throws NotFoundException {
-        return new ResponseEntity<List<RoutingDetailResponse>>(routingService.getRoutingDetails(routingId), HttpStatus.OK);
+        return new ResponseEntity<>(routingService.getRoutingDetails(routingId), HttpStatus.OK);
     }
 
     // 라우팅 디테일 수정
@@ -101,9 +106,9 @@ public class RoutingController {
     public ResponseEntity<RoutingDetailResponse> updateRoutingDetail(
             @PathVariable(value = "routing-id") Long routingId,
             @PathVariable(value = "routing-detail-id") Long routingDetailId,
-            @RequestBody RoutingDetailRequest routingDetailRequest
+            @RequestBody @Valid RoutingDetailRequest routingDetailRequest
     ) throws NotFoundException {
-        return new ResponseEntity<RoutingDetailResponse>(routingService.updateRoutingDetail(routingId, routingDetailId, routingDetailRequest), HttpStatus.OK);
+        return new ResponseEntity<>(routingService.updateRoutingDetail(routingId, routingDetailId, routingDetailRequest), HttpStatus.OK);
     }
 
     // 라우팅 디테일 삭제

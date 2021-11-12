@@ -1,10 +1,13 @@
 package com.mes.mesBackend.dto.request;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiOperation;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@ApiModel(description = "그리드 옵션")
 public class GridOptionRequest {
     String aggFunc;
 //    String colId;

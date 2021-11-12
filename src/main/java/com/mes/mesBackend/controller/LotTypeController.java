@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 // Lot 유형
@@ -28,7 +29,7 @@ public class LotTypeController {
     @ResponseBody
     @ApiOperation(value = "LOT 유형 생성")
     public ResponseEntity<LotTypeResponse> createLotType(
-            @RequestBody LotTypeRequest lotTypeRequest
+            @RequestBody @Valid LotTypeRequest lotTypeRequest
     ) {
         return new ResponseEntity<>(lotTypeService.createLotType(lotTypeRequest), HttpStatus.OK);
     }
@@ -55,7 +56,7 @@ public class LotTypeController {
     @ApiOperation(value = "LOT 유형 수정")
     public ResponseEntity<LotTypeResponse> updateLotType(
             @PathVariable Long id,
-            @RequestBody LotTypeRequest lotTypeRequest
+            @RequestBody @Valid LotTypeRequest lotTypeRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(lotTypeService.updateLotType(id, lotTypeRequest), HttpStatus.OK);
     }

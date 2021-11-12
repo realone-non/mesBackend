@@ -10,9 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/users")
@@ -27,7 +30,9 @@ public class UserController {
     @PostMapping
     @ResponseBody
     @ApiOperation(value = "직원(작업자) 생성")
-    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest userRequest) throws NotFoundException {
+    public ResponseEntity<UserResponse> createUser(
+            @RequestBody @Valid UserRequest userRequest
+    ) throws NotFoundException {
         return new ResponseEntity<>(userService.createUser(userRequest), HttpStatus.OK);
     }
 
@@ -43,7 +48,7 @@ public class UserController {
     @GetMapping
     @ResponseBody()
     @ApiOperation(value = "직원(작업자) 페이징 조회")
-    public ResponseEntity<Page<UserResponse>> getUsers(Pageable pageable) {
+    public ResponseEntity<Page<UserResponse>> getUsers(@PageableDefault Pageable pageable) {
         return new ResponseEntity<>(userService.getUsers(pageable), HttpStatus.OK);
     }
 
@@ -52,8 +57,8 @@ public class UserController {
     @ResponseBody()
     @ApiOperation(value = "직원(작업자) 수정")
     public ResponseEntity<UserResponse> updateUser(
-            @PathVariable(value = "id") Long id,
-            @RequestBody UserRequest userRequest
+            @PathVariable Long id,
+            @RequestBody @Valid UserRequest userRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(userService.updateUser(id, userRequest), HttpStatus.OK);
     }
@@ -61,7 +66,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "직원(작업자) 삭제")
-    public ResponseEntity deleteUser(@PathVariable(value = "id") Long id) throws NotFoundException {
+    public ResponseEntity deleteUser(@PathVariable Long id) throws NotFoundException {
         userService.deleteUser(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

@@ -10,9 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 // 3-2-2. 품목그룹 등록
 @RestController
@@ -28,7 +31,7 @@ public class ItemGroupController {
     @ResponseBody()
     @ApiOperation(value = "품목그룹 생성")
     public ResponseEntity<ItemGroupResponse> createItemGroup(
-            @RequestBody ItemGroupRequest itemGroupRequest
+            @RequestBody @Valid ItemGroupRequest itemGroupRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(itemGroupService.createItemGroup(itemGroupRequest), HttpStatus.OK);
     }
@@ -47,7 +50,7 @@ public class ItemGroupController {
     @GetMapping
     @ResponseBody()
     @ApiOperation(value = "품목그룹 페이징 조회")
-    public ResponseEntity<Page<ItemGroupResponse>> getItemGroups(Pageable pageable) {
+    public ResponseEntity<Page<ItemGroupResponse>> getItemGroups(@PageableDefault Pageable pageable) {
         return new ResponseEntity<>(itemGroupService.getItemGroups(pageable), HttpStatus.OK);
     }
 
@@ -57,7 +60,7 @@ public class ItemGroupController {
     @ApiOperation(value = "품목그룹 수정")
     public ResponseEntity<ItemGroupResponse> updateItemGroup(
             @PathVariable Long id,
-            @RequestBody ItemGroupRequest itemGroupRequest
+            @RequestBody @Valid ItemGroupRequest itemGroupRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(itemGroupService.updateItemGroup(id, itemGroupRequest), HttpStatus.OK);
     }

@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 // 3-3-2. 작업 공정 코드 등록
@@ -30,7 +31,7 @@ public class WorkProcessCodeController {
     @ResponseBody
     @ApiOperation(value = "작업공정 코드 생성")
     public ResponseEntity<CodeResponse> createWorkProcessCode(
-            @RequestBody CodeRequest codeRequest
+            @RequestBody @Valid CodeRequest codeRequest
     ) {
         return new ResponseEntity<>(workProcessCodeService.createWorkProcessCode(codeRequest), HttpStatus.OK);
     }

@@ -10,9 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/ware-houses")
@@ -28,7 +31,7 @@ public class WareHouseController {
     @ResponseBody()
     @ApiOperation(value = "창고 생성")
     public ResponseEntity<WareHouseResponse> createWareHouse(
-            @RequestBody WareHouseRequest wareHouseRequest
+            @RequestBody @Valid WareHouseRequest wareHouseRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(wareHouseService.createWareHouse(wareHouseRequest), HttpStatus.OK);
     }
@@ -37,7 +40,7 @@ public class WareHouseController {
     @GetMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "창고 단일 조회")
-    public ResponseEntity<WareHouseResponse> getWareHouse(@PathVariable(value = "id") Long id) throws NotFoundException {
+    public ResponseEntity<WareHouseResponse> getWareHouse(@PathVariable Long id) throws NotFoundException {
         return new ResponseEntity<>(wareHouseService.getWareHouse(id), HttpStatus.OK);
     }
 
@@ -45,7 +48,7 @@ public class WareHouseController {
     @GetMapping
     @ResponseBody()
     @ApiOperation(value = "창고 페이징 조회")
-    public ResponseEntity<Page<WareHouseResponse>> getWareHouses(Pageable pageable) {
+    public ResponseEntity<Page<WareHouseResponse>> getWareHouses(@PageableDefault Pageable pageable) {
         return new ResponseEntity<>(wareHouseService.getWareHouses(pageable), HttpStatus.OK);
     }
 
@@ -54,8 +57,8 @@ public class WareHouseController {
     @ResponseBody()
     @ApiOperation(value = "창고 수정")
     public ResponseEntity<WareHouseResponse> updateWareHouse(
-            @PathVariable(value = "id") Long id,
-            @RequestBody WareHouseRequest wareHouseRequest
+            @PathVariable Long id,
+            @RequestBody @Valid WareHouseRequest wareHouseRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(wareHouseService.updateWareHouse(id, wareHouseRequest), HttpStatus.OK);
     }
@@ -64,7 +67,7 @@ public class WareHouseController {
     @DeleteMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "창고 삭제")
-    public ResponseEntity<Void> deleteWareHouse(@PathVariable(value = "id") Long id) throws NotFoundException {
+    public ResponseEntity<Void> deleteWareHouse(@PathVariable Long id) throws NotFoundException {
         wareHouseService.deleteWareHouse(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

@@ -10,9 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 // 3-3-2. 작업 공정 등록
 @RestController
@@ -29,7 +32,7 @@ public class WorkProcessController {
     @ResponseBody()
     @ApiOperation(value = "작업공정 생성")
     public ResponseEntity<WorkProcessResponse> createWorkProcess(
-            @RequestBody WorkProcessRequest workProcessRequest
+            @RequestBody @Valid WorkProcessRequest workProcessRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(workProcessService.createWorkProcess(workProcessRequest), HttpStatus.OK);
     }
@@ -48,7 +51,7 @@ public class WorkProcessController {
     @GetMapping
     @ResponseBody()
     @ApiOperation(value = "작업공정 페이징 조회")
-    public ResponseEntity<Page<WorkProcessResponse>> getWorkProcesses(Pageable pageable) {
+    public ResponseEntity<Page<WorkProcessResponse>> getWorkProcesses(@PageableDefault Pageable pageable) {
         return new ResponseEntity<>(workProcessService.getWorkProcesses(pageable), HttpStatus.OK);
     }
 
@@ -58,7 +61,7 @@ public class WorkProcessController {
     @ApiOperation(value = "작업공정 수정")
     public ResponseEntity<WorkProcessResponse> updateWorkProcess(
             @PathVariable Long id,
-            @RequestBody WorkProcessRequest workProcessRequest
+            @RequestBody @Valid WorkProcessRequest workProcessRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(workProcessService.updateWorkProcess(id, workProcessRequest), HttpStatus.OK);
     }

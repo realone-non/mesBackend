@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 // 검사방법
@@ -28,7 +29,7 @@ public class TestProcessController {
     @ResponseBody
     @ApiOperation(value = "검사방법 생성")
     public ResponseEntity<TestProcessResponse> createTestProcess(
-            @RequestBody TestProcessRequest testProcessRequest
+            @RequestBody @Valid TestProcessRequest testProcessRequest
     ) {
         return new ResponseEntity<>(testProcessService.createTestProcess(testProcessRequest), HttpStatus.OK);
     }
@@ -55,7 +56,7 @@ public class TestProcessController {
     @ApiOperation(value = "검사방법 수정")
     public ResponseEntity<TestProcessResponse> updateTestProcess(
             @PathVariable Long id,
-            @RequestBody TestProcessRequest testProcessRequest
+            @RequestBody @Valid TestProcessRequest testProcessRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(testProcessService.updateTestProcess(id, testProcessRequest), HttpStatus.OK);
     }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,9 @@ public class CountryCodeController {
     @GetMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "국가코드 조회")
-    public ResponseEntity<CountryCodeResponse> getCountryCode(@PathVariable(value = "id") Long id) throws NotFoundException {
+    public ResponseEntity<CountryCodeResponse> getCountryCode(
+            @PathVariable Long id
+    ) throws NotFoundException {
         return new ResponseEntity<>(countryCodeService.getCountryCode(id), HttpStatus.OK);
     }
 
@@ -47,7 +50,7 @@ public class CountryCodeController {
     @GetMapping
     @ResponseBody()
     @ApiOperation(value = "국가코드 페이징 조회")
-    public ResponseEntity<Page<CountryCodeResponse>> getCountryCodes(Pageable pageable) {
+    public ResponseEntity<Page<CountryCodeResponse>> getCountryCodes(@PageableDefault Pageable pageable) {
         return new ResponseEntity<>(countryCodeService.getCountryCodes(pageable), HttpStatus.OK);
     }
 

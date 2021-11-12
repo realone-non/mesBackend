@@ -34,12 +34,10 @@ public class ClientController {
     // 거래처 생성
     @PostMapping
     @ResponseBody
-    @ApiOperation(
-            value = "거래처 생성",
-            notes = "not null field:\n" +
-                    "clientCode, name, clientType, businessNumber, ceoName, useYn"
-    )
-    public ResponseEntity<ClientResponse> createClient(@RequestBody @Valid ClientRequest clientRequest) throws NotFoundException {
+    @ApiOperation(value = "거래처 생성")
+    public ResponseEntity<ClientResponse> createClient(
+            @RequestBody @Valid ClientRequest clientRequest
+    ) throws NotFoundException {
         return new ResponseEntity<>(clientService.createClient(clientRequest), HttpStatus.OK);
     }
 
@@ -68,7 +66,9 @@ public class ClientController {
     @PatchMapping("/{id}")
     @ResponseBody
     @ApiOperation(value = "거래처 수정")
-    public ResponseEntity<ClientResponse> updateClient(@PathVariable Long id, @RequestBody ClientRequest clientRequest) throws NotFoundException {
+    public ResponseEntity<ClientResponse> updateClient(
+            @PathVariable Long id,
+            @RequestBody @Valid ClientRequest clientRequest) throws NotFoundException {
         return new ResponseEntity<>(clientService.updateClient(id, clientRequest), HttpStatus.OK);
     }
 

@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 // 용도유형
@@ -28,7 +29,7 @@ public class UseTypeController {
     @ResponseBody
     @ApiOperation(value = "용도유형 생성")
     public ResponseEntity<UseTypeResponse> createUseType(
-            @RequestBody UseTypeRequest useTypeRequest
+            @RequestBody @Valid UseTypeRequest useTypeRequest
     ) {
         return new ResponseEntity<>(useTypeService.createUseType(useTypeRequest), HttpStatus.OK);
     }
@@ -55,7 +56,7 @@ public class UseTypeController {
     @ApiOperation(value = "용도유형 수정")
     public ResponseEntity<UseTypeResponse> updateUseType(
             @PathVariable Long id,
-            @RequestBody UseTypeRequest useTypeRequest
+            @RequestBody @Valid UseTypeRequest useTypeRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(useTypeService.updateUseType(id, useTypeRequest), HttpStatus.OK);
     }

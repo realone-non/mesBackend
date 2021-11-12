@@ -10,9 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 // 부서등록
 @RestController
@@ -27,7 +30,9 @@ public class DepartmentController {
     @PostMapping
     @ResponseBody()
     @ApiOperation(value = "부서 생성")
-    public ResponseEntity<DepartmentResponse> createDepartment(@RequestBody DepartmentRequest departmentRequest) {
+    public ResponseEntity<DepartmentResponse> createDepartment(
+            @RequestBody @Valid DepartmentRequest departmentRequest
+    ) {
         return new ResponseEntity<>(departmentService.createDepartment(departmentRequest), HttpStatus.OK);
     }
 
@@ -35,7 +40,7 @@ public class DepartmentController {
     @GetMapping("/{id}")
     @ResponseBody()
     @ApiOperation(value = "부서 조회")
-    public ResponseEntity<DepartmentResponse> getDepartment(@PathVariable(value = "id") Long id) throws NotFoundException {
+    public ResponseEntity<DepartmentResponse> getDepartment(@PathVariable Long id) throws NotFoundException {
         return new ResponseEntity<>(departmentService.getDepartment(id), HttpStatus.OK);
     }
 
@@ -43,7 +48,7 @@ public class DepartmentController {
     @GetMapping
     @ResponseBody()
     @ApiOperation(value = "부서 페이징 조회")
-    public ResponseEntity<Page<DepartmentResponse>> getDepartments(Pageable pageable) {
+    public ResponseEntity<Page<DepartmentResponse>> getDepartments(@PageableDefault Pageable pageable) {
         return new ResponseEntity<>(departmentService.getDepartments(pageable), HttpStatus.OK);
     }
 
@@ -53,7 +58,7 @@ public class DepartmentController {
     @ApiOperation(value = "부서 수정")
     public ResponseEntity<DepartmentResponse> updateDepartment(
             @PathVariable Long id,
-            @RequestBody DepartmentRequest departmentRequest
+            @RequestBody @Valid DepartmentRequest departmentRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(departmentService.updateDepartment(id, departmentRequest), HttpStatus.OK);
     }

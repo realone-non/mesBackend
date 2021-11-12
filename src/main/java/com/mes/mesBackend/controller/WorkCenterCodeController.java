@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -32,7 +33,7 @@ public class WorkCenterCodeController {
     @ResponseBody
     @ApiOperation(value = "작업장 코드 생성")
     public ResponseEntity<CodeResponse> createWorkCenterCode(
-            @RequestBody CodeRequest codeRequest
+            @RequestBody @Valid CodeRequest codeRequest
     ) {
         return new ResponseEntity<>(workCenterService.createWorkCenterCode(codeRequest), HttpStatus.OK);
     }

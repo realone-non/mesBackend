@@ -5,11 +5,12 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import static com.mes.mesBackend.exception.Message.NOT_EMPTY;
-import static com.mes.mesBackend.exception.Message.NOT_NULL;
+import static com.mes.mesBackend.exception.Message.*;
+import static com.mes.mesBackend.exception.Message.NOT_ZERO;
 
 @Getter
 @Setter
@@ -24,7 +25,8 @@ public class WareHouseRequest {
     String wareHouseName;
 
     @ApiModelProperty(value = "창고유형 id NOT NULL")
-    @NotBlank(message = NOT_EMPTY)
+    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
     Long wareHouseType;
 
     @ApiModelProperty(value = "창고그룹")

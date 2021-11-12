@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 // 3-3-4. 작업장별 점검 항목 등록
@@ -91,7 +92,7 @@ public class WorkCenterCheckController {
     @ApiOperation(value = "작업장별 점검유형 세부 생성", notes = "lsl, usl 소수점 3자리까지 기입가능")
     public ResponseEntity<WorkCenterCheckDetailResponse> createWorkCenterCheckDetail(
             @PathVariable(value = "work-center-check-id") Long workCenterCheckId,
-            @RequestBody WorkCenterCheckDetailRequest workCenterCheckDetailRequest
+            @RequestBody @Valid WorkCenterCheckDetailRequest workCenterCheckDetailRequest
     ) throws NotFoundException, BadRequestException {
         return new ResponseEntity<>(workCenterCheckService.createWorkCenterCheckDetail(workCenterCheckId,workCenterCheckDetailRequest), HttpStatus.OK);
     }
@@ -124,7 +125,7 @@ public class WorkCenterCheckController {
     public ResponseEntity<WorkCenterCheckDetailResponse> updateWorkCenterCheckDetail(
             @PathVariable(value = "work-center-check-id") Long workCenterCheckId,
             @PathVariable(value = "work-center-check-detail-id") Long workCenterCheckDetailId,
-            @RequestBody WorkCenterCheckDetailRequest workCenterCheckDetailRequest
+            @RequestBody @Valid WorkCenterCheckDetailRequest workCenterCheckDetailRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(workCenterCheckService.updateWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailId, workCenterCheckDetailRequest), HttpStatus.OK);
     }
