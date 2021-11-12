@@ -6,6 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
+
 /*
  * 작업장별 점검항목 등록 -> 작업장별 세부 점검항목 등록 리스트
  * 점검코드 (001,002)
@@ -26,12 +30,12 @@ import javax.persistence.*;
 @Data
 public class WorkCenterCheckDetail extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업장별 세부 점검항목 고유아이디'")
     private Long id;
 
     // 다대일 단방향 매핑
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "WORK_CENTER_CHECK", nullable = false, columnDefinition = "bigint COMMENT '작업장별 점검항목'")
     private WorkCenterCheck workCenterCheck;    // 작업장별 점검항목
 

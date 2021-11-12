@@ -2,6 +2,8 @@ package com.mes.mesBackend.dto.response;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,13 +12,25 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Getter
 @Setter
 @JsonInclude(NON_NULL)
+@ApiModel(description = "작업장")
 public class WorkCenterResponse {
+    @ApiModelProperty(value = "고유아이디")
     Long id;
-    CodeResponse.idAndCode workCenterCode;       // 작업장코드
-    String workCenterName;             // 작업장명
-    ClientResponse.idAndName outCompany;     // 외주사(거래처)
-    String costCenter;                 // Cost Center
-    boolean useYn = true;              // 사용여부
+
+    @ApiModelProperty(value = "작업장코드")
+    CodeResponse.idAndCode workCenterCode;
+
+    @ApiModelProperty(value = "작업장명")
+    String workCenterName;
+
+    @ApiModelProperty(value = "외주사(거래처)")
+    ClientResponse.idAndName outCompany;
+
+    @ApiModelProperty(value = "Cost Center")
+    String costCenter;
+
+    @ApiModelProperty(value = "사용여부")
+    boolean useYn = true;
 
     @Getter
     @Setter

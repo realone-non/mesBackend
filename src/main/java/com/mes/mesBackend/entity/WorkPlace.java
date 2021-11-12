@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "WORK_PLACES")
 @Data
-public class WorkPlace extends BaseTimeEntity{
+public class WorkPlace extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '사업장 고유아이디'")

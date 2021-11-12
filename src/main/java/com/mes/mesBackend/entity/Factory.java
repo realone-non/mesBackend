@@ -31,10 +31,10 @@ public class Factory extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '공장등록 고유아이디'")
     private Long id;
 
-    @Column(name = "FACTORY_CODE", columnDefinition = "varchar(255) COMMENT '공장코드'")
+    @Column(name = "FACTORY_CODE", columnDefinition = "varchar(255) COMMENT '공장코드'", nullable = false)
     private String factoryCode;     // 공장코드
 
-    @Column(name = "FACTORY_NAME", columnDefinition = "varchar(255) COMMENT '공장명'")
+    @Column(name = "FACTORY_NAME", columnDefinition = "varchar(255) COMMENT '공장명'", nullable = false)
     private String factoryName;     // 공장명
 
     @Column(name = "SHORT_NAME", columnDefinition = "varchar(255) COMMENT '약어'")
@@ -61,12 +61,12 @@ public class Factory extends BaseTimeEntity {
     @Column(name = "FAX_NUMBER", columnDefinition = "varchar(255) COMMENT 'fax번호'")
     private String faxNumber;       // fax번호
 
-    @Column(name = "LOT_CODE", columnDefinition = "varchar(255) COMMENT 'LOT용 코드'")
+    @Column(name = "LOT_CODE", columnDefinition = "varchar(255) COMMENT 'LOT용 코드'", nullable = false)
     private String lotCode;         // LOT용 코드
 
     // 다대일 단방향
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "WORK_PLACES_ID", columnDefinition = "bigint COMMENT '사업장'")
+    @JoinColumn(name = "WORK_PLACES_ID", columnDefinition = "bigint COMMENT '사업장'", nullable = false)
     private WorkPlace workPlace;    // 사업장
 
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")

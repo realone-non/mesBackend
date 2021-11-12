@@ -1,5 +1,7 @@
 package com.mes.mesBackend.dto.request;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,10 +9,11 @@ import javax.validation.constraints.NotBlank;
 
 import static com.mes.mesBackend.exception.Message.NOT_NULL;
 
-// 점검유형
 @Getter
 @Setter
+@ApiModel(description = "점검유형")
 public class CheckTypeRequest {
+    @ApiModelProperty(value = "점검유형")
     @NotBlank(message = NOT_NULL)
-    String checkType;       // 점검유형
+    String checkType;
 }

@@ -1,5 +1,7 @@
 package com.mes.mesBackend.dto.request;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,16 +13,27 @@ import static com.mes.mesBackend.exception.Message.*;
 
 @Getter
 @Setter
+@ApiModel(description = "부서")
 public class DepartmentRequest {
+
+    @ApiModelProperty(value = "부서코드 NOT NULL")
     @Min(value = ID_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
-    int deptCode; // 부서코드
+    int deptCode;
+
+    @ApiModelProperty(value = "부서명 NOT NULL")
     @NotBlank(message = NOT_NULL)
-    String deptName;    // 부서명
+    String deptName;
+
+    @ApiModelProperty(value = "부서약어명 NOT NULL")
     @NotBlank(message = NOT_NULL)
-    String shortName;   // 부서약어명
+    String shortName;
+
+    @ApiModelProperty(value = "순번 NOT NULL")
     @NotNull(message = NOT_NULL)
-    int orders;         // 순번
+    int orders;
+
+    @ApiModelProperty(value = "사용여부 NOT NULL")
     @NotNull(message = NOT_NULL)
-    boolean useYn = true;      // 사용여부
+    boolean useYn = true;
 }

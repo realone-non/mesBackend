@@ -2,6 +2,8 @@ package com.mes.mesBackend.dto.request;
 
 import com.mes.mesBackend.entity.enumeration.DevelopStatus;
 import com.mes.mesBackend.entity.enumeration.TestType;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,84 +16,113 @@ import static com.mes.mesBackend.exception.Message.*;
 
 @Getter
 @Setter
+@ApiModel(description = "품목")
 public class ItemRequest {
+
+    @ApiModelProperty(value = "품번 NOT NULL")
     @NotBlank(message = NOT_EMPTY)
-    String itemNo;// 품번
+    String itemNo;
 
+    @ApiModelProperty(value = "품명 NOT NULL")
     @NotBlank(message = NOT_EMPTY)
-    String itemName;                                // 품명
+    String itemName;
 
-    String standard;                                // 규격
+    @ApiModelProperty(value = "규격")
+    String standard;
 
+    @ApiModelProperty(value = "품목계정 id NOT NULL")
     @Min(value = ID_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
-    Long itemAccount;                             // 품목계정
+    Long itemAccount;
 
+    @ApiModelProperty(value = "품목그룹 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
-    Long itemGroup;                               // 품목그룹
+    Long itemGroup;
 
+    @ApiModelProperty(value = "품목형태 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
-    Long itemForm;                                 // 품목형태
+    Long itemForm;
 
+    @ApiModelProperty(value = "용도유형 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
-    Long useType;                                   // 용도유형
+    Long useType;
 
+    @ApiModelProperty(value = " 라우팅 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
-    Long routing;                                    // 라우팅 (라우팅 명)
+    Long routing;
 
+    @ApiModelProperty(value = "재고단위  id NOT NULL")
     @Min(value = ID_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
-    Long unit;                                          // 재고단위
+    Long unit;
 
+    @ApiModelProperty(value = "uhp NOT NULL")
     @NotNull(message = NOT_NULL)
-    int uhp;                                       // uhp
+    int uhp;
 
+    @ApiModelProperty(value = "유효일수 NOT NULL")
     @NotNull(message = NOT_NULL)
-    int validDay;                                  // 유효일수
+    int validDay;
 
+    @ApiModelProperty(value = "LOT유형 id NOT NULL")
     @NotNull(message = NOT_NULL)
-    Long lotType;                               // LOT유형
+    Long lotType;
 
+    @ApiModelProperty(value = "수입검사 NOT NULL")
     @NotNull(message = NOT_NULL)
-    TestType inputTest = TestType.NO_TEST;              // 수입검사
+    TestType inputTest = TestType.NO_TEST;
 
+    @ApiModelProperty(value = "출하검사 NOT NULL")
     @NotNull(message = NOT_NULL)
-    TestType outputTest = TestType.NO_TEST;             // 출하검사
+    TestType outputTest = TestType.NO_TEST;
 
+    @ApiModelProperty(value = "폐기품 Lot 관리 NOT NULL")
     @NotNull(message = NOT_NULL)
-    boolean wasteProductLot;                                   // 폐기품 Lot 관리
+    boolean wasteProductLot;
 
+    @ApiModelProperty(value = "개발상태 NOT NULL")
     @NotNull(message = NOT_NULL)
-    DevelopStatus developStatus = DevelopStatus.BEFORE;           // 개발상태
+    DevelopStatus developStatus = DevelopStatus.BEFORE;
 
+    @ApiModelProperty(value = "재고관리 NOT NULL")
     @NotNull(message = NOT_NULL)
-    boolean stockControl;                                  // 재고관리
+    boolean stockControl;
 
+    @ApiModelProperty(value = "입고단가 NOT NULL")
     @NotNull(message = NOT_NULL)
-    int inputUnitPrice;                                    // 입고단가
+    int inputUnitPrice;
 
+    @ApiModelProperty(value = "저장위치 NOT NULL")
     @NotBlank(message = NOT_EMPTY)
-    String storageLocation;                               // 저장위치
+    String storageLocation;
 
-    String clientItemNo;                                   // 거래처 품번
+    @ApiModelProperty(value = "거래처품번")
+    String clientItemNo;
 
+    @ApiModelProperty(value = "제조사품번 NOT NULL")
     @NotBlank(message = NOT_EMPTY)
-    String manufacturerPartNo;                                   // 제조사품번
+    String manufacturerPartNo;
 
+    @ApiModelProperty(value = "제조사 id NOT NULL")
     @Min(value = ID_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
-    Long manufacturer;                                 // 제조사
+    Long manufacturer;
 
+    @ApiModelProperty(value = "검사기준 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
-    Long testCriteria;                                 // 검사기준
+    Long testCriteria;
 
+    @ApiModelProperty(value = "검사방법 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
-    Long testProcess;                                   // 검사방법
+    Long testProcess;
 
+    @ApiModelProperty(value = "사용여부 NOT NULL")
     @NotNull(message = NOT_NULL)
-    boolean useYn;                                                 // 사용
+    boolean useYn;
 
-    String searchWord;                                     // 검색어
+    @ApiModelProperty(value = "검색어")
+    String searchWord;
 
-    boolean agingMaterialYn;                                 // 시효성자재
+    @ApiModelProperty(value = "시효성자재")
+    boolean agingMaterialYn;
 }

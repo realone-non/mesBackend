@@ -1,5 +1,7 @@
 package com.mes.mesBackend.dto.request;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,50 +13,108 @@ import static com.mes.mesBackend.exception.Message.*;
 
 @Getter
 @Setter
+@ApiModel(description = "거래처")
 public class ClientRequest {
-    // 거래처코드
+
+    @ApiModelProperty(value = "거래처코드 NOT NULL")
     @NotBlank(message = NOT_NULL)
     String clientCode;
-    // 거래처명
+
+    @ApiModelProperty(value = "거래처명 NOT NULL")
     @NotBlank(message = NOT_NULL)
     String name;
-    // 약어
+
+    @ApiModelProperty(value = "약어")
     String shortName;
-    // 거래처 유형
+
+    @ApiModelProperty(value = "거래처 유형 id NOT NULL")
     @Min(value = ID_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long clientType;
-    // 사업자등록번호
+
+    @ApiModelProperty(value = "사업자등록번호 NOT NULL")
     @NotBlank(message = NOT_NULL)
     String businessNumber;
-    String businessFile;   // 사업자등록증
+
+    @ApiModelProperty(value = "사업자등록증")
+    String businessFile;
+
+    @ApiModelProperty(value = "대표자명 NOT NULL")
     @NotBlank(message = NOT_NULL)
-    String ceoName;    // 대표자명
-    String postalCode;      // 우편번호
-    String address;     // 주소
-    String detailAddress;   // 상세주소
+    String ceoName;
+
+    @ApiModelProperty(value = "우편번호")
+    String postalCode;
+
+    @ApiModelProperty(value = "주소")
+    String address;
+
+    @ApiModelProperty(value = "상세주소")
+    String detailAddress;
+
+    @ApiModelProperty(value = "업태 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
-    Long businessType;      // 업태 아이디
-    String item;        // 업종
-    String telNumber;   // 전화번호
-    String faxNumber;   // fax번호 12자
-    String homePageUrl; //  홈페이지 주소
-    String mail;        // 메일
-    String clientChargeName;  // 거래처 담당자 명
-    String tradeBusinessRegNo;  // 무역업등록번호
-    String pccc;            // 통관고유번호
+    Long businessType;
+
+    @ApiModelProperty(value = "업종")
+    String item;
+
+    @ApiModelProperty(value = "전화번호")
+    String telNumber;
+
+    @ApiModelProperty(value = "fax번호")
+    String faxNumber;
+
+    @ApiModelProperty(value = "홈페이지")
+    String homePageUrl;
+
+    @ApiModelProperty(value = "메일")
+    String mail;
+
+    @ApiModelProperty(value = "담당자 이름")
+    String clientChargeName;
+
+    @ApiModelProperty(value = "무역업등록번호")
+    String tradeBusinessRegNo;
+
+    @ApiModelProperty(value = "통관고유번호")
+    String pccc;
+
+    @ApiModelProperty(value = "국가코드 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
-    Long countryCode;     // 국가코드 Id
-    String area;        // 지역
-    String currencyUnit;    // 거래화폐단위
-    String companyCharge;  // 회사담당자
-    String companyChargeDept;  // 회사담당부서
-    String paymentMethod;   // 대금결제방법
-    String paymentDate;     // 결제일자
-    String transitMethod;   // 운송방법
-    String testMethod;      // 검사방법
-    String searchWord;      // 검색어
-    String phoneNumber;     // 휴대폰번호
+    Long countryCode;
+
+    @ApiModelProperty(value = "지역")
+    String area;
+
+    @ApiModelProperty(value = "거래화폐단위")
+    String currencyUnit;
+
+    @ApiModelProperty(value = "회사담당자")
+    String companyCharge;
+
+    @ApiModelProperty(value = "회사담당부서")
+    String companyChargeDept;
+
+    @ApiModelProperty(value = "대금결제방법")
+    String paymentMethod;
+
+    @ApiModelProperty(value = "결제일자")
+    String paymentDate;
+
+    @ApiModelProperty(value = "운송방법")
+    String transitMethod;
+
+    @ApiModelProperty(value = "검사방법")
+    String testMethod;
+
+    @ApiModelProperty(value = "검색어")
+    String searchWord;
+
+    @ApiModelProperty(value = "휴대폰번호")
+    String phoneNumber;
+
+    @ApiModelProperty(value = "사용여부 NOT NULL")
     @NotNull(message = NOT_NULL)
-    boolean useYn;          // 사용여부
+    boolean useYn;
 }
