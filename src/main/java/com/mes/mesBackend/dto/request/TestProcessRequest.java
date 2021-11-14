@@ -1,7 +1,6 @@
 package com.mes.mesBackend.dto.request;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,10 +10,10 @@ import static com.mes.mesBackend.exception.Message.NOT_NULL;
 
 @Getter
 @Setter
-@ApiModel(description = "검사방법")
+@Schema(description = "검사방법")
 public class TestProcessRequest {
 
-    @ApiModelProperty(value = "검사방법 NOT NULL")
+    @Schema(description = "검사방법")
     @NotBlank(message = NOT_NULL)
     String testProcess;
 }

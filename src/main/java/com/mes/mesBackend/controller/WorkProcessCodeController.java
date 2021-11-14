@@ -5,8 +5,10 @@ import com.mes.mesBackend.dto.response.CodeResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.WorkProcessService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,9 +19,9 @@ import javax.validation.Valid;
 import java.util.List;
 
 // 3-3-2. 작업 공정 코드 등록
-@RestController
+@Tag(name = "work-process-code", description = "작업 공정 코드 API")
 @RequestMapping("/work-process-codes")
-@Api(tags = "work-process-code")
+@RestController
 @RequiredArgsConstructor
 public class WorkProcessCodeController {
 
@@ -29,7 +31,13 @@ public class WorkProcessCodeController {
     //  코드 생성
     @PostMapping
     @ResponseBody
-    @ApiOperation(value = "작업공정 코드 생성")
+    @Operation(summary = "작업공정 코드 생성")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
     public ResponseEntity<CodeResponse> createWorkProcessCode(
             @RequestBody @Valid CodeRequest codeRequest
     ) {
@@ -39,7 +47,13 @@ public class WorkProcessCodeController {
     // 코드 단일 조회
     @GetMapping("/{id}")
     @ResponseBody()
-    @ApiOperation(value = "작업공정 코드 조회")
+    @Operation(summary = "작업공정 코드 조회")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+            }
+    )
     public ResponseEntity<CodeResponse> getWorkProcessCode(
             @PathVariable Long id
     ) throws NotFoundException {
@@ -49,7 +63,7 @@ public class WorkProcessCodeController {
     // 코드 리스트 조회
     @GetMapping
     @ResponseBody()
-    @ApiOperation(value = "작업공정 코드 리스트 조회")
+    @Operation(summary = "작업공정 코드 리스트 조회")
     public ResponseEntity<List<CodeResponse>> getWorkProcessCodes() {
         return new ResponseEntity<>(workProcessCodeService.getWorkProcessCodes(), HttpStatus.OK);
     }
@@ -57,7 +71,13 @@ public class WorkProcessCodeController {
     // 코드 삭제
     @DeleteMapping("/{id}")
     @ResponseBody()
-    @ApiOperation(value = "작업공정 코드 삭제")
+    @Operation(summary = "작업공정 코드 삭제")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "204", description = "no content"),
+                    @ApiResponse(responseCode = "404", description = "not found resource")
+            }
+    )
     public ResponseEntity deleteWorkProcessCode(
             @PathVariable Long id
     ) throws NotFoundException, BadRequestException {

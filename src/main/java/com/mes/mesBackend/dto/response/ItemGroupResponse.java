@@ -1,8 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,28 +10,28 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Getter
 @Setter
 @JsonInclude(NON_NULL)
-@ApiModel(description = "품목그룹")
+@Schema(description = "품목그룹")
 public class ItemGroupResponse {
 
-    @ApiModelProperty(value = "그룹코드")
+    @Schema(description = "그룹코드")
     CodeResponse.idAndCode itemGroupCode;
 
-    @ApiModelProperty(value = "상위그룹코드")
+    @Schema(description = "상위그룹코드")
     String topGroupCode;
 
-    @ApiModelProperty(value = "상위그룹명")
+    @Schema(description = "상위그룹명")
     String topGroupName;
 
-    @ApiModelProperty(value = "그룹명")
+    @Schema(description = "그룹명")
     String groupName;
 
-    @ApiModelProperty(value = "기본어명")
+    @Schema(description = "기본어명")
     String defaultName;
 
-    @ApiModelProperty(value = "순번")
+    @Schema(description = "순번")
     int orders;
 
-    @ApiModelProperty(value = "사용여부")
+    @Schema(description = "사용여부")
     boolean useYn;
 
     @Getter

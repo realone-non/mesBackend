@@ -1,7 +1,6 @@
 package com.mes.mesBackend.dto.request;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,23 +11,23 @@ import static com.mes.mesBackend.exception.Message.NOT_NULL;
 
 @Setter
 @Getter
-@ApiModel(description = "서브 네비게이션")
+@Schema(description = "서브 네비게이션")
 public class SubNavRequest {
 
-    @ApiModelProperty(value = "네비게이션 이름 NOT NULL")
+    @Schema(description = "네비게이션 이름")
     @NotBlank(message = NOT_NULL)
     String name;
 
-    @ApiModelProperty(value = "유저레벨 NOT NULL")
+    @Schema(description = "유저레벨")
     @NotNull(message = NOT_NULL)
     int level;
 
-    @ApiModelProperty(value = "출력순번 NOT NULL")
+    @Schema(description = "출력순번")
     @NotNull(message = NOT_NULL)
     int orders;
 
 
-    @ApiModelProperty(value = "사용여부 NOT NULL")
+    @Schema(description = "사용여부")
     @NotNull(message = NOT_NULL)
     boolean useYn;
 }

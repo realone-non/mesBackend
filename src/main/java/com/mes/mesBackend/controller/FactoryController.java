@@ -4,8 +4,15 @@ import com.mes.mesBackend.dto.request.FactoryRequest;
 import com.mes.mesBackend.dto.response.FactoryResponse;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.FactoryService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,9 +25,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 // 공장 등록
-@RestController
+@Tag(name = "factory", description = "공장 API")
 @RequestMapping(value = "/factories")
-@Api(tags = "factory")
+@RestController
 @RequiredArgsConstructor
 public class FactoryController {
 
@@ -29,7 +36,14 @@ public class FactoryController {
     // 공장 생성
     @PostMapping
     @ResponseBody()
-    @ApiOperation(value = "공장 생성")
+    @Operation(summary = "공장 생성")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
     public ResponseEntity<FactoryResponse> createFactory(
             @RequestBody @Valid FactoryRequest factoryRequest
     ) throws NotFoundException {
@@ -39,7 +53,13 @@ public class FactoryController {
     // 공장 단일 조회
     @GetMapping("/{id}")
     @ResponseBody()
-    @ApiOperation(value = "공장 조회")
+    @Operation(summary = "공장 단일 조회")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+            }
+    )
     public ResponseEntity<FactoryResponse> getFactory(@PathVariable Long id) throws NotFoundException {
         return new ResponseEntity<>(factoryService.getFactory(id), HttpStatus.OK);
     }
@@ -47,15 +67,43 @@ public class FactoryController {
     // 공장 페이징 조회
     @GetMapping
     @ResponseBody()
-    @ApiOperation(value = "공장 페이징 조회")
-    public ResponseEntity<Page<FactoryResponse>> getFactories(@PageableDefault Pageable pageable) {
+    @Operation(summary = "공장 페이징 조회")
+    @Parameters(
+            value = {
+                    @Parameter(
+                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "integer", defaultValue = "0")
+                    ),
+                    @Parameter(
+                            name = "size", description = "페이지의 사이즈",
+                            in = ParameterIn.QUERY,
+                            schema = @Schema(type = "integer", defaultValue = "20")
+                    ),
+                    @Parameter(
+                            name = "sort", in = ParameterIn.QUERY,
+                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
+                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
+                    )
+            }
+    )
+    public ResponseEntity<Page<FactoryResponse>> getFactories(
+            @PageableDefault @Parameter(hidden = true) Pageable pageable
+    ) {
         return new ResponseEntity<>(factoryService.getFactories(pageable), HttpStatus.OK);
     }
 
     // 공장 수정
     @PatchMapping("/{id}")
     @ResponseBody()
-    @ApiOperation(value = "공장 수정")
+    @Operation(summary = "공장 수정")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
     public ResponseEntity<FactoryResponse> updateFactory(
             @PathVariable Long id,
             @RequestBody @Valid FactoryRequest factoryRequest
@@ -66,7 +114,13 @@ public class FactoryController {
     // 공장 삭제
     @DeleteMapping("/{id}")
     @ResponseBody()
-    @ApiOperation(value = "공장 삭제")
+    @Operation(summary = "공장 삭제")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "204", description = "no content"),
+                    @ApiResponse(responseCode = "404", description = "not found resource")
+            }
+    )
     public ResponseEntity<Void> deleteFactory(@PathVariable Long id) throws NotFoundException {
         factoryService.deleteFactory(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);

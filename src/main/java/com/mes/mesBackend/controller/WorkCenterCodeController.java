@@ -5,8 +5,10 @@ import com.mes.mesBackend.dto.response.CodeResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.WorkCenterService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,9 +21,9 @@ import java.util.List;
 
 
 // 3-3-1. 작업장 코드 등록
-@RestController
+@Tag(name = "work-center-code", description = "작업장 코드 API")
 @RequestMapping("/work-center-codes")
-@Api(tags = "work-center-code")
+@RestController
 @RequiredArgsConstructor
 public class WorkCenterCodeController {
 
@@ -31,7 +33,13 @@ public class WorkCenterCodeController {
     //  코드 생성
     @PostMapping
     @ResponseBody
-    @ApiOperation(value = "작업장 코드 생성")
+    @Operation(summary = "작업장 코드 생성")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
     public ResponseEntity<CodeResponse> createWorkCenterCode(
             @RequestBody @Valid CodeRequest codeRequest
     ) {
@@ -41,7 +49,13 @@ public class WorkCenterCodeController {
     // 코드 단일 조회
     @GetMapping("/{id}")
     @ResponseBody()
-    @ApiOperation(value = "작업장 코드 조회")
+    @Operation(summary = "작업장 코드 조회")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+            }
+    )
     public ResponseEntity<CodeResponse> getWorkCenterCode(
             @PathVariable Long id
     ) throws NotFoundException {
@@ -51,7 +65,7 @@ public class WorkCenterCodeController {
     // 코드 전체 조회
     @GetMapping
     @ResponseBody()
-    @ApiOperation(value = "작업장 코드 전체 조회")
+    @Operation(summary = "작업장 코드 전체 조회")
     public ResponseEntity<List<CodeResponse>> getWorkCenterCodes() {
         return new ResponseEntity<>(workCenterService.getWorkCenterCodes(), HttpStatus.OK);
     }
@@ -59,7 +73,13 @@ public class WorkCenterCodeController {
     // 코드 삭제
     @DeleteMapping("/{id}")
     @ResponseBody()
-    @ApiOperation(value = "작업장 코드 삭제")
+    @Operation(summary = "작업장 코드 삭제")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "204", description = "no content"),
+                    @ApiResponse(responseCode = "404", description = "not found resource")
+            }
+    )
     public ResponseEntity deleteWorkCenterCode(
             @PathVariable Long id
     ) throws NotFoundException, BadRequestException {

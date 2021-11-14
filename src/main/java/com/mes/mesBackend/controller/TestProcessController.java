@@ -4,8 +4,10 @@ import com.mes.mesBackend.dto.request.TestProcessRequest;
 import com.mes.mesBackend.dto.response.TestProcessResponse;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.TestProcessService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,9 +18,9 @@ import javax.validation.Valid;
 import java.util.List;
 
 // 검사방법
-@RestController
+@Tag(name = "test-process", description = "검사방법 API")
 @RequestMapping(value = "/test-processes")
-@Api(tags = "test-process")
+@RestController
 @RequiredArgsConstructor
 public class TestProcessController {
     @Autowired
@@ -27,7 +29,14 @@ public class TestProcessController {
     // 검사방법 생성
     @PostMapping
     @ResponseBody
-    @ApiOperation(value = "검사방법 생성")
+    @Operation(summary = "검사방법 생성")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
     public ResponseEntity<TestProcessResponse> createTestProcess(
             @RequestBody @Valid TestProcessRequest testProcessRequest
     ) {
@@ -37,7 +46,13 @@ public class TestProcessController {
     // 검사방법 단일 조회
     @GetMapping("/{id}")
     @ResponseBody
-    @ApiOperation(value = "검사방법 단일 조회")
+    @Operation(summary = "검사방법 단일 조회")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+            }
+    )
     public ResponseEntity<TestProcessResponse> getTestProcess(@PathVariable Long id) throws NotFoundException {
         return new ResponseEntity<>(testProcessService.getTestProcess(id), HttpStatus.OK);
     }
@@ -45,7 +60,7 @@ public class TestProcessController {
     // 검사방법 리스트 조회
     @GetMapping
     @ResponseBody
-    @ApiOperation(value = "검사방법 리스트 조회")
+    @Operation(summary = "검사방법 리스트 조회")
     public ResponseEntity<List<TestProcessResponse>> getTestProcesses() {
         return new ResponseEntity<>(testProcessService.getTestProcesses(), HttpStatus.OK);
     }
@@ -53,7 +68,14 @@ public class TestProcessController {
     // 검사방법 수정
     @PatchMapping("/{id}")
     @ResponseBody
-    @ApiOperation(value = "검사방법 수정")
+    @Operation(summary = "검사방법 수정")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
     public ResponseEntity<TestProcessResponse> updateTestProcess(
             @PathVariable Long id,
             @RequestBody @Valid TestProcessRequest testProcessRequest
@@ -64,7 +86,13 @@ public class TestProcessController {
     // 검사방법 삭제
     @DeleteMapping("/{id}")
     @ResponseBody
-    @ApiOperation(value = "검사방법 삭제")
+    @Operation(summary = "검사방법 삭제")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "204", description = "no content"),
+                    @ApiResponse(responseCode = "404", description = "not found resource")
+            }
+    )
     public ResponseEntity deleteTestProcess(
             @PathVariable Long id
     ) throws NotFoundException {

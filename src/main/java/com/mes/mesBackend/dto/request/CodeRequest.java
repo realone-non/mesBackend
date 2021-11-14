@@ -1,7 +1,6 @@
 package com.mes.mesBackend.dto.request;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,20 +11,20 @@ import static com.mes.mesBackend.exception.Message.NOT_NULL;
 
 @Getter
 @Setter
-@ApiModel(description = "코드")
+@Schema(description = "코드")
 public class CodeRequest {
-    @ApiModelProperty(value = "코드 NOT NULL")
+    @Schema(description = "코드")
     @NotBlank(message = NOT_NULL)
     String code;
 
-    @ApiModelProperty(value = "코드명 NOT NULL")
+    @Schema(description = "코드명")
     @NotBlank(message = NOT_NULL)
     String codeName;
 
-    @ApiModelProperty(value = "설명")
+    @Schema(description = "설명")
     String description;
 
-    @ApiModelProperty(value = "사용여부 NOT NULL")
+    @Schema(description = "사용여부")
     @NotNull(message = NOT_NULL)
     boolean useYn;
 }

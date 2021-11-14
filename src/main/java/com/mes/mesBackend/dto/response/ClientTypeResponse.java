@@ -1,20 +1,19 @@
 package com.mes.mesBackend.dto.response;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@ApiModel(description = "거래처 타입")
+@Schema(description = "거래처 타입")
 public class ClientTypeResponse {
-    @ApiModelProperty(value = "고유아이디")
+    @Schema(description = "고유아이디")
     Long id;
 
-    @ApiModelProperty(value = "타입")
+    @Schema(description = "타입")
     String name;
 
-    @ApiModelProperty(value = "사용여부")
+    @Schema(description = "사용여부")
     boolean useYn;
 }

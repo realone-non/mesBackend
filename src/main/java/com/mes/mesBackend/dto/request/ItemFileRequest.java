@@ -1,7 +1,6 @@
 package com.mes.mesBackend.dto.request;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,13 +11,13 @@ import static com.mes.mesBackend.exception.Message.*;
 
 @Getter
 @Setter
-@ApiModel(description = "품목파일")
+@Schema(description = "품목파일")
 public class ItemFileRequest {
-    @ApiModelProperty(value = "VER")
+    @Schema(description = "VER")
     @Min(value = ID_VALUE, message = NOT_ZERO)
     int version;
 
-    @ApiModelProperty(value = "등록자")
+    @Schema(description = "등록자")
     @Min(value = ID_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long user;

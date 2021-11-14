@@ -2,8 +2,7 @@ package com.mes.mesBackend.dto.response;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,24 +11,24 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Getter
 @Setter
 @JsonInclude(NON_NULL)
-@ApiModel(description = "작업장")
+@Schema(description = "작업장")
 public class WorkCenterResponse {
-    @ApiModelProperty(value = "고유아이디")
+    @Schema(description = "고유아이디")
     Long id;
 
-    @ApiModelProperty(value = "작업장코드")
+    @Schema(description = "작업장코드")
     CodeResponse.idAndCode workCenterCode;
 
-    @ApiModelProperty(value = "작업장명")
+    @Schema(description = "작업장명")
     String workCenterName;
 
-    @ApiModelProperty(value = "외주사(거래처)")
+    @Schema(description = "외주사(거래처)")
     ClientResponse.idAndName outCompany;
 
-    @ApiModelProperty(value = "Cost Center")
+    @Schema(description = "Cost Center")
     String costCenter;
 
-    @ApiModelProperty(value = "사용여부")
+    @Schema(description = "사용여부")
     boolean useYn = true;
 
     @Getter

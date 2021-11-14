@@ -4,8 +4,10 @@ import com.mes.mesBackend.dto.request.TestCriteriaRequest;
 import com.mes.mesBackend.dto.response.TestCriteriaResponse;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.TestCriteriaService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,9 +18,9 @@ import javax.validation.Valid;
 import java.util.List;
 
 // 검사기준
-@RestController
+@Tag(name = "test-criteria", description = "검사기준 API")
 @RequestMapping(value = "/test-criterias")
-@Api(tags = "test-criteria")
+@RestController
 @RequiredArgsConstructor
 public class TestCriteriaController {
     @Autowired
@@ -27,7 +29,14 @@ public class TestCriteriaController {
     // 검사기준 생성
     @PostMapping
     @ResponseBody
-    @ApiOperation(value = "검사기준 생성")
+    @Operation(summary = "검사기준 생성")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
     public ResponseEntity<TestCriteriaResponse> createTestCriteria(
             @RequestBody @Valid TestCriteriaRequest testCriteriaRequest
     ) {
@@ -37,7 +46,7 @@ public class TestCriteriaController {
     // 검사기준 단일 조회
     @GetMapping("/{id}")
     @ResponseBody
-    @ApiOperation(value = "검사기준 단일 조회")
+    @Operation(summary = "검사기준 단일 조회")
     public ResponseEntity<TestCriteriaResponse> getTestCriteria(@PathVariable Long id) throws NotFoundException {
         return new ResponseEntity<>(testCriteriaService.getTestCriteria(id), HttpStatus.OK);
     }
@@ -45,7 +54,7 @@ public class TestCriteriaController {
     // 검사기준 리스트 조회
     @GetMapping
     @ResponseBody
-    @ApiOperation(value = "검사기준 리스트 조회")
+    @Operation(summary = "검사기준 리스트 조회")
     public ResponseEntity<List<TestCriteriaResponse>> getTestCriterias() {
         return new ResponseEntity<>(testCriteriaService.getTestCriterias(), HttpStatus.OK);
     }
@@ -53,7 +62,13 @@ public class TestCriteriaController {
     // 검사기준 수정
     @PatchMapping("/{id}")
     @ResponseBody
-    @ApiOperation(value = "검사기준 수정")
+    @Operation(summary = "검사기준 수정")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+            }
+    )
     public ResponseEntity<TestCriteriaResponse> updateTestCriteria(
             @PathVariable Long id,
             @RequestBody @Valid TestCriteriaRequest testCriteriaRequest
@@ -64,7 +79,13 @@ public class TestCriteriaController {
     // 검사기준 삭제
     @DeleteMapping("/{id}")
     @ResponseBody
-    @ApiOperation(value = "검사기준 삭제")
+    @Operation(summary = "검사기준 삭제")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "204", description = "no content"),
+                    @ApiResponse(responseCode = "404", description = "not found resource")
+            }
+    )
     public ResponseEntity deleteTestCriteria(
             @PathVariable Long id
     ) throws NotFoundException {
