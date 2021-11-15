@@ -29,6 +29,6 @@ public class MainNavRequest {
     @NotNull(message = NOT_NULL)
     boolean useYn;
     
-    @Schema(description = "이미지아이콘)
+    @Schema(description = "이미지아이콘")
     String icon;
 }
