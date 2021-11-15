@@ -34,13 +34,11 @@ public class DetailNavigation {
     @Column(name = "ORDERS", columnDefinition = "int COMMENT '출력순번'")
     private int orders;     // 출력순번
 
-    @Column(name = "PATH", columnDefinition = "varchar(255) COMMENT '경로'")
-    private String path;    // 경로주소
+
 
     public void put(DetailNavigation detailNavigation) {
         setName(detailNavigation.name);
         setLevel(detailNavigation.level);
         setOrders(detailNavigation.orders);
-        setPath(detailNavigation.path);
     }
 }

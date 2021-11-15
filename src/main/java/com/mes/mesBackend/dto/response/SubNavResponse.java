@@ -19,4 +19,7 @@ public class SubNavResponse {
 
     @Schema(description = "출력순번")
     int orders;
+
+    @Schema(description = "경로주소")
+    String path;
 }
