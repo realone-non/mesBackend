@@ -26,6 +26,9 @@ public class SubNavRequest {
     @NotNull(message = NOT_NULL)
     int orders;
 
+    @Schema(description = "경로주소")
+    @NotBlank(message = NOT_NULL)
+    String path;
 
     @Schema(description = "사용여부")
     @NotNull(message = NOT_NULL)
