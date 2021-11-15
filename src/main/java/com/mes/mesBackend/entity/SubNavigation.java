@@ -41,5 +41,6 @@ public class SubNavigation {
         setName(newSubNavigation.name);
         setLevel(newSubNavigation.level);
         setOrders(newSubNavigation.orders);
+        setPath(newSubNavigation.path);
     }
 }
