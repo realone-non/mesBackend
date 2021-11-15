@@ -4,20 +4,23 @@ import com.mes.mesBackend.dto.request.LotTypeRequest;
 import com.mes.mesBackend.dto.response.LotTypeResponse;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.LotTypeService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 // Lot 유형
-@RestController
+@Tag(name = "lot-type", description = "LOT 유형 API")
 @RequestMapping(value = "/lot-types")
-@Api(tags = "lot-type")
+@RestController
 @RequiredArgsConstructor
 public class LotTypeController {
     @Autowired
@@ -26,9 +29,16 @@ public class LotTypeController {
     // LOT 유형 생성
     @PostMapping
     @ResponseBody
-    @ApiOperation(value = "LOT 유형 생성")
+    @Operation(summary = "LOT 유형 생성")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
     public ResponseEntity<LotTypeResponse> createLotType(
-            @RequestBody LotTypeRequest lotTypeRequest
+            @RequestBody @Valid LotTypeRequest lotTypeRequest
     ) {
         return new ResponseEntity<>(lotTypeService.createLotType(lotTypeRequest), HttpStatus.OK);
     }
@@ -36,7 +46,13 @@ public class LotTypeController {
     // LOT 유형 단일 조회
     @GetMapping("/{id}")
     @ResponseBody
-    @ApiOperation(value = "LOT 유형 단일 조회")
+    @Operation(summary = "LOT 유형 단일 조회")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+            }
+    )
     public ResponseEntity<LotTypeResponse> getLotType(@PathVariable Long id) throws NotFoundException {
         return new ResponseEntity<>(lotTypeService.getLotType(id), HttpStatus.OK);
     }
@@ -44,7 +60,7 @@ public class LotTypeController {
     // LOT 유형 리스트 조회
     @GetMapping
     @ResponseBody
-    @ApiOperation(value = "LOT 유형 리스트 조회")
+    @Operation(summary = "LOT 유형 리스트 조회")
     public ResponseEntity<List<LotTypeResponse>> getLotTypes() {
         return new ResponseEntity<>(lotTypeService.getLotTypes(), HttpStatus.OK);
     }
@@ -52,10 +68,17 @@ public class LotTypeController {
     // LOT 유형 수정
     @PatchMapping("/{id}")
     @ResponseBody
-    @ApiOperation(value = "LOT 유형 수정")
+    @Operation(summary = "LOT 유형 수정")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
     public ResponseEntity<LotTypeResponse> updateLotType(
             @PathVariable Long id,
-            @RequestBody LotTypeRequest lotTypeRequest
+            @RequestBody @Valid LotTypeRequest lotTypeRequest
     ) throws NotFoundException {
         return new ResponseEntity<>(lotTypeService.updateLotType(id, lotTypeRequest), HttpStatus.OK);
     }
@@ -63,7 +86,13 @@ public class LotTypeController {
     // LOT 유형 삭제
     @DeleteMapping("/{id}")
     @ResponseBody
-    @ApiOperation(value = "LOT 유형 삭제")
+    @Operation(summary = "LOT 유형 삭제")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "204", description = "no content"),
+                    @ApiResponse(responseCode = "404", description = "not found resource")
+            }
+    )
     public ResponseEntity deleteLotType(
             @PathVariable Long id
     ) throws NotFoundException {

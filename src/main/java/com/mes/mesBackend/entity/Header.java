@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static javax.persistence.GenerationType.IDENTITY;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -14,7 +16,7 @@ import javax.persistence.*;
 public class Header {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '헤더 고유아이디'")
     private Long id;
 

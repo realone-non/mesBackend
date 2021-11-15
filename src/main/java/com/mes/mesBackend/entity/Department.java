@@ -34,7 +34,7 @@ public class Department extends BaseTimeEntity{
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;      // 사용여부
 
-    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
     public void put(Department newDepartment) {

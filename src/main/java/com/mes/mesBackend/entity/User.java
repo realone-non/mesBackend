@@ -42,7 +42,7 @@ public class User extends BaseTimeEntity {
     @Column(name = "TEL_NUMBER", columnDefinition = "varchar(255) COMMENT '연락처'")
     private String telNumber;   // 연락처
 
-    @Column(name = "ENG_NAME", columnDefinition = "varchar(255) COMMENT '영문이름+직위'")
+    @Column(name = "ENG_NAME", columnDefinition = "varchar(255) COMMENT '영문이름'")
     private String engName;     // 영문이름+직위
 
     @Column(name = "MAIL", nullable = false, columnDefinition = "varchar(255) COMMENT '메일'")

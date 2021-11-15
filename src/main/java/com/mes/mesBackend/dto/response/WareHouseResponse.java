@@ -1,6 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,13 +10,25 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Getter
 @Setter
 @JsonInclude(NON_NULL)
+@Schema(description = "창고")
 public class WareHouseResponse {
+    @Schema(description = "고유아이디")
     Long id;
-    String wareHouseCode;  // 창고코드
-    String wareHouseName;   // 창고명
+
+    @Schema(description = "창고코드")
+    String wareHouseCode;
+
+    @Schema(description = "창고명")
+    String wareHouseName;
+
+    @Schema(description = "창고유형")
     WareHouseTypeResponse wareHouseType;
-    String wareHouseGroup;   // 창고그룹
-    boolean useYn;      // 사용여부
+
+    @Schema(description = "창고그룹")
+    String wareHouseGroup;
+
+    @Schema(description = "사용여부")
+    boolean useYn;
 
     @Getter
     @Setter

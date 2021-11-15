@@ -29,7 +29,6 @@ alter table INSTRUCTION_STATUSES comment = '지시상태';
 alter table INVOICES comment = 'Invoice';
 alter table ITEMS comment = '품목정보';
 alter table ITEM_ACCOUNTS comment = '품목계정';
-alter table ITEM_CHECK_CATEGORIES comment = '품목별 검사항목 정보';
 alter table ITEM_CHECK_DETAILS comment = '품목별 검사항목 정보 세부 정보';
 alter table ITEM_FILES comment = '품목정보 파일';
 alter table ITEM_FORMS comment = '품목형태';
@@ -56,7 +55,6 @@ alter table STOCK_INSPECT_REQUEST_DETAILS comment = '재고조사 의뢰 상세 
 alter table SUB_CODE_MASTERS comment = '부코드 정보';
 alter table SUB_ITEMS comment = '대체품목 정보';
 alter table SUB_NAVS comment = '서브 네비게이션';
-alter table TEST_CATEGORIES comment = '검사유형';
 alter table TEST_CRITERIA comment = '검사기준';
 alter table TEST_PROCESSES comment = '검사방법';
 alter table TEST_TYPES comment = '검사타입';
@@ -66,7 +64,7 @@ alter table WARE_HOUSES comment = '창고 정보';
 alter table WARE_HOUSE_TYPES comment = '창고유형';
 alter table WORK_CENTERS comment = '작업장 정보';
 alter table WORK_CENTER_CHECKS comment = '작업장별 점검항목 정보';
-alter table WORK_CENTER_CHECK_TYPES comment = '작업장별 세부 점검항목 디테일 정보';
+alter table WORK_CENTER_CHECK_DETAILS comment = '작업장별 세부 점검항목 디테일 정보';
 alter table WORK_DOCUMENTS comment = '작업표준서 정보';
 alter table WORK_LINES comment = '작업라인 정보';
 alter table WORK_ORDERS comment = '제조오더 정보';
@@ -87,6 +85,21 @@ alter table EQUIPMENT_CHECKS comment = '설비 점검 실적 정보';
 alter table EQUIPMENT_CHECK_DETAILS comment ='설비 점검 세부 항목';
 alter table MEASURE_CALIBRATIONS comment ='계측기 검교정 실적 정보';
 alter table LOT_MASTERS comment = 'Lot 마스터 정보';
+
+alter table PURCHASE_RETURNS comment = '구매입고 반품등록';
+alter table PURCHASE_INPUTS comment = '구매입고 등록';
+alter table PURCHASE_REQUESTS comment = '구매요청 등록';
+alter table KITTINGS comment = 'kitting 등록';
+alter table PRODUCT_RESULTS comment = '생산실적 관리';
+alter table END_TIMES comment = '마감일자';
+
+alter table GRID_OPTIONS comment = '그리드 옵션';
+alter table ITEM_CHECKS comment = '품목별 검사항목';
+alter table ITEM_GROUP_CODES comment = '품목 그룹코드';
+alter table WORK_CENTER_CODES comment = '작업장 코드';
+alter table WORK_LINE_CODES comment = '작업라인 코드';
+alter table WORK_PROCESS_CODES comment = '작업공정 코드';
+
 
 
 # 테이블명,테이블정보,column정보,column이름,type,null 정보 조회 쿼리

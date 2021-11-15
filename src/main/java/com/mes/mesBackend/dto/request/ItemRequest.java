@@ -2,6 +2,7 @@ package com.mes.mesBackend.dto.request;
 
 import com.mes.mesBackend.entity.enumeration.DevelopStatus;
 import com.mes.mesBackend.entity.enumeration.TestType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,84 +15,113 @@ import static com.mes.mesBackend.exception.Message.*;
 
 @Getter
 @Setter
+@Schema(description = "품목")
 public class ItemRequest {
+
+    @Schema(description = "품번")
     @NotBlank(message = NOT_EMPTY)
-    String itemNo;// 품번
+    String itemNo;
 
+    @Schema(description = "품명")
     @NotBlank(message = NOT_EMPTY)
-    String itemName;                                // 품명
+    String itemName;
 
-    String standard;                                // 규격
+    @Schema(description = "규격")
+    String standard;
 
+    @Schema(description = "품목계정 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
-    Long itemAccount;                             // 품목계정
+    Long itemAccount;
 
+    @Schema(description = "품목그룹 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
-    Long itemGroup;                               // 품목그룹
+    Long itemGroup;
 
+    @Schema(description = "품목형태 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
-    Long itemForm;                                 // 품목형태
+    Long itemForm;
 
+    @Schema(description = "용도유형 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
-    Long useType;                                   // 용도유형
+    Long useType;
 
+    @Schema(description = " 라우팅 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
-    Long routing;                                    // 라우팅 (라우팅 명)
+    Long routing;
 
+    @Schema(description = "재고단위  id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
-    Long unit;                                          // 재고단위
+    Long unit;
 
+    @Schema(description = "uhp")
     @NotNull(message = NOT_NULL)
-    int uhp;                                       // uhp
+    int uhp;
 
+    @Schema(description = "유효일수")
     @NotNull(message = NOT_NULL)
-    int validDay;                                  // 유효일수
+    int validDay;
 
+    @Schema(description = "LOT유형 id")
     @NotNull(message = NOT_NULL)
-    Long lotType;                               // LOT유형
+    Long lotType;
 
+    @Schema(description = "수입검사")
     @NotNull(message = NOT_NULL)
-    TestType inputTest = TestType.NO_TEST;              // 수입검사
+    TestType inputTest = TestType.NO_TEST;
 
+    @Schema(description = "출하검사")
     @NotNull(message = NOT_NULL)
-    TestType outputTest = TestType.NO_TEST;             // 출하검사
+    TestType outputTest = TestType.NO_TEST;
 
+    @Schema(description = "폐기품 Lot 관리")
     @NotNull(message = NOT_NULL)
-    boolean wasteProductLot;                                   // 폐기품 Lot 관리
+    boolean wasteProductLot;
 
+    @Schema(description = "개발상태")
     @NotNull(message = NOT_NULL)
-    DevelopStatus developStatus = DevelopStatus.BEFORE;           // 개발상태
+    DevelopStatus developStatus = DevelopStatus.BEFORE;
 
+    @Schema(description = "재고관리")
     @NotNull(message = NOT_NULL)
-    boolean stockControl;                                  // 재고관리
+    boolean stockControl;
 
+    @Schema(description = "입고단가")
     @NotNull(message = NOT_NULL)
-    int inputUnitPrice;                                    // 입고단가
+    int inputUnitPrice;
 
+    @Schema(description = "저장위치")
     @NotBlank(message = NOT_EMPTY)
-    String storageLocation;                               // 저장위치
+    String storageLocation;
 
-    String clientItemNo;                                   // 거래처 품번
+    @Schema(description = "거래처품번")
+    String clientItemNo;
 
+    @Schema(description = "제조사품번")
     @NotBlank(message = NOT_EMPTY)
-    String manufacturerPartNo;                                   // 제조사품번
+    String manufacturerPartNo;
 
+    @Schema(description = "제조사 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
-    Long manufacturer;                                 // 제조사
+    Long manufacturer;
 
+    @Schema(description = "검사기준 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
-    Long testCriteria;                                 // 검사기준
+    Long testCriteria;
 
+    @Schema(description = "검사방법 id")
     @Min(value = ID_VALUE, message = NOT_ZERO)
-    Long testProcess;                                   // 검사방법
+    Long testProcess;
 
+    @Schema(description = "사용여부")
     @NotNull(message = NOT_NULL)
-    boolean useYn;                                                 // 사용
+    boolean useYn;
 
-    String searchWord;                                     // 검색어
+    @Schema(description = "검색어")
+    String searchWord;
 
-    boolean agingMaterialYn;                                 // 시효성자재
+    @Schema(description = "시효성자재")
+    boolean agingMaterialYn;
 }

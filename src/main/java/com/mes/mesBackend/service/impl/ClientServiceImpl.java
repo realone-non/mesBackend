@@ -51,8 +51,8 @@ public class ClientServiceImpl implements ClientService {
 
     // 거래처 생성
     public ClientResponse createClient(ClientRequest clientRequest) throws NotFoundException {
-        BusinessType businessType = businessTypeService.getBusinessTypeOrThrow(clientRequest.getBusinessType());
-        CountryCode countryCode = countryCodeService.getCountryCodeOrThrow(clientRequest.getCountryCode());
+        BusinessType businessType = clientRequest.getBusinessType() != null ? businessTypeService.getBusinessTypeOrThrow(clientRequest.getBusinessType()) : null;
+        CountryCode countryCode = clientRequest.getCountryCode() != null ? countryCodeService.getCountryCodeOrThrow(clientRequest.getCountryCode()) : null;
         ClientType clientType = clientTypeService.getClientTypeOrThrow(clientRequest.getClientType());
 
         Client client = modelMapper.toEntity(clientRequest, Client.class);
@@ -82,9 +82,9 @@ public class ClientServiceImpl implements ClientService {
         Client newClient = modelMapper.toEntity(clientRequest, Client.class);
         Client findClient = getClientOrThrow(id);
 
-        BusinessType newBusinessType = businessTypeService.getBusinessTypeOrThrow(clientRequest.getBusinessType());
+        BusinessType newBusinessType = clientRequest.getBusinessType() != null ? businessTypeService.getBusinessTypeOrThrow(clientRequest.getBusinessType()) : null;
+        CountryCode newCountryCode = clientRequest.getCountryCode() != null ? countryCodeService.getCountryCodeOrThrow(clientRequest.getCountryCode()) : null;
         ClientType newClientType = clientTypeService.getClientTypeOrThrow(clientRequest.getClientType());
-        CountryCode newCountryCode = countryCodeService.getCountryCodeOrThrow(clientRequest.getCountryCode());
 
         findClient.put(newClient, newBusinessType, newCountryCode, newClientType);
         clientRepository.save(findClient);

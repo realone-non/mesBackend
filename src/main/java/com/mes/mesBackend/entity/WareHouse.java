@@ -53,10 +53,10 @@ public class WareHouse extends BaseTimeEntity {
 //    @Column(name = "WORK_PROCESS")
 //    private String workProcess; // 작업공정
 
-    @Column(name = "USE_YN", columnDefinition = "bit(1) COMMENT '사용여부'")
+    @Column(name = "USE_YN", columnDefinition = "bit(1) COMMENT '사용여부'", nullable = false)
     private boolean useYn;      // 사용여부
 
-    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
 //    @ManyToOne(fetch = FetchType.LAZY)

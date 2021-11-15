@@ -45,9 +45,9 @@ public class WorkLineServiceImpl implements WorkLineService {
     // 작업라인 생성
     @Override
     public WorkLineResponse createWorkLine(WorkLineRequest workLineRequest) throws NotFoundException {
-        WorkLineCode workLineCode = getWorkLineCodeOrThrow(workLineRequest.getWorkLineCode());
-        WorkCenter workCenter = workCenterService.getWorkCenterOrThrow(workLineRequest.getWorkCenter());
-        WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(workLineRequest.getWorkProcess());
+        WorkLineCode workLineCode = workLineRequest.getWorkLineCode() != null ? getWorkLineCodeOrThrow(workLineRequest.getWorkLineCode()) : null;
+        WorkCenter workCenter = workLineRequest.getWorkCenter() != null ? workCenterService.getWorkCenterOrThrow(workLineRequest.getWorkCenter()) : null;
+        WorkProcess workProcess = workLineRequest.getWorkProcess() != null ? workProcessService.getWorkProcessOrThrow(workLineRequest.getWorkProcess()) : null;
 
         WorkLine workLine = mapper.toEntity(workLineRequest, WorkLine.class);
         workLine.addMapping(workLineCode, workCenter, workProcess);
@@ -73,12 +73,14 @@ public class WorkLineServiceImpl implements WorkLineService {
     // 작업라인 수정
     @Override
     public WorkLineResponse updateWorkLine(Long id, WorkLineRequest workLineRequest) throws NotFoundException {
-        WorkLineCode newWorkLineCode = getWorkLineCodeOrThrow(workLineRequest.getWorkLineCode());
-        WorkCenter newWorkCenter = workCenterService.getWorkCenterOrThrow(workLineRequest.getWorkCenter());
-        WorkProcess newWorkProcess = workProcessService.getWorkProcessOrThrow(workLineRequest.getWorkProcess());
+
+        WorkLineCode newWorkLineCode = workLineRequest.getWorkLineCode() != null ? getWorkLineCodeOrThrow(workLineRequest.getWorkLineCode()) : null;
+        WorkCenter newWorkCenter = workLineRequest.getWorkCenter() != null ? workCenterService.getWorkCenterOrThrow(workLineRequest.getWorkCenter()) : null;
+        WorkProcess newWorkProcess = workLineRequest.getWorkProcess() != null ? workProcessService.getWorkProcessOrThrow(workLineRequest.getWorkProcess()) : null;
 
         WorkLine findWorkLine = getWorkLineOrThrow(id);
         WorkLine newWorkLine = mapper.toEntity(workLineRequest, WorkLine.class);
+
         findWorkLine.put(newWorkLine, newWorkLineCode, newWorkCenter, newWorkProcess);
         workLineRepository.save(findWorkLine);
         return mapper.toResponse(findWorkLine, WorkLineResponse.class);

@@ -38,11 +38,11 @@ public class WorkCenterServiceImpl implements WorkCenterService {
     // 작업장 생성
     @Override
     public WorkCenterResponse createWorkCenter(WorkCenterRequest workCenterRequest) throws NotFoundException {
-        Client client = clientService.getClientOrThrow(workCenterRequest.getOutCompany());
+        Client outCompany = workCenterRequest.getOutCompany() != null ? clientService.getClientOrThrow(workCenterRequest.getOutCompany()) : null;
         WorkCenterCode workCenterCode = getWorkCenterCodeOrThrow(workCenterRequest.getWorkCenterCode());
         WorkCenter workCenter = mapper.toEntity(workCenterRequest, WorkCenter.class);
         // workcenter, client 추가
-        workCenter.addWorkCenterCodeAndClient(workCenterCode, client);
+        workCenter.addWorkCenterCodeAndClient(workCenterCode, outCompany);
         WorkCenter saveWorkCenter = workCenterRepository.save(workCenter);
         return mapper.toResponse(saveWorkCenter, WorkCenterResponse.class);
     }
@@ -65,10 +65,13 @@ public class WorkCenterServiceImpl implements WorkCenterService {
     @Override
     public WorkCenterResponse updateWorkCenter(Long workCenterId, WorkCenterRequest workCenterRequest) throws NotFoundException {
         WorkCenter findWorkCenter = getWorkCenterOrThrow(workCenterId);
+
         WorkCenterCode newWorkCenterCode = getWorkCenterCodeOrThrow(workCenterRequest.getWorkCenterCode());
-        Client newClient = clientService.getClientOrThrow(workCenterRequest.getOutCompany());
+        Client newOutCompany = workCenterRequest.getOutCompany() != null ? clientService.getClientOrThrow(workCenterRequest.getOutCompany()) : null;
+
         WorkCenter newWorkCenter = mapper.toEntity(workCenterRequest, WorkCenter.class);
-        findWorkCenter.put(newWorkCenter, newWorkCenterCode, newClient);
+
+        findWorkCenter.put(newWorkCenter, newWorkCenterCode, newOutCompany);
         workCenterRepository.save(findWorkCenter);
         return mapper.toResponse(findWorkCenter, WorkCenterResponse.class);
     }
