@@ -19,4 +19,5 @@ public class MainNavResponse {
 
     @Schema(description = "출력순번")
     int orders;
+    String icon;
 }
