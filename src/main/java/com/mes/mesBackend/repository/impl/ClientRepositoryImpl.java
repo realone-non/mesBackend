@@ -53,7 +53,7 @@ public class ClientRepositoryImpl implements ClientRepositoryCustom {
 
     // 거래처명에 대한 검색 조건
     private BooleanExpression isNameContaining(String name) {
-        return name != null ? client.name.contains(name) : null;
+        return name != null ? client.clientName.contains(name) : null;
     }
 
     // deleteYn false

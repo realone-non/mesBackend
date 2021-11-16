@@ -21,7 +21,7 @@ public class ClientRequest {
 
     @Schema(description = "거래처명")
     @NotBlank(message = NOT_NULL)
-    String name;
+    String clientName;
 
     @Schema(description = "약어")
     String shortName;
