@@ -19,7 +19,7 @@ public class ClientResponse {
     String clientCode;
 
     @Schema(description = "거래처명")
-    String name;    // 거래처명
+    String clientName;    // 거래처명
 
     @Schema(description = "약어")
     String shortName;      // 약어
@@ -114,6 +114,6 @@ public class ClientResponse {
         @Schema(description = "고유아이디")
         Long id;
         @Schema(description = "거래처명")
-        String name;
+        String clientName;
     }
 }

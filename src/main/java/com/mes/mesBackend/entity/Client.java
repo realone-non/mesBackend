@@ -51,8 +51,8 @@ public class Client extends BaseTimeEntity {
     @Column(name = "CLIENT_CODE", nullable = false, columnDefinition = "varchar(255) COMMENT '거래처 코드'")
     private String clientCode;  // 거래처코드
 
-    @Column(name = "NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '거래처 명'")
-    private String name;    // 거래처명
+    @Column(name = "CLIENT_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '거래처 명'")
+    private String clientName;    // 거래처명
 
     @Column(name = "SHORT_NAME", columnDefinition = "varchar(255) COMMENT '약어'")
     private String shortName;      // 약어
@@ -156,7 +156,7 @@ public class Client extends BaseTimeEntity {
                     ClientType newClientType
     ) {
         setClientCode(newClient.clientCode);
-        setName(newClient.name);
+        setClientName(newClient.clientName);
         setShortName(newClient.shortName);
         setClientType(newClientType);
         setBusinessNumber(newClient.businessNumber);
