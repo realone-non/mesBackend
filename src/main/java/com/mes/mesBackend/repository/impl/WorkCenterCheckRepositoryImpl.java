@@ -32,7 +32,10 @@ public class WorkCenterCheckRepositoryImpl implements WorkCenterCheckRepositoryC
                         isCheckTypeEq(checkTypeId),
                         isWorkCenterEq(workCenterId),
                         isDeleteYnFalse()
-                ).fetchResults();
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetchResults();
         return new PageImpl<>(results.getResults(), pageable, results.getTotal());
     }
 
