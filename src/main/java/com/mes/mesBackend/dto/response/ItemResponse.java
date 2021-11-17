@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -95,4 +96,36 @@ public class ItemResponse {
 
     @Schema(description = "시효성자재")
     boolean agingMaterialYn;      // 시효성자재
+
+    @Getter
+    @Setter
+    @JsonInclude(NON_NULL)
+    public static class itemToBomResponse {
+        @Schema(description = "고유아이디")
+        Long id;
+
+        @Schema(description = "품번")
+        String itemNo;
+
+        @Schema(description = "품명")
+        String itemName;
+
+        @Schema(description = "품목 계정")
+        String itemAccount;
+
+        @Schema(description = "제조사 품번")
+        String manufacturerPartNo;
+
+        @Schema(description = "제조사")
+        String clientName;      // 제조사
+
+        @Schema(description = "단위")
+        String unitCodeName;        // 재고단위
+
+        @Schema(description = "저장위치")
+        String storageLocation;    // 저장위치
+
+        @Schema(description = "입고단가")
+        int inputUnitPrice;         // 입고단가
+    }
 }
