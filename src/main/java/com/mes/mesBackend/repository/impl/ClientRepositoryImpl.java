@@ -35,6 +35,8 @@ public class ClientRepositoryImpl implements ClientRepositoryCustom {
                         isNameContaining(name),
                         isDeleteYnFalse()
                 )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetchResults();
         return new PageImpl<>(results.getResults(), pageable, results.getTotal());
     }
@@ -43,7 +45,6 @@ public class ClientRepositoryImpl implements ClientRepositoryCustom {
     // 거래처유형에 대한 검색조건
     private BooleanExpression isTypeContaining(Long type) {
         return type != null ? client.clientType.id.eq(type) : null;
-//        return type != null ? client.clientType.id.eq(type).and(isDeleteYnFalse()) : null;
     }
 
     // 거래처 코드에 대한 검색 조건

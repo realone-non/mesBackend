@@ -1,16 +1,18 @@
 package com.mes.mesBackend.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.mapper.MapperCustom;
-import org.modelmapper.*;
+import org.modelmapper.Converter;
+import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
-import org.modelmapper.convention.NamingConventions;
 import org.modelmapper.spi.MappingContext;
-import org.modelmapper.spi.MatchingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.persistence.Convert;
+import javax.persistence.JoinColumn;
 import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -34,6 +36,9 @@ public class MapperConfig {
         modelMapper.addConverter(toGridResponseConvert);
         modelMapper.addConverter(toWorkCenterCheckDetailResponseConvert);
         modelMapper.addConverter(toItemFileResponseConvert);
+        modelMapper.addConverter(toBomItemResponseConvert);
+        modelMapper.addConverter(toItemBomResponseConvert);
+        modelMapper.addConverter(toBomMasterResponseConvert);
 
         return modelMapper;
     }
@@ -135,6 +140,50 @@ public class MapperConfig {
             ItemFileResponse itemFileResponse = modelMapper.map(itemFile, ItemFileResponse.class);
             itemFileResponse.setCreatedDate(itemFile.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             return itemFileResponse;
+        }
+    };
+
+    // BomItemResponse의 price 매핑  단가*수량
+    Converter<BomItemDetail, BomItemResponse> toBomItemResponseConvert = new Converter<BomItemDetail, BomItemResponse>() {
+        @Override
+        public BomItemResponse convert(MappingContext<BomItemDetail, BomItemResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            BomItemDetail bomItemDetail = context.getSource();
+            BomItemResponse bomItemResponse = modelMapper.map(bomItemDetail, BomItemResponse.class);
+            int price = bomItemResponse.getItem().getInputUnitPrice() * bomItemResponse.getAmount();
+            bomItemResponse.setPrice(price);
+            return bomItemResponse;
+        }
+    };
+
+    Converter<Item, ItemResponse.itemToBomResponse> toItemBomResponseConvert = new Converter<Item, ItemResponse.itemToBomResponse>() {
+        @Override
+        public ItemResponse.itemToBomResponse convert(MappingContext<Item, ItemResponse.itemToBomResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            Item item = context.getSource();
+
+            ItemResponse itemResponse = modelMapper.map(item, ItemResponse.class);
+            ItemResponse.itemToBomResponse map = modelMapper.map(item, ItemResponse.itemToBomResponse.class);
+
+            String account = itemResponse.getItemAccount().getAccount();
+
+            map.setItemAccount(account);
+            return map;
+        }
+    };
+
+    Converter<BomMaster, BomMasterResponse> toBomMasterResponseConvert = new Converter<BomMaster, BomMasterResponse>() {
+        @Override
+        public BomMasterResponse convert(MappingContext<BomMaster, BomMasterResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            BomMaster bomMaster = context.getSource();
+            BomMasterResponse bomMasterResponse = modelMapper.map(bomMaster, BomMasterResponse.class);
+
+            bomMasterResponse.getItem().setClientName(null);
+            bomMasterResponse.getItem().setUnitCodeName(null);
+            bomMasterResponse.getItem().setStorageLocation(null);
+
+            return bomMasterResponse;
         }
     };
 }

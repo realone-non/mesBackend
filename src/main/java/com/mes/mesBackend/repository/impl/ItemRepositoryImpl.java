@@ -37,8 +37,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                         isItemAccountEq(itemAccountId),
                         isItemNoContaining(itemNo),
                         isItemNameContaining(itemName),
-                        isSearchContaining(searchWord)
+                        isSearchContaining(searchWord),
+                        isDeleteYnFalse()
                 )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetchResults();
         return new PageImpl<>(results.getResults(), pageable, results.getTotal());
     }
@@ -68,5 +71,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
         return searchWord!= null ? item.searchWord.contains(searchWord) : null;
     }
 
-
+    private BooleanExpression isDeleteYnFalse() {
+        return item.deleteYn.isFalse();
+    }
 }

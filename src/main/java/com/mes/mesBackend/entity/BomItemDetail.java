@@ -1,8 +1,13 @@
 package com.mes.mesBackend.entity;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import static javax.persistence.FetchType.LAZY;
 
 /*
  * BOM품목 정보 등록
@@ -33,41 +38,22 @@ public class BomItemDetail extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT 'BOM 품목 정보 등록 고유아이디'")
     private Long id;
 
-    @Column(name = "LEVEL", columnDefinition = "int COMMENT '레벨'")
+    @Column(name = "LEVEL", columnDefinition = "int COMMENT '레벨'", nullable = false)
     private int level;     // 레벨
 
-    @Column(name = "DETAIL_ITEM_NO", nullable = false, columnDefinition = "varchar(255) COMMENT '품번'")
-    private String detailItemNo;    // 품번
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목'", nullable = false)
+    private Item item;
 
-    @Column(name = "DETAIL_ITEM_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '품명'")
-    private String detailItemName;  // 품명
-
-    @Column(name = "MANUFACTURER_ITEM_NO", columnDefinition = "varchar(255) COMMENT '제조사 품번'")
-    private String manufacturerItemNo;      //  제조사 품번
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UNIT", columnDefinition = "bigint COMMENT '단위'")
-    private Unit unit;    // 단위
-
-    @Column(name = "AMOUNT", columnDefinition = "int COMMENT '수량'")
+    @Column(name = "AMOUNT", columnDefinition = "int COMMENT '수량'", nullable = false)
     private int amount;     // 수량
 
-    @Column(name = "TO_BUY", columnDefinition = "varchar(255) COMMENT '구매처'")
-    private String toBuy;       // 구매처
-
-    @Column(name = "LOCATION", columnDefinition = "varchar(255) COMMENT '위치'")
-    private String location;    // 위치
-
-    @Column(name = "UNIT_PRICE", columnDefinition = "int COMMENT '단가'")
-    private int unitPrice;      // 단가
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '구매처'", nullable = false)
+    private Client toBuy;
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ITEM_ACCOUNTS", columnDefinition = "bigint COMMENT '품목계정'")
-    private ItemAccount itemAccount;    // 품목계정
-
-    // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '공정'")
     private WorkProcess workProcess;     // 공정
 
@@ -75,13 +61,44 @@ public class BomItemDetail extends BaseTimeEntity {
     private String note;        // 비고
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "BOM_MASTERS_ID", columnDefinition = "bigint COMMENT 'BomMaster'")
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "BOM_MASTERS_ID", columnDefinition = "bigint COMMENT 'BomMaster'", nullable = false)
     private BomMaster bomMaster;
 
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
-    private Boolean useYn = true;      //  사용여부
+    private boolean useYn = true;      //  사용여부
 
-    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
+
+    public void addJoin(
+            BomMaster bomMaster,
+            Item item,
+            Client toBuy,
+            WorkProcess workProcess
+    ) {
+        setBomMaster(bomMaster);
+        setItem(item);
+        setToBuy(toBuy);
+        setWorkProcess(workProcess);
+    }
+
+    public void update(
+            Item newItem,
+            Client newToBuy,
+            WorkProcess newWorkProcess,
+            BomItemDetail newBomItemDetail
+    ) {
+        setLevel(newBomItemDetail.level);
+        setItem(newItem);
+        setAmount(newBomItemDetail.amount);
+        setToBuy(newToBuy);
+        setWorkProcess(newWorkProcess);
+        setUseYn(newBomItemDetail.useYn);
+        setNote(newBomItemDetail.note);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }
