@@ -30,28 +30,28 @@ public class ItemRequest {
     String standard;
 
     @Schema(description = "품목계정 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long itemAccount;
 
     @Schema(description = "품목그룹 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long itemGroup;
 
     @Schema(description = "품목형태 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long itemForm;
 
     @Schema(description = "용도유형 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long useType;
 
     @Schema(description = " 라우팅 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long routing;
 
     @Schema(description = "재고단위  id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long unit;
 
@@ -103,16 +103,16 @@ public class ItemRequest {
     String manufacturerPartNo;
 
     @Schema(description = "제조사 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long manufacturer;
 
     @Schema(description = "검사기준 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long testCriteria;
 
     @Schema(description = "검사방법 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long testProcess;
 
     @Schema(description = "사용여부")

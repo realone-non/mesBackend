@@ -15,12 +15,12 @@ import static com.mes.mesBackend.exception.Message.*;
 public class BomItemRequest {
 
     @Schema(description = "레벨")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     int level;
 
     @Schema(description = "품목 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long item;
 
@@ -29,12 +29,12 @@ public class BomItemRequest {
     int amount;
 
     @Schema(description = "거래처 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long toBuy;
 
     @Schema(description = "공정 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long workProcess;
 
     @Schema(description = "사용여부")

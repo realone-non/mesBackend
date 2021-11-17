@@ -28,6 +28,6 @@ public class HeaderRequest {
 
     @Schema(description = "순서")
     @NotNull(message = NOT_NULL)
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     int seq;
 }

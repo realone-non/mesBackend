@@ -27,7 +27,7 @@ public class ClientRequest {
     String shortName;
 
     @Schema(description = "거래처 유형 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long clientType;
 
@@ -52,7 +52,7 @@ public class ClientRequest {
     String detailAddress;
 
     @Schema(description = "업태 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long businessType;
 
     @Schema(description = "업종")
@@ -80,7 +80,7 @@ public class ClientRequest {
     String pccc;
 
     @Schema(description = "국가코드 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long countryCode;
 
     @Schema(description = "지역")

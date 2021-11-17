@@ -14,11 +14,11 @@ import static com.mes.mesBackend.exception.Message.*;
 @Schema(description = "품목파일")
 public class ItemFileRequest {
     @Schema(description = "VER")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     int version;
 
     @Schema(description = "등록자")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long user;
 }

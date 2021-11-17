@@ -15,12 +15,12 @@ import static com.mes.mesBackend.exception.Message.*;
 public class WorkCenterCheckRequest {
 
     @Schema(description = "작업장코드 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long workCenter;      // 작업장코드
 
     @Schema(description = "점검유형 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long checkType;        // 점검유형
 }

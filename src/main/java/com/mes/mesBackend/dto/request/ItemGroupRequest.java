@@ -15,7 +15,7 @@ import static com.mes.mesBackend.exception.Message.*;
 public class ItemGroupRequest {
 
     @Schema(description = "그룹코드 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long itemGroupCode;
 
@@ -32,7 +32,7 @@ public class ItemGroupRequest {
     String defaultName;         // 기본어명
 
     @Schema(description = "순번")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     int orders;              // 순번
 

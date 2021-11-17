@@ -23,7 +23,7 @@ public class WareHouseRequest {
     String wareHouseName;
 
     @Schema(description = "창고유형 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long wareHouseType;
 
