@@ -14,7 +14,7 @@ import static com.mes.mesBackend.exception.Message.*;
 @Schema(description = "작업장")
 public class WorkCenterRequest {
     @Schema(description = "작업장코드 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long workCenterCode;
 
@@ -22,7 +22,7 @@ public class WorkCenterRequest {
     String workCenterName;
 
     @Schema(description = "외주사 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long outCompany;
 
     @Schema(description = "Cost Center")

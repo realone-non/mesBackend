@@ -1,6 +1,5 @@
 package com.mes.mesBackend.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -127,5 +126,18 @@ public class ItemResponse {
 
         @Schema(description = "입고단가")
         int inputUnitPrice;         // 입고단가
+    }
+
+    @Getter
+    @Setter
+    public static class toSubItem {
+        @Schema(description = "고유아이디")
+        Long id;
+
+        @Schema(description = "품번")
+        String itemNo;
+
+        @Schema(description = "품명")
+        String itemName;
     }
 }

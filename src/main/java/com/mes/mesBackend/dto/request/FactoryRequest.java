@@ -57,6 +57,6 @@ public class FactoryRequest {
 
     @Schema(description = "사업장 id")
     @NotNull(message = NOT_NULL)
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long workPlaceId;       // 사업장
 }

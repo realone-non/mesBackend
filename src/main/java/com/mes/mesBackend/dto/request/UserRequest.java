@@ -27,7 +27,7 @@ public class UserRequest {
     String korName;    // 이름
 
     @Schema(description = "부서 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long departmentId;  // 부서
 

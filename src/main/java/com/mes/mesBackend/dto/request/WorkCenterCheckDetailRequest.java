@@ -47,7 +47,7 @@ public class WorkCenterCheckDetailRequest {
 
     @Schema(description = "표시순서")
     @NotNull(message = NOT_NULL)
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     int orders;
 
     @Schema(description = "사용여부")

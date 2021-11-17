@@ -16,7 +16,7 @@ import static com.mes.mesBackend.exception.Message.*;
 public class DepartmentRequest {
 
     @Schema(description = "부서코드")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     int deptCode;
 
@@ -29,7 +29,7 @@ public class DepartmentRequest {
     String shortName;
 
     @Schema(description = "순번")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     int orders;
 

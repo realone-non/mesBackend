@@ -8,7 +8,7 @@ import lombok.Setter;
 import javax.validation.constraints.Min;
 import java.time.LocalDate;
 
-import static com.mes.mesBackend.exception.Message.ID_VALUE;
+import static com.mes.mesBackend.exception.Message.ONE_VALUE;
 import static com.mes.mesBackend.exception.Message.NOT_ZERO;
 
 @Getter
@@ -16,26 +16,26 @@ import static com.mes.mesBackend.exception.Message.NOT_ZERO;
 @Schema(description = "라우팅 상세")
 public class RoutingDetailRequest {
     @Schema(description = "작업순번")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     int orders;
 
     @Schema(description = "작업공정 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long workProcess;
 
     @Schema(description = "작업장 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long workCenter;
 
     @Schema(description = "검사유형")
     TestCategory testCategory = TestCategory.INPUT_TEST;
 
     @Schema(description = "원자재 창고 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long rawMaterialWareHouse;
 
     @Schema(description = "입고 창고 id")
-    @Min(value = ID_VALUE, message = NOT_ZERO)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long inputWareHouse;
 
     @Schema(description = "메인공정")
