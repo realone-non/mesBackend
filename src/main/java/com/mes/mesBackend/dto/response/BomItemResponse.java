@@ -30,6 +30,9 @@ public class BomItemResponse {
     @Schema(description = "금액")
     int price;      // 금액
 
+    @Schema(description = "공정")
+    WorkProcessResponse.idAndName workProcess;
+
     @Schema(description = "사용")
     boolean useYn;
 
