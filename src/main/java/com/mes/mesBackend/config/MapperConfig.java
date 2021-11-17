@@ -1,6 +1,5 @@
 package com.mes.mesBackend.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.mapper.MapperCustom;
@@ -11,8 +10,6 @@ import org.modelmapper.spi.MappingContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.persistence.Convert;
-import javax.persistence.JoinColumn;
 import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -39,6 +36,7 @@ public class MapperConfig {
         modelMapper.addConverter(toBomItemResponseConvert);
         modelMapper.addConverter(toItemBomResponseConvert);
         modelMapper.addConverter(toBomMasterResponseConvert);
+        modelMapper.addConverter(toSubItemResponseConvert);
 
         return modelMapper;
     }
@@ -184,6 +182,23 @@ public class MapperConfig {
             bomMasterResponse.getItem().setStorageLocation(null);
 
             return bomMasterResponse;
+        }
+    };
+
+    Converter<SubItem, SubItemResponse> toSubItemResponseConvert = new Converter<SubItem, SubItemResponse>() {
+        @Override
+        public SubItemResponse convert(MappingContext<SubItem, SubItemResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            SubItem subItem = context.getSource();
+            SubItemResponse subItemResponse = modelMapper.map(subItem, SubItemResponse.class);
+
+            subItemResponse.setItemId(subItem.getItem().getId());
+            subItemResponse.setItemNo(subItem.getItem().getItemNo());
+            subItemResponse.setItemName(subItem.getItem().getItemName());
+            subItemResponse.setSubItemId(subItem.getSubItem().getId());
+            subItemResponse.setSubItemNo(subItem.getSubItem().getItemNo());
+            subItemResponse.setSubItemName(subItem.getSubItem().getItemName());
+            return subItemResponse;
         }
     };
 }
