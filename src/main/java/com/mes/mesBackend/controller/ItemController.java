@@ -30,6 +30,8 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+
 // 3-2-1. 품목 등록
 @Tag(name = "item", description = "품목 API")
 @RequestMapping(value = "/items")
@@ -157,7 +159,7 @@ public class ItemController {
     }
 
     // 파일 생성
-    @PutMapping("/{item-id}/item-files/{item-file-id}")
+    @PutMapping(value = "/{item-id}/item-files/{item-file-id}", consumes = MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     @Operation(summary = "품목 파일 생성")
     @ApiResponses(
@@ -186,7 +188,8 @@ public class ItemController {
     }
 
     // 품목 파일 정보 수정
-    @PatchMapping("/{item-id}/item-files/{item-file-id}")
+    @PatchMapping("/{item-id}/item-files/{item-file-id}"
+    )
     @ResponseBody
     @Operation(summary = "품목 파일 정보 수정")
     @ApiResponses(

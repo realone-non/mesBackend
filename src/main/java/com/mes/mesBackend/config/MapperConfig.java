@@ -37,6 +37,7 @@ public class MapperConfig {
         modelMapper.addConverter(toItemBomResponseConvert);
         modelMapper.addConverter(toBomMasterResponseConvert);
         modelMapper.addConverter(toSubItemResponseConvert);
+        modelMapper.addConverter(toWorkDocumentConvert);
 
         return modelMapper;
     }
@@ -199,6 +200,21 @@ public class MapperConfig {
             subItemResponse.setSubItemNo(subItem.getSubItem().getItemNo());
             subItemResponse.setSubItemName(subItem.getSubItem().getItemName());
             return subItemResponse;
+        }
+    };
+
+    Converter<WorkDocument, WorkDocumentResponse> toWorkDocumentConvert = new Converter<WorkDocument, WorkDocumentResponse>() {
+        @Override
+        public WorkDocumentResponse convert(MappingContext<WorkDocument, WorkDocumentResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            WorkDocument workDocument = context.getSource();
+            WorkDocumentResponse workDocumentResponse = modelMapper.map(workDocument, WorkDocumentResponse.class);
+            workDocumentResponse.setWorkProcess(workDocument.getWorkProcess().getWorkProcessName());
+            workDocumentResponse.setWorkLine(workDocument.getWorkLine().getWorkLineName());
+            workDocumentResponse.setItemId(workDocument.getItem().getId());
+            workDocumentResponse.setItemNo(workDocument.getItem().getItemNo());
+            workDocumentResponse.setItemName(workDocument.getItem().getItemName());
+            return workDocumentResponse;
         }
     };
 }
