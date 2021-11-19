@@ -130,7 +130,7 @@ public class ItemResponse {
 
     @Getter
     @Setter
-    public static class toSubItem {
+    public static class noAndName {
         @Schema(description = "고유아이디")
         Long id;
 
