@@ -38,6 +38,7 @@ public class MapperConfig {
         modelMapper.addConverter(toBomMasterResponseConvert);
         modelMapper.addConverter(toSubItemResponseConvert);
         modelMapper.addConverter(toWorkDocumentConvert);
+        modelMapper.addConverter(toWorkLineResponse);
 
         return modelMapper;
     }
@@ -215,6 +216,19 @@ public class MapperConfig {
             workDocumentResponse.setItemNo(workDocument.getItem().getItemNo());
             workDocumentResponse.setItemName(workDocument.getItem().getItemName());
             return workDocumentResponse;
+        }
+    };
+
+    Converter<WorkLine, WorkLineResponse.workLineAndWorkCenterAndWorkProcess> toWorkLineResponse = new Converter<WorkLine, WorkLineResponse.workLineAndWorkCenterAndWorkProcess>() {
+        @Override
+        public WorkLineResponse.workLineAndWorkCenterAndWorkProcess convert(MappingContext<WorkLine, WorkLineResponse.workLineAndWorkCenterAndWorkProcess> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            WorkLine workLine = context.getSource();
+            WorkLineResponse.workLineAndWorkCenterAndWorkProcess workLineCustomResponse = modelMapper.map(workLine, WorkLineResponse.workLineAndWorkCenterAndWorkProcess.class);
+            workLineCustomResponse.setWorkLineName(workLine.getWorkLineName());
+            workLineCustomResponse.setWorkCenterName(workLine.getWorkCenter().getWorkCenterName());
+            workLineCustomResponse.setWorkProcessName(workLine.getWorkProcess().getWorkProcessName());
+            return workLineCustomResponse;
         }
     };
 }
