@@ -35,4 +35,23 @@ public class WorkLineResponse {
 
     @Schema(description = "사용여부")
     boolean useYn;
+
+    @Getter
+    @Setter
+    @JsonInclude(NON_NULL)
+    @Schema(description = "작업라인")
+    public static class workLineAndWorkCenterAndWorkProcess {
+        @Schema(description = "고유아이디")
+        Long id;
+
+        @Schema(description = "작업라인명")
+        String workLineName;                    // 작업라인명
+
+        @Schema(description = "작업장")
+        String workCenterName;          // 작업장
+
+        @Schema(description = "작업공정")
+        String workProcessName;        // 작업공정
+
+    }
 }
