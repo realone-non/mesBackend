@@ -57,7 +57,7 @@ public class GaugeTypeController {
     }
 
     // GAUGE 유형 리스트 조회
-    @Operation(summary = "GAUGE 유형 리스트 조회", description = "검색조건: 품목그룹, 품목계정, 품번, 품명")
+    @Operation(summary = "GAUGE 유형 리스트 조회", description = "")
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<GaugeTypeResponse>> getGaugeTypes() {

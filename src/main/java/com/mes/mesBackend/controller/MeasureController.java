@@ -89,7 +89,7 @@ public class MeasureController {
     )
     public ResponseEntity<Page<MeasureResponse>> getMeasures(
             @RequestParam(required = false) @Parameter(description = "GAUGE유형 id") Long gaugeId,
-            @RequestParam(required = false) @Parameter(description = "월") int month,
+            @RequestParam(required = false) @Parameter(description = "월") Long month,
             @PageableDefault @Parameter(hidden = true) Pageable pageable
     ) {
         return new ResponseEntity<>(measureService.getMeasures(gaugeId, month, pageable), HttpStatus.OK);

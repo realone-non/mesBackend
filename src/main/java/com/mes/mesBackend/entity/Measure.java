@@ -67,15 +67,19 @@ public class Measure extends BaseTimeEntity {
     @Column(name = "CALIBRATION_LAST_DATE", columnDefinition = "datetime COMMENT '최종 검교정일자'", nullable = false)
     private LocalDateTime calibrationLastDate;      // 최종 검교정일자
 
+    @Column(name = "CALIBRATION_NEXT_DATE", columnDefinition = "datetime COMMENT '차기 검교정일자'", nullable = false)
+    private LocalDateTime calibrationNextDate;
+
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;  // 사용여부
 
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    public void addJoin(GaugeType gaugeType, Department department) {
+    public void addMapping(GaugeType gaugeType, Department department, LocalDateTime calibrationLastDate, Long calibrationCycle) {
         setGaugeType(gaugeType);
         setDepartment(department);
+        setCalibrationNextDate(calibrationLastDate.plusMonths(calibrationCycle));
     }
 
     public void update(Measure newMeasure, GaugeType newGaugeType, Department newDepartment) {
@@ -87,8 +91,9 @@ public class Measure extends BaseTimeEntity {
         setPurchaseDate(newMeasure.purchaseDate);
         setMaker(newMeasure.maker);
         setCalibrationCycle(newMeasure.calibrationCycle);
-        setCalibrationLastDate(newDepartment.getCreatedDate());
+        setCalibrationLastDate(newMeasure.calibrationLastDate);
         setUseYn(newMeasure.useYn);
+        setCalibrationNextDate(newMeasure.calibrationLastDate.plusMonths(newMeasure.calibrationCycle));
     }
 
     public void delete() {

@@ -40,7 +40,6 @@ public class MapperConfig {
         modelMapper.addConverter(toSubItemResponseConvert);
         modelMapper.addConverter(toWorkDocumentConvert);
         modelMapper.addConverter(toWorkLineResponse);
-        modelMapper.addConverter(toMeasureResponseConvert);
 
         return modelMapper;
     }
@@ -231,19 +230,6 @@ public class MapperConfig {
             workLineCustomResponse.setWorkCenterName(workLine.getWorkCenter().getWorkCenterName());
             workLineCustomResponse.setWorkProcessName(workLine.getWorkProcess().getWorkProcessName());
             return workLineCustomResponse;
-        }
-    };
-
-    // 차기 검교정일자 계산/ 최종 검교정일자+검교정주기
-    Converter<Measure, MeasureResponse> toMeasureResponseConvert = new Converter<Measure, MeasureResponse>() {
-        @Override
-        public MeasureResponse convert(MappingContext<Measure, MeasureResponse> context) {
-            ModelMapper modelMapper = new ModelMapper();
-            Measure measure = context.getSource();
-            MeasureResponse measureResponse = modelMapper.map(measure, MeasureResponse.class);
-            LocalDateTime plusMonths = measureResponse.getCalibrationLastDate().plusMonths(measureResponse.getCalibrationCycle());
-            measureResponse.setCalibrationNextDate(plusMonths);
-            return measureResponse;
         }
     };
 }

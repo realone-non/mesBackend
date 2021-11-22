@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class MeasureServiceImpl implements MeasureService {
 
@@ -34,7 +36,7 @@ public class MeasureServiceImpl implements MeasureService {
         GaugeType gaugeType = gaugeTypeService.getGaugeTypeOrThrow(measureRequest.getGaugeType());
         Department department = departmentService.getDepartmentOrThrow(measureRequest.getDepartment());
         Measure measure = mapper.toEntity(measureRequest, Measure.class);
-        measure.addJoin(gaugeType, department);
+        measure.addMapping(gaugeType, department, measure.getCalibrationLastDate(), measure.getCalibrationCycle());
         measureRepository.save(measure);
         return mapper.toResponse(measure, MeasureResponse.class);
     }
@@ -48,8 +50,9 @@ public class MeasureServiceImpl implements MeasureService {
 
     // 계측기 페이징 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
     @Override
-    public Page<MeasureResponse> getMeasures(Long gaugeId, int month, Pageable pageable) {
-        return null;
+    public Page<MeasureResponse> getMeasures(Long gaugeId, Long month, Pageable pageable) {
+        Page<Measure> measures = measureRepository.findAllByCondition(gaugeId, month, pageable);
+        return mapper.toPageResponses(measures, MeasureResponse.class);
     }
 
     // 계측기 수정
@@ -60,6 +63,7 @@ public class MeasureServiceImpl implements MeasureService {
         Department newDepartment = departmentService.getDepartmentOrThrow(measureRequest.getDepartment());
         Measure newMeasure = mapper.toEntity(measureRequest, Measure.class);
         findMeasure.update(newMeasure, newGaugeType, newDepartment);
+        measureRepository.save(findMeasure);
         return mapper.toResponse(findMeasure, MeasureResponse.class);
     }
 
