@@ -57,4 +57,17 @@ public class UserResponse {
         Long id;
         String korName;
     }
+
+    @Getter
+    @Setter
+    @JsonInclude(NON_NULL)
+    @Schema(description = "직원")
+    public static class idAndKorNameAndEmail {
+        @Schema(description = "고유아이디")
+        Long id;
+        @Schema(description = "이름")
+        String korName;
+        @Schema(description = "메일")
+        String mail;
+    }
 }

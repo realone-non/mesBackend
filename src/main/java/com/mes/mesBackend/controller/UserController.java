@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.UserRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.NoSuchAlgorithmException;
 
 @Tag(name = "user", description = "직원(작업자) API")
 @RequestMapping(value = "/users")
@@ -46,7 +48,7 @@ public class UserController {
     )
     public ResponseEntity<UserResponse> createUser(
             @RequestBody @Valid UserRequest userRequest
-    ) throws NotFoundException {
+    ) throws NotFoundException, NoSuchAlgorithmException, BadRequestException {
         return new ResponseEntity<>(userService.createUser(userRequest), HttpStatus.OK);
     }
 
@@ -107,7 +109,7 @@ public class UserController {
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
             @RequestBody @Valid UserRequest userRequest
-    ) throws NotFoundException {
+    ) throws NotFoundException, NoSuchAlgorithmException {
         return new ResponseEntity<>(userService.updateUser(id, userRequest), HttpStatus.OK);
     }
 
@@ -132,12 +134,13 @@ public class UserController {
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
                     @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity<UserResponse> getLoginInfo(
+    public ResponseEntity<UserResponse.idAndKorNameAndEmail> getLoginInfo(
             @RequestParam String userCode,
             @RequestParam String password
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException, NoSuchAlgorithmException {
         return new ResponseEntity<>(userService.getLogin(userCode, password), HttpStatus.OK);
     }
 }
