@@ -29,4 +29,16 @@ public class DepartmentResponse {
 
     @Schema(description = "사용여부")
     boolean useYn;
+
+
+    @Getter
+    @Setter
+    @Schema(description = "부서")
+    public static class idAndName {
+        @Schema(description = "고유아이디")
+        Long id;
+
+        @Schema(description = "부서명")
+        String deptName;
+    }
 }
