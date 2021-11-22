@@ -22,8 +22,11 @@ public class User extends BaseTimeEntity {
     @Column(name = "USER_CODE", nullable = false, columnDefinition = "varchar(255) COMMENT '사번'")
     private String userCode;     // 사번
 
-    @Column(name = "PASSWORD", nullable = false, columnDefinition = "varchar(255) COMMENT '비밀번호'")
+    @Column(name = "PASSWORD", nullable = false, columnDefinition = "varchar(500) COMMENT '비밀번호'")
     private String password;        // 비번
+
+    @Column(name = "SALT", nullable = false, columnDefinition = "varchar(500) COMMENT '솔트'")
+    private String salt;
 
     @Column(name = "KOR_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '이름'")
     private String korName;    // 이름
@@ -62,6 +65,9 @@ public class User extends BaseTimeEntity {
 
     @Column(name = "DESCRIPTION", columnDefinition = "varchar(255) COMMENT '메모'")
     private String description;
+
+    @Column(name = "IMAGE_URL", columnDefinition = "varchar(255) COMMENT '프로필사진 url'")
+    private String imageUrl;
 
     public void put(User newUser, Department newDepartment) {
         setUserCode(newUser.userCode);
