@@ -57,6 +57,7 @@ public class ClientServiceImpl implements ClientService {
 
         Client client = modelMapper.toEntity(clientRequest, Client.class);
         client.addJoin(businessType, countryCode, clientType);
+        clientRepository.save(client);
         return modelMapper.toResponse(client, ClientResponse.class);
     }
 
