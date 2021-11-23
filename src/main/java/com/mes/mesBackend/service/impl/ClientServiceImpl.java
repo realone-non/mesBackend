@@ -17,11 +17,11 @@ import com.mes.mesBackend.service.ClientTypeService;
 import com.mes.mesBackend.service.CountryCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class ClientServiceImpl implements ClientService {
@@ -68,14 +68,13 @@ public class ClientServiceImpl implements ClientService {
     }
 
     // 거래처 조건 페이징 조회 (거래처 유형, 거래처 코드, 거래처 명)
-    public Page<ClientResponse> getClients(
+    public List<ClientResponse> getClients(
             Long type,
             String code,
-            String clientName,
-            Pageable pageable
+            String clientName
     ) {
-        Page<Client> clients = clientRepository.findByTypeAndCodeAndName(type, code, clientName, pageable);
-        return modelMapper.toPageResponses(clients, ClientResponse.class);
+        List<Client> clients = clientRepository.findByTypeAndCodeAndName(type, code, clientName);
+        return modelMapper.toListResponses(clients, ClientResponse.class);
     }
 
     // 거래처 수정

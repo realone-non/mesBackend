@@ -116,4 +116,19 @@ public class ClientResponse {
         @Schema(description = "거래처명")
         String clientName;
     }
+
+    @Getter
+    @Setter
+    @JsonInclude(NON_NULL)
+    @Schema(description = "거래처")
+    public static class idAndNameAndNoAndCharge {
+        @Schema(description = "고유아이디")
+        Long id;
+        @Schema(description = "거래처코드")
+        String clientCode;
+        @Schema(description = "거래처명")
+        String clientName;
+        @Schema(description = "회사담당자")
+        String companyCharge;
+    }
 }

@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
@@ -69,36 +70,16 @@ public class ClientController {
         return new ResponseEntity<>(clientService.getClient(id), HttpStatus.OK);
     }
 
-    // 거래처 조건 페이징 조회 (거래처 유형, 거래처 코드, 거래처 명)
+    // 거래처 전체 조회 (거래처 유형, 거래처 코드, 거래처 명)
     @GetMapping
     @ResponseBody
-    @Operation(summary = "거래처 페이징 조회", description = "검색조건 : 거래처 유형, 거래처 코드, 거래처 명")
-    @Parameters(
-            value = {
-                    @Parameter(
-                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "0")
-                    ),
-                    @Parameter(
-                            name = "size", description = "페이지의 사이즈",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "20")
-                    ),
-                    @Parameter(
-                            name = "sort", in = ParameterIn.QUERY,
-                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
-                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
-                    )
-            }
-    )
-    public ResponseEntity<Page<ClientResponse>> getClients(
+    @Operation(summary = "거래처 전체 조회", description = "검색조건 : 거래처 유형, 거래처 코드, 거래처 명")
+    public ResponseEntity<List<ClientResponse>> getClients(
             @RequestParam(required = false) @Parameter(description = "거래처 유형 id") Long clientType,
             @RequestParam(required = false) @Parameter(description = "거래처 코드 id") String clientCode,
-            @RequestParam(required = false) @Parameter(description = "거래처 명") String name,
-            @PageableDefault @Parameter(hidden = true) Pageable pageable
+            @RequestParam(required = false) @Parameter(description = "거래처 명") String name
     ) {
-        return new ResponseEntity<>(clientService.getClients(clientType, clientCode, name, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(clientService.getClients(clientType, clientCode, name), HttpStatus.OK);
     }
 
     // 거래처 수정
