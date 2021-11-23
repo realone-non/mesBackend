@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class ClientRepositoryImpl implements ClientRepositoryCustom {
 
@@ -21,13 +23,12 @@ public class ClientRepositoryImpl implements ClientRepositoryCustom {
     final QClient client = QClient.client;
 
     // 거래처 유형, 거래처 코드, 거래처 명
-    public Page<Client> findByTypeAndCodeAndName(
+    public List<Client> findByTypeAndCodeAndName(
             Long type,
             String clientCode,
-            String name,
-            Pageable pageable
+            String name
     ) {
-        QueryResults<Client> results = jpaQueryFactory
+        return jpaQueryFactory
                 .selectFrom(client)
                 .where(
                         isTypeContaining(type),
@@ -35,10 +36,7 @@ public class ClientRepositoryImpl implements ClientRepositoryCustom {
                         isNameContaining(name),
                         isDeleteYnFalse()
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetchResults();
-        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+                .fetch();
     }
 
     // 각 조건에 대해 null인지 판별 후 BooleanExpression 리턴

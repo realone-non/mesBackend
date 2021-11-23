@@ -1,15 +1,18 @@
 package com.mes.mesBackend.entity;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
+
+import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
+
 /*
- * 견적등록
+ * 4-1. 견적등록
  * 검색: 공장(드롭),거래처(체크),견적기간(캘린더),화폐,담당자
  * 견적번호 (20210714-001)
  * 거래처 (1238152076)                      -> Client
@@ -29,12 +32,11 @@ import java.util.List;
  * 견적에 해당하는 품목정보:품번,품명,규격,단위,수량,단가,금액,비고    -> EstimateItemList
  * */
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 @Entity(name = "ESTIMATES")
 @Data
 public class Estimate extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '견적등록 고유아이디'")
     private Long id;
 
@@ -42,33 +44,28 @@ public class Estimate extends BaseTimeEntity {
     private String estimateNo;  // 견적번호
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "CLIENT", nullable = false, columnDefinition = "bigint COMMENT '거래처'")
     private Client client;      // 거래처
 
-    // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MANAGER", nullable = false, columnDefinition = "bigint COMMENT '담당자'")
-    private Manager manager;      // 담당자
-
-    @Column(name = "ESTIMATE_DATE", nullable = false, columnDefinition = "date COMMENT '견적일자'")
-    private LocalDate estimateDate;     // 견적일자
+    @Column(name = "ESTIMATE_DATE", nullable = false, columnDefinition = "datetime COMMENT '견적일자'")
+    private LocalDateTime estimateDate;     // 견적일자
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CURRENCY", columnDefinition = "bigint COMMENT '화폐'")
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "CURRENCY", columnDefinition = "bigint COMMENT '화폐'", nullable = false)
     private Currency currency;            // 화폐
 
-    @Column(name = "PERIOD", columnDefinition = "varchar(255) COMMENT '납기'")
+    @Column(name = "PERIOD", columnDefinition = "varchar(255) COMMENT '납기'", nullable = false)
     private String period;              // 납기
 
     @Column(name = "VALIDITY", nullable = false, columnDefinition = "int COMMENT '유효기간'")
     private int validity;               // 유효기간
 
-    @Column(name = "PAY_CONDITION", columnDefinition = "varchar(255) COMMENT '지불조건'")
+    @Column(name = "PAY_CONDITION", columnDefinition = "varchar(255) COMMENT '지불조건'", nullable = false)
     private String payCondition;        // 지불조건
 
-    @Column(name = "SURTAX", columnDefinition = "varchar(255) COMMENT '부가세'")
+    @Column(name = "SURTAX", columnDefinition = "varchar(255) COMMENT '부가세'", nullable = false)
     private String surtax;              // 부가세
 
     @Column(name = "TRANSPORT_CONDITION", columnDefinition = "varchar(255) COMMENT '운송조건'")
@@ -80,22 +77,39 @@ public class Estimate extends BaseTimeEntity {
     @Column(name = "DESTINATION", columnDefinition = "varchar(255) COMMENT 'DESTINATION'")
     private String destination;             // DESTINATION
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ESTIMATE_ITEM", columnDefinition = "bigint COMMENT '품목정보'")
-    private List<EstimateItemDetail> estimateItemLists;       // 해당하는 품목정보
-
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;   // 사용여부
 
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
+//
+//    @OneToOne(fetch = LAZY)
+//    @JoinColumn(name = "PI", columnDefinition = "bigint COMMENT 'PI'")
+//    private Pi pi;              // P/I
 
-    // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
-    private Factory factory;                // 공장
+    public void addMapping(Client client, Currency currency, String estimateNo) {
+        setClient(client);
+        setCurrency(currency);
+        // 견적번호 생성
+        setEstimateNo(estimateNo);
+    }
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PI", columnDefinition = "bigint COMMENT 'PI'")
-    private Pi pi;              // P/I
+    public void update(Client newClient, Currency newCurrency, Estimate newEstimate) {
+        setClient(newClient);
+        setEstimateDate(newEstimate.estimateDate);
+        setCurrency(newCurrency);
+        setCurrency(newEstimate.currency);
+        setPeriod(newEstimate.period);
+        setValidity(newEstimate.validity);
+        setPayCondition(newEstimate.payCondition);
+        setSurtax(newEstimate.surtax);
+        setTransportCondition(newEstimate.transportCondition);
+        setForwader(newEstimate.forwader);
+        setDestination(newEstimate.destination);
+        setUseYn(newEstimate.useYn);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }
