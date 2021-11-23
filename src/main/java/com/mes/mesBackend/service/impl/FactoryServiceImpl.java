@@ -30,7 +30,7 @@ public class FactoryServiceImpl implements FactoryService {
 
     // 공장 생성
     public FactoryResponse createFactory(FactoryRequest factoryRequest) throws NotFoundException {
-        WorkPlace workPlace = workPlaceService.getWorkPlaceOrThrow(factoryRequest.getWorkPlaceId());
+        WorkPlace workPlace = workPlaceService.getWorkPlaceOrThrow(factoryRequest.getWorkPlace());
         Factory factory = modelMapper.toEntity(factoryRequest, Factory.class);
         factory.addJoin(workPlace);
         factoryRepository.save(factory);
@@ -51,7 +51,7 @@ public class FactoryServiceImpl implements FactoryService {
 
     // 공장 수정
     public FactoryResponse updateFactory(Long id, FactoryRequest factoryRequest) throws NotFoundException {
-        WorkPlace newWorkPlace = workPlaceService.getWorkPlaceOrThrow(factoryRequest.getWorkPlaceId());
+        WorkPlace newWorkPlace = workPlaceService.getWorkPlaceOrThrow(factoryRequest.getWorkPlace());
         Factory newFactory = modelMapper.toEntity(factoryRequest, Factory.class);
         Factory findFactory = getFactoryOrThrow(id);
         findFactory.put(newFactory, newWorkPlace);
