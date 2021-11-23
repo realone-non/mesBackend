@@ -20,7 +20,7 @@ public class BomMasterRequest {
     @Schema(description = "품목 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
-    Long itemId;
+    Long item;
 
     @Schema(description = "BOM 번호")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
