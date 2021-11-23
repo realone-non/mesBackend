@@ -1,6 +1,8 @@
 package com.mes.mesBackend.controller;
 
+import com.mes.mesBackend.dto.request.EstimateItemRequest;
 import com.mes.mesBackend.dto.request.EstimateRequest;
+import com.mes.mesBackend.dto.response.EstimateItemResponse;
 import com.mes.mesBackend.dto.response.EstimateResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -18,12 +20,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Tag(name = "estimate", description = "견적 API")
 @RequestMapping("/estimates")
@@ -45,13 +50,13 @@ public class EstimateController {
     )
     public ResponseEntity<EstimateResponse> createEstimate(
             @RequestBody @Valid EstimateRequest estimateRequest
-    ) throws NotFoundException, BadRequestException {
+    ) throws NotFoundException {
         return new ResponseEntity<>(estimateService.createEstimate(estimateRequest), HttpStatus.OK);
     }
 
     // 견적 단일 조회
     @Operation(summary = "견적 단일 조회")
-    @GetMapping("/{id}")
+    @GetMapping("/{estimate-id}")
     @ResponseBody
     @ApiResponses(
             value = {
@@ -60,9 +65,9 @@ public class EstimateController {
             }
     )
     public ResponseEntity<EstimateResponse> getEstimate(
-            @PathVariable @Parameter(description = "견적 id") Long id
+            @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId
     ) throws NotFoundException {
-        return new ResponseEntity<>(estimateService.getEstimate(id), HttpStatus.OK);
+        return new ResponseEntity<>(estimateService.getEstimate(estimateId), HttpStatus.OK);
     }
 
     // 견적 페이징 조회 검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 담당자
@@ -90,18 +95,18 @@ public class EstimateController {
     )
     public ResponseEntity<Page<EstimateResponse>> getEstimates(
             @RequestParam(required = false) @Parameter(description = "거래처") String clientName,
-            @RequestParam(required = false) @Parameter(description = "견적기간 startDate") LocalDateTime startDate,
-            @RequestParam(required = false) @Parameter(description = "견적기간 endDate") LocalDateTime endDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "견적기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "견적기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "화폐 id") Long currencyId,
             @RequestParam(required = false) @Parameter(description = "담당자 명") String chargeName,
             @PageableDefault @Parameter(hidden = true) Pageable pageable
     ) {
-        return new ResponseEntity<>(estimateService.getEstimates(clientName, startDate, endDate, currencyId, chargeName, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(estimateService.getEstimates(clientName, fromDate, toDate, currencyId, chargeName, pageable), HttpStatus.OK);
     }
 
     // 견적 수정
     @Operation(summary = "견적 수정")
-    @PatchMapping("/{id}")
+    @PatchMapping("/{estimate-id}")
     @ResponseBody
     @ApiResponses(
             value = {
@@ -111,14 +116,14 @@ public class EstimateController {
             }
     )
     public ResponseEntity<EstimateResponse> updateEstimate(
-            @PathVariable @Parameter(description = "견적 id") Long id,
+            @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
             @RequestBody @Valid EstimateRequest estimateRequest
-    ) throws NotFoundException, BadRequestException {
-        return new ResponseEntity<>(estimateService.updateEstimate(id, estimateRequest), HttpStatus.OK);
+    ) throws NotFoundException {
+        return new ResponseEntity<>(estimateService.updateEstimate(estimateId, estimateRequest), HttpStatus.OK);
     }
 
     // 견적 삭제
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{estimate-id}")
     @Operation(summary = "견적 삭제")
     @ResponseBody
     @ApiResponses(
@@ -127,8 +132,100 @@ public class EstimateController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity deleteEstimate(@PathVariable @Parameter(description = "견적 id") Long id) throws NotFoundException {
-        estimateService.deleteEstimate(id);
+    public ResponseEntity deleteEstimate(
+            @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId
+    ) throws NotFoundException {
+        estimateService.deleteEstimate(estimateId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+
+    // ===================================== 견적 품목 정보 ======================================
+
+    @Operation(summary = "견적 품목정보 생성")
+    @PostMapping("/{estimate-id}/items")
+    @ResponseBody
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    public ResponseEntity<EstimateItemResponse> createEstimateItem(
+            @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
+            @RequestBody @Valid EstimateItemRequest estimateItemRequest
+    ) throws NotFoundException {
+        return new ResponseEntity<>(estimateService.createEstimateItem(estimateId, estimateItemRequest), HttpStatus.OK);
+    }
+    
+    @Operation(summary = "견적 품목정보 단일 조회")
+    @GetMapping("/{estimate-id}/items/{item-id}")
+    @ResponseBody
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    public ResponseEntity<EstimateItemResponse> getEstimateItem(
+            @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
+            @PathVariable(value = "item-id") @Parameter(description = "견적 품목 id") Long estimateItemId
+    ) {
+        return new ResponseEntity<>(estimateService.getEstimateItem(estimateId, estimateItemId), HttpStatus.OK);
+    }
+
+
+    @Operation(summary = "견적 품목정보 리스트 조회",description = "해당하는 견적에 대한 모든 품목 조회")
+    @GetMapping("/{estimate-id}/items")
+    @ResponseBody
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    public ResponseEntity<List<EstimateItemResponse>> getEstimateItems(
+            @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId
+    ) {
+        return new ResponseEntity<>(estimateService.getEstimateItems(estimateId), HttpStatus.OK);
+    }
+    
+    @Operation(summary = "견적 품목정보 수정")
+    @PatchMapping("/{estimate-id}/items/{item-id}")
+    @ResponseBody
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    public ResponseEntity<EstimateItemResponse> updateEstimateItem(
+            @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
+            @PathVariable(value = "item-id") @Parameter(description = "견적 품목 id") Long estimateItemId,
+            @RequestBody @Valid EstimateItemRequest estimateItemRequest
+    ) {
+        return new ResponseEntity<>(estimateService.updateEstimateItem(estimateId, estimateItemId, estimateItemRequest), HttpStatus.OK);
+    }
+
+    @Operation(summary = "견적 품목정보 삭제")
+    @DeleteMapping("/{estimate-id}/items/{item-id}")
+    @ResponseBody
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    public ResponseEntity deleteEstimateItem(
+            @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
+            @PathVariable(value = "item-id") @Parameter(description = "견적 품목 id") Long estimateItemId
+    ) {
+        estimateService.deleteEstimateItem(estimateId, estimateItemId);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
 }

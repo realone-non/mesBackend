@@ -3,12 +3,16 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.entity.Estimate;
 import com.mes.mesBackend.entity.QEstimate;
 import com.mes.mesBackend.repository.custom.EstimateRepositoryCustom;
+import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
@@ -23,12 +27,25 @@ public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
     @Override
     public Page<Estimate> findAllByCondition(
             String clientName,
-            LocalDateTime startDate,
-            LocalDateTime endDate,
+            LocalDate fromDate,
+            LocalDate toDate,
             Long currencyId,
-            String chargeName
+            String chargeName,
+            Pageable pageable
     ) {
-        return null;
+        QueryResults<Estimate> results = jpaQueryFactory
+                .selectFrom(estimate)
+                .where(
+                        isClientNameContaining(clientName),
+                        isEstimateDate(fromDate, toDate),
+                        isCurrencyEq(currencyId),
+                        isChargeNameContaining(chargeName),
+                        isDeleteYnFalse()
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetchResults();
+        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
     }
 
     // 거래처 명 조회
@@ -37,9 +54,21 @@ public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
     }
 
     // 견적기간 조회
-    private BooleanExpression isEstimateDate(LocalDateTime startDate, LocalDateTime endDate) {
-        return startDate != null ? estimate.estimateDate.
+    private BooleanExpression isEstimateDate(LocalDate fromDate, LocalDate toDate) {
+        return fromDate != null ? estimate.estimateDate.between(fromDate, toDate) : null;
     }
+
     // 화폐로 조회
+    private BooleanExpression isCurrencyEq(Long currencyId) {
+        return currencyId != null ? estimate.currency.id.eq(currencyId) : null;
+    }
+
     // 담당자명 조회
+    private BooleanExpression isChargeNameContaining(String chargeName) {
+        return chargeName != null ? estimate.client.companyCharge.contains(chargeName) : null;
+    }
+
+    private BooleanExpression isDeleteYnFalse() {
+        return estimate.deleteYn.isFalse();
+    }
 }

@@ -38,7 +38,7 @@ public class BomMasterServiceImpl implements BomMasterService {
     // BOM 마스터 생성
     @Override
     public BomMasterResponse createBomMaster(BomMasterRequest bomMasterRequest) throws NotFoundException {
-        Item item = itemService.getItemOrThrow(bomMasterRequest.getItemId());
+        Item item = itemService.getItemOrThrow(bomMasterRequest.getItem());
         BomMaster bomMaster = mapper.toEntity(bomMasterRequest, BomMaster.class);
 
         bomMaster.addJoin(item);
@@ -75,7 +75,7 @@ public class BomMasterServiceImpl implements BomMasterService {
     // BOM 마스터 수정
     @Override
     public BomMasterResponse updateBomMaster(Long bomMasterId, BomMasterRequest bomMasterRequest) throws NotFoundException {
-        Item newItem = itemService.getItemOrThrow(bomMasterRequest.getItemId());
+        Item newItem = itemService.getItemOrThrow(bomMasterRequest.getItem());
 
         BomMaster findBomMaster = getBomMasterOrThrow(bomMasterId);
         BomMaster newBomMaster = mapper.toEntity(bomMasterRequest, BomMaster.class);

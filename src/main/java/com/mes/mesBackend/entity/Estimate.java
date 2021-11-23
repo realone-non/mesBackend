@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static javax.persistence.FetchType.LAZY;
@@ -48,8 +49,8 @@ public class Estimate extends BaseTimeEntity {
     @JoinColumn(name = "CLIENT", nullable = false, columnDefinition = "bigint COMMENT '거래처'")
     private Client client;      // 거래처
 
-    @Column(name = "ESTIMATE_DATE", nullable = false, columnDefinition = "datetime COMMENT '견적일자'")
-    private LocalDateTime estimateDate;     // 견적일자
+    @Column(name = "ESTIMATE_DATE", nullable = false, columnDefinition = "date COMMENT '견적일자'")
+    private LocalDate estimateDate;     // 견적일자
 
     // 다대일 단방향
     @ManyToOne(fetch = LAZY)
@@ -98,7 +99,6 @@ public class Estimate extends BaseTimeEntity {
         setClient(newClient);
         setEstimateDate(newEstimate.estimateDate);
         setCurrency(newCurrency);
-        setCurrency(newEstimate.currency);
         setPeriod(newEstimate.period);
         setValidity(newEstimate.validity);
         setPayCondition(newEstimate.payCondition);

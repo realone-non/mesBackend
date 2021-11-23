@@ -1,10 +1,12 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -21,13 +23,14 @@ public class EstimateResponse {
     String estimateNo;
 
     @Schema(description = "거래처 id")
-    Long client;
+    ClientResponse.idAndNameAndNoAndCharge client;
 
     @Schema(description = "견적일자")
-    LocalDateTime estimateDate;
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    LocalDate estimateDate;
 
     @Schema(description = "화폐 id")
-    Long currency;
+    CurrencyResponse currency;
 
     @Schema(description = "납기")
     String period;

@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.mes.mesBackend.exception.Message.*;
@@ -23,7 +24,7 @@ public class EstimateRequest {
 
     @Schema(description = "견적일자")
     @NotNull(message = NOT_NULL)
-    LocalDateTime estimateDate;
+    LocalDate estimateDate;
 
     @Schema(description = "화폐 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
