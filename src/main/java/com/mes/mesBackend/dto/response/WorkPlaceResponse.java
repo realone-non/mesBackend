@@ -61,4 +61,15 @@ public class WorkPlaceResponse {
 
     @Schema(description = "사용여부")
     boolean useYn;           // 사용여부
+
+    @Getter
+    @Setter
+    @Schema(description = "사업장")
+    public static class idAndName {
+        @Schema(description = "고유아이디")
+        Long id;
+
+        @Schema(description = "사업장명")
+        String workPlaceName;   // 사업장명
+    }
 }
