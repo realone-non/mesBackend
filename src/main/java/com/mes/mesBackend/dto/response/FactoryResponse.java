@@ -52,5 +52,5 @@ public class FactoryResponse {
     boolean useYn;           // 사용
 
     @Schema(description = "사업장")
-    String workPlaceName;   // 사업장
+    WorkPlaceResponse.idAndName workPlace;
 }

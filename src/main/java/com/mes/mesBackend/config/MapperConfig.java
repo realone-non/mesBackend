@@ -28,7 +28,6 @@ public class MapperConfig {
 //        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         modelMapper.addConverter(toWorkPlaceResponseConvert);
-        modelMapper.addConverter(toFactoryResponseConvert);
         modelMapper.addConverter(toEmpResponseConvert);
         modelMapper.addConverter(toUnitResponseConverter);
         modelMapper.addConverter(toGridResponseConvert);
@@ -60,19 +59,6 @@ public class MapperConfig {
             }
             workPlaceResponse.setType(businessTypeResponses);
             return workPlaceResponse;
-        }
-    };
-
-    // FactoryResponse workPlaceName 매핑
-    Converter<Factory, FactoryResponse> toFactoryResponseConvert = new Converter<Factory, FactoryResponse>() {
-        @Override
-        public FactoryResponse convert(MappingContext<Factory, FactoryResponse> context) {
-            ModelMapper modelMapper = new ModelMapper();
-            Factory factory = context.getSource();
-            FactoryResponse factoryResponse = modelMapper.map(factory, FactoryResponse.class);
-
-            factoryResponse.setWorkPlaceName(factory.getWorkPlace().getWorkPlaceName());
-            return factoryResponse;
         }
     };
 
