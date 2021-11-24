@@ -140,4 +140,28 @@ public class ItemResponse {
         @Schema(description = "품명")
         String itemName;
     }
+
+    @Getter
+    @Setter
+    @JsonInclude(NON_NULL)
+    @Schema(description = "품목")
+    public static class toEstimateItem {
+        @Schema(description = "고유아이디")
+        Long id;
+
+        @Schema(description = "품번")
+        String itemNo;
+
+        @Schema(description = "품명")
+        String itemName;
+
+        @Schema(description = "규격")
+        String standard;    // 규격
+
+        @Schema(description = "단위")
+        String unitCodeName;
+
+        @Schema(description = "입고단가")
+        int inputUnitPrice;
+    }
 }
