@@ -16,8 +16,10 @@ public interface ItemCheckService {
     ItemCheckResponse createItemCheck(ItemCheckRequest itemCheckRequest) throws NotFoundException;
     // 품목별 검사항목 단일 조회
     ItemCheckResponse getItemCheck(Long itemCheckId) throws NotFoundException;
+    // 품목별 검사항목 전체 조회
+    List<ItemCheckResponse> getItemChecks(TestCategory testCategory, Long itemGroupId, Long itemAccountId);
     // 품목별 검사항목 페이징 조회
-    Page<ItemCheckResponse> getItemChecks(TestCategory testCategory, Long itemGroupId, Long itemAccountId, Pageable pageable);
+//    Page<ItemCheckResponse> getItemChecks(TestCategory testCategory, Long itemGroupId, Long itemAccountId, Pageable pageable);
     // 품목별 검사항목 수정
     ItemCheckResponse updateItemCheck(Long itemCheckId, ItemCheckRequest itemCheckRequest) throws NotFoundException;
     // 품목별 검사항목 삭제

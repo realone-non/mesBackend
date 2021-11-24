@@ -13,8 +13,6 @@ import com.mes.mesBackend.repository.WorkProcessCodeRepository;
 import com.mes.mesBackend.repository.WorkProcessRepository;
 import com.mes.mesBackend.service.WorkProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,12 +47,19 @@ public class WorkProcessServiceImpl implements WorkProcessService {
         return mapper.toResponse(workProcess, WorkProcessResponse.class);
     }
 
-    // 작업공정 페이징 조회
+    // 작업공정 전체 조회
     @Override
-    public Page<WorkProcessResponse> getWorkProcesses(Pageable pageable) {
-        Page<WorkProcess> workProcesses = workProcessRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(workProcesses, WorkProcessResponse.class);
+    public List<WorkProcessResponse> getWorkProcesses() {
+        List<WorkProcess> workProcesses = workProcessRepository.findAllByDeleteYnFalse();
+        return mapper.toListResponses(workProcesses, WorkProcessResponse.class);
     }
+
+    // 작업공정 페이징 조회
+//    @Override
+//    public Page<WorkProcessResponse> getWorkProcesses(Pageable pageable) {
+//        Page<WorkProcess> workProcesses = workProcessRepository.findAllByDeleteYnFalse(pageable);
+//        return mapper.toPageResponses(workProcesses, WorkProcessResponse.class);
+//    }
 
     // 작업공정 수정
     @Override

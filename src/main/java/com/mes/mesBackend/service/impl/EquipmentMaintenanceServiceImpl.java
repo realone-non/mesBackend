@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 // 3-5-2. 설비 보전항목 등록
 @Service
 public class EquipmentMaintenanceServiceImpl implements EquipmentMaintenanceService {
@@ -33,12 +35,17 @@ public class EquipmentMaintenanceServiceImpl implements EquipmentMaintenanceServ
         EquipmentMaintenance equipmentMaintenance = getEquipmentMaintenanceOrThrow(id);
         return mapper.toResponse(equipmentMaintenance, EquipmentMaintenanceResponse.class);
     }
-    // 설비 보전항목 페이징 조회
+    // 설비 보전항목 전체 조회
     @Override
-    public Page<EquipmentMaintenanceResponse> getEquipmentMaintenances(Pageable pageable) {
-        Page<EquipmentMaintenance> equipmentMaintenances = equipmentMaintenanceRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(equipmentMaintenances, EquipmentMaintenanceResponse.class);
+    public List<EquipmentMaintenanceResponse> getEquipmentMaintenances() {
+        List<EquipmentMaintenance> equipmentMaintenances = equipmentMaintenanceRepository.findAllByDeleteYnFalse();
+        return mapper.toListResponses(equipmentMaintenances, EquipmentMaintenanceResponse.class);
     }
+//    public Page<EquipmentMaintenanceResponse> getEquipmentMaintenances(Pageable pageable) {
+//        Page<EquipmentMaintenance> equipmentMaintenances = equipmentMaintenanceRepository.findAllByDeleteYnFalse(pageable);
+//        return mapper.toPageResponses(equipmentMaintenances, EquipmentMaintenanceResponse.class);
+//    }
+
     // 설비 보전항목 수정
     @Override
     public EquipmentMaintenanceResponse updateEquipmentMaintenance(Long id, EquipmentMaintenanceRequest equipmentMaintenanceRequest) throws NotFoundException {

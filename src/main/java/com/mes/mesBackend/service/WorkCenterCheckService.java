@@ -16,8 +16,10 @@ public interface WorkCenterCheckService {
     WorkCenterCheckResponse createWorkCenterCheck(Long workCenterId, Long checkTypeId) throws NotFoundException;
     // 작업장별 점검유형 단일 조회
     WorkCenterCheckResponse getWorkCenterCheck(Long workCenterCheckId) throws NotFoundException;
+    // 작업장별 점검유형 리스트 조회/ 검색: 작업장, 점검유형
+    List<WorkCenterCheckResponse> getWorkCenterChecks(Long workCenterId, Long checkTypeId) throws NotFoundException;
     // 작업장별 점검유형 페이징 조회/ 검색: 작업장, 점검유형
-    Page<WorkCenterCheckResponse> getWorkCenterChecks(Long workCenterId, Long checkTypeId, Pageable pageable) throws NotFoundException;
+//    Page<WorkCenterCheckResponse> getWorkCenterChecks(Long workCenterId, Long checkTypeId, Pageable pageable) throws NotFoundException;
     // 작업장별 점검유형 수정
     WorkCenterCheckResponse updateWorkCenterCheck(Long workCenterCheckId, Long workCenterId, Long checkTypeId) throws NotFoundException;
     // 작업장별 점검유형 삭제

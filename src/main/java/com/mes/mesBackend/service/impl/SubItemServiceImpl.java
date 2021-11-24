@@ -15,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class SubItemServiceImpl implements SubItemService {
 
@@ -69,12 +71,19 @@ public class SubItemServiceImpl implements SubItemService {
                 .orElseThrow(() -> new NotFoundException("subItem does not exist. input id: " + id));
     }
 
-    // 대체품 페이징 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
+    // 대체품 전체 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
     @Override
-    public Page<SubItemResponse> getSubItems(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Pageable pageable) {
-        Page<SubItem> subItems = subItemRepository.findAllCondition(itemGroupId, itemAccountId, itemNo, itemName, pageable);
-        return mapper.toPageResponses(subItems, SubItemResponse.class);
+    public List<SubItemResponse> getSubItems(Long itemGroupId, Long itemAccountId, String itemNo, String itemName) {
+        List<SubItem> subItems = subItemRepository.findAllCondition(itemGroupId, itemAccountId, itemNo, itemName);
+        return mapper.toListResponses(subItems, SubItemResponse.class);
     }
+
+    // 대체품 페이징 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
+//    @Override
+//    public Page<SubItemResponse> getSubItems(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Pageable pageable) {
+//        Page<SubItem> subItems = subItemRepository.findAllCondition(itemGroupId, itemAccountId, itemNo, itemName, pageable);
+//        return mapper.toPageResponses(subItems, SubItemResponse.class);
+//    }
 
     // 대체품 수정
     @Override

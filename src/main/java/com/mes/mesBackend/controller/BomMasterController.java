@@ -67,35 +67,15 @@ public class BomMasterController {
         return new ResponseEntity<>(bomMasterService.getBomMaster(bomMasterId), HttpStatus.OK);
     }
     
-    @Operation(summary = "BOM 마스터 페이징 조회", description = "검색조건: 품목계정, 품목그룹, 품번|품명")
+    @Operation(summary = "BOM 마스터 전체 조회", description = "검색조건: 품목계정, 품목그룹, 품번|품명")
     @GetMapping
     @ResponseBody
-    @Parameters(
-            value = {
-                    @Parameter(
-                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "0")
-                    ),
-                    @Parameter(
-                            name = "size", description = "페이지의 사이즈",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "20")
-                    ),
-                    @Parameter(
-                            name = "sort", in = ParameterIn.QUERY,
-                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
-                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
-                    )
-            }
-    )
-    public ResponseEntity<Page<BomMasterResponse>> getBomMasters(
+    public ResponseEntity<List<BomMasterResponse>> getBomMasters(
             @RequestParam(required = false) @Parameter(description = "품목계정 id") Long itemAccountId,
             @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
-            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoAndItemName,
-            @PageableDefault @Parameter(hidden = true) Pageable pageable
+            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoAndItemName
     ) {
-        return new ResponseEntity<>(bomMasterService.getBomMasters(itemAccountId, itemGroupId, itemNoAndItemName, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(bomMasterService.getBomMasters(itemAccountId, itemGroupId, itemNoAndItemName), HttpStatus.OK);
     }
     
     @Operation(summary = "BOM 마스터 수정")
@@ -214,4 +194,35 @@ public class BomMasterController {
     ) throws NotFoundException {
         return new ResponseEntity<>(bomMasterService.getBomItem(bomMasterId, bomItemId), HttpStatus.OK);
     }
+
+//    @Operation(summary = "BOM 마스터 페이징 조회", description = "검색조건: 품목계정, 품목그룹, 품번|품명")
+//    @GetMapping
+//    @ResponseBody
+//    @Parameters(
+//            value = {
+//                    @Parameter(
+//                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "0")
+//                    ),
+//                    @Parameter(
+//                            name = "size", description = "페이지의 사이즈",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "20")
+//                    ),
+//                    @Parameter(
+//                            name = "sort", in = ParameterIn.QUERY,
+//                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
+//                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
+//                    )
+//            }
+//    )
+//    public ResponseEntity<Page<BomMasterResponse>> getBomMasterPages(
+//            @RequestParam(required = false) @Parameter(description = "품목계정 id") Long itemAccountId,
+//            @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
+//            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoAndItemName,
+//            @PageableDefault @Parameter(hidden = true) Pageable pageable
+//    ) {
+//        return new ResponseEntity<>(bomMasterService.getBomMasters(itemAccountId, itemGroupId, itemNoAndItemName, pageable), HttpStatus.OK);
+//    }
 }

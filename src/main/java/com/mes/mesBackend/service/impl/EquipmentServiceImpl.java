@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 // 3-5-1. 설비등록
 @Service
 public class EquipmentServiceImpl implements EquipmentService {
@@ -47,12 +49,16 @@ public class EquipmentServiceImpl implements EquipmentService {
         return mapper.toResponse(equipment, EquipmentResponse.class);
     }
 
-    // 설비 페이징 조회
+    // 설비 전체 조회
     @Override
-    public Page<EquipmentResponse> getEquipments(Pageable pageable) {
-        Page<Equipment> equipments = equipmentRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(equipments, EquipmentResponse.class);
+    public List<EquipmentResponse> getEquipments() {
+        List<Equipment> equipments = equipmentRepository.findAllByDeleteYnFalse();
+        return mapper.toListResponses(equipments, EquipmentResponse.class);
     }
+//    public Page<EquipmentResponse> getEquipments(Pageable pageable) {
+//        Page<Equipment> equipments = equipmentRepository.findAllByDeleteYnFalse(pageable);
+//        return mapper.toPageResponses(equipments, EquipmentResponse.class);
+//    }
 
     // 설비 수정
     @Override

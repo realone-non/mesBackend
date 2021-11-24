@@ -49,12 +49,19 @@ public class ItemCheckServiceImpl implements ItemCheckService {
         return mapper.toResponse(itemCheck, ItemCheckResponse.class);
     }
 
-    // 품목별 검사항목 페이징 조회 검색조건: 검사유형, 품목그룹, 품목계정
+    // 품목별 검사항목 전체 조회 검색조건: 검사유형, 품목그룹, 품목계정
     @Override
-    public Page<ItemCheckResponse> getItemChecks(TestCategory testCategory, Long itemGroupId, Long itemAccountId, Pageable pageable) {
-        Page<ItemCheck> itemChecks = itemCheckRepository.findAllCondition(testCategory, itemGroupId, itemAccountId, pageable);
-        return mapper.toPageResponses(itemChecks, ItemCheckResponse.class);
+    public List<ItemCheckResponse> getItemChecks(TestCategory testCategory, Long itemGroupId, Long itemAccountId) {
+        List<ItemCheck> itemChecks = itemCheckRepository.findAllCondition(testCategory, itemGroupId, itemAccountId);
+        return mapper.toListResponses(itemChecks, ItemCheckResponse.class);
     }
+    // 품목별 검사항목 페이징 조회 검색조건: 검사유형, 품목그룹, 품목계정
+//    @Override
+//    public Page<ItemCheckResponse> getItemChecks(TestCategory testCategory, Long itemGroupId, Long itemAccountId, Pageable pageable) {
+//        Page<ItemCheck> itemChecks = itemCheckRepository.findAllCondition(testCategory, itemGroupId, itemAccountId, pageable);
+//        return mapper.toPageResponses(itemChecks, ItemCheckResponse.class);
+//    }
+
 
     // 품목별 검사항목 수정
     @Override

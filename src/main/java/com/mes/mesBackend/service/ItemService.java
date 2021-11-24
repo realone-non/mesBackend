@@ -19,8 +19,10 @@ public interface ItemService {
     ItemResponse createItem(ItemRequest itemRequest) throws NotFoundException;
     // 품목 단일 조회
     ItemResponse getItem(Long id) throws NotFoundException;
+    // 품목 전체 조회
+    List<ItemResponse> getItems(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, String searchWord);
     // 품목 페이징 조회
-    Page<ItemResponse> getItems(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, String searchWord, Pageable pageable);
+//    Page<ItemResponse> getItems(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, String searchWord, Pageable pageable);
     // 품목 수정
     ItemResponse updateItem(Long id, ItemRequest itemRequest) throws NotFoundException;
     // 품목 삭제

@@ -7,8 +7,6 @@ import com.mes.mesBackend.dto.response.WorkLineResponse;
 import com.mes.mesBackend.entity.WorkLine;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -18,8 +16,10 @@ public interface WorkLineService {
     WorkLineResponse createWorkLine(WorkLineRequest workLineRequest) throws NotFoundException;
     // 작업라인 단일 조회
     WorkLineResponse getWorkLine(Long id) throws NotFoundException;
+    // 작업라인 전체 조회
+    List<WorkLineResponse> getWorkLines();
     // 작업라인 페이징 조회
-    Page<WorkLineResponse> getWorkLines(Pageable pageable);
+//    Page<WorkLineResponse> getWorkLines(Pageable pageable);
     // 작업라인 수정
     WorkLineResponse updateWorkLine(Long id, WorkLineRequest workLineRequest) throws NotFoundException;
     // 작업라인 삭제

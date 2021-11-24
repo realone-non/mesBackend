@@ -69,33 +69,12 @@ public class RoutingController {
         return new ResponseEntity<>(routingService.getRouting(id), HttpStatus.OK);
     }
 
-    // 라우팅 페이징 조회
+    // 라우팅 전체 조회
     @GetMapping
     @ResponseBody
-    @Operation(summary = "라우팅 페이징 조회")
-    @Parameters(
-            value = {
-                    @Parameter(
-                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "0")
-                    ),
-                    @Parameter(
-                            name = "size", description = "페이지의 사이즈",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "20")
-                    ),
-                    @Parameter(
-                            name = "sort", in = ParameterIn.QUERY,
-                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
-                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
-                    )
-            }
-    )
-    public ResponseEntity<Page<RoutingResponse>> getRoutings(
-            @PageableDefault @Parameter(hidden = true) Pageable pageable
-    ) {
-        return new ResponseEntity<>(routingService.getRoutings(pageable), HttpStatus.OK);
+    @Operation(summary = "라우팅 전체 조회")
+    public ResponseEntity<List<RoutingResponse>> getRoutings() {
+        return new ResponseEntity<>(routingService.getRoutings(), HttpStatus.OK);
     }
 
     // 라우팅 수정
@@ -194,4 +173,33 @@ public class RoutingController {
         routingService.deleteRoutingDetail(routingId, routingDetailId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+
+    // 라우팅 페이징 조회
+//    @GetMapping
+//    @ResponseBody
+//    @Operation(summary = "라우팅 페이징 조회")
+//    @Parameters(
+//            value = {
+//                    @Parameter(
+//                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "0")
+//                    ),
+//                    @Parameter(
+//                            name = "size", description = "페이지의 사이즈",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "20")
+//                    ),
+//                    @Parameter(
+//                            name = "sort", in = ParameterIn.QUERY,
+//                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
+//                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
+//                    )
+//            }
+//    )
+//    public ResponseEntity<Page<RoutingResponse>> getRoutings(
+//            @PageableDefault @Parameter(hidden = true) Pageable pageable
+//    ) {
+//        return new ResponseEntity<>(routingService.getRoutings(pageable), HttpStatus.OK);
+//    }
 }

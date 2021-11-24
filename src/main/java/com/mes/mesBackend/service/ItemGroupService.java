@@ -18,8 +18,10 @@ public interface ItemGroupService {
     ItemGroupResponse createItemGroup(ItemGroupRequest itemGroupRequest) throws NotFoundException;
     // 품목그룹 단일 조회
     ItemGroupResponse getItemGroup(Long id) throws NotFoundException;
+    // 품목그룹 리스트 조회
+    List<ItemGroupResponse> getItemGroups();
     // 품목그룹 페이징 조회
-    Page<ItemGroupResponse> getItemGroups(Pageable pageable);
+//    Page<ItemGroupResponse> getItemGroups(Pageable pageable);
     // 품목그룹 수정
     ItemGroupResponse updateItemGroup(Long id, ItemGroupRequest itemGroupRequest) throws NotFoundException;
     // 품목그룹 삭제

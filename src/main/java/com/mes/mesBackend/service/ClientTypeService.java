@@ -7,6 +7,8 @@ import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface ClientTypeService {
 
     // 거래처유형 생성
@@ -16,7 +18,8 @@ public interface ClientTypeService {
     ClientTypeResponse getClientType(Long id) throws NotFoundException;
 
     // 거래처유형 전체 조회
-    Page<ClientTypeResponse> getClientTypes(Pageable pageable);
+    List<ClientTypeResponse> getClientTypes();
+//    Page<ClientTypeResponse> getClientTypes(Pageable pageable);
 
     // 거래처유형 수정
     ClientTypeResponse updateClientType(Long id, ClientTypeRequest clientTypeRequest) throws NotFoundException;

@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 // 3-5-1. 설비등록
 @Tag(name = "equipment", description = "설비 API")
@@ -45,7 +46,7 @@ public class EquipmentController {
     )
     public ResponseEntity<EquipmentResponse> createEquipment(
             @RequestBody @Valid EquipmentRequest equipmentRequest
-    ) throws NotFoundException, BadRequestException {
+    ) throws NotFoundException {
         return new ResponseEntity<>(equipmentService.createEquipment(equipmentRequest), HttpStatus.OK);
     }
 
@@ -65,33 +66,12 @@ public class EquipmentController {
         return new ResponseEntity<>(equipmentService.getEquipment(id), HttpStatus.OK);
     }
 
-    // 설비 페이징 조회 검색조건: 설비명
-    @Operation(summary = "설비 페이징 조회", description = "")
+    // 설비 전체 조회 검색조건: 설비명
+    @Operation(summary = "설비 전체 조회", description = "")
     @GetMapping
     @ResponseBody
-    @Parameters(
-            value = {
-                    @Parameter(
-                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "0")
-                    ),
-                    @Parameter(
-                            name = "size", description = "페이지의 사이즈",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "20")
-                    ),
-                    @Parameter(
-                            name = "sort", in = ParameterIn.QUERY,
-                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
-                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
-                    )
-            }
-    )
-    public ResponseEntity<Page<EquipmentResponse>> getEquipments(
-            @PageableDefault @Parameter(hidden = true) Pageable pageable
-    ) {
-        return new ResponseEntity<>(equipmentService.getEquipments(pageable), HttpStatus.OK);
+    public ResponseEntity<List<EquipmentResponse>> getEquipments() {
+        return new ResponseEntity<>(equipmentService.getEquipments(), HttpStatus.OK);
     }
 
     // 설비 수정
@@ -126,4 +106,33 @@ public class EquipmentController {
         equipmentService.deleteEquipment(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+
+//    // 설비 페이징 조회 검색조건: 설비명
+//    @Operation(summary = "설비 페이징 조회", description = "")
+//    @GetMapping
+//    @ResponseBody
+//    @Parameters(
+//            value = {
+//                    @Parameter(
+//                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "0")
+//                    ),
+//                    @Parameter(
+//                            name = "size", description = "페이지의 사이즈",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "20")
+//                    ),
+//                    @Parameter(
+//                            name = "sort", in = ParameterIn.QUERY,
+//                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
+//                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
+//                    )
+//            }
+//    )
+//    public ResponseEntity<Page<EquipmentResponse>> getEquipments(
+//            @PageableDefault @Parameter(hidden = true) Pageable pageable
+//    ) {
+//        return new ResponseEntity<>(equipmentService.getEquipments(pageable), HttpStatus.OK);
+//    }
 }

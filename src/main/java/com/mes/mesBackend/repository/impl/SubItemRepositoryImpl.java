@@ -12,9 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class SubItemRepositoryImpl implements SubItemRepositoryCustom {
-    // 대체품 페이징 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
+    // 대체품 전체 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
 
     @Autowired
     JPAQueryFactory jpaQueryFactory;
@@ -22,25 +24,22 @@ public class SubItemRepositoryImpl implements SubItemRepositoryCustom {
     final QSubItem subItem = QSubItem.subItem1;
 
     @Override
-    public Page<SubItem> findAllCondition(
+    public List<SubItem> findAllCondition(
             Long itemGroupId,
             Long itemAccountId,
             String itemNo,
-            String itemName,
-            Pageable pageable
+            String itemName
     ) {
-        QueryResults<SubItem> results = jpaQueryFactory
+        return jpaQueryFactory
                 .selectFrom(subItem)
                 .where(
                         isItemGroupEq(itemGroupId),
                         isItemAccountEq(itemAccountId),
                         isItemNoContains(itemNo),
-                        isItemNameContains(itemName)
+                        isItemNameContains(itemName),
+                        isDeleteYnFalse()
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetchResults();
-        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+                .fetch();
     }
 
     // 품목그룹으로 조회
@@ -62,4 +61,37 @@ public class SubItemRepositoryImpl implements SubItemRepositoryCustom {
     private BooleanExpression isItemNameContains(String itemName) {
         return itemName != null ? subItem.item.itemName.contains(itemName) : null;
     }
+
+    private BooleanExpression isDeleteYnFalse() {
+        return subItem.deleteYn.isFalse();
+    }
+
+    // 대체품 페이징 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
+
+//    @Autowired
+//    JPAQueryFactory jpaQueryFactory;
+//
+//    final QSubItem subItem = QSubItem.subItem1;
+//
+//    @Override
+//    public Page<SubItem> findAllCondition(
+//            Long itemGroupId,
+//            Long itemAccountId,
+//            String itemNo,
+//            String itemName,
+//            Pageable pageable
+//    ) {
+//        QueryResults<SubItem> results = jpaQueryFactory
+//                .selectFrom(subItem)
+//                .where(
+//                        isItemGroupEq(itemGroupId),
+//                        isItemAccountEq(itemAccountId),
+//                        isItemNoContains(itemNo),
+//                        isItemNameContains(itemName)
+//                )
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetchResults();
+//        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+//    }
 }

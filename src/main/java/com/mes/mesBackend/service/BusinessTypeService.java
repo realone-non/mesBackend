@@ -7,6 +7,8 @@ import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface BusinessTypeService {
 
     // 업태 타입 생성
@@ -16,7 +18,8 @@ public interface BusinessTypeService {
     BusinessTypeResponse getBusinessType(Long id) throws NotFoundException;
 
     // 업태 타입 전체 조회
-    Page<BusinessTypeResponse> getBusinessTypes(Pageable pageable);
+    List<BusinessTypeResponse> getBusinessTypes();
+//    Page<BusinessTypeResponse> getBusinessTypes(Pageable pageable);
 
     // 업태 타입 수정
     BusinessTypeResponse updateBusinessType(Long id, BusinessTypeRequest businessTypeRequest) throws NotFoundException;

@@ -68,17 +68,29 @@ public class EstimateServiceImpl implements EstimateService {
 
     // 견적 페이징 조회 검색조건: 거래처, 견적기간(fromDate~toDate), 화폐, 담당자
     @Override
-    public Page<EstimateResponse> getEstimates(
+    public List<EstimateResponse> getEstimates(
             String clientName,
             LocalDate fromDate,
             LocalDate toDate,
             Long currencyId,
-            String chargeName,
-            Pageable pageable
+            String chargeName
     ) {
-        Page<Estimate> estimates = estimateRepository.findAllByCondition(clientName, fromDate, toDate, currencyId, chargeName, pageable);
-        return mapper.toPageResponses(estimates, EstimateResponse.class);
+        List<Estimate> estimates = estimateRepository.findAllByCondition(clientName, fromDate, toDate, currencyId, chargeName);
+        return mapper.toListResponses(estimates, EstimateResponse.class);
     }
+    // 견적 페이징 조회 검색조건: 거래처, 견적기간(fromDate~toDate), 화폐, 담당자
+//    @Override
+//    public Page<EstimateResponse> getEstimates(
+//            String clientName,
+//            LocalDate fromDate,
+//            LocalDate toDate,
+//            Long currencyId,
+//            String chargeName,
+//            Pageable pageable
+//    ) {
+//        Page<Estimate> estimates = estimateRepository.findAllByCondition(clientName, fromDate, toDate, currencyId, chargeName, pageable);
+//        return mapper.toPageResponses(estimates, EstimateResponse.class);
+//    }
 
     // 견적 수정
     @Override

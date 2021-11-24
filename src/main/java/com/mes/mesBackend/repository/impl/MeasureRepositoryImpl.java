@@ -13,9 +13,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class MeasureRepositoryImpl implements MeasureRepositoryCustom {
-    // 계측기 페이징 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
+    // 계측기 전체 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
 
     @Autowired
     JPAQueryFactory jpaQueryFactory;
@@ -25,19 +27,15 @@ public class MeasureRepositoryImpl implements MeasureRepositoryCustom {
     final QMeasure measure = QMeasure.measure;
 
     @Override
-    public Page<Measure> findAllByCondition(Long gaugeTypeId, Long month, Pageable pageable) {
-        QueryResults<Measure> results = jpaQueryFactory
+    public List<Measure> findAllByCondition(Long gaugeTypeId, Long month) {
+        return jpaQueryFactory
                 .selectFrom(measure)
                 .where(
                         isGaugeTypeEq(gaugeTypeId),
                         isCalibrationDateEq(month),
                         isDeleteYnFalse()
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetchResults();
-
-        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+                .fetch();
     }
 
     // Gauge 유형으로 검색
@@ -53,4 +51,21 @@ public class MeasureRepositoryImpl implements MeasureRepositoryCustom {
     private BooleanExpression isDeleteYnFalse() {
         return measure.deleteYn.isFalse();
     }
+
+// 계측기 페이징 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
+//    @Override
+//    public Page<Measure> findAllByCondition(Long gaugeTypeId, Long month, Pageable pageable) {
+//        QueryResults<Measure> results = jpaQueryFactory
+//                .selectFrom(measure)
+//                .where(
+//                        isGaugeTypeEq(gaugeTypeId),
+//                        isCalibrationDateEq(month),
+//                        isDeleteYnFalse()
+//                )
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetchResults();
+//
+//        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+//    }
 }

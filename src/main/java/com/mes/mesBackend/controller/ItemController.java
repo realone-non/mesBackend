@@ -73,38 +73,18 @@ public class ItemController {
         return new ResponseEntity<>(itemService.getItem(id), HttpStatus.OK);
     }
 
-    // 품목 페이징 조회
+    // 품목 전체 조회
     @GetMapping
     @ResponseBody
-    @Operation(summary = "품목 페이징 조회", description = "검색조건: 품목그룹, 품목계정, 품번, 품명, 검색어")
-    @Parameters(
-            value = {
-                    @Parameter(
-                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "0")
-                    ),
-                    @Parameter(
-                            name = "size", description = "페이지의 사이즈",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "20")
-                    ),
-                    @Parameter(
-                            name = "sort", in = ParameterIn.QUERY,
-                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
-                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
-                    )
-            }
-    )
-    public ResponseEntity<Page<ItemResponse>> getItems(
+    @Operation(summary = "품목 전체 조회", description = "검색조건: 품목그룹, 품목계정, 품번, 품명, 검색어")
+    public ResponseEntity<List<ItemResponse>> getItems(
             @RequestParam(required = false) @Parameter(description = "품목 그룹 id") Long itemGroupId,
             @RequestParam(required = false) @Parameter(description = "품목 계정 id") Long itemAccountId,
             @RequestParam(required = false) @Parameter(description = "품번") String itemNo,
             @RequestParam(required = false) @Parameter(description = "품명") String itemName,
-            @RequestParam(required = false) @Parameter(description = "검색어") String searchWord,
-            @PageableDefault @Parameter(hidden = true) Pageable pageable
+            @RequestParam(required = false) @Parameter(description = "검색어") String searchWord
     ) {
-        return new ResponseEntity<>(itemService.getItems(itemGroupId, itemAccountId, itemNo, itemName, searchWord, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(itemService.getItems(itemGroupId, itemAccountId, itemNo, itemName, searchWord), HttpStatus.OK);
     }
 
     // 품목 수정
@@ -224,4 +204,38 @@ public class ItemController {
         itemService.deleteItemFile(itemId, itemFileId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+
+    // 품목 페이징 조회
+//    @GetMapping
+//    @ResponseBody
+//    @Operation(summary = "품목 페이징 조회", description = "검색조건: 품목그룹, 품목계정, 품번, 품명, 검색어")
+//    @Parameters(
+//            value = {
+//                    @Parameter(
+//                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "0")
+//                    ),
+//                    @Parameter(
+//                            name = "size", description = "페이지의 사이즈",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "20")
+//                    ),
+//                    @Parameter(
+//                            name = "sort", in = ParameterIn.QUERY,
+//                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
+//                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
+//                    )
+//            }
+//    )
+//    public ResponseEntity<Page<ItemResponse>> getItems(
+//            @RequestParam(required = false) @Parameter(description = "품목 그룹 id") Long itemGroupId,
+//            @RequestParam(required = false) @Parameter(description = "품목 계정 id") Long itemAccountId,
+//            @RequestParam(required = false) @Parameter(description = "품번") String itemNo,
+//            @RequestParam(required = false) @Parameter(description = "품명") String itemName,
+//            @RequestParam(required = false) @Parameter(description = "검색어") String searchWord,
+//            @PageableDefault @Parameter(hidden = true) Pageable pageable
+//    ) {
+//        return new ResponseEntity<>(itemService.getItems(itemGroupId, itemAccountId, itemNo, itemName, searchWord, pageable), HttpStatus.OK);
+//    }
 }

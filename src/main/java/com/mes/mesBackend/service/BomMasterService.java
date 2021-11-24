@@ -16,7 +16,9 @@ public interface BomMasterService {
     // BOM 마스처 단일 조회
     BomMasterResponse getBomMaster(Long bomMasterId) throws NotFoundException;
     // BOM 마스터 페이징 조회 검색조건: 품목계정, 품목그룹, 품번|품명
-    Page<BomMasterResponse> getBomMasters(Long itemAccountId, Long itemGroupId, String itemNoAndItemName, Pageable pageable);
+//    Page<BomMasterResponse> getBomMasters(Long itemAccountId, Long itemGroupId, String itemNoAndItemName, Pageable pageable);
+    // Bom 마스터 전체 조회 검색조건: 품목계정, 품목그룹, 품번|품명
+    List<BomMasterResponse> getBomMasters(Long itemAccountId, Long itemGroupId, String itemNoAndItemName);
     // BOM 마스터 수정
     BomMasterResponse updateBomMaster(Long bomMasterId, BomMasterRequest bomMasterRequest) throws NotFoundException;
     // BOM 마스터 삭제

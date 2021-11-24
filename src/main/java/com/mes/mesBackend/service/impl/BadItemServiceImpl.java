@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BadItemServiceImpl implements BadItemService {
     @Autowired
@@ -35,9 +37,9 @@ public class BadItemServiceImpl implements BadItemService {
     }
     // 불량항목 페이징 조회
     @Override
-    public Page<BadItemResponse> getBadItems(Pageable pageable) {
-        Page<BadItem> badItems = badItemRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(badItems, BadItemResponse.class);
+    public List<BadItemResponse> getBadItems() {
+        List<BadItem> badItems = badItemRepository.findAllByDeleteYnFalse();
+        return mapper.toListResponses(badItems, BadItemResponse.class);
     }
     // 불량항목 수정
     @Override

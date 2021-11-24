@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class WorkDocumentServiceImpl implements WorkDocumentService {
@@ -65,10 +66,18 @@ public class WorkDocumentServiceImpl implements WorkDocumentService {
 
     // 작업표준서 페이징 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
     @Override
-    public Page<WorkDocumentResponse> getWorkDocuments(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Pageable pageable) {
-        Page<WorkDocument> workDocuments = workDocumentRepository.findAllByCondition(itemGroupId, itemAccountId, itemNo, itemName, pageable);
-        return mapper.toPageResponses(workDocuments, WorkDocumentResponse.class);
+    public List<WorkDocumentResponse> getWorkDocuments(Long itemGroupId, Long itemAccountId, String itemNo, String itemName) {
+        List<WorkDocument> workDocuments = workDocumentRepository.findAllByCondition(itemGroupId, itemAccountId, itemNo, itemName);
+        return mapper.toListResponses(workDocuments, WorkDocumentResponse.class);
     }
+
+    // 작업표준서 페이징 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
+//    @Override
+//    public Page<WorkDocumentResponse> getWorkDocuments(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Pageable pageable) {
+//        Page<WorkDocument> workDocuments = workDocumentRepository.findAllByCondition(itemGroupId, itemAccountId, itemNo, itemName, pageable);
+//        return mapper.toPageResponses(workDocuments, WorkDocumentResponse.class);
+//    }
+
     // 작업표준서 수정
     @Override
     public WorkDocumentResponse updateWorkDocument(Long id, WorkDocumentRequest workDocumentRequest) throws NotFoundException {

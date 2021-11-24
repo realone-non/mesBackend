@@ -62,15 +62,25 @@ public class BomMasterServiceImpl implements BomMasterService {
 
     // BOM 마스터 페이징 조회 검색조건: 품목계정, 품목그룹, 품번|품명
     @Override
-    public Page<BomMasterResponse> getBomMasters(
+    public List<BomMasterResponse> getBomMasters(
             Long itemAccountId,
             Long itemGroupId,
-            String itemNoAndItemName,
-            Pageable pageable
+            String itemNoAndItemName
     ) {
-        Page<BomMaster> bomMasters = bomMasterRepository.findAllByCondition(itemAccountId, itemGroupId, itemNoAndItemName, pageable);
-        return mapper.toPageResponses(bomMasters, BomMasterResponse.class);
+        List<BomMaster> bomMasters = bomMasterRepository.findAllByCondition(itemAccountId, itemGroupId, itemNoAndItemName);
+        return mapper.toListResponses(bomMasters, BomMasterResponse.class);
     }
+    // BOM 마스터 페이징 조회 검색조건: 품목계정, 품목그룹, 품번|품명
+//    @Override
+//    public Page<BomMasterResponse> getBomMasters(
+//            Long itemAccountId,
+//            Long itemGroupId,
+//            String itemNoAndItemName,
+//            Pageable pageable
+//    ) {
+//        Page<BomMaster> bomMasters = bomMasterRepository.findAllByCondition(itemAccountId, itemGroupId, itemNoAndItemName, pageable);
+//        return mapper.toPageResponses(bomMasters, BomMasterResponse.class);
+//    }
 
     // BOM 마스터 수정
     @Override

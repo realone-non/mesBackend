@@ -12,9 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class WorkDocumentRepositoryImpl implements WorkDocumentRepositoryCustom {
-    // 작업표준서 페이징 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
+    // 작업표준서 전체 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
 
     @Autowired
     JPAQueryFactory jpaQueryFactory;
@@ -22,14 +24,13 @@ public class WorkDocumentRepositoryImpl implements WorkDocumentRepositoryCustom 
     final QWorkDocument workDocument = QWorkDocument.workDocument;
 
     @Override
-    public Page<WorkDocument> findAllByCondition(
+    public List<WorkDocument> findAllByCondition(
             Long itemGroupId,
             Long itemAccountId,
             String itemNo,
-            String itemName,
-            Pageable pageable
+            String itemName
     ) {
-        QueryResults<WorkDocument> results = jpaQueryFactory
+        return jpaQueryFactory
                 .selectFrom(workDocument)
                 .where(
                         isItemGroupEq(itemGroupId),
@@ -38,10 +39,7 @@ public class WorkDocumentRepositoryImpl implements WorkDocumentRepositoryCustom 
                         isItemNameContaining(itemName),
                         isDeleteYnFalse()
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetchResults();
-        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+                .fetch();
     }
 
     // 품목 그룹 조회
@@ -68,4 +66,27 @@ public class WorkDocumentRepositoryImpl implements WorkDocumentRepositoryCustom 
     private BooleanExpression isDeleteYnFalse() {
         return workDocument.deleteYn.isFalse();
     }
+
+//    @Override
+//    public Page<WorkDocument> findAllByCondition(
+//            Long itemGroupId,
+//            Long itemAccountId,
+//            String itemNo,
+//            String itemName,
+//            Pageable pageable
+//    ) {
+//        QueryResults<WorkDocument> results = jpaQueryFactory
+//                .selectFrom(workDocument)
+//                .where(
+//                        isItemGroupEq(itemGroupId),
+//                        isItemAccountEq(itemAccountId),
+//                        isItemNoContaining(itemNo),
+//                        isItemNameContaining(itemName),
+//                        isDeleteYnFalse()
+//                )
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetchResults();
+//        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+//    }
 }

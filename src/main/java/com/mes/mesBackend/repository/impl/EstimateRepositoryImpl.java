@@ -3,17 +3,13 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.entity.Estimate;
 import com.mes.mesBackend.entity.QEstimate;
 import com.mes.mesBackend.repository.custom.EstimateRepositoryCustom;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
@@ -25,15 +21,14 @@ public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
     final QEstimate estimate = QEstimate.estimate;
 
     @Override
-    public Page<Estimate> findAllByCondition(
+    public List<Estimate> findAllByCondition(
             String clientName,
             LocalDate fromDate,
             LocalDate toDate,
             Long currencyId,
-            String chargeName,
-            Pageable pageable
+            String chargeName
     ) {
-        QueryResults<Estimate> results = jpaQueryFactory
+        return jpaQueryFactory
                 .selectFrom(estimate)
                 .where(
                         isClientNameContaining(clientName),
@@ -42,10 +37,7 @@ public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
                         isChargeNameContaining(chargeName),
                         isDeleteYnFalse()
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetchResults();
-        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+                .fetch();
     }
 
     // 거래처 명 조회
@@ -71,4 +63,28 @@ public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
     private BooleanExpression isDeleteYnFalse() {
         return estimate.deleteYn.isFalse();
     }
+
+//    @Override
+//    public Page<Estimate> findAllByCondition(
+//            String clientName,
+//            LocalDate fromDate,
+//            LocalDate toDate,
+//            Long currencyId,
+//            String chargeName,
+//            Pageable pageable
+//    ) {
+//        QueryResults<Estimate> results = jpaQueryFactory
+//                .selectFrom(estimate)
+//                .where(
+//                        isClientNameContaining(clientName),
+//                        isEstimateDate(fromDate, toDate),
+//                        isCurrencyEq(currencyId),
+//                        isChargeNameContaining(chargeName),
+//                        isDeleteYnFalse()
+//                )
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetchResults();
+//        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+//    }
 }

@@ -4,7 +4,10 @@ import com.mes.mesBackend.dto.request.CodeRequest;
 import com.mes.mesBackend.dto.request.WorkLineRequest;
 import com.mes.mesBackend.dto.response.CodeResponse;
 import com.mes.mesBackend.dto.response.WorkLineResponse;
-import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.WorkCenter;
+import com.mes.mesBackend.entity.WorkLine;
+import com.mes.mesBackend.entity.WorkLineCode;
+import com.mes.mesBackend.entity.WorkProcess;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
@@ -12,9 +15,8 @@ import com.mes.mesBackend.repository.WorkLineCodeRepository;
 import com.mes.mesBackend.repository.WorkLineRepository;
 import com.mes.mesBackend.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -63,12 +65,19 @@ public class WorkLineServiceImpl implements WorkLineService {
         return mapper.toResponse(workLine, WorkLineResponse.class);
     }
 
-    // 작업라인 페이징 조회
+    // 작업라인 전체 조회
     @Override
-    public Page<WorkLineResponse> getWorkLines(Pageable pageable) {
-        Page<WorkLine> workLines = workLineRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(workLines, WorkLineResponse.class);
+    public List<WorkLineResponse> getWorkLines() {
+        List<WorkLine> workLines = workLineRepository.findAllByDeleteYnFalse();
+        return mapper.toListResponses(workLines, WorkLineResponse.class);
     }
+
+    // 작업라인 페이징 조회
+//    @Override
+//    public Page<WorkLineResponse> getWorkLines(Pageable pageable) {
+//        Page<WorkLine> workLines = workLineRepository.findAllByDeleteYnFalse(pageable);
+//        return mapper.toPageResponses(workLines, WorkLineResponse.class);
+//    }
 
     // 작업라인 수정
     @Override

@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class MeasureServiceImpl implements MeasureService {
@@ -48,12 +49,19 @@ public class MeasureServiceImpl implements MeasureService {
         return mapper.toResponse(measure, MeasureResponse.class);
     }
 
-    // 계측기 페이징 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
+    // 계측기 전체 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
     @Override
-    public Page<MeasureResponse> getMeasures(Long gaugeId, Long month, Pageable pageable) {
-        Page<Measure> measures = measureRepository.findAllByCondition(gaugeId, month, pageable);
-        return mapper.toPageResponses(measures, MeasureResponse.class);
+    public List<MeasureResponse> getMeasures(Long gaugeId, Long month) {
+        List<Measure> measures = measureRepository.findAllByCondition(gaugeId, month);
+        return mapper.toListResponses(measures, MeasureResponse.class);
     }
+
+    // 계측기 페이징 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
+//    @Override
+//    public Page<MeasureResponse> getMeasures(Long gaugeId, Long month, Pageable pageable) {
+//        Page<Measure> measures = measureRepository.findAllByCondition(gaugeId, month, pageable);
+//        return mapper.toPageResponses(measures, MeasureResponse.class);
+//    }
 
     // 계측기 수정
     @Override

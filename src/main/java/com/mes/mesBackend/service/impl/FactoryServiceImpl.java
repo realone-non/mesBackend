@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class FactoryServiceImpl implements FactoryService {
 
@@ -44,10 +46,14 @@ public class FactoryServiceImpl implements FactoryService {
     }
 
     // 공장 전체 조회
-    public Page<FactoryResponse> getFactories(Pageable pageable) {
-        Page<Factory> factories = factoryRepository.findAllByDeleteYnFalse(pageable);
-        return modelMapper.toPageResponses(factories, FactoryResponse.class);
+    public List<FactoryResponse> getFactories() {
+        List<Factory> factories = factoryRepository.findAllByDeleteYnFalse();
+        return modelMapper.toListResponses(factories, FactoryResponse.class);
     }
+//    public Page<FactoryResponse> getFactories(Pageable pageable) {
+//        Page<Factory> factories = factoryRepository.findAllByDeleteYnFalse(pageable);
+//        return modelMapper.toPageResponses(factories, FactoryResponse.class);
+//    }
 
     // 공장 수정
     public FactoryResponse updateFactory(Long id, FactoryRequest factoryRequest) throws NotFoundException {

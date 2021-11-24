@@ -6,13 +6,15 @@ import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface BadItemService {
     // 불량항목 생성
     BadItemResponse createBadItem(BadItemRequest badItemRequest);
     // 불량항목 단일 조회
     BadItemResponse getBadItem(Long id) throws NotFoundException;
     // 불량항목 페이징 조회
-    Page<BadItemResponse> getBadItems(Pageable pageable);
+    List<BadItemResponse> getBadItems();
     // 불량항목 수정
     BadItemResponse updateBadItem(Long id, BadItemRequest badItemRequest) throws NotFoundException;
     // 불량항목 삭제

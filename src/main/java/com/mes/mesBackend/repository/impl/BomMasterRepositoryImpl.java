@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class BomMasterRepositoryImpl implements BomMasterRepositoryCustom {
     // 검색조건: 품목계정, 품목그룹, 품번|품명
@@ -22,13 +24,12 @@ public class BomMasterRepositoryImpl implements BomMasterRepositoryCustom {
     final QBomMaster bomMaster = QBomMaster.bomMaster;
 
     @Override
-    public Page<BomMaster> findAllByCondition(
+    public List<BomMaster> findAllByCondition(
             Long itemAccountId,
             Long itemGroupId,
-            String itemNoOrName,
-            Pageable pageable
+            String itemNoOrName
     ) {
-        QueryResults<BomMaster> results = jpaQueryFactory
+        return jpaQueryFactory
                 .selectFrom(bomMaster)
                 .where(
                         isItemAccountEq(itemAccountId),
@@ -36,11 +37,7 @@ public class BomMasterRepositoryImpl implements BomMasterRepositoryCustom {
                         isItemNoOrItemNameToItemNoOrItemName(itemNoOrName),
                         isDeleteYnFalse()
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetchResults();
-
-        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+                .fetch();
     }
 
     // 품목 계정 검색
@@ -63,4 +60,26 @@ public class BomMasterRepositoryImpl implements BomMasterRepositoryCustom {
     private BooleanExpression isDeleteYnFalse() {
         return bomMaster.deleteYn.isFalse();
     }
+
+//    @Override
+//    public Page<BomMaster> findAllByCondition(
+//            Long itemAccountId,
+//            Long itemGroupId,
+//            String itemNoOrName,
+//            Pageable pageable
+//    ) {
+//        QueryResults<BomMaster> results = jpaQueryFactory
+//                .selectFrom(bomMaster)
+//                .where(
+//                        isItemAccountEq(itemAccountId),
+//                        isItemGroupEq(itemGroupId),
+//                        isItemNoOrItemNameToItemNoOrItemName(itemNoOrName),
+//                        isDeleteYnFalse()
+//                )
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetchResults();
+//
+//        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+//    }
 }

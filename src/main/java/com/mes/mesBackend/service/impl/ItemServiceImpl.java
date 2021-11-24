@@ -94,17 +94,29 @@ public class ItemServiceImpl implements ItemService {
 
     // 품목 페이징 조회
     @Override
-    public Page<ItemResponse> getItems(
+    public List<ItemResponse> getItems(
             Long itemGroupId,
             Long itemAccountId,
             String itemNo,
             String itemName,
-            String searchWord,
-            Pageable pageable
+            String searchWord
     ) {
-        Page<Item> items = itemRepository.findAllByCondition(itemGroupId, itemAccountId, itemNo, itemName, searchWord, pageable);
-        return mapper.toPageResponses(items, ItemResponse.class);
+        List<Item> items = itemRepository.findAllByCondition(itemGroupId, itemAccountId, itemNo, itemName, searchWord);
+        return mapper.toListResponses(items, ItemResponse.class);
     }
+    // 품목 페이징 조회
+//    @Override
+//    public Page<ItemResponse> getItems(
+//            Long itemGroupId,
+//            Long itemAccountId,
+//            String itemNo,
+//            String itemName,
+//            String searchWord,
+//            Pageable pageable
+//    ) {
+//        Page<Item> items = itemRepository.findAllByCondition(itemGroupId, itemAccountId, itemNo, itemName, searchWord, pageable);
+//        return mapper.toPageResponses(items, ItemResponse.class);
+//    }
 
     // 품목 수정
     @Override

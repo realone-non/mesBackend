@@ -22,7 +22,8 @@ public interface EstimateService {
     // 견적 단일 조회
     EstimateResponse getEstimate(Long estimateId) throws NotFoundException;
     // 견적 페이징 조회 검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 담당자
-    Page<EstimateResponse> getEstimates(String clientName, LocalDate fromDate, LocalDate toDate, Long currencyId, String chargeName, Pageable pageable);
+    List<EstimateResponse> getEstimates(String clientName, LocalDate fromDate, LocalDate toDate, Long currencyId, String chargeName);
+//    Page<EstimateResponse> getEstimates(String clientName, LocalDate fromDate, LocalDate toDate, Long currencyId, String chargeName, Pageable pageable);
     // 견적 수정
     EstimateResponse updateEstimate(Long estimateId, EstimateRequest estimateRequest) throws NotFoundException;
     // 견적 삭제
