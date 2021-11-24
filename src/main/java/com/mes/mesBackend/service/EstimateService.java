@@ -1,10 +1,13 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.EstimateItemRequest;
+import com.mes.mesBackend.dto.request.EstimatePiRequest;
 import com.mes.mesBackend.dto.request.EstimateRequest;
 import com.mes.mesBackend.dto.response.EstimateItemResponse;
+import com.mes.mesBackend.dto.response.EstimatePiResponse;
 import com.mes.mesBackend.dto.response.EstimateResponse;
 import com.mes.mesBackend.entity.Estimate;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,11 +34,21 @@ public interface EstimateService {
     // 견적 품목 생성
     EstimateItemResponse createEstimateItem(Long estimateId, EstimateItemRequest estimateItemRequest) throws NotFoundException;
     // 견적 품목 단일 조회
-    EstimateItemResponse getEstimateItem(Long estimateId, Long estimateItemId);
-    // 견적 품목 페이징 조회
-    List<EstimateItemResponse> getEstimateItems(Long estimateId);
+    EstimateItemResponse getEstimateItem(Long estimateId, Long estimateItemId) throws NotFoundException;
+    // 견적 품목 전체 조회
+    List<EstimateItemResponse> getEstimateItems(Long estimateId) throws NotFoundException;
     // 견적 품목 수정
-    EstimateItemResponse updateEstimateItem(Long estimateId, Long estimateItemId, EstimateItemRequest estimateItemRequest);
+    EstimateItemResponse updateEstimateItem(Long estimateId, Long estimateItemId, EstimateItemRequest estimateItemRequest) throws NotFoundException;
     // 견적 품목 삭제
-    void deleteEstimateItem(Long estimateId, Long estimateItemId);
+    void deleteEstimateItem(Long estimateId, Long estimateItemId) throws NotFoundException;
+
+    // ===================================== 견적 P/I ======================================
+    // 견적 P/I 생성
+    EstimatePiResponse createEstimatePi(Long estimateId, EstimatePiRequest estimatePiRequest) throws NotFoundException, BadRequestException;
+    // 견적 P/I 조회
+    EstimatePiResponse getEstimatePi(Long estimateId) throws NotFoundException;
+    // 견적 P/I 수정
+    EstimatePiResponse updateEstimatePi(Long estimateId, Long estimatePiId, EstimatePiRequest estimatePiRequest) throws NotFoundException, BadRequestException;
+    // 견적 P/I 삭제
+    void deleteEstimatePi(Long estimateId, Long estimatePiId) throws NotFoundException, BadRequestException;
 }

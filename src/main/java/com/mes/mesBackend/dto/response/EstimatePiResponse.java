@@ -9,21 +9,21 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Getter
 @Setter
+@Schema(description = "P/I")
 @JsonInclude(NON_NULL)
-@Schema(description = "견적 품목")
-public class EstimateItemResponse {
+public class EstimatePiResponse {
     @Schema(description = "고유아이디")
     Long id;
 
-    @Schema(description = "품목")
-    ItemResponse.toEstimateItem item;
+    @Schema(description = "Invoice No")
+    String invoiceNo;
 
-    @Schema(description = "수량")
-    int amount;
+    @Schema(description = "customer PO NO")
+    String customerPoNo;
 
-    @Schema(description = "금액")
-    int price;
+    @Schema(description = "Bill To")
+    String billTo;
 
-    @Schema(description = "비고")
-    String note;
+    @Schema(description = "Remarks")
+    String remarks;
 }

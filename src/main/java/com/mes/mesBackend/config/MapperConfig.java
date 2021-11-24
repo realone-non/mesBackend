@@ -39,6 +39,7 @@ public class MapperConfig {
         modelMapper.addConverter(toSubItemResponseConvert);
         modelMapper.addConverter(toWorkDocumentConvert);
         modelMapper.addConverter(toWorkLineResponse);
+        modelMapper.addConverter(toEstimateItemResponse);
 
         return modelMapper;
     }
@@ -216,6 +217,18 @@ public class MapperConfig {
             workLineCustomResponse.setWorkCenterName(workLine.getWorkCenter().getWorkCenterName());
             workLineCustomResponse.setWorkProcessName(workLine.getWorkProcess().getWorkProcessName());
             return workLineCustomResponse;
+        }
+    };
+
+    Converter<EstimateItemDetail, EstimateItemResponse> toEstimateItemResponse = new Converter<EstimateItemDetail, EstimateItemResponse>() {
+        @Override
+        public EstimateItemResponse convert(MappingContext<EstimateItemDetail, EstimateItemResponse> context) {
+            ModelMapper mapper = new ModelMapper();
+            EstimateItemDetail itemDetail = context.getSource();
+            EstimateItemResponse estimateItemResponse = mapper.map(itemDetail, EstimateItemResponse.class);
+            int price = estimateItemResponse.getItem().getInputUnitPrice() * estimateItemResponse.getAmount();
+            estimateItemResponse.setPrice(price);
+            return estimateItemResponse;
         }
     };
 }

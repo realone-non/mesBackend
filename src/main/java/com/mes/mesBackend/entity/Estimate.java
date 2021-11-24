@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -78,15 +79,12 @@ public class Estimate extends BaseTimeEntity {
     @Column(name = "DESTINATION", columnDefinition = "varchar(255) COMMENT 'DESTINATION'")
     private String destination;             // DESTINATION
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
-    private boolean useYn = true;   // 사용여부
-
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
-//
-//    @OneToOne(fetch = LAZY)
-//    @JoinColumn(name = "PI", columnDefinition = "bigint COMMENT 'PI'")
-//    private Pi pi;              // P/I
+
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "PI", columnDefinition = "bigint COMMENT 'PI'")
+    private Pi pi;              // P/I
 
     public void addMapping(Client client, Currency currency, String estimateNo) {
         setClient(client);
@@ -106,10 +104,13 @@ public class Estimate extends BaseTimeEntity {
         setTransportCondition(newEstimate.transportCondition);
         setForwader(newEstimate.forwader);
         setDestination(newEstimate.destination);
-        setUseYn(newEstimate.useYn);
     }
 
     public void delete() {
         setDeleteYn(true);
+    }
+
+    public void addPi(Pi pi) {
+        setPi(pi);
     }
 }

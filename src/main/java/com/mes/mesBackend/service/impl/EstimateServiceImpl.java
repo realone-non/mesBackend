@@ -1,20 +1,23 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.EstimateItemRequest;
+import com.mes.mesBackend.dto.request.EstimatePiRequest;
 import com.mes.mesBackend.dto.request.EstimateRequest;
 import com.mes.mesBackend.dto.response.EstimateItemResponse;
+import com.mes.mesBackend.dto.response.EstimatePiResponse;
 import com.mes.mesBackend.dto.response.EstimateResponse;
-import com.mes.mesBackend.entity.Client;
-import com.mes.mesBackend.entity.Currency;
-import com.mes.mesBackend.entity.Estimate;
-import com.mes.mesBackend.entity.EstimateItemDetail;
+import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.Constants;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.EstimateItemDetailRepository;
 import com.mes.mesBackend.repository.EstimateRepository;
+import com.mes.mesBackend.repository.PiRepository;
 import com.mes.mesBackend.service.ClientService;
 import com.mes.mesBackend.service.CurrencyService;
 import com.mes.mesBackend.service.EstimateService;
+import com.mes.mesBackend.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +27,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static com.mes.mesBackend.helper.Constants.DATE_TIME_FORMAT;
 
 @Service
 public class EstimateServiceImpl implements EstimateService {
@@ -37,6 +42,10 @@ public class EstimateServiceImpl implements EstimateService {
     ModelMapper mapper;
     @Autowired
     EstimateItemDetailRepository estimateItemRepository;
+    @Autowired
+    ItemService itemService;
+    @Autowired
+    PiRepository piRepository;
 
     // 견적 생성
     @Override
@@ -100,7 +109,7 @@ public class EstimateServiceImpl implements EstimateService {
 
     // 견적번호 날짜형식으로 생성
     private String createEstimateNo() {
-        String dateTimeFormat = "yyyyMMdd_HHmmss";
+        String dateTimeFormat = DATE_TIME_FORMAT;
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormat));
     }
 
@@ -109,33 +118,128 @@ public class EstimateServiceImpl implements EstimateService {
     @Override
     public EstimateItemResponse createEstimateItem(Long estimateId, EstimateItemRequest estimateItemRequest) throws NotFoundException {
         Estimate estimate = getEstimateOrThrow(estimateId);
+        Item item = itemService.getItemOrThrow(estimateItemRequest.getItem());
 
-        EstimateItemDetail itemDetail = mapper.toEntity(estimateItemRequest, EstimateItemDetail.class);
-        return null;
+        EstimateItemDetail estimateItem = mapper.toEntity(estimateItemRequest, EstimateItemDetail.class);
+
+        estimateItem.addJoin(estimate, item);
+        estimateItemRepository.save(estimateItem);
+        return mapper.toResponse(estimateItem, EstimateItemResponse.class);
     }
+
     // 견적 품목 단일 조회
     @Override
-    public EstimateItemResponse getEstimateItem(Long estimateId, Long estimateItemId) {
-        return null;
+    public EstimateItemResponse getEstimateItem(Long estimateId, Long estimateItemId) throws NotFoundException {
+        Estimate estimate = getEstimateOrThrow(estimateId);
+        EstimateItemDetail estimateItem = getEstimateItemOrThrow(estimateItemId, estimate);
+        return mapper.toResponse(estimateItem, EstimateItemResponse.class);
     }
+
     // 견적 품목 페이징 조회
     @Override
-    public List<EstimateItemResponse> getEstimateItems(Long estimateId) {
-        return null;
+    public List<EstimateItemResponse> getEstimateItems(Long estimateId) throws NotFoundException {
+        Estimate estimate = getEstimateOrThrow(estimateId);
+        List<EstimateItemDetail> itemDetails = estimateItemRepository.findAllByEstimateAndDeleteYnFalse(estimate);
+        return mapper.toListResponses(itemDetails, EstimateItemResponse.class);
     }
+
     // 견적 품목 수정
     @Override
-    public EstimateItemResponse updateEstimateItem(Long estimateId, Long estimateItemId, EstimateItemRequest estimateItemRequest) {
-        return null;
+    public EstimateItemResponse updateEstimateItem(Long estimateId, Long estimateItemId, EstimateItemRequest estimateItemRequest) throws NotFoundException {
+        Estimate estimate = getEstimateOrThrow(estimateId);
+        Item newItem = itemService.getItemOrThrow(estimateItemRequest.getItem());
+        EstimateItemDetail findEstimateItem = getEstimateItemOrThrow(estimateItemId, estimate);
+        EstimateItemDetail newEstimateItem = mapper.toEntity(estimateItemRequest, EstimateItemDetail.class);
+        findEstimateItem.update(newItem, newEstimateItem);
+        estimateItemRepository.save(findEstimateItem);
+        return mapper.toResponse(findEstimateItem, EstimateItemResponse.class);
     }
+
     // 견적 품목 삭제
     @Override
-    public void deleteEstimateItem(Long estimateId, Long estimateItemId) {
-
+    public void deleteEstimateItem(Long estimateId, Long estimateItemId) throws NotFoundException {
+        Estimate estimate = getEstimateOrThrow(estimateId);
+        EstimateItemDetail estimateItem = getEstimateItemOrThrow(estimateItemId, estimate);
+        estimateItem.delete();
+        estimateItemRepository.save(estimateItem);
     }
+
     // 견적품목 단일 조회 및 예외
     private EstimateItemDetail getEstimateItemOrThrow(Long estimateItemId, Estimate estimate) throws NotFoundException {
         return estimateItemRepository.findByIdAndEstimateAndDeleteYnFalse(estimateItemId, estimate)
                 .orElseThrow(() -> new NotFoundException("estimate item does not exist. input estimate item id: " + estimateItemId));
+    }
+
+    // ===================================== 견적 P/I ======================================
+
+    // 견적 P/I 생성
+    @Override
+    public EstimatePiResponse createEstimatePi(Long estimateId, EstimatePiRequest estimatePiRequest) throws NotFoundException, BadRequestException {
+        Estimate estimate = getEstimateOrThrow(estimateId);
+        String invoiceNo = createInvoiceNo();           // invoiceNo 생성
+        checkExistsInvoiceNo(invoiceNo);        // invoiceNo 중복 EXCEPTION
+        Pi pi = mapper.toEntity(estimatePiRequest, Pi.class);
+        pi.setInvoiceNo(invoiceNo);
+        piRepository.save(pi);
+        estimate.addPi(pi);
+        estimateRepository.save(estimate);
+        return mapper.toResponse(pi, EstimatePiResponse.class);
+    }
+
+
+    // 견적의 P/I 조회
+    @Override
+    public EstimatePiResponse getEstimatePi(Long estimateId) throws NotFoundException {
+        Pi pi = getEstimatePiOrThrow(estimateId);
+        return mapper.toResponse(pi, EstimatePiResponse.class);
+    }
+
+    // 견적 P/I 수정
+    @Override
+    public EstimatePiResponse updateEstimatePi(Long estimateId, Long estimatePiId, EstimatePiRequest estimatePiRequest) throws NotFoundException, BadRequestException {
+        Estimate estimate = getEstimateOrThrow(estimateId);
+        if (estimate.getPi() == null || !estimate.getPi().getId().equals(estimatePiId)) {
+            throw new BadRequestException("estimate pi does not exist. input estimate id: " + estimateId);
+        }
+        Pi findPi = getEstimatePiOrThrow(estimateId);
+        Pi newPi = mapper.toEntity(estimatePiRequest, Pi.class);
+        findPi.update(newPi);
+        piRepository.save(findPi);
+        return mapper.toResponse(findPi, EstimatePiResponse.class);
+    }
+
+    // 견적 P/I 삭제
+    @Override
+    public void deleteEstimatePi(Long estimateId, Long estimatePiId) throws NotFoundException, BadRequestException {
+        Estimate estimate = getEstimateOrThrow(estimateId);
+        if (!estimate.getPi().getId().equals(estimatePiId)) {
+            throw new BadRequestException("pi does not exist. input estimate id: " + estimateId);
+        }
+        estimate.setPi(null);
+        piRepository.deleteById(estimatePiId);
+    }
+
+    // Invoice No 생성
+    public String createInvoiceNo() {
+        String dateTimeFormat = DATE_TIME_FORMAT;
+        return "EPI"+LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormat));
+    }
+
+    // pi 단일 조회 및 예외
+    private Pi getEstimatePiOrThrow(Long estimateId) throws NotFoundException {
+        Estimate estimate = getEstimateOrThrow(estimateId);
+        if (estimate.getPi() == null) {
+            return null;
+        }
+        return piRepository.findById(estimate.getPi().getId())
+                .orElseThrow(() -> new NotFoundException("estimate pi does not exist. input estimate id: " + estimateId));
+    }
+
+    // invoiceNo 중복 체크
+    private void checkExistsInvoiceNo(String invoiceNo) throws BadRequestException {
+        List<Pi> pis = piRepository.findAllByInvoiceNo(invoiceNo);
+        if (!pis.isEmpty()) {
+            throw new BadRequestException("exists by invoiceNo.");
+        }
     }
 }
