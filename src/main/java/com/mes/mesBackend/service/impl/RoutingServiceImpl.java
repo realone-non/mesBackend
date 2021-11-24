@@ -60,12 +60,19 @@ public class RoutingServiceImpl implements RoutingService {
         return mapper.toResponse(routing, RoutingResponse.class);
     }
 
-    // 라우팅 페이징 조회
+    // 라우팅 전체 조회
     @Override
-    public Page<RoutingResponse> getRoutings(Pageable pageable) {
-        Page<Routing> routings = routingRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(routings, RoutingResponse.class);
+    public List<RoutingResponse> getRoutings() {
+        List<Routing> routings = routingRepository.findAllByDeleteYnFalse();
+        return mapper.toListResponses(routings, RoutingResponse.class);
     }
+
+    // 라우팅 페이징 조회
+//    @Override
+//    public Page<RoutingResponse> getRoutings(Pageable pageable) {
+//        Page<Routing> routings = routingRepository.findAllByDeleteYnFalse(pageable);
+//        return mapper.toPageResponses(routings, RoutingResponse.class);
+//    }
 
     // 라우팅 수정
     @Override

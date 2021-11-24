@@ -13,9 +13,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class ItemCheckRepositoryImpl implements ItemCheckRepositoryCustom {
-    // 품목별 검사항목 페이징 조회 /  검색조건: 검사유형, 품목그룹, 품목계정
+    // 품목별 검사항목 전체 조회 /  검색조건: 검사유형, 품목그룹, 품목계정
 
     @Autowired
     JPAQueryFactory jpaQueryFactory;
@@ -23,13 +25,12 @@ public class ItemCheckRepositoryImpl implements ItemCheckRepositoryCustom {
     final QItemCheck itemCheck = QItemCheck.itemCheck;
 
     @Override
-    public Page<ItemCheck> findAllCondition(
+    public List<ItemCheck> findAllCondition(
             TestCategory testCategory,
             Long itemGroup,
-            Long itemAccount,
-            Pageable pageable
+            Long itemAccount
     ) {
-        QueryResults<ItemCheck> results = jpaQueryFactory
+        return jpaQueryFactory
                 .selectFrom(itemCheck)
                 .where(
                         isTestCategoryEq(testCategory),
@@ -37,10 +38,7 @@ public class ItemCheckRepositoryImpl implements ItemCheckRepositoryCustom {
                         isItemAccountEq(itemAccount),
                         isDeleteYnFalse()
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetchResults();
-        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+                .fetch();
     }
 
 
@@ -63,4 +61,25 @@ public class ItemCheckRepositoryImpl implements ItemCheckRepositoryCustom {
     private BooleanExpression isDeleteYnFalse() {
         return itemCheck.deleteYn.isFalse();
     }
+
+//    @Override
+//    public Page<ItemCheck> findAllCondition(
+//            TestCategory testCategory,
+//            Long itemGroup,
+//            Long itemAccount,
+//            Pageable pageable
+//    ) {
+//        QueryResults<ItemCheck> results = jpaQueryFactory
+//                .selectFrom(itemCheck)
+//                .where(
+//                        isTestCategoryEq(testCategory),
+//                        isItemGroupEq(itemGroup),
+//                        isItemAccountEq(itemAccount),
+//                        isDeleteYnFalse()
+//                )
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetchResults();
+//        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+//    }
 }

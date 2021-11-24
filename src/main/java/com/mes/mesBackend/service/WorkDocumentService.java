@@ -9,14 +9,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface WorkDocumentService {
     // 작업표준서 생성
     WorkDocumentResponse createWorkDocument(WorkDocumentRequest workDocumentRequest) throws NotFoundException;
     // 작업표준서 단일 조회
     WorkDocumentResponse getWorkDocument(Long id) throws NotFoundException;
+    // 작업표준서 전체 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
+    List<WorkDocumentResponse> getWorkDocuments(Long itemGroupId, Long itemAccountId, String itemNo, String itemName);
     // 작업표준서 페이징 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
-    Page<WorkDocumentResponse> getWorkDocuments(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Pageable pageable);
+//    Page<WorkDocumentResponse> getWorkDocuments(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Pageable pageable);
     // 작업표준서 수정
     WorkDocumentResponse updateWorkDocument(Long id, WorkDocumentRequest workDocumentRequest) throws NotFoundException;
     // 작업표준서 삭제

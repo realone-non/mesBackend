@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 @RequestMapping(value = "/business-types")
@@ -63,31 +64,11 @@ public class BusinessTypeController {
 
     @GetMapping
     @ResponseBody
-    @Operation(summary = "업태 페이징 조회", description = "")
-    @Parameters(
-            value = {
-                    @Parameter(
-                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "0")
-                    ),
-                    @Parameter(
-                            name = "size", description = "페이지의 사이즈",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "20")
-                    ),
-                    @Parameter(
-                            name = "sort", in = ParameterIn.QUERY,
-                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
-                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
-                    )
-            }
-    )
-    public ResponseEntity<Page<BusinessTypeResponse>> getBusinessTypes(
-            @PageableDefault @Parameter(hidden = true) Pageable pageable
-    ) {
-        return new ResponseEntity<>(businessTypeService.getBusinessTypes(pageable), HttpStatus.OK);
+    @Operation(summary = "업태 전체 조회", description = "")
+    public ResponseEntity<List<BusinessTypeResponse>> getBusinessTypes() {
+        return new ResponseEntity<>(businessTypeService.getBusinessTypes(), HttpStatus.OK);
     }
+
     @PatchMapping("/{id}")
     @ResponseBody()
     @Operation(summary = "업태 수정", description = "")
@@ -118,4 +99,32 @@ public class BusinessTypeController {
         businessTypeService.deleteBusinessType(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+
+//    @GetMapping
+//    @ResponseBody
+//    @Operation(summary = "업태 페이징 조회", description = "")
+//    @Parameters(
+//            value = {
+//                    @Parameter(
+//                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "0")
+//                    ),
+//                    @Parameter(
+//                            name = "size", description = "페이지의 사이즈",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "20")
+//                    ),
+//                    @Parameter(
+//                            name = "sort", in = ParameterIn.QUERY,
+//                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
+//                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
+//                    )
+//            }
+//    )
+//    public ResponseEntity<Page<BusinessTypeResponse>> getBusinessTypes(
+//            @PageableDefault @Parameter(hidden = true) Pageable pageable
+//    ) {
+//        return new ResponseEntity<>(businessTypeService.getBusinessTypes(pageable), HttpStatus.OK);
+//    }
 }

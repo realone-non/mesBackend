@@ -24,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Tag(name = "unit", description = "단위 API")
 @RequestMapping(value = "/units")
@@ -65,33 +66,12 @@ public class UnitController {
         return new ResponseEntity<>(unitService.getUnit(id), HttpStatus.OK);
     }
 
-    // 단위 페이징 조회
+    // 단위 전체 조회
     @GetMapping
     @ResponseBody()
-    @Operation(summary = "단위 페이징 조회")
-    @Parameters(
-            value = {
-                    @Parameter(
-                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "0")
-                    ),
-                    @Parameter(
-                            name = "size", description = "페이지의 사이즈",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "20")
-                    ),
-                    @Parameter(
-                            name = "sort", in = ParameterIn.QUERY,
-                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
-                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
-                    )
-            }
-    )
-    public ResponseEntity<Page<UnitResponse>> getUnits(
-            @PageableDefault @Parameter(hidden = true) Pageable pageable
-    ) {
-        return new ResponseEntity<>(unitService.getUnits(pageable), HttpStatus.OK);
+    @Operation(summary = "단위 전체 조회")
+    public ResponseEntity<List<UnitResponse>> getUnits() {
+        return new ResponseEntity<>(unitService.getUnits(), HttpStatus.OK);
     }
 
     // 단위 수정
@@ -126,4 +106,33 @@ public class UnitController {
         unitService.deleteUnit(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+
+    // 단위 페이징 조회
+//    @GetMapping
+//    @ResponseBody()
+//    @Operation(summary = "단위 페이징 조회")
+//    @Parameters(
+//            value = {
+//                    @Parameter(
+//                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "0")
+//                    ),
+//                    @Parameter(
+//                            name = "size", description = "페이지의 사이즈",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "20")
+//                    ),
+//                    @Parameter(
+//                            name = "sort", in = ParameterIn.QUERY,
+//                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
+//                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
+//                    )
+//            }
+//    )
+//    public ResponseEntity<Page<UnitResponse>> getUnits(
+//            @PageableDefault @Parameter(hidden = true) Pageable pageable
+//    ) {
+//        return new ResponseEntity<>(unitService.getUnits(pageable), HttpStatus.OK);
+//    }
 }

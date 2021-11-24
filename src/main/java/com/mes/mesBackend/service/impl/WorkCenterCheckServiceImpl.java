@@ -59,16 +59,26 @@ public class WorkCenterCheckServiceImpl implements WorkCenterCheckService {
                 .orElseThrow(() -> new NotFoundException("workCenterCheck does not exist. input id: " + id));
     }
 
-    // 작업장별 점검유형 페이징 조회/ 검색: 작업장, 점검유형
+    // 작업장별 점검유형 전체 조회/ 검색: 작업장, 점검유형
     @Override
-    public Page<WorkCenterCheckResponse> getWorkCenterChecks(
+    public List<WorkCenterCheckResponse> getWorkCenterChecks(
             Long workCenterId,
-            Long checkTypeId,
-            Pageable pageable
+            Long checkTypeId
     ) {
-        Page<WorkCenterCheck> workCenterChecks = workCenterCheckRepository.findByWorkCenterAndCheckTypes(workCenterId, checkTypeId, pageable);
-        return mapper.toPageResponses(workCenterChecks, WorkCenterCheckResponse.class);
+        List<WorkCenterCheck> workCenterChecks = workCenterCheckRepository.findByWorkCenterAndCheckTypes(workCenterId, checkTypeId);
+        return mapper.toListResponses(workCenterChecks, WorkCenterCheckResponse.class);
     }
+
+    // 작업장별 점검유형 페이징 조회/ 검색: 작업장, 점검유형
+//    @Override
+//    public Page<WorkCenterCheckResponse> getWorkCenterChecks(
+//            Long workCenterId,
+//            Long checkTypeId,
+//            Pageable pageable
+//    ) {
+//        Page<WorkCenterCheck> workCenterChecks = workCenterCheckRepository.findByWorkCenterAndCheckTypes(workCenterId, checkTypeId, pageable);
+//        return mapper.toPageResponses(workCenterChecks, WorkCenterCheckResponse.class);
+//    }
 
     // 작업장별 점검유형 수정
     @Override

@@ -7,6 +7,8 @@ import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 // 창고유형
 public interface WareHouseTypeService {
     // 생성
@@ -15,8 +17,11 @@ public interface WareHouseTypeService {
     // 단일조회
     WareHouseTypeResponse getWareHouseType(Long id) throws NotFoundException;
 
+    // 리스트 조회
+    List<WareHouseTypeResponse> getWareHouseTypes();
+
     // 페이징조회
-    Page<WareHouseTypeResponse> getWareHouseTypes(Pageable pageable);
+//    Page<WareHouseTypeResponse> getWareHouseTypes(Pageable pageable);
 
     // 수정
     WareHouseTypeResponse updateWareHouseType(Long id, WareHouseTypeRequest wareHouseTypeRequest) throws NotFoundException;

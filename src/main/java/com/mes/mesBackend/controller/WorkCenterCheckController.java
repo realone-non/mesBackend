@@ -71,35 +71,15 @@ public class WorkCenterCheckController {
         return new ResponseEntity<>(workCenterCheckService.getWorkCenterCheck(workCenterCheckId), HttpStatus.OK);
     }
 
-    // 작업장별 점검유형 페이징 조회/ 검색: 작업장, 점검유형
+    // 작업장별 점검유형 전체 조회/ 검색: 작업장, 점검유형
     @GetMapping
     @ResponseBody
-    @Operation(summary = "작업장별 점검유형 페이징 조회", description = "검색조건: 작업장, 점검유형")
-    @Parameters(
-            value = {
-                    @Parameter(
-                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "0")
-                    ),
-                    @Parameter(
-                            name = "size", description = "페이지의 사이즈",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "20")
-                    ),
-                    @Parameter(
-                            name = "sort", in = ParameterIn.QUERY,
-                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
-                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
-                    )
-            }
-    )
-    public ResponseEntity<Page<WorkCenterCheckResponse>> getWorkCenterChecks(
+    @Operation(summary = "작업장별 점검유형 전체 조회", description = "검색조건: 작업장, 점검유형")
+    public ResponseEntity<List<WorkCenterCheckResponse>> getWorkCenterChecks(
             @RequestParam(required = false) @Parameter(description = "작업장 id") Long workCenterId,
-            @RequestParam(required = false) @Parameter(description = "점검유형 id") Long checkTypeId,
-            @PageableDefault @Parameter(hidden = true) Pageable pageable
+            @RequestParam(required = false) @Parameter(description = "점검유형 id") Long checkTypeId
     ) throws NotFoundException {
-        return new ResponseEntity<>(workCenterCheckService.getWorkCenterChecks(workCenterId, checkTypeId, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(workCenterCheckService.getWorkCenterChecks(workCenterId, checkTypeId), HttpStatus.OK);
     }
 
     // 작업장별 점검유형 수정
@@ -219,4 +199,35 @@ public class WorkCenterCheckController {
         workCenterCheckService.deleteWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+
+    // 작업장별 점검유형 페이징 조회/ 검색: 작업장, 점검유형
+//    @GetMapping
+//    @ResponseBody
+//    @Operation(summary = "작업장별 점검유형 페이징 조회", description = "검색조건: 작업장, 점검유형")
+//    @Parameters(
+//            value = {
+//                    @Parameter(
+//                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "0")
+//                    ),
+//                    @Parameter(
+//                            name = "size", description = "페이지의 사이즈",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "20")
+//                    ),
+//                    @Parameter(
+//                            name = "sort", in = ParameterIn.QUERY,
+//                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
+//                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
+//                    )
+//            }
+//    )
+//    public ResponseEntity<Page<WorkCenterCheckResponse>> getWorkCenterChecks(
+//            @RequestParam(required = false) @Parameter(description = "작업장 id") Long workCenterId,
+//            @RequestParam(required = false) @Parameter(description = "점검유형 id") Long checkTypeId,
+//            @PageableDefault @Parameter(hidden = true) Pageable pageable
+//    ) throws NotFoundException {
+//        return new ResponseEntity<>(workCenterCheckService.getWorkCenterChecks(workCenterId, checkTypeId, pageable), HttpStatus.OK);
+//    }
 }

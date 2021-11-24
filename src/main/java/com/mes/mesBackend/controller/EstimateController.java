@@ -72,38 +72,18 @@ public class EstimateController {
         return new ResponseEntity<>(estimateService.getEstimate(estimateId), HttpStatus.OK);
     }
 
-    // 견적 페이징 조회 검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 담당자
-    @Operation(summary = "견적 페이징 조회", description = "검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 담당자")
+    // 견적 전체 조회 검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 담당자
+    @Operation(summary = "견적 전체 조회", description = "검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 담당자")
     @GetMapping
     @ResponseBody
-    @Parameters(
-            value = {
-                    @Parameter(
-                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "0")
-                    ),
-                    @Parameter(
-                            name = "size", description = "페이지의 사이즈",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "20")
-                    ),
-                    @Parameter(
-                            name = "sort", in = ParameterIn.QUERY,
-                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
-                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
-                    )
-            }
-    )
-    public ResponseEntity<Page<EstimateResponse>> getEstimates(
+    public ResponseEntity<List<EstimateResponse>> getEstimates(
             @RequestParam(required = false) @Parameter(description = "거래처") String clientName,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "견적기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "견적기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "화폐 id") Long currencyId,
-            @RequestParam(required = false) @Parameter(description = "담당자 명") String chargeName,
-            @PageableDefault @Parameter(hidden = true) Pageable pageable
+            @RequestParam(required = false) @Parameter(description = "담당자 명") String chargeName
     ) {
-        return new ResponseEntity<>(estimateService.getEstimates(clientName, fromDate, toDate, currencyId, chargeName, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(estimateService.getEstimates(clientName, fromDate, toDate, currencyId, chargeName), HttpStatus.OK);
     }
 
     // 견적 수정
@@ -140,6 +120,40 @@ public class EstimateController {
         estimateService.deleteEstimate(estimateId);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+
+    // 견적 페이징 조회 검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 담당자
+//    @Operation(summary = "견적 페이징 조회", description = "검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 담당자")
+//    @GetMapping
+//    @ResponseBody
+//    @Parameters(
+//            value = {
+//                    @Parameter(
+//                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "0")
+//                    ),
+//                    @Parameter(
+//                            name = "size", description = "페이지의 사이즈",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "20")
+//                    ),
+//                    @Parameter(
+//                            name = "sort", in = ParameterIn.QUERY,
+//                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
+//                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
+//                    )
+//            }
+//    )
+//    public ResponseEntity<Page<EstimateResponse>> getEstimates(
+//            @RequestParam(required = false) @Parameter(description = "거래처") String clientName,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "견적기간 fromDate") LocalDate fromDate,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "견적기간 toDate") LocalDate toDate,
+//            @RequestParam(required = false) @Parameter(description = "화폐 id") Long currencyId,
+//            @RequestParam(required = false) @Parameter(description = "담당자 명") String chargeName,
+//            @PageableDefault @Parameter(hidden = true) Pageable pageable
+//    ) {
+//        return new ResponseEntity<>(estimateService.getEstimates(clientName, fromDate, toDate, currencyId, chargeName, pageable), HttpStatus.OK);
+//    }
 
     // ===================================== 견적 품목 정보 ======================================
 

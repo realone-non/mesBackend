@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UnitServiceImpl implements UnitService {
     @Autowired
@@ -38,12 +40,19 @@ public class UnitServiceImpl implements UnitService {
         return modelMapper.toResponse(unit, UnitResponse.class);
     }
 
-    // 페이징조회
+    // 전체조회
     @Override
-    public Page<UnitResponse> getUnits(Pageable pageable) {
-        Page<Unit> units = unitRepository.findAllByDeleteYnFalse(pageable);
-        return modelMapper.toPageResponses(units, UnitResponse.class );
+    public List<UnitResponse> getUnits() {
+        List<Unit> units = unitRepository.findAllByDeleteYnFalse();
+        return modelMapper.toListResponses(units, UnitResponse.class);
     }
+
+    // 페이징조회
+//    @Override
+//    public Page<UnitResponse> getUnits(Pageable pageable) {
+//        Page<Unit> units = unitRepository.findAllByDeleteYnFalse(pageable);
+//        return modelMapper.toPageResponses(units, UnitResponse.class );
+//    }
 
     // 수정
     @Override

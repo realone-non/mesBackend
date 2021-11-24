@@ -7,8 +7,6 @@ import com.mes.mesBackend.dto.response.WorkProcessResponse;
 import com.mes.mesBackend.entity.WorkProcess;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -21,7 +19,10 @@ public interface WorkProcessService {
     WorkProcessResponse getWorkProcess(Long workProcessId) throws NotFoundException;
 
     // 작업공정 페이징 조회
-    Page<WorkProcessResponse> getWorkProcesses(Pageable pageable);
+    List<WorkProcessResponse> getWorkProcesses();
+
+    // 작업공정 페이징 조회
+//    Page<WorkProcessResponse> getWorkProcesses(Pageable pageable);
 
     // 작업공정 수정
     WorkProcessResponse updateWorkProcess(Long workProcessId, WorkProcessRequest workProcessRequest) throws NotFoundException;

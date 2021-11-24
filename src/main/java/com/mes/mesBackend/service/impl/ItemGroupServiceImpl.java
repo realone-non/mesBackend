@@ -46,12 +46,19 @@ public class ItemGroupServiceImpl implements ItemGroupService {
         return mapper.toResponse(itemGroup, ItemGroupResponse.class);
     }
 
-    // 품목그룹 페이징 조회
+    // 품목그룹 리스트 전체 조회
     @Override
-    public Page<ItemGroupResponse> getItemGroups(Pageable pageable) {
-        Page<ItemGroup> itemGroups = itemGroupRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(itemGroups, ItemGroupResponse.class);
+    public List<ItemGroupResponse> getItemGroups() {
+        List<ItemGroup> itemGroups = itemGroupRepository.findAllByDeleteYnFalse();
+        return mapper.toListResponses(itemGroups, ItemGroupResponse.class);
     }
+
+    // 품목그룹 페이징 조회
+//    @Override
+//    public Page<ItemGroupResponse> getItemGroups(Pageable pageable) {
+//        Page<ItemGroup> itemGroups = itemGroupRepository.findAllByDeleteYnFalse(pageable);
+//        return mapper.toPageResponses(itemGroups, ItemGroupResponse.class);
+//    }
 
     // 품목그룹 수정
     @Override

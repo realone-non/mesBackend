@@ -14,8 +14,6 @@ import com.mes.mesBackend.repository.WorkCenterCodeRepository;
 import com.mes.mesBackend.repository.WorkCenterRepository;
 import com.mes.mesBackend.service.WorkCenterService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -54,12 +52,19 @@ public class WorkCenterServiceImpl implements WorkCenterService {
         return mapper.toResponse(workCenter, WorkCenterResponse.class);
     }
 
-    // 페이징조회
+    // 전체조회
     @Override
-    public Page<WorkCenterResponse> getWorkCenters(Pageable pageable) {
-        Page<WorkCenter> workCenters = workCenterRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(workCenters, WorkCenterResponse.class);
+    public List<WorkCenterResponse> getWorkCenters() {
+        List<WorkCenter> workCenters = workCenterRepository.findAllByDeleteYnFalse();
+        return mapper.toListResponses(workCenters, WorkCenterResponse.class);
     }
+
+    // 페이징조회
+//    @Override
+//    public Page<WorkCenterResponse> getWorkCenters(Pageable pageable) {
+//        Page<WorkCenter> workCenters = workCenterRepository.findAllByDeleteYnFalse(pageable);
+//        return mapper.toPageResponses(workCenters, WorkCenterResponse.class);
+//    }
 
     // 수정
     @Override

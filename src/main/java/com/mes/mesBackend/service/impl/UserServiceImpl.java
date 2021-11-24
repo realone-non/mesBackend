@@ -11,13 +11,12 @@ import com.mes.mesBackend.repository.UserRepository;
 import com.mes.mesBackend.service.DepartmentService;
 import com.mes.mesBackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -70,11 +69,17 @@ public class UserServiceImpl implements UserService {
         return mapper.toResponse(user, UserResponse.class);
     }
 
-    // 직원(작업자) 페이징 조회
-    public Page<UserResponse> getUsers(Pageable pageable) {
-        Page<User> users = userRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(users, UserResponse.class);
+    // 직원(작업자) 전체 조회
+    public List<UserResponse> getUsers(Long departmentId, String userCode, String korName) {
+        List<User> users = userRepository.findAllCondition(departmentId, userCode, korName);
+        return mapper.toListResponses(users, UserResponse.class);
     }
+
+    // 직원(작업자) 페이징 조회
+//    public Page<UserResponse> getUsers(Pageable pageable) {
+//        Page<User> users = userRepository.findAllByDeleteYnFalse(pageable);
+//        return mapper.toPageResponses(users, UserResponse.class);
+//    }
 
     // 직원(작업자) 수정
     public UserResponse updateUser(Long id, UserRequest userRequest) throws NotFoundException, NoSuchAlgorithmException {

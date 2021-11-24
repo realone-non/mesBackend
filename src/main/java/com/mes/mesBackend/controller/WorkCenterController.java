@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 // 3-3-1. 작업장 등록
 @Tag(name = "work-center", description = "작업장 API")
@@ -67,33 +68,12 @@ public class WorkCenterController {
         return new ResponseEntity<>(workCenterService.getWorkCenter(id), HttpStatus.OK);
     }
 
-    // 작업장 페이징 조회
+    // 작업장 전체 조회
     @GetMapping
-    @ResponseBody()
-    @Operation(summary = "작업장 페이징 조회")
-    @Parameters(
-            value = {
-                    @Parameter(
-                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "0")
-                    ),
-                    @Parameter(
-                            name = "size", description = "페이지의 사이즈",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "20")
-                    ),
-                    @Parameter(
-                            name = "sort", in = ParameterIn.QUERY,
-                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
-                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
-                    )
-            }
-    )
-    public ResponseEntity<Page<WorkCenterResponse>> getWorkCenters(
-            @PageableDefault @Parameter(hidden = true) Pageable pageable
-    ) {
-        return new ResponseEntity<>(workCenterService.getWorkCenters(pageable), HttpStatus.OK);
+    @ResponseBody
+    @Operation(summary = "작업장 전체 조회")
+    public ResponseEntity<List<WorkCenterResponse>> getWorkCenters() {
+        return new ResponseEntity<>(workCenterService.getWorkCenters(), HttpStatus.OK);
     }
 
     // 작업장 수정
@@ -130,4 +110,33 @@ public class WorkCenterController {
         workCenterService.deleteWorkCenter(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+
+    // 작업장 페이징 조회
+//    @GetMapping
+//    @ResponseBody()
+//    @Operation(summary = "작업장 페이징 조회")
+//    @Parameters(
+//            value = {
+//                    @Parameter(
+//                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "0")
+//                    ),
+//                    @Parameter(
+//                            name = "size", description = "페이지의 사이즈",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "20")
+//                    ),
+//                    @Parameter(
+//                            name = "sort", in = ParameterIn.QUERY,
+//                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
+//                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
+//                    )
+//            }
+//    )
+//    public ResponseEntity<Page<WorkCenterResponse>> getWorkCenters(
+//            @PageableDefault @Parameter(hidden = true) Pageable pageable
+//    ) {
+//        return new ResponseEntity<>(workCenterService.getWorkCenters(pageable), HttpStatus.OK);
+//    }
 }

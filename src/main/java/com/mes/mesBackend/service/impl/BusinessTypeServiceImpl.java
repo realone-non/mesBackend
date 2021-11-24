@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.stylesheets.LinkStyle;
+
+import java.util.List;
 
 @Service
 public class BusinessTypeServiceImpl implements BusinessTypeService {
@@ -41,10 +44,14 @@ public class BusinessTypeServiceImpl implements BusinessTypeService {
     }
 
     // 업체 타입 전체 조회
-    public Page<BusinessTypeResponse> getBusinessTypes(Pageable pageable) {
-        Page<BusinessType> businessTypes = businessTypeRepository.findAllByDeleteYnFalse(pageable);
-        return modelMapper.toPageResponses(businessTypes, BusinessTypeResponse.class);
+    public List<BusinessTypeResponse> getBusinessTypes() {
+        List<BusinessType> businessTypes = businessTypeRepository.findAllByDeleteYnFalse();
+        return modelMapper.toListResponses(businessTypes, BusinessTypeResponse.class);
     }
+//    public Page<BusinessTypeResponse> getBusinessTypes(Pageable pageable) {
+//        Page<BusinessType> businessTypes = businessTypeRepository.findAllByDeleteYnFalse(pageable);
+//        return modelMapper.toPageResponses(businessTypes, BusinessTypeResponse.class);
+//    }
 
     // 업태 타입 수정
     public BusinessTypeResponse updateBusinessType(Long id, BusinessTypeRequest businessTypeRequest) throws NotFoundException {

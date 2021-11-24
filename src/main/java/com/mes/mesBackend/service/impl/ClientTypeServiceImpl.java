@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ClientTypeServiceImpl implements ClientTypeService {
 
@@ -40,10 +42,14 @@ public class ClientTypeServiceImpl implements ClientTypeService {
     }
 
     // 거래처유형 전체 조회
-    public Page<ClientTypeResponse> getClientTypes(Pageable pageable) {
-        Page<ClientType> clientTypes = clientTypeRepository.findAllByDeleteYnFalse(pageable);
-        return modelMapper.toPageResponses(clientTypes, ClientTypeResponse.class);
+    public List<ClientTypeResponse> getClientTypes() {
+        List<ClientType> clientTypes = clientTypeRepository.findAllByDeleteYnFalse();
+        return modelMapper.toListResponses(clientTypes, ClientTypeResponse.class);
     }
+//    public Page<ClientTypeResponse> getClientTypes(Pageable pageable) {
+//        Page<ClientType> clientTypes = clientTypeRepository.findAllByDeleteYnFalse(pageable);
+//        return modelMapper.toPageResponses(clientTypes, ClientTypeResponse.class);
+//    }
 
     // 거래처유형 수정
     public ClientTypeResponse updateClientType(Long id, ClientTypeRequest clientTypeRequest) throws NotFoundException {

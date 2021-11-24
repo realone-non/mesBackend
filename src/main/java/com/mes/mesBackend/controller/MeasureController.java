@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 // 3-5-3. 계측기 등록
 @Tag(name = "measure", description = "계측기 API")
@@ -55,7 +56,7 @@ public class MeasureController {
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
-                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
     public ResponseEntity<MeasureResponse> getMeasure(
@@ -64,35 +65,15 @@ public class MeasureController {
         return new ResponseEntity<>(measureService.getMeasure(id), HttpStatus.OK);
     }
 
-    // 계측기 페이징 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
-    @Operation(summary = "계측기 페이징 조회", description = "검색조건: GAUGE유형, 검교정대상(월)")
+    // 계측기 전체 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
+    @Operation(summary = "계측기 전체 조회", description = "검색조건: GAUGE유형, 검교정대상(월)")
     @GetMapping
     @ResponseBody
-    @Parameters(
-            value = {
-                    @Parameter(
-                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "0")
-                    ),
-                    @Parameter(
-                            name = "size", description = "페이지의 사이즈",
-                            in = ParameterIn.QUERY,
-                            schema = @Schema(type = "integer", defaultValue = "20")
-                    ),
-                    @Parameter(
-                            name = "sort", in = ParameterIn.QUERY,
-                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
-                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
-                    )
-            }
-    )
-    public ResponseEntity<Page<MeasureResponse>> getMeasures(
+    public ResponseEntity<List<MeasureResponse>> getMeasures(
             @RequestParam(required = false) @Parameter(description = "GAUGE유형 id") Long gaugeId,
-            @RequestParam(required = false) @Parameter(description = "월") Long month,
-            @PageableDefault @Parameter(hidden = true) Pageable pageable
+            @RequestParam(required = false) @Parameter(description = "월") Long month
     ) {
-        return new ResponseEntity<>(measureService.getMeasures(gaugeId, month, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(measureService.getMeasures(gaugeId, month), HttpStatus.OK);
     }
 
     // 계측기 수정
@@ -127,4 +108,35 @@ public class MeasureController {
         measureService.deleteMeasure(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+
+    // 계측기 페이징 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
+//    @Operation(summary = "계측기 페이징 조회", description = "검색조건: GAUGE유형, 검교정대상(월)")
+//    @GetMapping
+//    @ResponseBody
+//    @Parameters(
+//            value = {
+//                    @Parameter(
+//                            name = "page", description = "0 부터 시작되는 페이지 (0..N)",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "0")
+//                    ),
+//                    @Parameter(
+//                            name = "size", description = "페이지의 사이즈",
+//                            in = ParameterIn.QUERY,
+//                            schema = @Schema(type = "integer", defaultValue = "20")
+//                    ),
+//                    @Parameter(
+//                            name = "sort", in = ParameterIn.QUERY,
+//                            description = "정렬할 대상과 정렬 방식, 데이터 형식: property(,asc|desc). + 디폴트 정렬순서는 오름차순, 다중정렬 가능",
+//                            array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "id,desc"))
+//                    )
+//            }
+//    )
+//    public ResponseEntity<Page<MeasureResponse>> getMeasures(
+//            @RequestParam(required = false) @Parameter(description = "GAUGE유형 id") Long gaugeId,
+//            @RequestParam(required = false) @Parameter(description = "월") Long month,
+//            @PageableDefault @Parameter(hidden = true) Pageable pageable
+//    ) {
+//        return new ResponseEntity<>(measureService.getMeasures(gaugeId, month, pageable), HttpStatus.OK);
+//    }
 }
