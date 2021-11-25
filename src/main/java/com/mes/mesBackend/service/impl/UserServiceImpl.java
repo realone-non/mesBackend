@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse createUser(UserRequest userRequest) throws NotFoundException, NoSuchAlgorithmException, BadRequestException {
         checkUserCode(userRequest.getUserCode());
 
-        Department department = departmentService.getDepartmentOrThrow(userRequest.getDepartmentId());
+        Department department = departmentService.getDepartmentOrThrow(userRequest.getDepartment());
         User user = mapper.toEntity(userRequest, User.class);
 
         String salt = createSalt();
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
 
     // 직원(작업자) 수정
     public UserResponse updateUser(Long id, UserRequest userRequest) throws NotFoundException, NoSuchAlgorithmException {
-        Department newDepartment = departmentService.getDepartmentOrThrow(userRequest.getDepartmentId());
+        Department newDepartment = departmentService.getDepartmentOrThrow(userRequest.getDepartment());
         User newUser = mapper.toEntity(userRequest, User.class);
         String salt = createSalt();
         // 솔트값, 해싱된 Password

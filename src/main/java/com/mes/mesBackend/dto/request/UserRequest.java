@@ -29,7 +29,7 @@ public class UserRequest {
     @Schema(description = "부서 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
-    Long departmentId;  // 부서
+    Long department;  // 부서
 
     @Schema(description = "직위")
     @NotBlank(message = NOT_EMPTY)
