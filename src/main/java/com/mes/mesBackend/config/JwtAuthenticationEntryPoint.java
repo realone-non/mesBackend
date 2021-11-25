@@ -1,4 +1,4 @@
-package com.mes.mesBackend.exception;
+package com.mes.mesBackend.config;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

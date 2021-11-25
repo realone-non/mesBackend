@@ -1,5 +1,7 @@
 package com.mes.mesBackend.service;
 
+import com.mes.mesBackend.config.TokenDto;
+import com.mes.mesBackend.config.TokenRequestDto;
 import com.mes.mesBackend.dto.request.UserRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.entity.User;
@@ -30,7 +32,9 @@ public interface UserService {
     void deleteUser(Long id) throws NotFoundException;
 
     // userLogin
-    UserResponse.idAndKorNameAndEmail getLogin(String userCode, String password) throws NotFoundException, NoSuchAlgorithmException, BadRequestException;
+    TokenDto getLogin(String userCode, String password) throws NotFoundException, NoSuchAlgorithmException, BadRequestException;
 
     User getUserOrThrow(Long id) throws NotFoundException;
+
+    TokenDto reissue(TokenRequestDto tokenRequestDto);
 }

@@ -1,17 +1,15 @@
 package com.mes.mesBackend.entity;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
+import static javax.persistence.GenerationType.IDENTITY;
+
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@Entity(name = "REFRESH_TOKEN")
 @Data
-@NoArgsConstructor
-@Table(name = "REFRESH_TOKEN")
-@Entity
 public class RefreshToken extends BaseTimeEntity {
     /*
     * key 에는 user id
@@ -19,18 +17,22 @@ public class RefreshToken extends BaseTimeEntity {
     *
     * */
 
-    @Id
-    private String key;
-    private String value;
+    @Id @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '고유아이디'")
+    private Long id;
+    @Column(name = "USER_CODE", columnDefinition = "varchar(50) COMMENT 'USER_CODE'")
+    private String userCode;
+    @Column(name = "TOKEN", columnDefinition = "varchar(700) COMMENT 'REFRESH_TOKEN'")
+    private String token;
 
     public RefreshToken updateValue(String token) {
-        this.value = token;
+        this.token = token;
         return this;
     }
 
-    @Builder
-    public RefreshToken(String key, String value) {
-        this.key = key;
-        this.value = value;
-    }
+//    @Builder
+//    public RefreshToken(String key, String value) {
+//        this.key = key;
+//        this.token = value;
+//    }
 }

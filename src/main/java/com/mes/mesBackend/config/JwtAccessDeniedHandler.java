@@ -1,4 +1,4 @@
-package com.mes.mesBackend.exception;
+package com.mes.mesBackend.config;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;

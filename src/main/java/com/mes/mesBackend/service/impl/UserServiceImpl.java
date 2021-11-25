@@ -1,17 +1,22 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.config.JwtTokenProvider;
+import com.mes.mesBackend.config.TokenDto;
+import com.mes.mesBackend.config.TokenRequestDto;
 import com.mes.mesBackend.dto.request.UserRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.entity.Department;
+import com.mes.mesBackend.entity.RefreshToken;
 import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
+import com.mes.mesBackend.repository.RefreshTokenRepository;
 import com.mes.mesBackend.repository.UserRepository;
 import com.mes.mesBackend.service.DepartmentService;
 import com.mes.mesBackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
@@ -19,6 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -107,9 +113,11 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Autowired
+    RefreshTokenRepository refreshTokenRepository;
     // 로그인
     @Override
-    public UserResponse.idAndKorNameAndEmail getLogin(String userCode, String password) throws NotFoundException, NoSuchAlgorithmException, BadRequestException {
+    public TokenDto getLogin(String userCode, String password) throws NotFoundException, NoSuchAlgorithmException, BadRequestException {
         User user = userRepository.findByUserCode(userCode)
                 .orElseThrow(() -> new NotFoundException("user does not exist. input userCode: " + userCode));
 
@@ -121,15 +129,62 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("password is not correct.");
         }
 
-//        System.out.println("========================== password 확인 ============================");
-//        System.out.println("입력받은 password: " + password);
-//        System.out.println("해당 유저의 salt 값: " + user.getSalt());
-//        System.out.println("해당 유저의 해싱된 password: " + user.getPassword());
-//        System.out.println("입력받은 password의 해싱된 값: " + hashing);
-//        System.out.println(user.getPassword().equals(hashing));
         UserResponse.idAndKorNameAndEmail userResponse = mapper.toResponse(user, UserResponse.idAndKorNameAndEmail.class);
-        userResponse.setToken(jwtTokenProvider.createToken(user.getUserCode(), user.getRoles()));
-        return userResponse;
+
+        Optional<RefreshToken> findToken = refreshTokenRepository.findByUserCode(userCode);
+
+        if (findToken != null ) {
+            refreshTokenRepository.deleteByUserCode(userCode);
+        }
+
+        // 토큰 생성
+        TokenDto tokenDto = jwtTokenProvider.createTokenDto(user.getUserCode(), user.getRoles());
+
+//        RefreshToken refreshToken = RefreshToken.builder()
+//                .key(user.getUserCode())
+//                .token(tokenDto.getRefreshToken())
+//                .build();
+
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setUserCode(user.getUserCode());
+        refreshToken.setToken(tokenDto.getRefreshToken());
+
+        refreshTokenRepository.save(refreshToken);
+
+        return tokenDto;
+    }
+
+    @Override
+    public TokenDto reissue(TokenRequestDto tokenRequestDto) {
+        // 1. Refresh Token 검증
+        if (!jwtTokenProvider.validateToken(tokenRequestDto.getRefreshToken())) {
+            throw new RuntimeException("Refresh token 이 유효하지 않습니다.");
+        }
+
+        // 2. Access Token 에서 UserID 가져오기
+        Authentication authentication = jwtTokenProvider.getAuthentication(tokenRequestDto.getAccessToken());
+
+        // 3. 저장소에서 userId를 기반으로 refreshToken 값 가져옴.
+        RefreshToken refreshToken = refreshTokenRepository.findByUserCode(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("로그아웃 된 사용자 입니다."));
+
+        // userCode로 user가져옴
+        User user = userRepository.findByUserCode(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
+
+        // 4. Refresh Token 일치하는지 검사
+        if (!refreshToken.getToken().equals(tokenRequestDto.getRefreshToken())) {
+            throw new RuntimeException("토큰의 유저 정보가 일치하지 않습니다.");
+        }
+
+        // 5. 새로운 토큰 생성
+        TokenDto newTokenDto = jwtTokenProvider.createTokenDto(authentication.getName(), user.getRoles());
+
+        // 6. 저장소 정보 업데이트
+        refreshToken.updateValue(newTokenDto.getRefreshToken());
+        refreshTokenRepository.save(refreshToken);
+
+        return newTokenDto;
     }
 
     private static final int SALT_SIZE = 16;

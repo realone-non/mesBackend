@@ -76,12 +76,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String imageUrl;
 
     @ElementCollection(fetch = EAGER)
-//    @Builder.Default
     private List<String> roles = new ArrayList<>();
-
-//    public User() {
-//
-//    }
 
     public void put(User newUser, Department newDepartment) {
         setUserCode(newUser.userCode);

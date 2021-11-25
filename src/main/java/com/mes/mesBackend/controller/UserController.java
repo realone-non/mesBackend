@@ -1,5 +1,7 @@
 package com.mes.mesBackend.controller;
 
+import com.mes.mesBackend.config.TokenDto;
+import com.mes.mesBackend.config.TokenRequestDto;
 import com.mes.mesBackend.dto.request.UserRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -114,11 +116,18 @@ public class UserController {
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity<UserResponse.idAndKorNameAndEmail> getLoginInfo(
+    public ResponseEntity<TokenDto> getLoginInfo(
             @RequestParam String userCode,
             @RequestParam String password
     ) throws NotFoundException, BadRequestException, NoSuchAlgorithmException {
         return new ResponseEntity<>(userService.getLogin(userCode, password), HttpStatus.OK);
+    }
+
+    @PatchMapping("/reissue")
+    @ResponseBody
+    @Operation(summary = "토큰 재발급")
+    public ResponseEntity<TokenDto> updateRefreshToken(@RequestBody TokenRequestDto tokenRequestDto) {
+        return new ResponseEntity<>(userService.reissue(tokenRequestDto), HttpStatus.OK);
     }
 
     // 직원(작업자) 페이징 조회
