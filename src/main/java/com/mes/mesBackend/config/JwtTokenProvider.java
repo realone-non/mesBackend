@@ -1,8 +1,5 @@
 package com.mes.mesBackend.config;
 
-import com.mes.mesBackend.dto.request.UserLogin;
-import com.mes.mesBackend.exception.BadRequestException;
-import com.mes.mesBackend.exception.NotFoundException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,10 +14,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,14 +31,14 @@ public class JwtTokenProvider {
 //    @Value("{jwt.token.header}")
 //    private String header;
 
-    private static final Long ACCESS_TOKEN_EXPIRE_TIME = 20 * 1000L;                // 20초
-    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 2 * 60 * 1000L;      // 4분
+//    private static final Long ACCESS_TOKEN_EXPIRE_TIME = 20 * 1000L;                // 20초
+//    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 2 * 60 * 1000L;      // 4분
+    private static final String ROLES = "roles";
 
-    //    private static final Long ACCESS_TOKEN_EXPIRE_TIME = 2 * 60 * 1000L;                // 2분
-//    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 3 * 60 * 1000L;      // 4분
+        private static final Long ACCESS_TOKEN_EXPIRE_TIME = 2 * 60 * 1000L;                // 2분
+    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 3 * 60 * 1000L;      // 4분
 //    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;      // 7일
 //    private static final String AUTHORITIES_KEY = "auth";
-    private static final String BEARER_TYPE = "bearer";
 
 
     private final UserDetailsService userDetailsService;
@@ -52,21 +49,97 @@ public class JwtTokenProvider {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
+    // AccessToken 생성
+    public String createAccessToken(Authentication authentication) {
+        Long now = new Date().getTime();
 
-    public TokenDto createToken(UserLogin userLogin) {
+        JwtBuilder builder = Jwts.builder();
+        // Header
+        builder.setHeaderParam("typ", "JWT");       // header "typ": JWT
+        builder.signWith(SignatureAlgorithm.HS256, secretKey);  // header "alg": HS256
 
+        // payLoad
+        builder.claim(ROLES, authentication.getAuthorities().toString().split(","));      // "roles": "ROLE_USER"
+        builder.setSubject(authentication.getName());       // "sub": userCode
+        builder.setExpiration(new Date(now + ACCESS_TOKEN_EXPIRE_TIME));    // "exp": 1516239022
+        builder.setIssuedAt(new Date());            // "iss": 15162120  토큰 발행시간 정보
 
-        // accessToken 생성
-        String accessToken = createJws(ACCESS_TOKEN_EXPIRE_TIME, userLogin);
-        // refreshToken 생성
-        String refreshToken = createJws(REFRESH_TOKEN_EXPIRE_TIME, userLogin);
-
-        TokenDto tokenDto = new TokenDto();
-        tokenDto.setAccessToken(accessToken);
-        tokenDto.setRefreshToken(refreshToken);
-
-        return tokenDto;
+        String accessToken = builder.compact();
+        return accessToken;
     }
+
+    // RefreshToke 생성
+    public String createRefreshToken() {
+        Long now = new Date().getTime();
+        JwtBuilder builder = Jwts.builder();
+
+        // Header
+        builder.setExpiration(new Date((now + REFRESH_TOKEN_EXPIRE_TIME)));
+        builder.signWith(SignatureAlgorithm.HS256, secretKey);
+        return builder.compact();
+    }
+
+
+    // 토큰 복호화
+    // JWT 토큰에서 인증 정보 조회
+    public Authentication getAuthenticationFromAccessToken(String accessToken) {
+        // 토큰 복호화
+        Claims claims = parseClaims(accessToken);
+
+        // claims 에서 권한 정보 가져오기
+        Collection<? extends GrantedAuthority> authorities =
+                Arrays.stream(claims.get(ROLES).toString().split(","))
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+
+        // UserDetails 객체를 만들어서 Authentication 리턴
+        UserDetails principal = new User(claims.getSubject(), "", authorities);
+
+        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+    }
+
+    private Claims parseClaims(String accessToken) {
+        try {
+            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(accessToken).getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
+    }
+
+    // token 의 유효성 + 만료일자 확인
+    public Boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            return true;
+//            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+//            return !claims.getBody().getExpiration().before(new Date());
+        } catch (MalformedJwtException e) {
+            log.info("잘못된 JWT 서명입니다.");
+        } catch (ExpiredJwtException e) {
+            log.info("만료된 JWT 토큰입니다.");
+        } catch (UnsupportedJwtException e) {
+            log.info("지원되지 않는 JWT 토큰입니다.");
+        } catch (IllegalArgumentException e) {
+            log.info("JWT 토큰이 잘못되었습니다.");
+        }
+        return false;
+    }
+
+
+//    public TokenDto createToken(UserLogin userLogin) {
+//
+//
+//        // accessToken 생성
+//        String accessToken = createJws(ACCESS_TOKEN_EXPIRE_TIME, userLogin);
+//        // refreshToken 생성
+//        String refreshToken = createJws(REFRESH_TOKEN_EXPIRE_TIME, userLogin);
+//
+//        TokenDto tokenDto = new TokenDto();
+//        tokenDto.setAccessToken(accessToken);
+//        tokenDto.setRefreshToken(refreshToken);
+//
+//        return tokenDto;
+//    }
 //    public TokenDto createTokenDto(String userCode, List<String> roles) {
 //        // 권한들 가져오기
 ////        String authorities = authentication.getAuthorities().stream()
@@ -100,32 +173,35 @@ public class JwtTokenProvider {
 //                .build();
 //    }
 
-    private String createJws(Long expMin, UserLogin userLogin) {
-        JwtBuilder builder = Jwts.builder();
+//    private String createJws(Authentication authentication) {
+//        JwtBuilder builder = Jwts.builder();
+//
+//        // Header
+//        /*
+//        * {
+//        *   "typ": JWT,
+//        *   "alg": HS256"
+//        * }
+//        * */
+//
+//        Long now = new Date().getTime();
+//        // Header
+//        builder.setHeaderParam("typ", "JWT");
+//        builder.signWith(HS256, secretKey);
+//        builder.claim("roles", authentication.getAuthorities().)
+//
+//        // PayLoad
+//        builder.setSubject(userLogin.getUserCode());
+//        builder.setExpiration(new Date(now + expMin));
+//        builder.setIssuedAt(new Date());
+//
+//        // Singature
+//
+//        String jws = builder.compact();
+//        return jws;
+//    }
 
-        // Header
-        /*
-        * {
-        *   "typ": JWT,
-        *   "alg": HS256"
-        * }
-        * */
 
-        Long now = new Date().getTime();
-        // Header
-        builder.setHeaderParam("typ", "JWT");
-        builder.signWith(SignatureAlgorithm.HS256, secretKey);
-
-        // PayLoad
-        builder.setSubject(userLogin.getUserCode());
-        builder.setExpiration(new Date(now + expMin));
-        builder.setIssuedAt(new Date());
-
-        // Singature
-
-        String jws = builder.compact();
-        return jws;
-    }
 
 //    public Authentication getAuthentication(String accessToken) throws IOException {
 //        // 토큰 복호화
@@ -147,22 +223,7 @@ public class JwtTokenProvider {
 //        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
 //    }
 
-    // token 의 유효성 + 만료일자 확인
-    public boolean validateToken(String token) {
-        try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-            return !claims.getBody().getExpiration().before(new Date());
-        } catch (MalformedJwtException e) {
-            log.info("잘못된 JWT 서명입니다.");
-        } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.");
-        } catch (UnsupportedJwtException e) {
-            log.info("지원되지 않는 JWT 토큰입니다.");
-        } catch (IllegalArgumentException e) {
-            log.info("JWT 토큰이 잘못되었습니다.");
-        }
-        return false;
-    }
+
 
 //    private Claims parseClaims(String accessToken) {
 //        try {
@@ -186,15 +247,15 @@ public class JwtTokenProvider {
 //    }
 
 //    // JWT 토큰에서 인증 정보 조회
-    public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserCode(token));
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-    }
+//    public Authentication getAuthentication(String token) {
+//        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserCode(token));
+//        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+//    }
 //
 //    // 토큰에서 회원 정보 추출
-    public String getUserCode(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
-    }
+//    public String getUserCode(String token) {
+//        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+//    }
 //
 //    // Request 의 Header 에서 token 값을 가져옴. "Authorization" : "TOKEN"
 //    public String resolveToken(HttpServletRequest request) {

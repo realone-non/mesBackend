@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.config.TokenDto;
 import com.mes.mesBackend.config.TokenRequestDto;
+import com.mes.mesBackend.dto.request.UserLogin;
 import com.mes.mesBackend.dto.request.UserRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -106,7 +108,7 @@ public class UserController {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/login")
+    @PostMapping(value = "/login")
     @ResponseBody
     @Operation(summary = "로그인")
     @ApiResponses(
@@ -117,10 +119,9 @@ public class UserController {
             }
     )
     public ResponseEntity<TokenDto> getLoginInfo(
-            @RequestParam String userCode,
-            @RequestParam String password
-    ) throws NotFoundException, BadRequestException, NoSuchAlgorithmException {
-        return new ResponseEntity<>(userService.getLogin(userCode, password), HttpStatus.OK);
+            @RequestBody @Valid UserLogin userLogin
+    ) throws NotFoundException, BadRequestException {
+        return new ResponseEntity<>(userService.getLogin(userLogin), HttpStatus.OK);
     }
 
     @PatchMapping("/reissue")

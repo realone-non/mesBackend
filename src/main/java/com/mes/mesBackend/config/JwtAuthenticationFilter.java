@@ -23,19 +23,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // JWT 토큰의 인증 정보를 현재 쓰레드의 SecurityContext 에 저장하는 역할 수핼
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // 1. reuqest header 에서 토큰을ㄱ 꺼냄
-        String token = resolveToken(request);
-
-        // 2. validateToken 으로 토큰 유효성 검사
-        // 정상 토큰이면 해당 토큰으로 Authentication 을 가져와서 SecurityContext 에 저장
-        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-            // 토큰이 유효하면 토큰으로부터 유저 정보를 받아옴.
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
+//        String token = resolveToken(request);
+        String token = request.getHeader(HEADER);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            // 복호화 된 토큰정보
+            Authentication authenticationFromAccessToken = jwtTokenProvider.getAuthenticationFromAccessToken(token);
+            SecurityContextHolder.getContext().setAuthentication(authenticationFromAccessToken);
         }
         filterChain.doFilter(request, response);
     }
+
+
+//    @Override
+//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+//        // 1. reuqest header 에서 토큰을ㄱ 꺼냄
+//        String token = resolveToken(request);
+//
+//        // 2. validateToken 으로 토큰 유효성 검사
+//        // 정상 토큰이면 해당 토큰으로 Authentication 을 가져와서 SecurityContext 에 저장
+//        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+//            // 토큰이 유효하면 토큰으로부터 유저 정보를 받아옴.
+//            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+//            SecurityContextHolder.getContext().setAuthentication(authentication);
+//        }
+//        filterChain.doFilter(request, response);
+//    }
 
     // request Header 에서 토큰 정보를 꺼내오기
     private String resolveToken(HttpServletRequest request) {
