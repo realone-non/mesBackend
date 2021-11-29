@@ -75,6 +75,9 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(name = "IMAGE_URL", columnDefinition = "varchar(255) COMMENT '프로필사진 url'")
     private String imageUrl;
 
+    @Column(name = "TOKEN", columnDefinition = "varchar(700) COMMENT 'REFRESH_TOKEN'")
+    private String refreshToken;
+
     @ElementCollection(fetch = EAGER)
     private List<String> roles = new ArrayList<>();
 
@@ -97,6 +100,10 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     public void delete() {
         setDeleteYn(true);
+    }
+
+    public void putRefreshToken(String refreshToken) {
+        setRefreshToken(refreshToken);
     }
 
     @Override

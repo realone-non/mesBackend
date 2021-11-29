@@ -1,5 +1,6 @@
 package com.mes.mesBackend.config;
 
+import com.mes.mesBackend.dto.request.UserLogin;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import io.jsonwebtoken.*;
@@ -33,8 +34,11 @@ public class JwtTokenProvider {
 //    @Value("{jwt.token.header}")
 //    private String header;
 
-    private static final Long ACCESS_TOKEN_EXPIRE_TIME = 2 * 60 * 1000L;                // 2분
-    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 3 * 60 * 1000L;      // 4분
+    private static final Long ACCESS_TOKEN_EXPIRE_TIME = 20 * 1000L;                // 20초
+    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 2 * 60 * 1000L;      // 4분
+
+    //    private static final Long ACCESS_TOKEN_EXPIRE_TIME = 2 * 60 * 1000L;                // 2분
+//    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 3 * 60 * 1000L;      // 4분
 //    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;      // 7일
 //    private static final String AUTHORITIES_KEY = "auth";
     private static final String BEARER_TYPE = "bearer";
@@ -49,38 +53,78 @@ public class JwtTokenProvider {
     }
 
 
-    public TokenDto createTokenDto(String userCode, List<String> roles) {
-        // 권한들 가져오기
-//        String authorities = authentication.getAuthorities().stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .collect(Collectors.joining(","));
-        Claims claims = Jwts.claims().setSubject(userCode);     // JWT payloac에 저장되는 정보단위
-        claims.put("role", roles);
+    public TokenDto createToken(UserLogin userLogin) {
 
-        Long now = (new Date()).getTime();
 
         // accessToken 생성
-        Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
-
-        String accessToken = Jwts.builder()
-                .setSubject(userCode)
-                .setClaims(claims)
-                .setExpiration(accessTokenExpiresIn)
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
-
+        String accessToken = createJws(ACCESS_TOKEN_EXPIRE_TIME, userLogin);
         // refreshToken 생성
-        String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
+        String refreshToken = createJws(REFRESH_TOKEN_EXPIRE_TIME, userLogin);
 
-        return TokenDto.builder()
-                .grantType(BEARER_TYPE)
-                .accessToken(accessToken)
-                .accessTokenExpiresIn(accessTokenExpiresIn.getTime())
-                .refreshToken(refreshToken)
-                .build();
+        TokenDto tokenDto = new TokenDto();
+        tokenDto.setAccessToken(accessToken);
+        tokenDto.setRefreshToken(refreshToken);
+
+        return tokenDto;
+    }
+//    public TokenDto createTokenDto(String userCode, List<String> roles) {
+//        // 권한들 가져오기
+////        String authorities = authentication.getAuthorities().stream()
+////                .map(GrantedAuthority::getAuthority)
+////                .collect(Collectors.joining(","));
+//        Claims claims = Jwts.claims().setSubject(userCode);     // JWT payloac에 저장되는 정보단위
+//        claims.put("role", roles);
+//
+//        Long now = (new Date()).getTime();
+//
+//        // accessToken 생성
+//        Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
+//        String accessToken = Jwts.builder()
+//                .setSubject(userCode)
+//                .setClaims(claims)
+//                .setExpiration(accessTokenExpiresIn)
+//                .signWith(SignatureAlgorithm.HS256, secretKey)
+//                .compact();
+//
+//        // refreshToken 생성
+//        String refreshToken = Jwts.builder()
+//                .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
+//                .signWith(SignatureAlgorithm.HS256, secretKey)
+//                .compact();
+//
+//        return TokenDto.builder()
+//                .grantType(BEARER_TYPE)
+//                .accessToken(accessToken)
+//                .accessTokenExpiresIn(accessTokenExpiresIn.getTime())
+//                .refreshToken(refreshToken)
+//                .build();
+//    }
+
+    private String createJws(Long expMin, UserLogin userLogin) {
+        JwtBuilder builder = Jwts.builder();
+
+        // Header
+        /*
+        * {
+        *   "typ": JWT,
+        *   "alg": HS256"
+        * }
+        * */
+
+        Long now = new Date().getTime();
+        // Header
+        builder.setHeaderParam("typ", "JWT");
+        builder.signWith(SignatureAlgorithm.HS256, secretKey);
+
+        // PayLoad
+        builder.setSubject(userLogin.getUserCode());
+        builder.setExpiration(new Date(now + expMin));
+        builder.setIssuedAt(new Date());
+
+        // Singature
+
+        String jws = builder.compact();
+        return jws;
     }
 
 //    public Authentication getAuthentication(String accessToken) throws IOException {

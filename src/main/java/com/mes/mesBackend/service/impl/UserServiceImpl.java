@@ -6,7 +6,6 @@ import com.mes.mesBackend.config.TokenRequestDto;
 import com.mes.mesBackend.dto.request.UserRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.entity.Department;
-import com.mes.mesBackend.entity.RefreshToken;
 import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -24,7 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -129,27 +127,11 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("password is not correct.");
         }
 
-        UserResponse.idAndKorNameAndEmail userResponse = mapper.toResponse(user, UserResponse.idAndKorNameAndEmail.class);
-
-        Optional<RefreshToken> findToken = refreshTokenRepository.findByUserCode(userCode);
-
-        if (findToken != null ) {
-            refreshTokenRepository.deleteByUserCode(userCode);
-        }
-
         // 토큰 생성
         TokenDto tokenDto = jwtTokenProvider.createTokenDto(user.getUserCode(), user.getRoles());
 
-//        RefreshToken refreshToken = RefreshToken.builder()
-//                .key(user.getUserCode())
-//                .token(tokenDto.getRefreshToken())
-//                .build();
-
-        RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setUserCode(user.getUserCode());
-        refreshToken.setToken(tokenDto.getRefreshToken());
-
-        refreshTokenRepository.save(refreshToken);
+        user.putRefreshToken(tokenDto.getRefreshToken());
+        userRepository.save(user);
 
         return tokenDto;
     }
