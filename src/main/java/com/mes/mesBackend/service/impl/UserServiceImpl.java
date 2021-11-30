@@ -150,7 +150,10 @@ public class UserServiceImpl implements UserService {
         // 토큰 생성
 //        TokenDto tokenDto = jwtTokenProvider.createTokenDto(user.getUserCode(), user.getRoles());
         // 토큰 생성
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUserCode(), user.getPassword(), user.getAuthorities());
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUserCode(), user.getPassword(),
+               //user.getAuthorities()
+                Collections.emptyList()
+        );
 
         String accessToken = jwtTokenProvider.createAccessToken(authenticationToken);
         String refreshToken = jwtTokenProvider.createRefreshToken();
@@ -194,7 +197,7 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(tokenRequestDto.getAccessToken());
 
         // 3. 저장소에서 userCode를 기반으로 refreshToken 값 가져옴.
-        String findRefreshToken = refreshTokenRepository.findRefreshTokenByUserCodeAndUseYnTrue(authentication.getName());
+        RefreshToken findRefreshToken = refreshTokenRepository.findByUserCodeAndUseYnTrue(authentication.getName());
 
 //        RefreshToken refreshToken = refreshTokenRepository.findByUserCode(authentication.getName())
 //                .orElseThrow(() -> new RuntimeException("로그아웃 된 사용자 입니다."));
@@ -204,7 +207,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
 
         // 4. Refresh Token 일치하는지 검사
-        if (findRefreshToken.equals(tokenRequestDto.getRefreshToken())) {
+        if (!findRefreshToken.getRefreshToken().equals(tokenRequestDto.getRefreshToken())) {
             throw new RuntimeException("토큰의 유저 정보가 일치하지 않습니다.");
         }
 

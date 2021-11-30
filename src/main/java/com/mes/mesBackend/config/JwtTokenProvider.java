@@ -14,10 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,8 +32,8 @@ public class JwtTokenProvider {
 //    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 2 * 60 * 1000L;      // 4분
     private static final String ROLES = "roles";
 
-        private static final Long ACCESS_TOKEN_EXPIRE_TIME = 2 * 60 * 1000L;                // 2분
-    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 3 * 60 * 1000L;      // 4분
+        private static final Long ACCESS_TOKEN_EXPIRE_TIME =  10 * 1000L;                // 2분
+    private static final Long REFRESH_TOKEN_EXPIRE_TIME =4 * 60 * 1000L;      // 4분
 //    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;      // 7일
 //    private static final String AUTHORITIES_KEY = "auth";
 
@@ -88,9 +85,10 @@ public class JwtTokenProvider {
 
         // claims 에서 권한 정보 가져오기
         Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(ROLES).toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
+                Collections.emptyList();
+//                Arrays.stream(claims.get(ROLES).toString().split(","))
+//                        .map(SimpleGrantedAuthority::new)
+//                        .collect(Collectors.toList());
 
         // UserDetails 객체를 만들어서 Authentication 리턴
         UserDetails principal = new User(claims.getSubject(), "", authorities);
