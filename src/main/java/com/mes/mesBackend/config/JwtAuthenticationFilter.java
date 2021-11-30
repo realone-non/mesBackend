@@ -3,7 +3,6 @@ package com.mes.mesBackend.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -28,57 +27,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-//        String token = resolveToken(request);
         String token = request.getHeader(HEADER);
+        System.out.println("token: ===================================== :" + token);
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            // 복호화 된 토큰정보
-            Authentication authenticationFromAccessToken = jwtTokenProvider.getAuthenticationFromAccessToken(token);
-            SecurityContextHolder.getContext().setAuthentication(authenticationFromAccessToken);
+            Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(token);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         filterChain.doFilter(request, response);
     }
-
-
-//    @Override
-//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-//        // 1. reuqest header 에서 토큰을ㄱ 꺼냄
-//        String token = resolveToken(request);
-//
-//        // 2. validateToken 으로 토큰 유효성 검사
-//        // 정상 토큰이면 해당 토큰으로 Authentication 을 가져와서 SecurityContext 에 저장
-//        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-//            // 토큰이 유효하면 토큰으로부터 유저 정보를 받아옴.
-//            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//        }
-//        filterChain.doFilter(request, response);
-//    }
-
-    // request Header 에서 토큰 정보를 꺼내오기
-    private String resolveToken(HttpServletRequest request) {
-        return request.getHeader(HEADER);
-
-//        if (StringUtils.hasText(header) && header.startsWith(this.header)) {
-//            return header.substring(7);
-////        }
-//        return null;
-    }
-//      @Override
-//    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-//        // 헤더에서 JWT를 받아옴.
-//        String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
-//        // 유요한 토큰인지 확인
-//        if (token != null && jwtTokenProvider.validateToken(token)) {
-//            // 토큰이 유효하면 토큰으로부터 유저 정보를 받아옴.
-//            Authentication authentication = null;
-//            try {
-//                authentication = jwtTokenProvider.getAuthentication(token);
-//            } catch (NotFoundException e) {
-//                e.printStackTrace();
-//            }
-//            // SecurityContext 에 Authentication 객체를 저장한다.
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//        }
-//        chain.doFilter(request, response);
-//    }
 }

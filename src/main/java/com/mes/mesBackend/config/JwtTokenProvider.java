@@ -110,9 +110,8 @@ public class JwtTokenProvider {
     public Boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            System.out.println(token);
             return true;
-//            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-//            return !claims.getBody().getExpiration().before(new Date());
         } catch (MalformedJwtException e) {
             log.info("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
