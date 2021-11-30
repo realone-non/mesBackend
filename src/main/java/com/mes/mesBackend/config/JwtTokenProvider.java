@@ -59,7 +59,7 @@ public class JwtTokenProvider {
         builder.signWith(SignatureAlgorithm.HS256, secretKey);  // header "alg": HS256
 
         // payLoad
-        builder.claim(ROLES, authentication.getAuthorities().toString().split(","));      // "roles": "ROLE_USER"
+//        builder.claim(ROLES, authentication.getAuthorities().toString().split(","));      // "roles": "ROLE_USER"
         builder.setSubject(authentication.getName());       // "sub": userCode
         builder.setExpiration(new Date(now + ACCESS_TOKEN_EXPIRE_TIME));    // "exp": 1516239022
         builder.setIssuedAt(new Date());            // "iss": 15162120  토큰 발행시간 정보

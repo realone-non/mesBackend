@@ -44,9 +44,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
 //                .antMatchers("/work-line-codes/**").hasRole("USER")
 //                .antMatchers("/work-line/**").hasRole("USER")
-                .antMatchers("/clients/**").hasRole("USER")
-                .antMatchers("/**").permitAll()
-//                .anyRequest().permitAll()       // 그 외 나머지 요청은 누구나 접근
+                .antMatchers("/clients").permitAll()
+//                .antMatchers( "/swagger-ui/", "/", "/login").permitAll()
+//                .anyRequest().authenticated()
+                .anyRequest().permitAll()       // 그 외 나머지 요청은 누구나 접근
                 // JwtFilter 를 addFilterBefore 로 등록했던 JwtAuthenticationFilter 클래스를 적용
                 .and()
 //                .apply(new JwtSecurityConfig(jwtTokenProvider));
