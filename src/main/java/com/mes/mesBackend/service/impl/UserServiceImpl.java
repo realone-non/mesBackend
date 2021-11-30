@@ -206,6 +206,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUserCode(authentication.getName())
                 .orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
 
+
         // 4. Refresh Token 일치하는지 검사
         if (!findRefreshToken.getRefreshToken().equals(tokenRequestDto.getRefreshToken())) {
             throw new RuntimeException("토큰의 유저 정보가 일치하지 않습니다.");
