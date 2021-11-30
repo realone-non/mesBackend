@@ -7,8 +7,6 @@ import com.mes.mesBackend.dto.response.WorkCenterResponse;
 import com.mes.mesBackend.entity.WorkCenter;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -20,8 +18,11 @@ public interface WorkCenterService {
     // 작업장 단일 조회
     WorkCenterResponse getWorkCenter(Long workCenterId) throws NotFoundException;
 
+    // 작업장 전체조회
+    List<WorkCenterResponse> getWorkCenters();
+
     // 작업장 페이징조회
-    Page<WorkCenterResponse> getWorkCenters(Pageable pageable);
+//    Page<WorkCenterResponse> getWorkCenters(Pageable pageable);
 
     // 작업장 수정
     WorkCenterResponse updateWorkCenter(Long workCenterId, WorkCenterRequest workCenterRequest) throws NotFoundException;

@@ -3,15 +3,15 @@ package com.mes.mesBackend.config;
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.mapper.MapperCustom;
-import org.modelmapper.*;
+import org.modelmapper.Converter;
+import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
-import org.modelmapper.convention.NamingConventions;
 import org.modelmapper.spi.MappingContext;
-import org.modelmapper.spi.MatchingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,16 +24,22 @@ public class MapperConfig {
         MapperCustom modelMapper = new MapperCustom();
 
 //        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration().setSkipNullEnabled(true);
+//        modelMapper.getConfiguration().setSkipNullEnabled(true);
+//        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
         modelMapper.addConverter(toWorkPlaceResponseConvert);
-        modelMapper.addConverter(toFactoryResponseConvert);
         modelMapper.addConverter(toEmpResponseConvert);
         modelMapper.addConverter(toUnitResponseConverter);
         modelMapper.addConverter(toGridResponseConvert);
         modelMapper.addConverter(toWorkCenterCheckDetailResponseConvert);
         modelMapper.addConverter(toItemFileResponseConvert);
+        modelMapper.addConverter(toBomItemResponseConvert);
+        modelMapper.addConverter(toItemBomResponseConvert);
+        modelMapper.addConverter(toBomMasterResponseConvert);
+        modelMapper.addConverter(toSubItemResponseConvert);
+        modelMapper.addConverter(toWorkDocumentConvert);
+        modelMapper.addConverter(toWorkLineResponse);
+        modelMapper.addConverter(toEstimateItemResponse);
 
         return modelMapper;
     }
@@ -54,19 +60,6 @@ public class MapperConfig {
             }
             workPlaceResponse.setType(businessTypeResponses);
             return workPlaceResponse;
-        }
-    };
-
-    // FactoryResponse workPlaceName 매핑
-    Converter<Factory, FactoryResponse> toFactoryResponseConvert = new Converter<Factory, FactoryResponse>() {
-        @Override
-        public FactoryResponse convert(MappingContext<Factory, FactoryResponse> context) {
-            ModelMapper modelMapper = new ModelMapper();
-            Factory factory = context.getSource();
-            FactoryResponse factoryResponse = modelMapper.map(factory, FactoryResponse.class);
-
-            factoryResponse.setWorkPlaceName(factory.getWorkPlace().getWorkPlaceName());
-            return factoryResponse;
         }
     };
 
@@ -138,15 +131,104 @@ public class MapperConfig {
         }
     };
 
-    // string blank condition
-    Condition<?, ?> isStringBlank = new AbstractCondition<Object, Object>() {
+    // BomItemResponse의 price 매핑  단가*수량
+    Converter<BomItemDetail, BomItemResponse> toBomItemResponseConvert = new Converter<BomItemDetail, BomItemResponse>() {
         @Override
-        public boolean applies(MappingContext<Object, Object> context) {
-            if(context.getSource() instanceof String) {
-                return null!=context.getSource() && !"".equals(context.getSource());
-            } else {
-                return context.getSource() != null;
-            }
+        public BomItemResponse convert(MappingContext<BomItemDetail, BomItemResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            BomItemDetail bomItemDetail = context.getSource();
+            BomItemResponse bomItemResponse = modelMapper.map(bomItemDetail, BomItemResponse.class);
+            int price = bomItemResponse.getItem().getInputUnitPrice() * bomItemResponse.getAmount();
+            bomItemResponse.setPrice(price);
+            return bomItemResponse;
+        }
+    };
+
+    Converter<Item, ItemResponse.itemToBomResponse> toItemBomResponseConvert = new Converter<Item, ItemResponse.itemToBomResponse>() {
+        @Override
+        public ItemResponse.itemToBomResponse convert(MappingContext<Item, ItemResponse.itemToBomResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            Item item = context.getSource();
+
+            ItemResponse itemResponse = modelMapper.map(item, ItemResponse.class);
+            ItemResponse.itemToBomResponse map = modelMapper.map(item, ItemResponse.itemToBomResponse.class);
+
+            String account = itemResponse.getItemAccount().getAccount();
+
+            map.setItemAccount(account);
+            return map;
+        }
+    };
+
+    Converter<BomMaster, BomMasterResponse> toBomMasterResponseConvert = new Converter<BomMaster, BomMasterResponse>() {
+        @Override
+        public BomMasterResponse convert(MappingContext<BomMaster, BomMasterResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            BomMaster bomMaster = context.getSource();
+            BomMasterResponse bomMasterResponse = modelMapper.map(bomMaster, BomMasterResponse.class);
+
+            bomMasterResponse.getItem().setClientName(null);
+            bomMasterResponse.getItem().setUnitCodeName(null);
+            bomMasterResponse.getItem().setStorageLocation(null);
+
+            return bomMasterResponse;
+        }
+    };
+
+    Converter<SubItem, SubItemResponse> toSubItemResponseConvert = new Converter<SubItem, SubItemResponse>() {
+        @Override
+        public SubItemResponse convert(MappingContext<SubItem, SubItemResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            SubItem subItem = context.getSource();
+            SubItemResponse subItemResponse = modelMapper.map(subItem, SubItemResponse.class);
+
+            subItemResponse.setItemId(subItem.getItem().getId());
+            subItemResponse.setItemNo(subItem.getItem().getItemNo());
+            subItemResponse.setItemName(subItem.getItem().getItemName());
+            subItemResponse.setSubItemId(subItem.getSubItem().getId());
+            subItemResponse.setSubItemNo(subItem.getSubItem().getItemNo());
+            subItemResponse.setSubItemName(subItem.getSubItem().getItemName());
+            return subItemResponse;
+        }
+    };
+
+    Converter<WorkDocument, WorkDocumentResponse> toWorkDocumentConvert = new Converter<WorkDocument, WorkDocumentResponse>() {
+        @Override
+        public WorkDocumentResponse convert(MappingContext<WorkDocument, WorkDocumentResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            WorkDocument workDocument = context.getSource();
+            WorkDocumentResponse workDocumentResponse = modelMapper.map(workDocument, WorkDocumentResponse.class);
+            workDocumentResponse.setWorkProcess(workDocument.getWorkProcess().getWorkProcessName());
+            workDocumentResponse.setWorkLine(workDocument.getWorkLine().getWorkLineName());
+            workDocumentResponse.setItemId(workDocument.getItem().getId());
+            workDocumentResponse.setItemNo(workDocument.getItem().getItemNo());
+            workDocumentResponse.setItemName(workDocument.getItem().getItemName());
+            return workDocumentResponse;
+        }
+    };
+
+    Converter<WorkLine, WorkLineResponse.workLineAndWorkCenterAndWorkProcess> toWorkLineResponse = new Converter<WorkLine, WorkLineResponse.workLineAndWorkCenterAndWorkProcess>() {
+        @Override
+        public WorkLineResponse.workLineAndWorkCenterAndWorkProcess convert(MappingContext<WorkLine, WorkLineResponse.workLineAndWorkCenterAndWorkProcess> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            WorkLine workLine = context.getSource();
+            WorkLineResponse.workLineAndWorkCenterAndWorkProcess workLineCustomResponse = modelMapper.map(workLine, WorkLineResponse.workLineAndWorkCenterAndWorkProcess.class);
+            workLineCustomResponse.setWorkLineName(workLine.getWorkLineName());
+            workLineCustomResponse.setWorkCenterName(workLine.getWorkCenter().getWorkCenterName());
+            workLineCustomResponse.setWorkProcessName(workLine.getWorkProcess().getWorkProcessName());
+            return workLineCustomResponse;
+        }
+    };
+
+    Converter<EstimateItemDetail, EstimateItemResponse> toEstimateItemResponse = new Converter<EstimateItemDetail, EstimateItemResponse>() {
+        @Override
+        public EstimateItemResponse convert(MappingContext<EstimateItemDetail, EstimateItemResponse> context) {
+            ModelMapper mapper = new ModelMapper();
+            EstimateItemDetail itemDetail = context.getSource();
+            EstimateItemResponse estimateItemResponse = mapper.map(itemDetail, EstimateItemResponse.class);
+            int price = estimateItemResponse.getItem().getInputUnitPrice() * estimateItemResponse.getAmount();
+            estimateItemResponse.setPrice(price);
+            return estimateItemResponse;
         }
     };
 }

@@ -7,6 +7,8 @@ import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface FactoryService {
 
     // 공장 생성
@@ -16,7 +18,8 @@ public interface FactoryService {
     FactoryResponse getFactory(Long id) throws NotFoundException;
 
     // 공장 전체 조회
-    Page<FactoryResponse> getFactories(Pageable pageable);
+    List<FactoryResponse> getFactories();
+//    Page<FactoryResponse> getFactories(Pageable pageable);
 
     // 공장 수정
     FactoryResponse updateFactory(Long id, FactoryRequest factoryRequest) throws NotFoundException;

@@ -17,8 +17,10 @@ public interface RoutingService {
     RoutingResponse createRouting(RoutingRequest routingRequest);
     // 라우팅 단일 조회
     RoutingResponse getRouting(Long id) throws NotFoundException;
+    // 라우팅 전체 조회
+    List<RoutingResponse> getRoutings();
     // 라우팅 페이징 조회
-    Page<RoutingResponse> getRoutings(Pageable pageable);
+//    Page<RoutingResponse> getRoutings(Pageable pageable);
     // 라우팅 수정
     RoutingResponse updateRouting(Long id, RoutingRequest routingRequest) throws NotFoundException;
     // 라우팅 삭제

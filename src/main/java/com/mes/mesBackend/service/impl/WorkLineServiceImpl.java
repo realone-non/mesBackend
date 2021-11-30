@@ -4,7 +4,10 @@ import com.mes.mesBackend.dto.request.CodeRequest;
 import com.mes.mesBackend.dto.request.WorkLineRequest;
 import com.mes.mesBackend.dto.response.CodeResponse;
 import com.mes.mesBackend.dto.response.WorkLineResponse;
-import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.WorkCenter;
+import com.mes.mesBackend.entity.WorkLine;
+import com.mes.mesBackend.entity.WorkLineCode;
+import com.mes.mesBackend.entity.WorkProcess;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
@@ -12,9 +15,8 @@ import com.mes.mesBackend.repository.WorkLineCodeRepository;
 import com.mes.mesBackend.repository.WorkLineRepository;
 import com.mes.mesBackend.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -45,9 +47,9 @@ public class WorkLineServiceImpl implements WorkLineService {
     // 작업라인 생성
     @Override
     public WorkLineResponse createWorkLine(WorkLineRequest workLineRequest) throws NotFoundException {
-        WorkLineCode workLineCode = getWorkLineCodeOrThrow(workLineRequest.getWorkLineCode());
-        WorkCenter workCenter = workCenterService.getWorkCenterOrThrow(workLineRequest.getWorkCenter());
-        WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(workLineRequest.getWorkProcess());
+        WorkLineCode workLineCode = workLineRequest.getWorkLineCode() != null ? getWorkLineCodeOrThrow(workLineRequest.getWorkLineCode()) : null;
+        WorkCenter workCenter = workLineRequest.getWorkCenter() != null ? workCenterService.getWorkCenterOrThrow(workLineRequest.getWorkCenter()) : null;
+        WorkProcess workProcess = workLineRequest.getWorkProcess() != null ? workProcessService.getWorkProcessOrThrow(workLineRequest.getWorkProcess()) : null;
 
         WorkLine workLine = mapper.toEntity(workLineRequest, WorkLine.class);
         workLine.addMapping(workLineCode, workCenter, workProcess);
@@ -63,22 +65,31 @@ public class WorkLineServiceImpl implements WorkLineService {
         return mapper.toResponse(workLine, WorkLineResponse.class);
     }
 
-    // 작업라인 페이징 조회
+    // 작업라인 전체 조회
     @Override
-    public Page<WorkLineResponse> getWorkLines(Pageable pageable) {
-        Page<WorkLine> workLines = workLineRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(workLines, WorkLineResponse.class);
+    public List<WorkLineResponse> getWorkLines() {
+        List<WorkLine> workLines = workLineRepository.findAllByDeleteYnFalse();
+        return mapper.toListResponses(workLines, WorkLineResponse.class);
     }
+
+    // 작업라인 페이징 조회
+//    @Override
+//    public Page<WorkLineResponse> getWorkLines(Pageable pageable) {
+//        Page<WorkLine> workLines = workLineRepository.findAllByDeleteYnFalse(pageable);
+//        return mapper.toPageResponses(workLines, WorkLineResponse.class);
+//    }
 
     // 작업라인 수정
     @Override
     public WorkLineResponse updateWorkLine(Long id, WorkLineRequest workLineRequest) throws NotFoundException {
-        WorkLineCode newWorkLineCode = getWorkLineCodeOrThrow(workLineRequest.getWorkLineCode());
-        WorkCenter newWorkCenter = workCenterService.getWorkCenterOrThrow(workLineRequest.getWorkCenter());
-        WorkProcess newWorkProcess = workProcessService.getWorkProcessOrThrow(workLineRequest.getWorkProcess());
+
+        WorkLineCode newWorkLineCode = workLineRequest.getWorkLineCode() != null ? getWorkLineCodeOrThrow(workLineRequest.getWorkLineCode()) : null;
+        WorkCenter newWorkCenter = workLineRequest.getWorkCenter() != null ? workCenterService.getWorkCenterOrThrow(workLineRequest.getWorkCenter()) : null;
+        WorkProcess newWorkProcess = workLineRequest.getWorkProcess() != null ? workProcessService.getWorkProcessOrThrow(workLineRequest.getWorkProcess()) : null;
 
         WorkLine findWorkLine = getWorkLineOrThrow(id);
         WorkLine newWorkLine = mapper.toEntity(workLineRequest, WorkLine.class);
+
         findWorkLine.put(newWorkLine, newWorkLineCode, newWorkCenter, newWorkProcess);
         workLineRepository.save(findWorkLine);
         return mapper.toResponse(findWorkLine, WorkLineResponse.class);

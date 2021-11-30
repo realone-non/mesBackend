@@ -28,7 +28,7 @@ public class ItemFile extends BaseTimeEntity {
     private String fileUrl;     // 첨부파일유알엘
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER", columnDefinition = "bigint COMMENT '등록자'")
+    @JoinColumn(name = "USER", columnDefinition = "bigint COMMENT '등록자'", nullable = false)
     private User user;      // 등록자
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")

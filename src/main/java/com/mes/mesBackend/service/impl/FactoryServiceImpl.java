@@ -14,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class FactoryServiceImpl implements FactoryService {
 
@@ -30,7 +32,7 @@ public class FactoryServiceImpl implements FactoryService {
 
     // 공장 생성
     public FactoryResponse createFactory(FactoryRequest factoryRequest) throws NotFoundException {
-        WorkPlace workPlace = workPlaceService.getWorkPlaceOrThrow(factoryRequest.getWorkPlaceId());
+        WorkPlace workPlace = workPlaceService.getWorkPlaceOrThrow(factoryRequest.getWorkPlace());
         Factory factory = modelMapper.toEntity(factoryRequest, Factory.class);
         factory.addJoin(workPlace);
         factoryRepository.save(factory);
@@ -44,14 +46,18 @@ public class FactoryServiceImpl implements FactoryService {
     }
 
     // 공장 전체 조회
-    public Page<FactoryResponse> getFactories(Pageable pageable) {
-        Page<Factory> factories = factoryRepository.findAllByDeleteYnFalse(pageable);
-        return modelMapper.toPageResponses(factories, FactoryResponse.class);
+    public List<FactoryResponse> getFactories() {
+        List<Factory> factories = factoryRepository.findAllByDeleteYnFalse();
+        return modelMapper.toListResponses(factories, FactoryResponse.class);
     }
+//    public Page<FactoryResponse> getFactories(Pageable pageable) {
+//        Page<Factory> factories = factoryRepository.findAllByDeleteYnFalse(pageable);
+//        return modelMapper.toPageResponses(factories, FactoryResponse.class);
+//    }
 
     // 공장 수정
     public FactoryResponse updateFactory(Long id, FactoryRequest factoryRequest) throws NotFoundException {
-        WorkPlace newWorkPlace = workPlaceService.getWorkPlaceOrThrow(factoryRequest.getWorkPlaceId());
+        WorkPlace newWorkPlace = workPlaceService.getWorkPlaceOrThrow(factoryRequest.getWorkPlace());
         Factory newFactory = modelMapper.toEntity(factoryRequest, Factory.class);
         Factory findFactory = getFactoryOrThrow(id);
         findFactory.put(newFactory, newWorkPlace);

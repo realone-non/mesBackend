@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class WorkCenterCheckRepositoryImpl implements WorkCenterCheckRepositoryCustom {
 
@@ -20,20 +22,19 @@ public class WorkCenterCheckRepositoryImpl implements WorkCenterCheckRepositoryC
 
     final QWorkCenterCheck workCenterCheck = QWorkCenterCheck.workCenterCheck;
 
-    // 작업장별 검유형 페이징 조회/ 검색: 작업장, 점검유형
-    public Page<WorkCenterCheck> findByWorkCenterAndCheckTypes(
+    // 작업장별 검유형 전체 조회/ 검색: 작업장, 점검유형
+    public List<WorkCenterCheck> findByWorkCenterAndCheckTypes(
             Long workCenterId,
-            Long checkTypeId,
-            Pageable pageable
+            Long checkTypeId
     ) {
-        QueryResults<WorkCenterCheck> results = jpaQueryFactory
+        return jpaQueryFactory
                 .selectFrom(workCenterCheck)
                 .where(
                         isCheckTypeEq(checkTypeId),
                         isWorkCenterEq(workCenterId),
                         isDeleteYnFalse()
-                ).fetchResults();
-        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+                )
+                .fetch();
     }
 
     // 작업장으로 조회
@@ -50,4 +51,23 @@ public class WorkCenterCheckRepositoryImpl implements WorkCenterCheckRepositoryC
     private BooleanExpression isDeleteYnFalse() {
         return workCenterCheck.deleteYn.isFalse();
     }
+
+    // 작업장별 검유형 페이징 조회/ 검색: 작업장, 점검유형
+//    public Page<WorkCenterCheck> findByWorkCenterAndCheckTypes(
+//            Long workCenterId,
+//            Long checkTypeId,
+//            Pageable pageable
+//    ) {
+//        QueryResults<WorkCenterCheck> results = jpaQueryFactory
+//                .selectFrom(workCenterCheck)
+//                .where(
+//                        isCheckTypeEq(checkTypeId),
+//                        isWorkCenterEq(workCenterId),
+//                        isDeleteYnFalse()
+//                )
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetchResults();
+//        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+//    }
 }

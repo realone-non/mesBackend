@@ -10,5 +10,4 @@ public class MainNavRequest {
     int level;
     boolean useYn;
     int orders;
-    String icon;
 }

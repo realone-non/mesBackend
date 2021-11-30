@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
 
@@ -39,10 +41,14 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     // 부서 전체 조회
-    public Page<DepartmentResponse> getDepartments(Pageable pageable) {
-        Page<Department> departments = departmentRepository.findAllByDeleteYnFalse(pageable);
-        return modelMapper.toPageResponses(departments, DepartmentResponse.class);
+    public List<DepartmentResponse> getDepartments() {
+        List<Department> departments = departmentRepository.findAllByDeleteYnFalse();
+        return modelMapper.toListResponses(departments, DepartmentResponse.class);
     }
+//    public Page<DepartmentResponse> getDepartments(Pageable pageable) {
+//        Page<Department> departments = departmentRepository.findAllByDeleteYnFalse(pageable);
+//        return modelMapper.toPageResponses(departments, DepartmentResponse.class);
+//    }
 
     // 부서 수정
     public DepartmentResponse updateDepartment(Long id, DepartmentRequest departmentRequest) throws NotFoundException {

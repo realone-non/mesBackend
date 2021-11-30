@@ -20,7 +20,7 @@ public class ItemGroup extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ITEM_GROUP_CODES_ID", columnDefinition = "bigint COMMENT '그룹코드'")
+    @JoinColumn(name = "ITEM_GROUP_CODES_ID", columnDefinition = "bigint COMMENT '그룹코드'", nullable = false)
     private ItemGroupCode itemGroupCode;
 
     @Column(name = "TOP_GROUP_CODE", columnDefinition = "varchar(255) COMMENT '상위그룹코드'")

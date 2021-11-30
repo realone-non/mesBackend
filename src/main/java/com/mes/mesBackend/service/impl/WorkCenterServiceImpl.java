@@ -14,8 +14,6 @@ import com.mes.mesBackend.repository.WorkCenterCodeRepository;
 import com.mes.mesBackend.repository.WorkCenterRepository;
 import com.mes.mesBackend.service.WorkCenterService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,11 +36,11 @@ public class WorkCenterServiceImpl implements WorkCenterService {
     // 작업장 생성
     @Override
     public WorkCenterResponse createWorkCenter(WorkCenterRequest workCenterRequest) throws NotFoundException {
-        Client client = clientService.getClientOrThrow(workCenterRequest.getOutCompany());
+        Client outCompany = workCenterRequest.getOutCompany() != null ? clientService.getClientOrThrow(workCenterRequest.getOutCompany()) : null;
         WorkCenterCode workCenterCode = getWorkCenterCodeOrThrow(workCenterRequest.getWorkCenterCode());
         WorkCenter workCenter = mapper.toEntity(workCenterRequest, WorkCenter.class);
         // workcenter, client 추가
-        workCenter.addWorkCenterCodeAndClient(workCenterCode, client);
+        workCenter.addWorkCenterCodeAndClient(workCenterCode, outCompany);
         WorkCenter saveWorkCenter = workCenterRepository.save(workCenter);
         return mapper.toResponse(saveWorkCenter, WorkCenterResponse.class);
     }
@@ -54,21 +52,31 @@ public class WorkCenterServiceImpl implements WorkCenterService {
         return mapper.toResponse(workCenter, WorkCenterResponse.class);
     }
 
-    // 페이징조회
+    // 전체조회
     @Override
-    public Page<WorkCenterResponse> getWorkCenters(Pageable pageable) {
-        Page<WorkCenter> workCenters = workCenterRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(workCenters, WorkCenterResponse.class);
+    public List<WorkCenterResponse> getWorkCenters() {
+        List<WorkCenter> workCenters = workCenterRepository.findAllByDeleteYnFalse();
+        return mapper.toListResponses(workCenters, WorkCenterResponse.class);
     }
+
+    // 페이징조회
+//    @Override
+//    public Page<WorkCenterResponse> getWorkCenters(Pageable pageable) {
+//        Page<WorkCenter> workCenters = workCenterRepository.findAllByDeleteYnFalse(pageable);
+//        return mapper.toPageResponses(workCenters, WorkCenterResponse.class);
+//    }
 
     // 수정
     @Override
     public WorkCenterResponse updateWorkCenter(Long workCenterId, WorkCenterRequest workCenterRequest) throws NotFoundException {
         WorkCenter findWorkCenter = getWorkCenterOrThrow(workCenterId);
+
         WorkCenterCode newWorkCenterCode = getWorkCenterCodeOrThrow(workCenterRequest.getWorkCenterCode());
-        Client newClient = clientService.getClientOrThrow(workCenterRequest.getOutCompany());
+        Client newOutCompany = workCenterRequest.getOutCompany() != null ? clientService.getClientOrThrow(workCenterRequest.getOutCompany()) : null;
+
         WorkCenter newWorkCenter = mapper.toEntity(workCenterRequest, WorkCenter.class);
-        findWorkCenter.put(newWorkCenter, newWorkCenterCode, newClient);
+
+        findWorkCenter.put(newWorkCenter, newWorkCenterCode, newOutCompany);
         workCenterRepository.save(findWorkCenter);
         return mapper.toResponse(findWorkCenter, WorkCenterResponse.class);
     }

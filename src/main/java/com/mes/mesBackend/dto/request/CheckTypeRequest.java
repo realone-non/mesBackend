@@ -1,11 +1,18 @@
 package com.mes.mesBackend.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-// 점검유형
+import javax.validation.constraints.NotBlank;
+
+import static com.mes.mesBackend.exception.Message.NOT_NULL;
+
 @Getter
 @Setter
+@Schema(description = "점검유형")
 public class CheckTypeRequest {
-    String checkType;       // 점검유형
+    @Schema(description = "점검유형")
+    @NotBlank(message = NOT_NULL)
+    String checkType;
 }

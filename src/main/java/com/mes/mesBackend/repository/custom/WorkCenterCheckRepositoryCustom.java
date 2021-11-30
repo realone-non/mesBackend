@@ -5,6 +5,9 @@ import com.mes.mesBackend.entity.WorkCenterCheck;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface WorkCenterCheckRepositoryCustom {
-    Page<WorkCenterCheck> findByWorkCenterAndCheckTypes(Long workCenterId, Long checkTypeId,Pageable pageable);
+    List<WorkCenterCheck> findByWorkCenterAndCheckTypes(Long workCenterId, Long checkTypeId);
+//    Page<WorkCenterCheck> findByWorkCenterAndCheckTypes(Long workCenterId, Long checkTypeId,Pageable pageable);
 }

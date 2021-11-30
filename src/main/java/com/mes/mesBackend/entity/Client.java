@@ -4,47 +4,45 @@ import lombok.*;
 
 import javax.persistence.*;
 
-// 거래처등록
+/*
+ * 거래처등록
+ * 검색: 거래처유형,거래처코드,거래처명
+ * 거래처코드 (1010633960)
+ * 거래처명 (백승종합상사)
+ * 약어명 ()
+ * 거래처유형 (매입매출처)
+ * 사업자등록번호 (1010607308)
+ * 대표자명 (박상균)
+ * 우편번호 (20148)
+ * 주소 (서울특별시 관악구 신림동 1455-26)
+ * 상세주소 ()
+ * 업태 (도소매)
+ * 업종 (전자부품)
+ * 전화번호 (02-2277-6102)
+ * FAX 번호 (031-733-1090)
+ * 홈페이지 주소
+ * EMAIL ()
+ * 거래처담당자명 (김선아 과장님)
+ * 무역업등록번호 ()
+ * 통관고유번호 ()
+ * 국가코드 ()
+ * 지역 ()
+ * 거래화폐단위 ()
+ * 회사담당자 (오석진)
+ * 회사담당부서 ()
+ * 대금결제방법
+ * 결제일자
+ * 운송방법
+ * 검사방법
+ * 사용
+ * 휴대폰번호
+ * 검색어 (홍콩대리점)
+ * */
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "CLIENTS")
 @Data
 public class Client extends BaseTimeEntity {
-    /*
-    * 거래처등록
-    * 검색: 거래처유형,거래처코드,거래처명
-    * 거래처코드 (1010633960)
-    * 거래처명 (백승종합상사)
-    * 약어명 ()
-    * 거래처유형 (매입매출처)
-    * 사업자등록번호 (1010607308)
-    * 대표자명 (박상균)
-    * 우편번호 (20148)
-    * 주소 (서울특별시 관악구 신림동 1455-26)
-    * 상세주소 ()
-    * 업태 (도소매)
-    * 업종 (전자부품)
-    * 전화번호 (02-2277-6102)
-    * FAX 번호 (031-733-1090)
-    * 홈페이지 주소
-    * EMAIL ()
-    * 거래처담당자명 (김선아 과장님)
-    * 무역업등록번호 ()
-    * 통관고유번호 ()
-    * 국가코드 ()
-    * 지역 ()
-    * 거래화폐단위 ()
-    * 회사담당자 (오석진)
-    * 회사담당부서 ()
-    * 대금결제방법
-    * 결제일자
-    * 운송방법
-    * 검사방법
-    * 사용
-    * 휴대폰번호
-    * 검색어 (홍콩대리점)
-    * */
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '거래처 고유아이디'")
@@ -53,10 +51,10 @@ public class Client extends BaseTimeEntity {
     @Column(name = "CLIENT_CODE", nullable = false, columnDefinition = "varchar(255) COMMENT '거래처 코드'")
     private String clientCode;  // 거래처코드
 
-    @Column(name = "NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '거래처 명'")
-    private String name;    // 거래처명
+    @Column(name = "CLIENT_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '거래처 명'")
+    private String clientName;    // 거래처명
 
-    @Column(name = "SHORT_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '약어'")
+    @Column(name = "SHORT_NAME", columnDefinition = "varchar(255) COMMENT '약어'")
     private String shortName;      // 약어
 
     // 다대일 단방향
@@ -73,10 +71,10 @@ public class Client extends BaseTimeEntity {
     @Column(name = "CEO_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '대표자명'")
     private String ceoName;     // 대표자명
 
-    @Column(name = "POSTAL_CODE", nullable = false, columnDefinition = "varchar(255) COMMENT '우편번호'")
+    @Column(name = "POSTAL_CODE", columnDefinition = "varchar(255) COMMENT '우편번호'")
     private String postalCode;      // 우편번호
 
-    @Column(name = "ADDRESS", nullable = false, columnDefinition = "varchar(255) COMMENT '주소'")
+    @Column(name = "ADDRESS", columnDefinition = "varchar(255) COMMENT '주소'")
     private String address;     // 주소
 
     @Column(name = "DETAIL_ADDRESS", columnDefinition = "varchar(255) COMMENT '상세주소'")
@@ -84,13 +82,13 @@ public class Client extends BaseTimeEntity {
 
     // 다대일 단방향
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "BUSINESS_TYPE", nullable = false, columnDefinition = "bigint COMMENT '업태'")
+    @JoinColumn(name = "BUSINESS_TYPE", columnDefinition = "bigint COMMENT '업태'")
     private BusinessType businessType;      // 업태
 
     @Column(name = "ITEM", columnDefinition = "varchar(255) COMMENT '업종'")
     private String item;        // 업종
 
-    @Column(name = "TEL_NUMBER", nullable = false, columnDefinition = "varchar(255) COMMENT '전화번호'")
+    @Column(name = "TEL_NUMBER", columnDefinition = "varchar(255) COMMENT '전화번호'")
     private String telNumber;   // 전화번호
 
     @Column(name = "FAX_NUMBER", columnDefinition = "varchar(255) COMMENT 'fax번호'")
@@ -99,7 +97,7 @@ public class Client extends BaseTimeEntity {
     @Column(name = "HOME_PAGE_URL", columnDefinition = "varchar(255) COMMENT '홈페이지 주소'")
     private String homePageUrl; //  홈페이지 주소
 
-    @Column(name = "MAIL", nullable = false, columnDefinition = "varchar(255) COMMENT '메일'")
+    @Column(name = "MAIL",columnDefinition = "varchar(255) COMMENT '메일'")
     private String mail;        // 메일
 
     @Column(name = "CLIENT_CHARGER_NAME", columnDefinition = "varchar(255) COMMENT '거래처담당자명'")
@@ -145,10 +143,10 @@ public class Client extends BaseTimeEntity {
     @Column(name = "SEARCH_WORD", columnDefinition = "varchar(255) COMMENT '검색어'")
     private String searchWord;      // 검색어
 
-    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
-    @Column(name = "USE_YN", columnDefinition = "bit(1) COMMENT '사용여부'")
+    @Column(name = "USE_YN", columnDefinition = "bit(1) COMMENT '사용여부'", nullable = false)
     private boolean useYn = true;       // 사용여부
 
     // 수정 매핑
@@ -158,7 +156,7 @@ public class Client extends BaseTimeEntity {
                     ClientType newClientType
     ) {
         setClientCode(newClient.clientCode);
-        setName(newClient.name);
+        setClientName(newClient.clientName);
         setShortName(newClient.shortName);
         setClientType(newClientType);
         setBusinessNumber(newClient.businessNumber);

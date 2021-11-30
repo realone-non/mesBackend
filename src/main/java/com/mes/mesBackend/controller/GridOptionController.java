@@ -5,8 +5,10 @@ import com.mes.mesBackend.dto.response.GridOptionResponse;
 import com.mes.mesBackend.dto.response.HeaderResponse;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.GridOptionService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,9 +17,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Tag(name = "grid-option", description = "그리드 옵션 API")
 @RequestMapping("/users/{user-id}/headers")
-@Api(tags = "grid-option")
+@RestController
 @RequiredArgsConstructor
 public class GridOptionController {
 
@@ -26,7 +28,14 @@ public class GridOptionController {
 
     @PostMapping("/{header-id}/grid-options")
     @ResponseBody
-    @ApiOperation(value = "그리드 옵션 단일 생성")
+    @Operation(summary = "그리드 옵션 단일 생성")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
     public ResponseEntity<GridOptionResponse> createGridOption(
             @PathVariable(value = "header-id") Long headerId,
             @PathVariable(value = "user-id") Long userId,
@@ -37,7 +46,13 @@ public class GridOptionController {
 
     @GetMapping
     @ResponseBody
-    @ApiOperation(value = "해당 유저에 해당하는 그리드 조회")
+    @Operation(summary = "해당 유저에 해당하는 그리드 조회")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource")
+            }
+    )
     public ResponseEntity<List<HeaderResponse>> getHeaderGridOptions(
             @PathVariable(value = "user-id") Long userId,
             @RequestParam(value = "controller-name") String controllerName

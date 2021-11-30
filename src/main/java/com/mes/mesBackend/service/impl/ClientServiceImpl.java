@@ -17,11 +17,11 @@ import com.mes.mesBackend.service.ClientTypeService;
 import com.mes.mesBackend.service.CountryCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class ClientServiceImpl implements ClientService {
@@ -51,12 +51,13 @@ public class ClientServiceImpl implements ClientService {
 
     // 거래처 생성
     public ClientResponse createClient(ClientRequest clientRequest) throws NotFoundException {
-        BusinessType businessType = businessTypeService.getBusinessTypeOrThrow(clientRequest.getBusinessType());
-        CountryCode countryCode = countryCodeService.getCountryCodeOrThrow(clientRequest.getCountryCode());
+        BusinessType businessType = clientRequest.getBusinessType() != null ? businessTypeService.getBusinessTypeOrThrow(clientRequest.getBusinessType()) : null;
+        CountryCode countryCode = clientRequest.getCountryCode() != null ? countryCodeService.getCountryCodeOrThrow(clientRequest.getCountryCode()) : null;
         ClientType clientType = clientTypeService.getClientTypeOrThrow(clientRequest.getClientType());
 
         Client client = modelMapper.toEntity(clientRequest, Client.class);
         client.addJoin(businessType, countryCode, clientType);
+        clientRepository.save(client);
         return modelMapper.toResponse(client, ClientResponse.class);
     }
 
@@ -67,14 +68,13 @@ public class ClientServiceImpl implements ClientService {
     }
 
     // 거래처 조건 페이징 조회 (거래처 유형, 거래처 코드, 거래처 명)
-    public Page<ClientResponse> getClients(
+    public List<ClientResponse> getClients(
             Long type,
             String code,
-            String clientName,
-            Pageable pageable
+            String clientName
     ) {
-        Page<Client> clients = clientRepository.findByTypeAndCodeAndName(type, code, clientName, pageable);
-        return modelMapper.toPageResponses(clients, ClientResponse.class);
+        List<Client> clients = clientRepository.findByTypeAndCodeAndName(type, code, clientName);
+        return modelMapper.toListResponses(clients, ClientResponse.class);
     }
 
     // 거래처 수정
@@ -82,9 +82,9 @@ public class ClientServiceImpl implements ClientService {
         Client newClient = modelMapper.toEntity(clientRequest, Client.class);
         Client findClient = getClientOrThrow(id);
 
-        BusinessType newBusinessType = businessTypeService.getBusinessTypeOrThrow(clientRequest.getBusinessType());
+        BusinessType newBusinessType = clientRequest.getBusinessType() != null ? businessTypeService.getBusinessTypeOrThrow(clientRequest.getBusinessType()) : null;
+        CountryCode newCountryCode = clientRequest.getCountryCode() != null ? countryCodeService.getCountryCodeOrThrow(clientRequest.getCountryCode()) : null;
         ClientType newClientType = clientTypeService.getClientTypeOrThrow(clientRequest.getClientType());
-        CountryCode newCountryCode = countryCodeService.getCountryCodeOrThrow(clientRequest.getCountryCode());
 
         findClient.put(newClient, newBusinessType, newCountryCode, newClientType);
         clientRepository.save(findClient);

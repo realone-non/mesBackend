@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CountryCodeServiceImpl implements CountryCodeService {
 
@@ -39,10 +41,14 @@ public class CountryCodeServiceImpl implements CountryCodeService {
     }
 
     // 국가코드 전체 조회
-    public Page<CountryCodeResponse> getCountryCodes(Pageable pageable) {
-        Page<CountryCode> countryCodes = countryCodeRepository.findAllByDeleteYnFalse(pageable);
-        return modelMapper.toPageResponses(countryCodes, CountryCodeResponse.class);
+    public List<CountryCodeResponse> getCountryCodes() {
+        List<CountryCode> countryCodes = countryCodeRepository.findAllByDeleteYnFalse();
+        return modelMapper.toListResponses(countryCodes, CountryCodeResponse.class);
     }
+//    public Page<CountryCodeResponse> getCountryCodes(Pageable pageable) {
+//        Page<CountryCode> countryCodes = countryCodeRepository.findAllByDeleteYnFalse(pageable);
+//        return modelMapper.toPageResponses(countryCodes, CountryCodeResponse.class);
+//    }
 
     // 국가코드 타입 수정
     public CountryCodeResponse updateCountryCode(Long id, CountryCodeRequest countryCodeRequest) throws NotFoundException {

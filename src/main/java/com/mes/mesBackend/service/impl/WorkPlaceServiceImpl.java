@@ -12,8 +12,6 @@ import com.mes.mesBackend.repository.WorkPlaceRepository;
 import com.mes.mesBackend.service.BusinessTypeService;
 import com.mes.mesBackend.service.WorkPlaceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -74,11 +72,17 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
         return modelMapper.toResponse(workPlace, WorkPlaceResponse.class);
     }
 
-    // 사업장 페이징 조회
-    public Page<WorkPlaceResponse> getWorkPlaces(Pageable pageable) {
-        Page<WorkPlace> workPlaces = workPlaceRepository.findAllByDeleteYnFalse(pageable);
-        return modelMapper.toPageResponses(workPlaces, WorkPlaceResponse.class);
+    // 사업장 전체 조회
+    public List<WorkPlaceResponse> getWorkPlaces() {
+        List<WorkPlace> workPlaces = workPlaceRepository.findAllByDeleteYnFalse();
+        return modelMapper.toListResponses(workPlaces, WorkPlaceResponse.class);
     }
+
+    // 사업장 페이징 조회
+//    public Page<WorkPlaceResponse> getWorkPlaces(Pageable pageable) {
+//        Page<WorkPlace> workPlaces = workPlaceRepository.findAllByDeleteYnFalse(pageable);
+//        return modelMapper.toPageResponses(workPlaces, WorkPlaceResponse.class);
+//    }
 
     // workPlaceMapped 모두 삭제
     private void deleteWorkPlaceMapped(WorkPlace workPlace) {

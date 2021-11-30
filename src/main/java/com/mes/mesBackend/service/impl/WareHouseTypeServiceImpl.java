@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 // 창고유형
 @Service
 public class WareHouseTypeServiceImpl implements WareHouseTypeService {
@@ -37,12 +39,19 @@ public class WareHouseTypeServiceImpl implements WareHouseTypeService {
         return mapper.toResponse(findWareHouseType, WareHouseTypeResponse.class);
     }
 
-    // 페이징조회
+    // 리스트조회
     @Override
-    public Page<WareHouseTypeResponse> getWareHouseTypes(Pageable pageable) {
-        Page<WareHouseType> findWareHouseTypes = wareHouseTypeRepository.findAllByDeleteYnFalse(pageable);
-        return mapper.toPageResponses(findWareHouseTypes, WareHouseTypeResponse.class);
+    public List<WareHouseTypeResponse> getWareHouseTypes() {
+        List<WareHouseType> findWareHouseTypes = wareHouseTypeRepository.findAllByDeleteYnFalse();
+        return mapper.toListResponses(findWareHouseTypes, WareHouseTypeResponse.class);
     }
+
+    // 페이징조회
+//    @Override
+//    public Page<WareHouseTypeResponse> getWareHouseTypes(Pageable pageable) {
+//        Page<WareHouseType> findWareHouseTypes = wareHouseTypeRepository.findAllByDeleteYnFalse(pageable);
+//        return mapper.toPageResponses(findWareHouseTypes, WareHouseTypeResponse.class);
+//    }
 
     // 수정
     @Override
