@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.Base64;
@@ -134,28 +135,4 @@ public class JwtTokenProvider {
         }
         return false;
     }
-
-//    private Authentication getAuthentication(HttpServletRequest request) {
-//        String authorization = request.getHeader(JwtProperties.HEADER_STRING);
-//        if(authorization == null) {
-//            return null;
-//        }
-//
-//        String token = authorization.substring(JwtProperties.TOKEN_PREFIX.length());
-//
-//        Claims claims = null;
-//
-//        try {
-//            claims = jwtUtil.parseToken(token);
-//        } catch (ExpiredJwtException e) {
-//            e.printStackTrace();
-//            request.setAttribute("exception", ErrorCode.EXPIRED_TOKEN.getCode());
-//        } catch (JwtException e) {
-//            e.printStackTrace();
-//            request.setAttribute("exception", ErrorCode.INVALID_TOKEN.getCode());
-//        }
-//
-//        return new UserAuthentication(claims);
-//    }
-
 }

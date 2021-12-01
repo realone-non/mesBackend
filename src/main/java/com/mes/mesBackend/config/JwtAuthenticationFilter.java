@@ -1,9 +1,6 @@
 package com.mes.mesBackend.config;
 
-import com.mes.mesBackend.exception.ErrorResponse;
-import com.mes.mesBackend.exception.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -30,8 +27,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+
+        // /auth 경로는 필터가 적용되지 않는다.
+//        String path = request.getRequestURI();
+//        if (path.startsWith("/auth/")) {
+//            filterChain.doFilter(request, response);
+//        }
         String token = request.getHeader(HEADER);
-        System.out.println("token: ===================================== :" + token);
         if (token != null && jwtTokenProvider.validateToken(token)) {
             Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);

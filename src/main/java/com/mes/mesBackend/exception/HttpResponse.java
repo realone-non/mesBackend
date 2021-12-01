@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import java.util.Date;
 
 @Data
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 public class HttpResponse {
     private Date timeStamp;
