@@ -8,6 +8,7 @@ import com.mes.mesBackend.dto.request.UserRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.exception.BadRequestException;
+import com.mes.mesBackend.exception.CustomJwtException;
 import com.mes.mesBackend.exception.ExpiredJwtException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
@@ -187,7 +188,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public TokenDto reissue(TokenRequestDto tokenRequestDto) throws ExpiredJwtException {
+    public TokenDto reissue(TokenRequestDto tokenRequestDto) throws CustomJwtException {
         // 1. Refresh Token 검증
         if (!jwtTokenProvider.validateToken(tokenRequestDto.getRefreshToken())) {
             throw new RuntimeException("Refresh token 이 유효하지 않습니다.");

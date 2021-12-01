@@ -1,5 +1,6 @@
 package com.mes.mesBackend.config;
 
+import com.mes.mesBackend.exception.CustomJwtException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -105,34 +106,22 @@ public class JwtTokenProvider {
     }
 
     // token 의 유효성 + 만료일자 확인
-    public Boolean validateToken(String token) {
+    // token 의 유효성 + 만료일자 확인
+    public Boolean validateToken(String token) throws CustomJwtException {
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
         } catch (SecurityException ex) {
-            log.info("잘못된 JWT 서명입니다.");
-
-            System.out.println("잘못된 JWT 서명입니다.");
+            throw new CustomJwtException(ex.getMessage());
         } catch (MalformedJwtException ex) {
-            log.info("잘못된 JWT 서명입니다.");
-            log.error("잘못된 JWT 서명입니다.");
-            System.out.println("잘못된 JWT 서명입니다.");
+            // jwt 형식에 맞지 않을때
+            throw new CustomJwtException("JWT token is malformed.");
         } catch (ExpiredJwtException ex) {
-            try {
-                throw new com.mes.mesBackend.exception.ExpiredJwtException("만료된 토큰임 !!!!!!!!!!!!!");
-            } catch (com.mes.mesBackend.exception.ExpiredJwtException e) {
-                e.printStackTrace();
-            }
-            log.info("만료된 JWT 토큰입니다.");
-            log.error("만료된 JWT 토큰입니다.");
-            System.out.println("만료된 JWT 토큰입니다.");
-        } catch (UnsupportedJwtException ex) {
-            log.info("지원되지 않는 JWT 토큰입니다.");
-            System.out.println("지원되지 않는 JWT 토큰입니다.");
+            // 토큰 기간 만료
+            throw new CustomJwtException("JWT token is expired.");
         } catch (IllegalArgumentException ex) {
-            log.info("JWT 토큰이 잘못되었습니다.");
-            System.out.println("JWT 토큰이 잘못되었습니다.");
+            // 토큰이 null 이거나 empty 일때
+            throw new CustomJwtException("JWT token is null or empty.");
         }
-        return false;
     }
 }

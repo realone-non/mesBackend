@@ -1,5 +1,6 @@
 package com.mes.mesBackend.config;
 
+import com.mes.mesBackend.exception.CustomJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,9 +35,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //            filterChain.doFilter(request, response);
 //        }
         String token = request.getHeader(HEADER);
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            if (token != null && jwtTokenProvider.validateToken(token)) {
+                Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (CustomJwtException e) {
+            e.printStackTrace();
         }
         filterChain.doFilter(request, response);
     }
