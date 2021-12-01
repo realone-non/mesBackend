@@ -27,4 +27,10 @@ public class ExceptionHandling implements ErrorController {
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST, ex.getBindingResult());
         return new ResponseEntity<>(errorResponse, errorResponse.getHttpStatus());
     }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<HttpResponse> expiredJwtException(ExpiredJwtException ex) {
+        HttpResponse httpResponse = HttpResponse.of(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        return new ResponseEntity<>(httpResponse, httpResponse.getHttpStatus());
+    }
 }

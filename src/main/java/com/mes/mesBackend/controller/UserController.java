@@ -6,6 +6,7 @@ import com.mes.mesBackend.dto.request.UserLogin;
 import com.mes.mesBackend.dto.request.UserRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.exception.BadRequestException;
+import com.mes.mesBackend.exception.ExpiredJwtException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -127,7 +128,7 @@ public class UserController {
     @PatchMapping("/reissue")
     @ResponseBody
     @Operation(summary = "토큰 재발급")
-    public ResponseEntity<TokenDto> updateRefreshToken(@RequestBody TokenRequestDto tokenRequestDto) {
+    public ResponseEntity<TokenDto> updateRefreshToken(@RequestBody TokenRequestDto tokenRequestDto) throws ExpiredJwtException {
         return new ResponseEntity<>(userService.reissue(tokenRequestDto), HttpStatus.OK);
     }
 

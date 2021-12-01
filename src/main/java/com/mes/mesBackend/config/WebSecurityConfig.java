@@ -1,5 +1,6 @@
 package com.mes.mesBackend.config;
 
+import com.mes.mesBackend.exception.ExceptionHandling;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -20,6 +22,7 @@ public class WebSecurityConfig extends
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final ExceptionHandling exceptionHandling;
 
 
 //    @Bean
@@ -43,11 +46,6 @@ public class WebSecurityConfig extends
                 // 요청에 대한 사용권한 체크
                 .and()
                 .authorizeRequests()
-//                .antMatchers("/work-line-codes/**").hasRole("USER")
-//                .antMatchers("/work-line/**").hasRole("USER")
-//                .antMatchers("/clients").permitAll()
-//                .antMatchers( "/swagger-ui/", "/", "/login").permitAll()
-//                .anyRequest().authenticated()
                 .antMatchers("/").permitAll()
                 .antMatchers("/swagger-ui/**").permitAll()
                 .antMatchers("/api-docs/**").permitAll()
@@ -58,7 +56,6 @@ public class WebSecurityConfig extends
                 .anyRequest().permitAll()       // 그 외 나머지 요청은 누구나 접근
                 // JwtFilter 를 addFilterBefore 로 등록했던 JwtAuthenticationFilter 클래스를 적용
                 .and()
-//                .apply(new JwtSecurityConfig(jwtTokenProvider));
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
     }
 }

@@ -7,6 +7,7 @@ import com.mes.mesBackend.dto.request.UserRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.exception.BadRequestException;
+import com.mes.mesBackend.exception.ExpiredJwtException;
 import com.mes.mesBackend.exception.NotFoundException;
 
 import java.security.NoSuchAlgorithmException;
@@ -37,5 +38,5 @@ public interface UserService {
 
     User getUserOrThrow(Long id) throws NotFoundException;
 
-    TokenDto reissue(TokenRequestDto tokenRequestDto);
+    TokenDto reissue(TokenRequestDto tokenRequestDto) throws ExpiredJwtException;
 }
