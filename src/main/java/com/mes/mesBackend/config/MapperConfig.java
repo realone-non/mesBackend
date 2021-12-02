@@ -198,11 +198,11 @@ public class MapperConfig {
             ModelMapper modelMapper = new ModelMapper();
             WorkDocument workDocument = context.getSource();
             WorkDocumentResponse workDocumentResponse = modelMapper.map(workDocument, WorkDocumentResponse.class);
-            workDocumentResponse.setWorkProcess(workDocument.getWorkProcess().getWorkProcessName());
-            workDocumentResponse.setWorkLine(workDocument.getWorkLine().getWorkLineName());
-            workDocumentResponse.setItemId(workDocument.getItem().getId());
-            workDocumentResponse.setItemNo(workDocument.getItem().getItemNo());
-            workDocumentResponse.setItemName(workDocument.getItem().getItemName());
+//            workDocumentResponse.setWorkProcess(workDocument.getWorkProcess().getWorkProcessName());
+//            workDocumentResponse.setWorkLine(workDocument.getWorkLine().getWorkLineName());
+//            workDocumentResponse.setItemId(workDocument.getItem().getId());
+//            workDocumentResponse.setItemNo(workDocument.getItem().getItemNo());
+//            workDocumentResponse.setItemName(workDocument.getItem().getItemName());
             return workDocumentResponse;
         }
     };

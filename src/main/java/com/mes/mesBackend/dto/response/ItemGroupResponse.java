@@ -12,6 +12,8 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @JsonInclude(NON_NULL)
 @Schema(description = "품목그룹")
 public class ItemGroupResponse {
+    @Schema(description = "고유아이디")
+    Long id;
 
     @Schema(description = "그룹코드")
     CodeResponse.idAndCode itemGroupCode;

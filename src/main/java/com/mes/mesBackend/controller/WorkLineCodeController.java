@@ -23,7 +23,6 @@ import java.util.List;
 @Tag(name = "work-line-code", description = "작업라인 코드 API")
 @RequestMapping("/work-line-codes")
 @RestController
-@RequiredArgsConstructor
 @SecurityRequirement(name = "Authorization")
 public class WorkLineCodeController {
     @Autowired
