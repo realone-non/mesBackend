@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,7 @@ import java.util.List;
 @Tag(name = "equipment-maintenance", description = "설비 보전항목 API")
 @RequestMapping("/equipment-maintenances")
 @RestController
+@SecurityRequirement(name = "Authorization")
 public class EquipmentMaintenanceController {
     @Autowired
     EquipmentMaintenanceService equipmentMaintenanceService;

@@ -1,36 +1,41 @@
 package com.mes.mesBackend.entity;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
-@Data
+import static javax.persistence.GenerationType.IDENTITY;
+
+@AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "REFRESH_TOKEN")
-@Entity
+@Entity(name = "REFRESH_TOKENS")
+@Data
 public class RefreshToken extends BaseTimeEntity {
-    /*
-    * key 에는 user id
-    * value 에는 Refresh Token String 이 들어감
-    *
-    * */
+    @Id @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '토큰 고유아이디'")
+    private Long id;
 
-    @Id
-    private String key;
-    private String value;
+    @Column(name = "USER_CODE", columnDefinition = "varchar(255) COMMENT '직원 코드'")
+    private String userCode;
 
-    public RefreshToken updateValue(String token) {
-        this.value = token;
-        return this;
+    @Column(name = "REFRESH_TOKEN", columnDefinition = "varchar(500) COMMENT 'Refresh Token'")
+    private String refreshToken;
+
+    @Column(name = "USE_YN", columnDefinition = "bit(1) COMMENT '사용여부'")
+    private Boolean useYn;
+
+    public void save(String userCode, String refreshToken) {
+        setUserCode(userCode);
+        setRefreshToken(refreshToken);
+        setUseYn(true);
     }
 
-    @Builder
-    public RefreshToken(String key, String value) {
-        this.key = key;
-        this.value = value;
+    public void useYnFalse() {
+        setUseYn(false);
     }
 }

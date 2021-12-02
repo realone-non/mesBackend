@@ -1,5 +1,6 @@
 package com.mes.mesBackend.entity;
 
+import javassist.Loader;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static javax.persistence.FetchType.EAGER;
+import static javax.persistence.FetchType.LAZY;
 
 // 직원(작업자)
 @AllArgsConstructor
@@ -38,7 +40,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     private String korName;    // 이름
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "DEPARTMENTS_ID", nullable = false, columnDefinition = "bigint COMMENT '부서'")
     private Department department;  // 부서
 
@@ -74,17 +76,11 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Column(name = "IMAGE_URL", columnDefinition = "varchar(255) COMMENT '프로필사진 url'")
     private String imageUrl;
-
-    @ElementCollection(fetch = EAGER)
-//    @Builder.Default
-    private List<String> roles = new ArrayList<>();
-
-//    public User() {
 //
-//    }
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    private List<UserRole> userRoles = new ArrayList<>();
 
     public void put(User newUser, Department newDepartment) {
-        setUserCode(newUser.userCode);
         setKorName(newUser.korName);
         setDepartment(newDepartment);
         setPosition(newUser.position);
@@ -106,10 +102,15 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.roles.stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        return null;
     }
+
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return this.userRoles.stream()
+//                .map(userRole -> new SimpleGrantedAuthority(userRole.getRole().getRole()))
+//                .collect(Collectors.toList());
+//    }
 
     @Override
     public String getUsername() {

@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ import java.util.List;
 @RequestMapping(value = "/item-checks")
 @Tag(name = "item-check", description = "품목별 검사항목 API")
 @RestController
+@SecurityRequirement(name = "Authorization")
 public class ItemCheckController {
     @Autowired
     ItemCheckService itemCheckService;
