@@ -10,6 +10,7 @@ import com.mes.mesBackend.service.NavigationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.util.List;
 @RequestMapping("/navigations/main-navs")
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Authorization")
 public class NavigationController {
 
     @Autowired

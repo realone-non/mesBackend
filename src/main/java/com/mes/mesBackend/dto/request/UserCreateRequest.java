@@ -8,19 +8,17 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import java.util.List;
+
 import static com.mes.mesBackend.exception.Message.*;
 
 @Getter
 @Setter
 @Schema(description = "직원")
-public class UserRequest {
+public class UserCreateRequest {
     @Schema(description = "사번")
     @NotBlank(message = NOT_EMPTY)
     String userCode;     // 사번
-
-    @Schema(description = "비밀번호")
-    @NotBlank(message = NOT_EMPTY)
-    String password;        // 비번
 
     @Schema(description = "이름")
     @NotBlank(message = NOT_EMPTY)
@@ -63,4 +61,7 @@ public class UserRequest {
 
     @Schema(description = "메모")
     String description;
+//
+//    @Schema(description = "권한 ids")
+//    List<Long> roles;
 }

@@ -1,14 +1,15 @@
 package com.mes.mesBackend.controller;
 
-import com.mes.mesBackend.dto.request.UserRequest;
+import com.mes.mesBackend.dto.request.UserCreateRequest;
+import com.mes.mesBackend.dto.request.UserUpdateRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
-import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,31 +30,16 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    // 직원(작업자) 생성
-    @PostMapping
-    @ResponseBody
-    @Operation(summary = "직원(작업자) 생성")
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "200", description = "success"),
-                    @ApiResponse(responseCode = "404", description = "not found resource"),
-                    @ApiResponse(responseCode = "400", description = "bad request")
-            }
-    )
-    public ResponseEntity<UserResponse> createUser(
-            @RequestBody @Valid UserRequest userRequest
-    ) throws NotFoundException, NoSuchAlgorithmException, BadRequestException {
-        return new ResponseEntity<>(userService.createUser(userRequest), HttpStatus.OK);
-    }
-
     // 직원(작업자) 단일 조회
     @GetMapping("/{id}")
     @ResponseBody
     @Operation(summary = "직원(작업자) 단일 조회")
+    @SecurityRequirement(name = "Authorization")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
                     @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "401", description = "un authorized")
             }
     )
     public ResponseEntity<UserResponse> getUser(@PathVariable Long id) throws NotFoundException {
@@ -64,6 +50,8 @@ public class UserController {
     @GetMapping
     @ResponseBody()
     @Operation(summary = "직원(작업자) 전체 조회", description = "검색조건: 부서, 사번, 이름")
+    @SecurityRequirement(name = "Authorization")
+    @ApiResponse(responseCode = "401", description = "un authorized")
     public ResponseEntity<List<UserResponse>> getUsers(
             @RequestParam(required = false) @Parameter(description = "부서 id") Long departmentId,
             @RequestParam(required = false) @Parameter(description = "사번") String userCode,
@@ -76,16 +64,18 @@ public class UserController {
     @PatchMapping("/{id}")
     @ResponseBody()
     @Operation(summary = "직원(작업자) 수정")
+    @SecurityRequirement(name = "Authorization")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
                     @ApiResponse(responseCode = "404", description = "not found resource"),
-                    @ApiResponse(responseCode = "400", description = "bad request")
+                    @ApiResponse(responseCode = "400", description = "bad request"),
+                    @ApiResponse(responseCode = "401", description = "un authorized")
             }
     )
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
-            @RequestBody @Valid UserRequest userRequest
+            @RequestBody @Valid UserUpdateRequest userRequest
     ) throws NotFoundException, NoSuchAlgorithmException {
         return new ResponseEntity<>(userService.updateUser(id, userRequest), HttpStatus.OK);
     }
@@ -93,32 +83,17 @@ public class UserController {
     @DeleteMapping("/{id}")
     @ResponseBody()
     @Operation(summary = "직원(작업자) 삭제")
+    @SecurityRequirement(name = "Authorization")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "204", description = "no content"),
-                    @ApiResponse(responseCode = "404", description = "not found resource")
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "401", description = "un authorized")
             }
     )
     public ResponseEntity deleteUser(@PathVariable Long id) throws NotFoundException {
         userService.deleteUser(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
-    }
-
-    @GetMapping("/login")
-    @ResponseBody
-    @Operation(summary = "로그인")
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "200", description = "success"),
-                    @ApiResponse(responseCode = "404", description = "not found resource"),
-                    @ApiResponse(responseCode = "400", description = "bad request")
-            }
-    )
-    public ResponseEntity<UserResponse.idAndKorNameAndEmail> getLoginInfo(
-            @RequestParam String userCode,
-            @RequestParam String password
-    ) throws NotFoundException, BadRequestException, NoSuchAlgorithmException {
-        return new ResponseEntity<>(userService.getLogin(userCode, password), HttpStatus.OK);
     }
 
     // 직원(작업자) 페이징 조회

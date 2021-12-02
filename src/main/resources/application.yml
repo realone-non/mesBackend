@@ -80,3 +80,8 @@ springdoc:
     path: /
   api-docs:
     path: /api-docs
+
+jwt:
+  token:
+    secret-key: silverstarmesbackendapplication190501    # hash 에 사용되는 키
+    header: Authorization                                # authorization 헤더로 전달
