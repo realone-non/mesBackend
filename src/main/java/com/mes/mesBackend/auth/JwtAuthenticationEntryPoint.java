@@ -33,7 +33,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             AuthenticationException authException
     ) throws IOException, ServletException {
         // 유효한 자격증명을 제공하지 않고 접근 할때 401
-        String token = request.getHeader(HEADER);
+        String token = request.getHeader(HEADER).substring(7);
         try {
             jwtTokenProvider.validateToken(token, "accessToken");
         } catch (CustomJwtException e) {

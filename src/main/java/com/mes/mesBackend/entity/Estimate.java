@@ -86,7 +86,7 @@ public class Estimate extends BaseTimeEntity {
     @JoinColumn(name = "PI", columnDefinition = "bigint COMMENT 'PI'")
     private Pi pi;              // P/I
 
-    @Column(name = "NOTE", nullable = false, columnDefinition = "bit(1) COMMENT '비고'")
+    @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;
 
     public void addMapping(Client client, Currency currency, String estimateNo) {

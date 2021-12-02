@@ -29,14 +29,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // /auth 경로는 필터가 적용되지 않는다.
+         // /auth 경로는 필터가 적용되지 않는다.
 //        String path = request.getRequestURI();
-//        if (path.startsWith("/auth/")) {
+//
+//        if (path.startsWith("/auth")) {
 //            filterChain.doFilter(request, response);
 //        }
-        String token = request.getHeader(HEADER);
+
+        String requestTokenHeader = request.getHeader(HEADER);
+
         try {
-            if (token != null && jwtTokenProvider.validateToken(token, "accessToken")) {
+            if (requestTokenHeader != null && jwtTokenProvider.validateToken(requestTokenHeader.substring(7), "accessToken")) {
+                String token = requestTokenHeader.substring(7);
                 Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
