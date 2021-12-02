@@ -240,3 +240,4 @@ public class UserServiceImpl implements UserService {
         return byteToString(password);
     }
 }
+
