@@ -1,4 +1,4 @@
-package com.mes.mesBackend.config;
+package com.mes.mesBackend.auth;
 
 import com.mes.mesBackend.exception.CustomJwtException;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //        }
         String token = request.getHeader(HEADER);
         try {
-            if (token != null && jwtTokenProvider.validateToken(token)) {
+            if (token != null && jwtTokenProvider.validateToken(token, "accessToken")) {
                 Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }

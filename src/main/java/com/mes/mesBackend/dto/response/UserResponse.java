@@ -1,7 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mes.mesBackend.config.TokenDto;
+import com.mes.mesBackend.auth.TokenResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -73,6 +73,6 @@ public class UserResponse {
 //        @Schema(description = "토큰")
 //        String token;
         @Schema(description = "토큰dto")
-        TokenDto token;
+TokenResponse token;
     }
 }

@@ -1,7 +1,7 @@
 package com.mes.mesBackend.controller;
 
-import com.mes.mesBackend.config.TokenDto;
-import com.mes.mesBackend.config.TokenRequestDto;
+import com.mes.mesBackend.auth.TokenResponse;
+import com.mes.mesBackend.auth.TokenRequest;
 import com.mes.mesBackend.dto.request.UserLogin;
 import com.mes.mesBackend.dto.request.UserRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -120,7 +119,7 @@ public class UserController {
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity<TokenDto> getLoginInfo(
+    public ResponseEntity<TokenResponse> getLoginInfo(
             @RequestBody @Valid UserLogin userLogin
     ) throws NotFoundException, BadRequestException {
         return new ResponseEntity<>(userService.getLogin(userLogin), HttpStatus.OK);
@@ -129,7 +128,7 @@ public class UserController {
     @PatchMapping("/reissue")
     @ResponseBody
     @Operation(summary = "토큰 재발급")
-    public ResponseEntity<TokenDto> updateRefreshToken(@RequestBody TokenRequestDto tokenRequestDto) throws ExpiredJwtException, CustomJwtException {
+    public ResponseEntity<TokenResponse> updateRefreshToken(@RequestBody TokenRequest tokenRequestDto) throws ExpiredJwtException, CustomJwtException {
         return new ResponseEntity<>(userService.reissue(tokenRequestDto), HttpStatus.OK);
     }
 

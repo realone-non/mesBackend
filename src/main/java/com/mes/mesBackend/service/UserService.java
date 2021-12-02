@@ -1,7 +1,7 @@
 package com.mes.mesBackend.service;
 
-import com.mes.mesBackend.config.TokenDto;
-import com.mes.mesBackend.config.TokenRequestDto;
+import com.mes.mesBackend.auth.TokenResponse;
+import com.mes.mesBackend.auth.TokenRequest;
 import com.mes.mesBackend.dto.request.UserLogin;
 import com.mes.mesBackend.dto.request.UserRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
@@ -35,9 +35,9 @@ public interface UserService {
     void deleteUser(Long id) throws NotFoundException;
 
     // userLogin
-    TokenDto getLogin(UserLogin userLogin) throws NotFoundException, BadRequestException;
+    TokenResponse getLogin(UserLogin userLogin) throws NotFoundException, BadRequestException;
 
     User getUserOrThrow(Long id) throws NotFoundException;
 
-    TokenDto reissue(TokenRequestDto tokenRequestDto) throws ExpiredJwtException, CustomJwtException;
+    TokenResponse reissue(TokenRequest tokenRequestDto) throws ExpiredJwtException, CustomJwtException;
 }

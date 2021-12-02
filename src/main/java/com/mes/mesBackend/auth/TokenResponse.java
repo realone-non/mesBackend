@@ -1,4 +1,4 @@
-package com.mes.mesBackend.config;
+package com.mes.mesBackend.auth;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -9,13 +9,11 @@ import lombok.Setter;
 @Setter
 @Schema(description = "Token")
 @NoArgsConstructor
-public class TokenDto {
-//    String grantType;
-//    Long accessTokenExpiresIn;
+public class TokenResponse {
     String accessToken;
     String refreshToken;
 
-    public TokenDto putToken(String accessToken, String refreshToken) {
+    public TokenResponse putToken(String accessToken, String refreshToken) {
         this.setAccessToken(accessToken);
         this.setRefreshToken(refreshToken);
         return this;

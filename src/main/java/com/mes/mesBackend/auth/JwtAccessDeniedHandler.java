@@ -1,4 +1,4 @@
-package com.mes.mesBackend.config;
+package com.mes.mesBackend.auth;
 
 import net.minidev.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
+// 권한 인증 없어서 현재 사용하지 않음
 @Component
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     @Override
