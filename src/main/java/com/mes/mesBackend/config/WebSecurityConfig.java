@@ -1,6 +1,5 @@
 package com.mes.mesBackend.config;
 
-
 import com.mes.mesBackend.auth.JwtAccessDeniedHandler;
 import com.mes.mesBackend.auth.JwtAuthenticationEntryPoint;
 import com.mes.mesBackend.auth.JwtAuthenticationFilter;
@@ -16,7 +15,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends
+        WebSecurityConfigurerAdapter
+{
 
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -43,9 +44,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/auth/signin").permitAll()
                 .antMatchers("/auth/signup").permitAll()
                 .antMatchers("/auth/reissue").permitAll()
-                .antMatchers("/**").authenticated()
                 .anyRequest().permitAll()       // 그 외 나머지 요청은 누구나 접근
-                .anyRequest().permitAll();       // 그 외 나머지 요청은 누구나 접근
                 // JwtFilter 를 addFilterBefore 로 등록했던 JwtAuthenticationFilter 클래스를 적용
+                .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
     }
 }

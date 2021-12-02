@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-      // 로그인
+    // 로그인
     @Override
     public TokenResponse getLogin(UserLogin userLogin) throws NotFoundException, BadRequestException {
         User user = userRepository.findByUserCode(userLogin.getUserCode())
@@ -159,6 +159,17 @@ public class UserServiceImpl implements UserService {
         refreshTokenRepository.save(newRefreshToken);
 
         return tokenDto;
+    }
+
+    // 기존에 있던 refreshToken 삭제
+    private void refreshTokenUseYnTrueToUseYnFalse(Authentication authentication) {
+        List<RefreshToken> findRefreshToken = refreshTokenRepository.findAllByUserCodeAndUseYnTrue(authentication.getName());
+        for (RefreshToken token : findRefreshToken) {
+            if (token.getUseYn()) {
+                token.useYnFalse();
+            }
+        }
+        refreshTokenRepository.saveAll(findRefreshToken);
     }
 
     @Override
@@ -229,3 +240,4 @@ public class UserServiceImpl implements UserService {
         return byteToString(password);
     }
 }
+
