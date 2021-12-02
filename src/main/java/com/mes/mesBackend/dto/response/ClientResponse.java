@@ -1,7 +1,11 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Getter
 @Setter
@@ -44,5 +48,20 @@ public class ClientResponse {
     public static class idAndName {
         Long id;
         String name;
+    }
+
+    @Getter
+    @Setter
+    @JsonInclude(NON_NULL)
+    @Schema(description = "거래처")
+    public static class idAndNameAndNoAndCharge {
+        @Schema(description = "고유아이디")
+        Long id;
+        @Schema(description = "거래처코드")
+        String clientCode;
+        @Schema(description = "거래처명")
+        String clientName;
+        @Schema(description = "회사담당자")
+        String companyCharge;
     }
 }
