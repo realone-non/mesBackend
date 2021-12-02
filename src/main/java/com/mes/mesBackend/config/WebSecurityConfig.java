@@ -41,8 +41,11 @@ public class WebSecurityConfig extends
                 .antMatchers("/").permitAll()
                 .antMatchers("/swagger-ui/**").permitAll()
                 .antMatchers("/api-docs/**").permitAll()
-                .antMatchers("/users/login").permitAll()
-                .antMatchers("/users/reissue").permitAll()
+                .antMatchers("/auth/signin").permitAll()
+                .antMatchers("/auth/signup").permitAll()
+                .antMatchers("/auth/reissue").permitAll()
+//                .antMatchers("/users/login").permitAll()
+//                .antMatchers("/users/reissue").permitAll()
                 //.antMatchers("/clients/**").permitAll()
                 .antMatchers("/**").authenticated()
                 .anyRequest().permitAll()       // 그 외 나머지 요청은 누구나 접근

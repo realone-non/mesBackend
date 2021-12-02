@@ -3,12 +3,12 @@ package com.mes.mesBackend.service;
 import com.mes.mesBackend.auth.TokenResponse;
 import com.mes.mesBackend.auth.TokenRequest;
 import com.mes.mesBackend.dto.request.UserLogin;
-import com.mes.mesBackend.dto.request.UserRequest;
+import com.mes.mesBackend.dto.request.UserCreateRequest;
+import com.mes.mesBackend.dto.request.UserUpdateRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.CustomJwtException;
-import com.mes.mesBackend.exception.ExpiredJwtException;
 import com.mes.mesBackend.exception.NotFoundException;
 
 import java.security.NoSuchAlgorithmException;
@@ -17,7 +17,7 @@ import java.util.List;
 public interface UserService {
 
     // 직원(작업자) 생성
-    UserResponse createUser(UserRequest userRequest) throws NotFoundException, NoSuchAlgorithmException, BadRequestException;
+    UserResponse createUser(UserCreateRequest userRequest) throws NotFoundException, NoSuchAlgorithmException, BadRequestException;
 
     // 직원(작업자) 단일 조회
     UserResponse getUser(Long id) throws NotFoundException;
@@ -29,7 +29,7 @@ public interface UserService {
 //    Page<UserResponse> getUsers(Pageable pageable);
 
     // 직원(작업자) 수정
-    UserResponse updateUser(Long id, UserRequest userRequest) throws NotFoundException, NoSuchAlgorithmException;
+    UserResponse updateUser(Long id, UserUpdateRequest userRequest) throws NotFoundException, NoSuchAlgorithmException;
 
     // 직원(작업자) 삭제
     void deleteUser(Long id) throws NotFoundException;
@@ -39,5 +39,5 @@ public interface UserService {
 
     User getUserOrThrow(Long id) throws NotFoundException;
 
-    TokenResponse reissue(TokenRequest tokenRequestDto) throws ExpiredJwtException, CustomJwtException;
+    TokenResponse reissue(TokenRequest tokenRequestDto) throws CustomJwtException;
 }

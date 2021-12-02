@@ -1,20 +1,21 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.auth.JwtTokenProvider;
-import com.mes.mesBackend.auth.TokenResponse;
 import com.mes.mesBackend.auth.TokenRequest;
+import com.mes.mesBackend.auth.TokenResponse;
 import com.mes.mesBackend.dto.request.UserLogin;
-import com.mes.mesBackend.dto.request.UserRequest;
+import com.mes.mesBackend.dto.request.UserCreateRequest;
+import com.mes.mesBackend.dto.request.UserUpdateRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
-import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.Department;
+import com.mes.mesBackend.entity.RefreshToken;
+import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.CustomJwtException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.RefreshTokenRepository;
-import com.mes.mesBackend.repository.RoleRepository;
 import com.mes.mesBackend.repository.UserRepository;
-import com.mes.mesBackend.repository.UserRoleRepository;
 import com.mes.mesBackend.service.DepartmentService;
 import com.mes.mesBackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,17 +45,16 @@ public class UserServiceImpl implements UserService {
     JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    RoleRepository roleRepository;
-
-    @Autowired
     RefreshTokenRepository refreshTokenRepository;
+
+    private static final int SALT_SIZE = 16;
 
     public User getUserOrThrow(Long id) throws NotFoundException {
         return userRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("user does not exists. input id: " + id));
     }
 
-    // userCode가 중복되지 않게 확인
+    // userCode 가 중복되지 않게 확인
     private void checkUserCode(String userCode) throws BadRequestException {
         boolean existsByUserCode = userRepository.existsByUserCode(userCode);
 
@@ -63,22 +63,18 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    // 이름, 메일주소, 프로필 이미지
-
-    @Autowired
-    UserRoleRepository userRoleRepository;
-
     // 직원(작업자) 생성
-    public UserResponse createUser(UserRequest userRequest) throws NotFoundException, NoSuchAlgorithmException, BadRequestException {
+    public UserResponse createUser(UserCreateRequest userRequest) throws NotFoundException, BadRequestException {
         checkUserCode(userRequest.getUserCode());
 
         Department department = departmentService.getDepartmentOrThrow(userRequest.getDepartment());
         User user = mapper.toEntity(userRequest, User.class);
 
+        // salt 생성
         String salt = createSalt();
         // 솔트값, 해싱된 Password
         user.setSalt(salt);
-        user.setPassword(passwordHashing(userRequest.getPassword().getBytes(), salt));
+        user.setPassword(passwordHashing(userRequest.getUserCode().getBytes(), salt));
         user.addJoin(department);
 
         // 권한 추가
@@ -114,14 +110,10 @@ public class UserServiceImpl implements UserService {
 //    }
 
     // 직원(작업자) 수정
-    public UserResponse updateUser(Long id, UserRequest userRequest) throws NotFoundException, NoSuchAlgorithmException {
+    public UserResponse updateUser(Long id, UserUpdateRequest userRequest) throws NotFoundException {
         Department newDepartment = departmentService.getDepartmentOrThrow(userRequest.getDepartment());
         User newUser = mapper.toEntity(userRequest, User.class);
-        String salt = createSalt();
-        // 솔트값, 해싱된 Password
         User findUser = getUserOrThrow(id);
-        findUser.setSalt(salt);
-        findUser.setPassword(passwordHashing(userRequest.getPassword().getBytes(), salt));
         findUser.put(newUser, newDepartment);
         userRepository.save(findUser);
         return mapper.toResponse(findUser, UserResponse.class);
@@ -184,7 +176,6 @@ public class UserServiceImpl implements UserService {
     public TokenResponse reissue(TokenRequest tokenRequestDto) throws CustomJwtException {
         // 1. Refresh Token , AccessToken 검증
         jwtTokenProvider.validateToken(tokenRequestDto.getRefreshToken(), "refreshToken");
-        jwtTokenProvider.validateToken(tokenRequestDto.getAccessToken(), "accessToken");
 
         // 2. Access Token user 인증정보 조회
         Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(tokenRequestDto.getAccessToken());
@@ -213,8 +204,6 @@ public class UserServiceImpl implements UserService {
 
         return tokenResponse.putToken(newAccessToken, newRefreshToken);
     }
-
-    private static final int SALT_SIZE = 16;
 
     // salt 값 생성
     private String createSalt() {

@@ -76,12 +76,11 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Column(name = "IMAGE_URL", columnDefinition = "varchar(255) COMMENT '프로필사진 url'")
     private String imageUrl;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<UserRole> userRoles = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    private List<UserRole> userRoles = new ArrayList<>();
 
     public void put(User newUser, Department newDepartment) {
-        setUserCode(newUser.userCode);
         setKorName(newUser.korName);
         setDepartment(newDepartment);
         setPosition(newUser.position);
@@ -101,20 +100,17 @@ public class User extends BaseTimeEntity implements UserDetails {
         setDeleteYn(true);
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
 //    @Override
 //    public Collection<? extends GrantedAuthority> getAuthorities() {
 //        return this.userRoles.stream()
-//                .map(SimpleGrantedAuthority::new)
+//                .map(userRole -> new SimpleGrantedAuthority(userRole.getRole().getRole()))
 //                .collect(Collectors.toList());
 //    }
-
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.userRoles.stream()
-                .map(userRole -> new SimpleGrantedAuthority(userRole.getRole().getRole()))
-                .collect(Collectors.toList());
-    }
 
     @Override
     public String getUsername() {
