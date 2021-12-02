@@ -15,6 +15,9 @@ import static com.mes.mesBackend.exception.Message.*;
 @Setter
 @Schema(description = "작업장별 세부 점검항목")
 public class WorkCenterCheckDetailRequest {
+    @Schema(description = "점검코드")
+    @NotBlank(message = NOT_EMPTY)
+    String checkCode;
 
     @Schema(description = "점검항목")
     @NotBlank(message = NOT_EMPTY)

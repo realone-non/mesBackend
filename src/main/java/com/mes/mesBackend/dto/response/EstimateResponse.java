@@ -53,6 +53,6 @@ public class EstimateResponse {
     @Schema(description = "DESTINATION")
     String destination;
 
-    @Schema(description = "사용여부")
-    boolean useYn;
+    @Schema(description = "비고")
+    String note;
 }

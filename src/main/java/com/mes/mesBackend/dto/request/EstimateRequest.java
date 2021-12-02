@@ -57,7 +57,6 @@ public class EstimateRequest {
     @Schema(description = "DESTINATION")
     String destination;
 
-    @Schema(description = "사용여부")
-    @NotNull(message = NOT_NULL)
-    boolean useYn;
+    @Schema(description = "비고")
+    String note;
 }

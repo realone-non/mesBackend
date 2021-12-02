@@ -34,6 +34,9 @@ public class WorkCenterCheckDetail extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업장별 세부 점검항목 고유아이디'")
     private Long id;
 
+    @Column(name = "CHECK_CODE", columnDefinition = "varchar(255) COMMENT '점검코드'", nullable = false)
+    private String checkCode;
+
     // 다대일 단방향 매핑
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "WORK_CENTER_CHECK", nullable = false, columnDefinition = "bigint COMMENT '작업장별 점검항목'")
@@ -77,6 +80,7 @@ public class WorkCenterCheckDetail extends BaseTimeEntity {
     }
 
     public void put(WorkCenterCheckDetail newWorkCenterCheckDetail) {
+        setCheckCode(newWorkCenterCheckDetail.checkCode);
         setCheckCategory(newWorkCenterCheckDetail.checkCategory);
         setCheckContent(newWorkCenterCheckDetail.checkContent);
         setCheckCriteria(newWorkCenterCheckDetail.checkCriteria);
