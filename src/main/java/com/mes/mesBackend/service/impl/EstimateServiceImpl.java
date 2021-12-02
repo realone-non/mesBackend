@@ -9,18 +9,12 @@ import com.mes.mesBackend.dto.response.EstimateResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.Constants;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.EstimateItemDetailRepository;
 import com.mes.mesBackend.repository.EstimateRepository;
 import com.mes.mesBackend.repository.PiRepository;
-import com.mes.mesBackend.service.ClientService;
-import com.mes.mesBackend.service.CurrencyService;
-import com.mes.mesBackend.service.EstimateService;
-import com.mes.mesBackend.service.ItemService;
+import com.mes.mesBackend.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -46,15 +40,18 @@ public class EstimateServiceImpl implements EstimateService {
     ItemService itemService;
     @Autowired
     PiRepository piRepository;
+    @Autowired
+    UserService userService;
 
     // 견적 생성
     @Override
     public EstimateResponse createEstimate(EstimateRequest estimateRequest) throws NotFoundException {
         Client client = clientService.getClientOrThrow(estimateRequest.getClient());
         Currency currency = currencyService.getCurrencyOrThrow(estimateRequest.getCurrency());
+        User user = userService.getUserOrThrow(estimateRequest.getUser());
         Estimate estimate = mapper.toEntity(estimateRequest, Estimate.class);
         String estimateNo = createEstimateNo();
-        estimate.addMapping(client, currency, estimateNo);
+        estimate.addMapping(client, currency, estimateNo, user);
         estimateRepository.save(estimate);
         return mapper.toResponse(estimate, EstimateResponse.class);
     }
@@ -98,8 +95,9 @@ public class EstimateServiceImpl implements EstimateService {
         Estimate findEstimate = getEstimateOrThrow(estimateId);
         Client newClient = clientService.getClientOrThrow(estimateRequest.getClient());
         Currency newCurrency = currencyService.getCurrencyOrThrow(estimateRequest.getCurrency());
+        User newUser = userService.getUserOrThrow(estimateRequest.getUser());
         Estimate newEstimate = mapper.toEntity(estimateRequest, Estimate.class);
-        findEstimate.update(newClient, newCurrency, newEstimate);
+        findEstimate.update(newClient, newCurrency, newEstimate, newUser);
         estimateRepository.save(findEstimate);
         return mapper.toResponse(findEstimate, EstimateResponse.class);
     }

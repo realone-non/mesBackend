@@ -8,7 +8,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static com.mes.mesBackend.exception.Message.*;
 
@@ -21,6 +20,11 @@ public class EstimateRequest {
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long client;
+
+    @Schema(description = "직원(담당자) id")
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
+    Long user;
 
     @Schema(description = "견적일자")
     @NotNull(message = NOT_NULL)

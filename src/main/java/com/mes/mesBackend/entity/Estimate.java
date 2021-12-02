@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -50,6 +48,10 @@ public class Estimate extends BaseTimeEntity {
     @JoinColumn(name = "CLIENT", nullable = false, columnDefinition = "bigint COMMENT '거래처'")
     private Client client;      // 거래처
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "USER", nullable = false, columnDefinition = "bigint COMMENT '직원'")
+    private User user;          // 담당자
+
     @Column(name = "ESTIMATE_DATE", nullable = false, columnDefinition = "date COMMENT '견적일자'")
     private LocalDate estimateDate;     // 견적일자
 
@@ -89,14 +91,15 @@ public class Estimate extends BaseTimeEntity {
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;
 
-    public void addMapping(Client client, Currency currency, String estimateNo) {
+    public void addMapping(Client client, Currency currency, String estimateNo, User user) {
         setClient(client);
         setCurrency(currency);
         // 견적번호 생성
         setEstimateNo(estimateNo);
+        setUser(user);
     }
 
-    public void update(Client newClient, Currency newCurrency, Estimate newEstimate) {
+    public void update(Client newClient, Currency newCurrency, Estimate newEstimate, User newUser) {
         setClient(newClient);
         setEstimateDate(newEstimate.estimateDate);
         setCurrency(newCurrency);
@@ -107,6 +110,7 @@ public class Estimate extends BaseTimeEntity {
         setTransportCondition(newEstimate.transportCondition);
         setForwader(newEstimate.forwader);
         setDestination(newEstimate.destination);
+        setUser(newUser);
     }
 
     public void delete() {

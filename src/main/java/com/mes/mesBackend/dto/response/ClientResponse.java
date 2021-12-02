@@ -63,7 +63,7 @@ public class ClientResponse {
         String clientCode;
         @Schema(description = "거래처명")
         String clientName;
-        @Schema(description = "회사담당자")
+        @Schema(description = "거래처담당자")
         String companyCharge;
     }
 }

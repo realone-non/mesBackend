@@ -74,8 +74,8 @@ public class EstimateController {
         return new ResponseEntity<>(estimateService.getEstimate(estimateId), HttpStatus.OK);
     }
 
-    // 견적 전체 조회 검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 담당자
-    @Operation(summary = "견적 전체 조회", description = "검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 담당자")
+    // 견적 전체 조회 검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 거래처 담당자
+    @Operation(summary = "견적 전체 조회", description = "검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 거래처 담당자")
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<EstimateResponse>> getEstimates(
@@ -83,7 +83,7 @@ public class EstimateController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "견적기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "견적기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "화폐 id") Long currencyId,
-            @RequestParam(required = false) @Parameter(description = "담당자 명") String chargeName
+            @RequestParam(required = false) @Parameter(description = "거래처 담당자 명") String chargeName
     ) {
         return new ResponseEntity<>(estimateService.getEstimates(clientName, fromDate, toDate, currencyId, chargeName), HttpStatus.OK);
     }

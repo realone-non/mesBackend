@@ -22,8 +22,11 @@ public class EstimateResponse {
     @Schema(description = "견적번호")
     String estimateNo;
 
-    @Schema(description = "거래처 id")
+    @Schema(description = "거래처")
     ClientResponse.idAndNameAndNoAndCharge client;
+
+    @Schema(description = "담당자")
+    UserResponse.idAndKorName user;
 
     @Schema(description = "견적일자")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")

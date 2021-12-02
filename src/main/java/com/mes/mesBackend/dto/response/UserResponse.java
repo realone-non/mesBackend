@@ -1,7 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mes.mesBackend.auth.TokenResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,25 +53,10 @@ public class UserResponse {
 
     @Getter
     @Setter
+    @Schema(description = "직원")
     public static class idAndKorName {
         Long id;
-        String korName;
-    }
-
-    @Getter
-    @Setter
-    @JsonInclude(NON_NULL)
-    @Schema(description = "직원")
-    public static class idAndKorNameAndEmail {
-        @Schema(description = "고유아이디")
-        Long id;
         @Schema(description = "이름")
-        String korName;
-        @Schema(description = "메일")
-        String mail;
-//        @Schema(description = "토큰")
-//        String token;
-        @Schema(description = "토큰dto")
-TokenResponse token;
+        String korName;    // 이름
     }
 }
