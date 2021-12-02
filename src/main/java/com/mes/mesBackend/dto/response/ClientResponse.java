@@ -9,6 +9,8 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Getter
 @Setter
+@JsonInclude(NON_NULL)
+@Schema(description = "거래처")
 public class ClientResponse {
     Long id;
     String clientCode;  // 거래처코드

@@ -44,7 +44,8 @@ public class WebSecurityConfig extends
                 .antMatchers("/auth/signin").permitAll()
                 .antMatchers("/auth/signup").permitAll()
                 .antMatchers("/auth/reissue").permitAll()
-                .anyRequest().permitAll()       // 그 외 나머지 요청은 누구나 접근
+                .antMatchers("/**").authenticated()
+//                .anyRequest().permitAll()       // 그 외 나머지 요청은 누구나 접근
                 // JwtFilter 를 addFilterBefore 로 등록했던 JwtAuthenticationFilter 클래스를 적용
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

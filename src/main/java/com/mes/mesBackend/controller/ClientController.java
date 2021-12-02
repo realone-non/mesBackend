@@ -29,6 +29,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 @RequestMapping(value = "/clients")
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Authorization")
 public class ClientController {
 
     @Autowired
