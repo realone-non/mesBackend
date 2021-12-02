@@ -5,7 +5,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.exception.Message.NOT_EMPTY;
 
 @Getter
 @Setter
@@ -14,6 +17,9 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 public class WorkCenterCheckDetailResponse {
     @Schema(description = "고유아이디")
     Long id;
+
+    @Schema(description = "점검코드")
+    String checkCode;
 
     @Schema(description = "점검항목")
     String checkCategory;
