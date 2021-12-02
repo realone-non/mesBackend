@@ -8,6 +8,8 @@ import lombok.Setter;
 @Setter
 @Schema(description = "불량항목")
 public class BadItemResponse {
+    @Schema(description = "고유아이디")
+    Long id;
 
     @Schema(description = "불량항목코드")
     String badItemCode;

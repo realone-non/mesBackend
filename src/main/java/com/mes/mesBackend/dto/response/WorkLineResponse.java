@@ -54,4 +54,16 @@ public class WorkLineResponse {
         String workProcessName;        // 작업공정
 
     }
+
+    @Getter
+    @Setter
+    @Schema(description = "작업라인")
+    public static class idAndName {
+        @Schema(description = "고유아이디")
+        Long id;
+
+        @Schema(description = "작업라인명")
+        String workLineName;
+    }
+
 }

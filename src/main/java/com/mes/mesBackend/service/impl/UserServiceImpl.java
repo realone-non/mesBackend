@@ -1,6 +1,5 @@
 package com.mes.mesBackend.service.impl;
 
-import com.mes.mesBackend.config.JwtTokenProvider;
 import com.mes.mesBackend.dto.request.UserRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.entity.Department;
@@ -31,8 +30,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     ModelMapper mapper;
-    @Autowired
-    JwtTokenProvider jwtTokenProvider;
 
     public User getUserOrThrow(Long id) throws NotFoundException {
         return userRepository.findByIdAndDeleteYnFalse(id)
@@ -128,7 +125,7 @@ public class UserServiceImpl implements UserService {
 //        System.out.println("입력받은 password의 해싱된 값: " + hashing);
 //        System.out.println(user.getPassword().equals(hashing));
         UserResponse.idAndKorNameAndEmail userResponse = mapper.toResponse(user, UserResponse.idAndKorNameAndEmail.class);
-        userResponse.setToken(jwtTokenProvider.createToken(user.getUserCode(), user.getRoles()));
+//        userResponse.setToken(jwtTokenProvider.createToken(user.getUserCode(), user.getRoles()));
         return userResponse;
     }
 

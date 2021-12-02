@@ -24,7 +24,6 @@ import java.util.List;
 @RequestMapping("/work-line-codes")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "X-AUTH-TOKEN")
 public class WorkLineCodeController {
     @Autowired
     WorkLineService workLineCodeService;
