@@ -69,5 +69,7 @@ public class UserResponse {
         String korName;
         @Schema(description = "메일")
         String mail;
+        @Schema(description = "토큰")
+        String token;
     }
 }

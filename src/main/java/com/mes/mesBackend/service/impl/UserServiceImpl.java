@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -57,6 +58,7 @@ public class UserServiceImpl implements UserService {
         // 솔트값, 해싱된 Password
         user.setSalt(salt);
         user.setPassword(passWordHashing(userRequest.getPassword().getBytes(), salt));
+        user.setRoles(Collections.singletonList("ROLE_USER"));
 
         user.addJoin(department);
         userRepository.save(user);
@@ -122,7 +124,9 @@ public class UserServiceImpl implements UserService {
 //        System.out.println("해당 유저의 해싱된 password: " + user.getPassword());
 //        System.out.println("입력받은 password의 해싱된 값: " + hashing);
 //        System.out.println(user.getPassword().equals(hashing));
-        return mapper.toResponse(user, UserResponse.idAndKorNameAndEmail.class);
+        UserResponse.idAndKorNameAndEmail userResponse = mapper.toResponse(user, UserResponse.idAndKorNameAndEmail.class);
+//        userResponse.setToken(jwtTokenProvider.createToken(user.getUserCode(), user.getRoles()));
+        return userResponse;
     }
 
     private static final int SALT_SIZE = 16;
