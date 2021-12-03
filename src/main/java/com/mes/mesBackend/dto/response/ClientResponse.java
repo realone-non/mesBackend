@@ -14,7 +14,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 public class ClientResponse {
     Long id;
     String clientCode;  // 거래처코드
-    String name;    // 거래처명
+    String clientName;    // 거래처명
     String shortName;      // 약어
     ClientTypeResponse clientType;   // 거래처 유형
     String businessNumber;  // 사업자등록번호

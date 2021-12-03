@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BadItemRepository extends JpaCustomRepository<BadItem, Long> {
+    boolean existsByBadItemCodeAndDeleteYnFalse(String badItemCode);
 }
