@@ -7,6 +7,7 @@ spring:
     username: admin
     password: SilverStar01!#
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: none
@@ -17,6 +18,18 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+
+  # mongoDB
+  data:
+    mongodb:
+      username: root
+      password: SilverStar01!@
+      authentication-database: admin
+      port: 27017
+      database: NON
+      host: ec2-52-78-41-194.ap-northeast-2.compute.amazonaws.com
+#      uri: mongodb://admin:SilverStar!@@ec2-52-78-41-194.ap-northeast-2.compute.amazonaws.com/NON?authSource=admin
+
 
 
   logging:
@@ -48,6 +61,7 @@ spring:
 
   freemarker:
     check-template-location: false
+
 
 cloud:
   aws:
@@ -85,3 +99,4 @@ jwt:
   token:
     secret-key: silverstarmesbackendapplication190501    # hash 에 사용되는 키
     header: Authorization                                # authorization 헤더로 전달
+

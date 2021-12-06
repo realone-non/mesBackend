@@ -3,13 +3,12 @@ package com.mes.mesBackend.service.impl;
 import com.mes.mesBackend.dto.request.BadItemRequest;
 import com.mes.mesBackend.dto.response.BadItemResponse;
 import com.mes.mesBackend.entity.BadItem;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.BadItemRepository;
 import com.mes.mesBackend.service.BadItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,12 +22,19 @@ public class BadItemServiceImpl implements BadItemService {
 
     // 불량항목 생성
     @Override
-    public BadItemResponse createBadItem(BadItemRequest badItemRequest) {
+    public BadItemResponse createBadItem(BadItemRequest badItemRequest) throws BadRequestException {
+        checkExistBadItemCode(badItemRequest.getBadItemCode());
         BadItem badItem = mapper.toEntity(badItemRequest, BadItem.class);
         badItemRepository.save(badItem);
         return mapper.toResponse(badItem, BadItemResponse.class);
-
     }
+
+    // 동일한 badItemCode가 존재하면 예외
+    private void checkExistBadItemCode(String badItemCode) throws BadRequestException {
+        boolean existByBadItemCode = badItemRepository.existsByBadItemCodeAndDeleteYnFalse(badItemCode);
+        if (existByBadItemCode) throw new BadRequestException("same badItemCode exists. input badItmeCode: " + badItemCode);
+    }
+
     // 불량항목 단일 조회
     @Override
     public BadItemResponse getBadItem(Long id) throws NotFoundException {
@@ -43,9 +49,14 @@ public class BadItemServiceImpl implements BadItemService {
     }
     // 불량항목 수정
     @Override
-    public BadItemResponse updateBadItem(Long id, BadItemRequest badItemRequest) throws NotFoundException {
+    public BadItemResponse updateBadItem(Long id, BadItemRequest badItemRequest) throws NotFoundException, BadRequestException {
         BadItem newBadItem = mapper.toEntity(badItemRequest, BadItem.class);
         BadItem findBadItem = getBadItemOrThrow(id);
+
+        if (!findBadItem.getBadItemCode().equals(badItemRequest.getBadItemCode())) {
+            checkExistBadItemCode(badItemRequest.getBadItemCode());
+        }
+
         findBadItem.update(newBadItem);
         badItemRepository.save(findBadItem);
         return mapper.toResponse(findBadItem, BadItemResponse.class);

@@ -2,22 +2,22 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.BadItemRequest;
 import com.mes.mesBackend.dto.response.BadItemResponse;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.BadItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,9 +29,16 @@ import java.util.List;
 @Tag(name = "bad-item", description = "불량항목 API")
 @RestController
 @SecurityRequirement(name = "Authorization")
+@Slf4j
 public class BadItemController {
     @Autowired
     BadItemService badItemService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(BadItemController.class);
+    private CustomLogger cLogger;
+
 
     @Operation(summary = "불량항목 생성", description = "")
     @PostMapping
@@ -42,9 +49,15 @@ public class BadItemController {
             }
     )
     public ResponseEntity<BadItemResponse> createBadItem(
-            @RequestBody @Valid BadItemRequest badItemRequest
-    ) {
-        return new ResponseEntity<>(badItemService.createBadItem(badItemRequest), HttpStatus.OK);
+            @RequestBody @Valid BadItemRequest badItemRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String header
+    ) throws BadRequestException {
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+
+        BadItemResponse badItem = badItemService.createBadItem(badItemRequest);
+        cLogger.createInfo(logService.getUserCode(header),badItem.getId(), "createdBadItem");
+
+        return new ResponseEntity<>(badItem, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -83,7 +96,7 @@ public class BadItemController {
     public ResponseEntity<BadItemResponse> updateBadItem(
             @PathVariable(value = "id") Long id,
             @RequestBody @Valid BadItemRequest badItemRequest
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         return new ResponseEntity<>(badItemService.updateBadItem(id, badItemRequest), HttpStatus.OK);
     }
 
