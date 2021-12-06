@@ -3,21 +3,19 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.MeasureRequest;
 import com.mes.mesBackend.dto.response.MeasureResponse;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.MeasureService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +31,11 @@ import java.util.List;
 public class MeasureController {
     @Autowired
     MeasureService measureService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(MeasureController.class);
+    private CustomLogger cLogger;
 
     // 계측기 생성
     @Operation(summary = "계측기 생성")
@@ -46,9 +49,13 @@ public class MeasureController {
             }
     )
     public ResponseEntity<MeasureResponse> createMeasure(
-            @RequestBody @Valid MeasureRequest measureRequest
+            @RequestBody @Valid MeasureRequest measureRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(measureService.createMeasure(measureRequest), HttpStatus.OK);
+        MeasureResponse measure = measureService.createMeasure(measureRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + measure.getId() + " from createMeasure.");
+        return new ResponseEntity<>(measure, HttpStatus.OK);
     }
 
     // 계측기 단일 조회
@@ -62,9 +69,13 @@ public class MeasureController {
             }
     )
     public ResponseEntity<MeasureResponse> getMeasure(
-            @PathVariable @Parameter(description = "계측기 id") Long id
+            @PathVariable @Parameter(description = "계측기 id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(measureService.getMeasure(id), HttpStatus.OK);
+        MeasureResponse measure = measureService.getMeasure(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + measure.getId() + " from getMeasure.");
+        return new ResponseEntity<>(measure, HttpStatus.OK);
     }
 
     // 계측기 전체 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
@@ -73,9 +84,13 @@ public class MeasureController {
     @ResponseBody
     public ResponseEntity<List<MeasureResponse>> getMeasures(
             @RequestParam(required = false) @Parameter(description = "GAUGE유형 id") Long gaugeId,
-            @RequestParam(required = false) @Parameter(description = "월") Long month
+            @RequestParam(required = false) @Parameter(description = "월") Long month,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(measureService.getMeasures(gaugeId, month), HttpStatus.OK);
+        List<MeasureResponse> measures = measureService.getMeasures(gaugeId, month);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of gaugeId: " + gaugeId + " from getMeasures.");
+        return new ResponseEntity<>(measures, HttpStatus.OK);
     }
 
     // 계측기 수정
@@ -91,9 +106,13 @@ public class MeasureController {
     )
     public ResponseEntity<MeasureResponse> updateMeasure(
             @PathVariable @Parameter(description = "계측기 id") Long id,
-            @RequestBody @Valid MeasureRequest measureRequest
+            @RequestBody @Valid MeasureRequest measureRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(measureService.updateMeasure(id, measureRequest), HttpStatus.OK);
+        MeasureResponse measure = measureService.updateMeasure(id, measureRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + measure.getId() + " from updateMeasure.");
+        return new ResponseEntity<>(measure, HttpStatus.OK);
     }
 
     // 계측기 삭제
@@ -106,8 +125,13 @@ public class MeasureController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity deleteMeasure(@PathVariable @Parameter(description = "계측기 id") Long id) throws NotFoundException {
+    public ResponseEntity deleteMeasure(
+            @PathVariable @Parameter(description = "계측기 id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
         measureService.deleteMeasure(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteMeasure.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

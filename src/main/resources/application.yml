@@ -1,13 +1,12 @@
 spring:
-#  profiles:
-#    include:
-#      - aws
+  # mySql
   datasource:
     url: jdbc:mysql://mes-dev.cyyxmbrc9eeg.ap-northeast-2.rds.amazonaws.com:3306/mes-dev?serverTimezone=UTC&characterEncoding=UTF-8
     username: admin
     password: SilverStar01!#
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  # jpa
   jpa:
     hibernate:
       ddl-auto: none
@@ -28,10 +27,8 @@ spring:
       port: 27017
       database: NON
       host: ec2-52-78-41-194.ap-northeast-2.compute.amazonaws.com
-#      uri: mongodb://admin:SilverStar!@@ec2-52-78-41-194.ap-northeast-2.compute.amazonaws.com/NON?authSource=admin
 
-
-
+  # log
   logging:
     level:
       org.hibernate.SQL: debug
@@ -50,19 +47,16 @@ spring:
     ssl:
       enabled: true
 
-
+  # multipartFile
   servlet:
      multipart:
        max-file-size:10MB
        max-request-size:10MB
-#  couchbase:
-#    env:
-#      timeouts:
 
   freemarker:
     check-template-location: false
 
-
+# aws s3 bucket
 cloud:
   aws:
     credentials:
@@ -88,6 +82,7 @@ server:
     whitelabel:
       enabled: true   # 에러 발생 시 Spring 기본 에러 페이지 노출 여부
 
+# swagger ui
 springdoc:
   swagger-ui:
     disable-swagger-default-url: true
@@ -95,6 +90,7 @@ springdoc:
   api-docs:
     path: /api-docs
 
+# jwt
 jwt:
   token:
     secret-key: silverstarmesbackendapplication190501    # hash 에 사용되는 키

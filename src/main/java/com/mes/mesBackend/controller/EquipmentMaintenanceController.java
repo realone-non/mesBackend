@@ -3,21 +3,19 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.EquipmentMaintenanceRequest;
 import com.mes.mesBackend.dto.response.EquipmentMaintenanceResponse;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.EquipmentMaintenanceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +31,11 @@ import java.util.List;
 public class EquipmentMaintenanceController {
     @Autowired
     EquipmentMaintenanceService equipmentMaintenanceService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(EquipmentMaintenanceController.class);
+    private CustomLogger cLogger;
 
     // 설비 보전항목 생성
     @Operation(summary = "설비 보전항목 생성")
@@ -46,9 +49,13 @@ public class EquipmentMaintenanceController {
             }
     )
     public ResponseEntity<EquipmentMaintenanceResponse> createEquipmentMaintenance(
-            @RequestBody @Valid EquipmentMaintenanceRequest equipmentMaintenanceRequest
+            @RequestBody @Valid EquipmentMaintenanceRequest equipmentMaintenanceRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(equipmentMaintenanceService.createEquipmentMaintenance(equipmentMaintenanceRequest), HttpStatus.OK);
+        EquipmentMaintenanceResponse equipmentMaintenance = equipmentMaintenanceService.createEquipmentMaintenance(equipmentMaintenanceRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + equipmentMaintenance.getId() + " from createEquipmentMaintenance.");
+        return new ResponseEntity<>(equipmentMaintenance, HttpStatus.OK);
     }
 
     // 설비 보전항목 단일 조회
@@ -62,17 +69,26 @@ public class EquipmentMaintenanceController {
             }
     )
     public ResponseEntity<EquipmentMaintenanceResponse> getEquipmentMaintenance(
-            @PathVariable @Parameter(description = "설비 보전항목 id") Long id
+            @PathVariable @Parameter(description = "설비 보전항목 id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(equipmentMaintenanceService.getEquipmentMaintenance(id), HttpStatus.OK);
+        EquipmentMaintenanceResponse equipmentMaintenance = equipmentMaintenanceService.getEquipmentMaintenance(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + equipmentMaintenance.getId() + " from getEquipmentMaintenance.");
+        return new ResponseEntity<>(equipmentMaintenance, HttpStatus.OK);
     }
 
     // 설비 보전항목 전체 조회
     @Operation(summary = "설비 보전항목 전체 조회", description = "")
     @GetMapping
     @ResponseBody
-    public ResponseEntity<List<EquipmentMaintenanceResponse>> getEquipmentMaintenances() {
-        return new ResponseEntity<>(equipmentMaintenanceService.getEquipmentMaintenances(), HttpStatus.OK);
+    public ResponseEntity<List<EquipmentMaintenanceResponse>> getEquipmentMaintenances(
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<EquipmentMaintenanceResponse> equipmentMaintenances = equipmentMaintenanceService.getEquipmentMaintenances();
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getEquipmentMaintenances.");
+        return new ResponseEntity<>(equipmentMaintenances, HttpStatus.OK);
     }
 
     // 설비 보전항목 수정
@@ -88,9 +104,13 @@ public class EquipmentMaintenanceController {
     )
     public ResponseEntity<EquipmentMaintenanceResponse> updateEquipmentMaintenance(
             @PathVariable @Parameter(description = "설비 보전항목 id") Long id,
-            @RequestBody @Valid EquipmentMaintenanceRequest equipmentMaintenanceRequest
+            @RequestBody @Valid EquipmentMaintenanceRequest equipmentMaintenanceRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(equipmentMaintenanceService.updateEquipmentMaintenance(id, equipmentMaintenanceRequest), HttpStatus.OK);
+        EquipmentMaintenanceResponse equipmentMaintenance = equipmentMaintenanceService.updateEquipmentMaintenance(id, equipmentMaintenanceRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + equipmentMaintenance.getId() + " from updateEquipmentMaintenance.");
+        return new ResponseEntity<>(equipmentMaintenance, HttpStatus.OK);
     }
 
     // 설비 보전항목 삭제
@@ -103,8 +123,13 @@ public class EquipmentMaintenanceController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity deleteEquipmentMaintenance(@PathVariable @Parameter(description = "설비 보전항목 id") Long id) throws NotFoundException {
+    public ResponseEntity deleteEquipmentMaintenance(
+            @PathVariable @Parameter(description = "설비 보전항목 id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
         equipmentMaintenanceService.deleteEquipmentMaintenance(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteEquipmentMaintenance.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

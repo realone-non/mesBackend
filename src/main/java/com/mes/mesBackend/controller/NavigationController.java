@@ -6,13 +6,19 @@ import com.mes.mesBackend.dto.request.SubNavRequest;
 import com.mes.mesBackend.dto.response.DetailNavResponse;
 import com.mes.mesBackend.dto.response.MainNavResponse;
 import com.mes.mesBackend.dto.response.SubNavResponse;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.NavigationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,13 +36,23 @@ public class NavigationController {
 
     @Autowired
     NavigationService navigationService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(NavigationController.class);
+    private CustomLogger cLogger;
 
     // 메인네비게이션 조회
     @GetMapping
     @ResponseBody
     @Operation(summary = "메인네비게이션 전체 조회")
-    public ResponseEntity<List<MainNavResponse>> getMainNavigations() {
-        return new ResponseEntity<>(navigationService.getMainNavigations(), HttpStatus.OK);
+    public ResponseEntity<List<MainNavResponse>> getMainNavigations(
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<MainNavResponse> mainNavigations = navigationService.getMainNavigations();
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getMainNavigations.");
+        return new ResponseEntity<>(mainNavigations, HttpStatus.OK);
     }
 
     // 메인네비게이션 생성
@@ -49,8 +65,14 @@ public class NavigationController {
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity<MainNavResponse> createHeader(@RequestBody @Valid MainNavRequest mainNavRequest) {
-        return new ResponseEntity<>(navigationService.createMainNavigation(mainNavRequest), HttpStatus.OK);
+    public ResponseEntity<MainNavResponse> createMainNavigation(
+            @RequestBody @Valid MainNavRequest mainNavRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        MainNavResponse mainNavigation = navigationService.createMainNavigation(mainNavRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + mainNavigation.getId() + " from createMainNavigation.");
+        return new ResponseEntity<>(mainNavigation, HttpStatus.OK);
     }
 
     // 메인네비게이션 수정
@@ -66,9 +88,13 @@ public class NavigationController {
     )
     public ResponseEntity<MainNavResponse> updateMainNavigation(
             @PathVariable(value = "main-nav-id") Long id,
-            @RequestBody @Valid MainNavRequest mainNavRequest
+            @RequestBody @Valid MainNavRequest mainNavRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(navigationService.updateMainNavigation(id, mainNavRequest), HttpStatus.OK);
+        MainNavResponse mainNav = navigationService.updateMainNavigation(id, mainNavRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + mainNav.getId() + " from updateMainNavigation.");
+        return new ResponseEntity<>(mainNav, HttpStatus.OK);
     }
 
     // 메인네비게이션바 삭제
@@ -81,8 +107,13 @@ public class NavigationController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity deleteMainNavigation(@PathVariable(value = "main-nav-id") Long id) {
+    public ResponseEntity deleteMainNavigation(
+            @PathVariable(value = "main-nav-id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
         navigationService.deleteMainNavigation(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteMainNavigation.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -96,8 +127,15 @@ public class NavigationController {
                     @ApiResponse(responseCode = "404", description = "not found resource"),
             }
     )
-    public ResponseEntity<List<SubNavResponse>> getSubNavigations(@PathVariable(value = "main-nav-id") Long mainNavId) {
-        return new ResponseEntity<>(navigationService.getSubNavigations(mainNavId), HttpStatus.OK);
+    public ResponseEntity<List<SubNavResponse>> getSubNavigations(
+            @PathVariable(value = "main-nav-id") Long mainNavId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<SubNavResponse> subNavigations = navigationService.getSubNavigations(mainNavId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of mainNavId: " + mainNavId +
+                " from getSubNavigations.");
+        return new ResponseEntity<>(subNavigations, HttpStatus.OK);
     }
 
     // 서브네비게이션바 생성
@@ -113,9 +151,13 @@ public class NavigationController {
     )
     public ResponseEntity<SubNavResponse> createSubNavigation(
             @PathVariable(value = "main-nav-id") Long mainNavId,
-            @RequestBody @Valid SubNavRequest subNavRequest
+            @RequestBody @Valid SubNavRequest subNavRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(navigationService.createSubNavigation(mainNavId, subNavRequest), HttpStatus.OK);
+        SubNavResponse subNavigation = navigationService.createSubNavigation(mainNavId, subNavRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + subNavigation.getId() + " from createSubNavigation.");
+        return new ResponseEntity<>(subNavigation, HttpStatus.OK);
     }
 
     // 서브네비게이션바 수정
@@ -131,9 +173,13 @@ public class NavigationController {
     )
     public ResponseEntity<SubNavResponse> updateSubNavigation(
             @PathVariable(value = "sub-nav-id") Long id,
-            @RequestBody @Valid SubNavRequest subNavRequest
+            @RequestBody @Valid SubNavRequest subNavRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(navigationService.updateSubNavigation(id, subNavRequest), HttpStatus.OK);
+        SubNavResponse subNav = navigationService.updateSubNavigation(id, subNavRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + subNav.getId() + " from updateSubNavigation.");
+        return new ResponseEntity<>(subNav, HttpStatus.OK);
     }
 
     // 서브네비게이션바 삭제
@@ -146,8 +192,13 @@ public class NavigationController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity deleteSubNavigation(@PathVariable Long id) {
+    public ResponseEntity deleteSubNavigation(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
         navigationService.deleteSubNavigation(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteSubNavigation.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -162,9 +213,14 @@ public class NavigationController {
             }
     )
     public ResponseEntity<List<DetailNavResponse>> getDetailNavigations(
-            @PathVariable(value = "sub-nav-id") Long subNavId
+            @PathVariable(value = "sub-nav-id") Long subNavId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(navigationService.getDetailNavigations(subNavId), HttpStatus.OK);
+        List<DetailNavResponse> detailNavigations = navigationService.getDetailNavigations(subNavId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of subNavId: " + subNavId +
+                " from getDetailNavigations.");
+        return new ResponseEntity<>(detailNavigations, HttpStatus.OK);
     }
 
     // 디테일네비게이션 생성
@@ -173,9 +229,13 @@ public class NavigationController {
     @Operation(summary = "디테일네비게이션 생성")
     public ResponseEntity<DetailNavResponse> createDetailNavigation(
             @PathVariable(value = "sub-nav-id") Long subNavId,
-            @RequestBody @Valid DetailNavRequest detailNavRequest
+            @RequestBody @Valid DetailNavRequest detailNavRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(navigationService.createDetailNavigation(subNavId, detailNavRequest), HttpStatus.OK);
+        DetailNavResponse detailNavigation = navigationService.createDetailNavigation(subNavId, detailNavRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + detailNavigation.getId() + " from createDetailNavigation.");
+        return new ResponseEntity<>(detailNavigation, HttpStatus.OK);
     }
 
     // 디테일네비게이션 수정
@@ -191,9 +251,13 @@ public class NavigationController {
     )
     public ResponseEntity<DetailNavResponse> updateDetailNavigation(
             @PathVariable(value = "detail-nav-id") Long detailNavId,
-            @RequestBody @Valid DetailNavRequest detailNavRequest
+            @RequestBody @Valid DetailNavRequest detailNavRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(navigationService.updateDetailNavigation(detailNavId, detailNavRequest), HttpStatus.OK);
+        DetailNavResponse detailNavigation = navigationService.updateDetailNavigation(detailNavId, detailNavRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + detailNavigation.getId() + " from updateDetailNavigation.");
+        return new ResponseEntity<>(detailNavigation, HttpStatus.OK);
     }
 
     // 디테일네비게이션 삭제
@@ -206,8 +270,13 @@ public class NavigationController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity deleteDetailNavigation(@PathVariable(value = "detail-nav-id") Long detailNavId) {
+    public ResponseEntity deleteDetailNavigation(
+            @PathVariable(value = "detail-nav-id") Long detailNavId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
         navigationService.deleteDetailNavigation(detailNavId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + detailNavId + " from deleteDetailNavigation.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

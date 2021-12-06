@@ -50,13 +50,11 @@ public class BadItemController {
     )
     public ResponseEntity<BadItemResponse> createBadItem(
             @RequestBody @Valid BadItemRequest badItemRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String header
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws BadRequestException {
-        cLogger = new MongoLogger(logger, "mongoTemplate");
-
         BadItemResponse badItem = badItemService.createBadItem(badItemRequest);
-        cLogger.createInfo(logService.getUserCode(header),badItem.getId(), "createdBadItem");
-
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + badItem.getId() + " from createBadItem.");
         return new ResponseEntity<>(badItem, HttpStatus.OK);
     }
 
@@ -70,16 +68,25 @@ public class BadItemController {
             }
     )
     public ResponseEntity<BadItemResponse> getBadItem(
-            @PathVariable(value = "id") Long id
+            @PathVariable(value = "id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(badItemService.getBadItem(id), HttpStatus.OK);
+        BadItemResponse badItem = badItemService.getBadItem(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + badItem.getId() + " from getBadItem.");
+        return new ResponseEntity<>(badItem, HttpStatus.OK);
     }
 
     @GetMapping
     @ResponseBody
     @Operation(summary = "불량항목 전체 조회", description = "")
-    public ResponseEntity<List<BadItemResponse>> getBadItems() {
-        return new ResponseEntity<>(badItemService.getBadItems(), HttpStatus.OK);
+    public ResponseEntity<List<BadItemResponse>> getBadItems(
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<BadItemResponse> badItems = badItemService.getBadItems();
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getBadItems.");
+        return new ResponseEntity<>(badItems, HttpStatus.OK);
     }
 
 
@@ -95,9 +102,13 @@ public class BadItemController {
     )
     public ResponseEntity<BadItemResponse> updateBadItem(
             @PathVariable(value = "id") Long id,
-            @RequestBody @Valid BadItemRequest badItemRequest
+            @RequestBody @Valid BadItemRequest badItemRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        return new ResponseEntity<>(badItemService.updateBadItem(id, badItemRequest), HttpStatus.OK);
+        BadItemResponse badItem = badItemService.updateBadItem(id, badItemRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + badItem.getId() + " from updateBadItem.");
+        return new ResponseEntity<>(badItem, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -109,8 +120,13 @@ public class BadItemController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteBadItem(@PathVariable(value = "id") Long id) throws NotFoundException {
+    public ResponseEntity<Void> deleteBadItem(
+            @PathVariable(value = "id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
         badItemService.deleteBadItem(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteBadItem.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

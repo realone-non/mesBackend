@@ -3,21 +3,19 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.BusinessTypeRequest;
 import com.mes.mesBackend.dto.response.BusinessTypeResponse;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.BusinessTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +32,12 @@ public class BusinessTypeController {
 
     @Autowired
     BusinessTypeService businessTypeService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(BusinessTypeController.class);
+    private CustomLogger cLogger;
+
 
     @Operation(summary = "업태생성", description = "")
     @PostMapping
@@ -44,9 +48,13 @@ public class BusinessTypeController {
             }
     )
     public ResponseEntity<BusinessTypeResponse> createBusinessType(
-            @RequestBody @Valid BusinessTypeRequest businessTypeRequest
+            @RequestBody @Valid BusinessTypeRequest businessTypeRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(businessTypeService.createBusinessType(businessTypeRequest), HttpStatus.OK);
+        BusinessTypeResponse businessType = businessTypeService.createBusinessType(businessTypeRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + businessType.getId() + " from createBusinessType.");
+        return new ResponseEntity<>(businessType, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -59,16 +67,25 @@ public class BusinessTypeController {
             }
     )
     public ResponseEntity<BusinessTypeResponse> getBusinessType(
-            @PathVariable(value = "id") Long id
+            @PathVariable(value = "id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(businessTypeService.getBusinessType(id), HttpStatus.OK);
+        BusinessTypeResponse businessType = businessTypeService.getBusinessType(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + businessType.getId() + " from getBusinessType.");
+        return new ResponseEntity<>(businessType, HttpStatus.OK);
     }
 
     @GetMapping
     @ResponseBody
     @Operation(summary = "업태 전체 조회", description = "")
-    public ResponseEntity<List<BusinessTypeResponse>> getBusinessTypes() {
-        return new ResponseEntity<>(businessTypeService.getBusinessTypes(), HttpStatus.OK);
+    public ResponseEntity<List<BusinessTypeResponse>> getBusinessTypes(
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<BusinessTypeResponse> businessTypes = businessTypeService.getBusinessTypes();
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getBusinessTypes.");
+        return new ResponseEntity<>(businessTypes, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
@@ -83,9 +100,13 @@ public class BusinessTypeController {
     )
     public ResponseEntity<BusinessTypeResponse> updateBusinessType(
             @PathVariable(value = "id") Long id,
-            @RequestBody @Valid BusinessTypeRequest businessTypeRequest
+            @RequestBody @Valid BusinessTypeRequest businessTypeRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(businessTypeService.updateBusinessType(id, businessTypeRequest), HttpStatus.OK);
+        BusinessTypeResponse businessType = businessTypeService.updateBusinessType(id, businessTypeRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + businessType.getId() + " from updateBusinessType.");
+        return new ResponseEntity<>(businessType, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -97,8 +118,13 @@ public class BusinessTypeController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteBusinessType(@PathVariable(value = "id") Long id) throws NotFoundException {
+    public ResponseEntity<Void> deleteBusinessType(
+            @PathVariable(value = "id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String header
+    ) throws NotFoundException {
         businessTypeService.deleteBusinessType(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(header) + " is deleted the " + id + " from deleteBusinessType.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

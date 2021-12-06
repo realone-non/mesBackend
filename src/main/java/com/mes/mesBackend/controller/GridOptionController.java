@@ -4,13 +4,19 @@ import com.mes.mesBackend.dto.request.GridOptionRequest;
 import com.mes.mesBackend.dto.response.GridOptionResponse;
 import com.mes.mesBackend.dto.response.HeaderResponse;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.GridOptionService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +33,13 @@ public class GridOptionController {
 
     @Autowired
     GridOptionService gridOptionService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(GridOptionController.class);
+    private CustomLogger cLogger;
+
+
 
     @PostMapping("/{header-id}/grid-options")
     @ResponseBody
@@ -41,9 +54,13 @@ public class GridOptionController {
     public ResponseEntity<GridOptionResponse> createGridOption(
             @PathVariable(value = "header-id") Long headerId,
             @PathVariable(value = "user-id") Long userId,
-            @RequestBody GridOptionRequest gridOptionRequest
+            @RequestBody GridOptionRequest gridOptionRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(gridOptionService.createGridOption(headerId, gridOptionRequest, userId), HttpStatus.OK);
+        GridOptionResponse gridOption = gridOptionService.createGridOption(headerId, gridOptionRequest, userId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + headerId + " from createGridOption.");
+        return new ResponseEntity<>(gridOption, HttpStatus.OK);
     }
 
     @GetMapping
@@ -57,8 +74,12 @@ public class GridOptionController {
     )
     public ResponseEntity<List<HeaderResponse>> getHeaderGridOptions(
             @PathVariable(value = "user-id") Long userId,
-            @RequestParam(value = "controller-name") String controllerName
+            @RequestParam(value = "controller-name") String controllerName,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(gridOptionService.getHeaderGridOptions(userId, controllerName), HttpStatus.OK);
+        List<HeaderResponse> headerGridOptions = gridOptionService.getHeaderGridOptions(userId, controllerName);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of controllerName: " + controllerName + " from getHeaderGridOptions.");
+        return new ResponseEntity<>(headerGridOptions, HttpStatus.OK);
     }
 }

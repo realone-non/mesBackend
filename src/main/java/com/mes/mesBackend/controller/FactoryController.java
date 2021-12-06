@@ -3,22 +3,20 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.FactoryRequest;
 import com.mes.mesBackend.dto.response.FactoryResponse;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.FactoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +32,15 @@ import java.util.List;
 @SecurityRequirement(name = "Authorization")
 public class FactoryController {
 
-    @Autowired FactoryService factoryService;
+    @Autowired
+    FactoryService factoryService;
+
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(FactoryController.class);
+    private CustomLogger cLogger;
+
 
     // 공장 생성
     @PostMapping
@@ -48,9 +54,13 @@ public class FactoryController {
             }
     )
     public ResponseEntity<FactoryResponse> createFactory(
-            @RequestBody @Valid FactoryRequest factoryRequest
+            @RequestBody @Valid FactoryRequest factoryRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(factoryService.createFactory(factoryRequest), HttpStatus.OK);
+        FactoryResponse factory = factoryService.createFactory(factoryRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + factory.getId() + " from createFactory.");
+        return new ResponseEntity<>(factory, HttpStatus.OK);
     }
 
     // 공장 단일 조회
@@ -63,16 +73,27 @@ public class FactoryController {
                     @ApiResponse(responseCode = "404", description = "not found resource"),
             }
     )
-    public ResponseEntity<FactoryResponse> getFactory(@PathVariable Long id) throws NotFoundException {
-        return new ResponseEntity<>(factoryService.getFactory(id), HttpStatus.OK);
+    public ResponseEntity<FactoryResponse> getFactory(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        FactoryResponse factory = factoryService.getFactory(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + factory.getId() + " from getFactory.");
+        return new ResponseEntity<>(factory, HttpStatus.OK);
     }
 
     // 공장 전체 조회
     @GetMapping
     @ResponseBody
     @Operation(summary = "공장 전체 조회")
-    public ResponseEntity<List<FactoryResponse>> getFactories() {
-        return new ResponseEntity<>(factoryService.getFactories(), HttpStatus.OK);
+    public ResponseEntity<List<FactoryResponse>> getFactories(
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<FactoryResponse> factories = factoryService.getFactories();
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getFactories.");
+        return new ResponseEntity<>(factories, HttpStatus.OK);
     }
 
     // 공장 수정
@@ -88,9 +109,13 @@ public class FactoryController {
     )
     public ResponseEntity<FactoryResponse> updateFactory(
             @PathVariable Long id,
-            @RequestBody @Valid FactoryRequest factoryRequest
+            @RequestBody @Valid FactoryRequest factoryRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(factoryService.updateFactory(id, factoryRequest), HttpStatus.OK);
+        FactoryResponse factory = factoryService.updateFactory(id, factoryRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + factory.getId() + " from updateFactory.");
+        return new ResponseEntity<>(factory, HttpStatus.OK);
     }
 
     // 공장 삭제
@@ -103,8 +128,13 @@ public class FactoryController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteFactory(@PathVariable Long id) throws NotFoundException {
+    public ResponseEntity<Void> deleteFactory(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
         factoryService.deleteFactory(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteFactory.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

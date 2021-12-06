@@ -3,22 +3,20 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.WorkCenterRequest;
 import com.mes.mesBackend.dto.response.WorkCenterResponse;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.WorkCenterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +34,11 @@ public class WorkCenterController {
 
     @Autowired
     WorkCenterService workCenterService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(WorkCenterController.class);
+    private CustomLogger cLogger;
 
     // 작업장 생성
     @PostMapping
@@ -49,9 +52,13 @@ public class WorkCenterController {
             }
     )
     public ResponseEntity<WorkCenterResponse> createWorkCenter(
-            @RequestBody @Valid WorkCenterRequest workCenterRequest
+            @RequestBody @Valid WorkCenterRequest workCenterRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(workCenterService.createWorkCenter(workCenterRequest), HttpStatus.OK);
+        WorkCenterResponse workCenter = workCenterService.createWorkCenter(workCenterRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + workCenter.getId() + " from createWorkCenter.");
+        return new ResponseEntity<>(workCenter, HttpStatus.OK);
     }
 
     // 작업장 단일 조회
@@ -65,17 +72,26 @@ public class WorkCenterController {
             }
     )
     public ResponseEntity<WorkCenterResponse> getWorkCenter(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(workCenterService.getWorkCenter(id), HttpStatus.OK);
+        WorkCenterResponse workCenter = workCenterService.getWorkCenter(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + workCenter.getId() + " from getWorkCenter.");
+        return new ResponseEntity<>(workCenter, HttpStatus.OK);
     }
 
     // 작업장 전체 조회
     @GetMapping
     @ResponseBody
     @Operation(summary = "작업장 전체 조회")
-    public ResponseEntity<List<WorkCenterResponse>> getWorkCenters() {
-        return new ResponseEntity<>(workCenterService.getWorkCenters(), HttpStatus.OK);
+    public ResponseEntity<List<WorkCenterResponse>> getWorkCenters(
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<WorkCenterResponse> workCenters = workCenterService.getWorkCenters();
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkCenters.");
+        return new ResponseEntity<>(workCenters, HttpStatus.OK);
     }
 
     // 작업장 수정
@@ -91,9 +107,13 @@ public class WorkCenterController {
     )
     public ResponseEntity<WorkCenterResponse> updateWorkCenter(
             @PathVariable Long id,
-            @RequestBody @Valid WorkCenterRequest workCenterRequest
+            @RequestBody @Valid WorkCenterRequest workCenterRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(workCenterService.updateWorkCenter(id, workCenterRequest), HttpStatus.OK);
+        WorkCenterResponse workCenter = workCenterService.updateWorkCenter(id, workCenterRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + workCenter.getId() + " from updateWorkCenter.");
+        return new ResponseEntity<>(workCenter, HttpStatus.OK);
     }
 
     // 작업장 삭제
@@ -107,9 +127,12 @@ public class WorkCenterController {
             }
     )
     public ResponseEntity<Void> deleteWorkCenter(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         workCenterService.deleteWorkCenter(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteWorkCenter.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

@@ -13,11 +13,15 @@ import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.CustomJwtException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.RefreshTokenRepository;
 import com.mes.mesBackend.repository.UserRepository;
 import com.mes.mesBackend.service.DepartmentService;
 import com.mes.mesBackend.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,6 +52,10 @@ public class UserServiceImpl implements UserService {
     RefreshTokenRepository refreshTokenRepository;
 
     private static final int SALT_SIZE = 16;
+
+    private Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
+    private CustomLogger cLogger;
+
 
     public User getUserOrThrow(Long id) throws NotFoundException {
         return userRepository.findByIdAndDeleteYnFalse(id)
@@ -129,6 +137,7 @@ public class UserServiceImpl implements UserService {
     // 로그인
     @Override
     public TokenResponse getLogin(UserLogin userLogin) throws NotFoundException, BadRequestException {
+        cLogger = new MongoLogger(logger, "mongoTemplate");
         User user = userRepository.findByUserCode(userLogin.getUserCode())
                 .orElseThrow(() -> new NotFoundException("user does not exist. input userCode: " + userLogin.getUserCode()));
 
@@ -137,6 +146,7 @@ public class UserServiceImpl implements UserService {
 
         // 저장소에 해싱되어 있는 Password 와 입력받은 Password 의 해싱된 값과 맞는지 비교
         if (!user.getPassword().equals(hashing)) {
+            cLogger.error("password is not correct.");
             throw new BadRequestException("password is not correct.");
         }
 
@@ -174,6 +184,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public TokenResponse reissue(TokenRequest tokenRequestDto) throws CustomJwtException {
+        cLogger = new MongoLogger(logger, "mongoTemplate");
         // 1. Refresh Token , AccessToken 검증
         jwtTokenProvider.validateToken(tokenRequestDto.getRefreshToken(), "refreshToken");
 

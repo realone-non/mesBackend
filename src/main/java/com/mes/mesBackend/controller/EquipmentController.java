@@ -2,23 +2,20 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.EquipmentRequest;
 import com.mes.mesBackend.dto.response.EquipmentResponse;
-import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.EquipmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +31,11 @@ import java.util.List;
 public class EquipmentController {
     @Autowired
     EquipmentService equipmentService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(EquipmentController.class);
+    private CustomLogger cLogger;
 
     // 설비 생성
     @Operation(summary = "설비 생성")
@@ -47,9 +49,13 @@ public class EquipmentController {
             }
     )
     public ResponseEntity<EquipmentResponse> createEquipment(
-            @RequestBody @Valid EquipmentRequest equipmentRequest
+            @RequestBody @Valid EquipmentRequest equipmentRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(equipmentService.createEquipment(equipmentRequest), HttpStatus.OK);
+        EquipmentResponse equipment = equipmentService.createEquipment(equipmentRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + equipment.getId() + " from createEquipment.");
+        return new ResponseEntity<>(equipment, HttpStatus.OK);
     }
 
     // 설비 단일 조회
@@ -63,17 +69,26 @@ public class EquipmentController {
             }
     )
     public ResponseEntity<EquipmentResponse> getEquipment(
-            @PathVariable @Parameter(description = "설비 id") Long id
+            @PathVariable @Parameter(description = "설비 id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(equipmentService.getEquipment(id), HttpStatus.OK);
+        EquipmentResponse equipment = equipmentService.getEquipment(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + equipment.getId() + " from getEquipment.");
+        return new ResponseEntity<>(equipment, HttpStatus.OK);
     }
 
     // 설비 전체 조회 검색조건: 설비명
     @Operation(summary = "설비 전체 조회", description = "")
     @GetMapping
     @ResponseBody
-    public ResponseEntity<List<EquipmentResponse>> getEquipments() {
-        return new ResponseEntity<>(equipmentService.getEquipments(), HttpStatus.OK);
+    public ResponseEntity<List<EquipmentResponse>> getEquipments(
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<EquipmentResponse> equipments = equipmentService.getEquipments();
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getEquipments.");
+        return new ResponseEntity<>(equipments, HttpStatus.OK);
     }
 
     // 설비 수정
@@ -89,9 +104,13 @@ public class EquipmentController {
     )
     public ResponseEntity<EquipmentResponse> updateEquipment(
             @PathVariable @Parameter(description = "설비 id") Long id,
-            @RequestBody @Valid EquipmentRequest equipmentRequest
-    ) throws NotFoundException, BadRequestException {
-        return new ResponseEntity<>(equipmentService.updateEquipment(id, equipmentRequest), HttpStatus.OK);
+            @RequestBody @Valid EquipmentRequest equipmentRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        EquipmentResponse equipment = equipmentService.updateEquipment(id, equipmentRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + equipment.getId() + " from updateEquipment.");
+        return new ResponseEntity<>(equipment, HttpStatus.OK);
     }
 
     // 설비 삭제
@@ -104,8 +123,13 @@ public class EquipmentController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity deleteEquipment(@PathVariable @Parameter(description = "설비 id") Long id) throws NotFoundException {
+    public ResponseEntity deleteEquipment(
+            @PathVariable @Parameter(description = "설비 id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
         equipmentService.deleteEquipment(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteEquipment.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

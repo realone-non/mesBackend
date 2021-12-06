@@ -5,22 +5,20 @@ import com.mes.mesBackend.dto.request.BomMasterRequest;
 import com.mes.mesBackend.dto.response.BomItemResponse;
 import com.mes.mesBackend.dto.response.BomMasterResponse;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.BomMasterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +37,11 @@ public class BomMasterController {
 
     @Autowired
     BomMasterService bomMasterService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(BomMasterController.class);
+    private CustomLogger cLogger;
     
     @Operation(summary = "BOM 마스터 생성")
     @PostMapping
@@ -50,8 +53,14 @@ public class BomMasterController {
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity<BomMasterResponse> createBomMaster(@RequestBody @Valid BomMasterRequest bomMasterRequest) throws NotFoundException {
-        return new ResponseEntity<>(bomMasterService.createBomMaster(bomMasterRequest), HttpStatus.OK);
+    public ResponseEntity<BomMasterResponse> createBomMaster(
+            @RequestBody @Valid BomMasterRequest bomMasterRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        BomMasterResponse bomMaster = bomMasterService.createBomMaster(bomMasterRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + bomMaster.getId() + " from createBomMaster.");
+        return new ResponseEntity<>(bomMaster, HttpStatus.OK);
     }
     
     @Operation(summary = "BOM 마스터 단일 조회")
@@ -64,9 +73,13 @@ public class BomMasterController {
             }
     )
     public ResponseEntity<BomMasterResponse> getBomMaster(
-            @PathVariable(value = "bom-master-id") @Parameter(description = "BOM 마스터 id") Long bomMasterId
+            @PathVariable(value = "bom-master-id") @Parameter(description = "BOM 마스터 id") Long bomMasterId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(bomMasterService.getBomMaster(bomMasterId), HttpStatus.OK);
+        BomMasterResponse bomMaster = bomMasterService.getBomMaster(bomMasterId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + bomMaster.getId() + " from getBomMaster.");
+        return new ResponseEntity<>(bomMaster, HttpStatus.OK);
     }
     
     @Operation(summary = "BOM 마스터 전체 조회", description = "검색조건: 품목계정, 품목그룹, 품번|품명")
@@ -75,9 +88,13 @@ public class BomMasterController {
     public ResponseEntity<List<BomMasterResponse>> getBomMasters(
             @RequestParam(required = false) @Parameter(description = "품목계정 id") Long itemAccountId,
             @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
-            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoAndItemName
+            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoAndItemName,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(bomMasterService.getBomMasters(itemAccountId, itemGroupId, itemNoAndItemName), HttpStatus.OK);
+        List<BomMasterResponse> bomMasters = bomMasterService.getBomMasters(itemAccountId, itemGroupId, itemNoAndItemName);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of itemAccountId: " +itemAccountId + ", itemGroupId : " + itemGroupId + " from getBomMasters.");
+        return new ResponseEntity<>(bomMasters, HttpStatus.OK);
     }
     
     @Operation(summary = "BOM 마스터 수정")
@@ -92,9 +109,13 @@ public class BomMasterController {
     )
     public ResponseEntity<BomMasterResponse> updateBomMaster(
             @PathVariable(value = "bom-master-id") @Parameter(description = "BOM 마스터 id") Long bomMasterId,
-            @RequestBody @Valid BomMasterRequest bomMasterRequest
+            @RequestBody @Valid BomMasterRequest bomMasterRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(bomMasterService.updateBomMaster(bomMasterId, bomMasterRequest), HttpStatus.OK);
+        BomMasterResponse bomMaster = bomMasterService.updateBomMaster(bomMasterId, bomMasterRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + bomMaster.getId() + " from updateBomMaster.");
+        return new ResponseEntity<>(bomMaster, HttpStatus.OK);
     }
     
     @Operation(summary = "BOM 마스터 삭제")
@@ -107,9 +128,12 @@ public class BomMasterController {
             }
     )
     public ResponseEntity deleteBomMaster(
-            @PathVariable(value = "bom-master-id") @Parameter(description = "BOM 마스터 id") Long bomMasterId
+            @PathVariable(value = "bom-master-id") @Parameter(description = "BOM 마스터 id") Long bomMasterId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         bomMasterService.deleteBomMaster(bomMasterId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + bomMasterId + " from deleteBomMaster.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
     
@@ -125,9 +149,13 @@ public class BomMasterController {
     )
     public ResponseEntity<BomItemResponse> createBomItem(
             @PathVariable(value = "bom-master-id") @Parameter(description = "BOM 마스터 id") Long bomMasterId,
-            @RequestBody @Valid BomItemRequest bomMasterDetailRequest
+            @RequestBody @Valid BomItemRequest bomMasterDetailRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(bomMasterService.createBomItem(bomMasterId, bomMasterDetailRequest), HttpStatus.OK);
+        BomItemResponse bomItem = bomMasterService.createBomItem(bomMasterId, bomMasterDetailRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + bomItem.getId() + " from createBomItem.");
+        return new ResponseEntity<>(bomItem, HttpStatus.OK);
     }
     
     @Operation(summary = "BOM 품목 리스트 조회")
@@ -141,9 +169,13 @@ public class BomMasterController {
     )
     public ResponseEntity<List<BomItemResponse>> getBomItems(
             @PathVariable(value = "bom-master-id") @Parameter(description = "BOM 마스터 id") Long bomMasterId,
-            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoOrItemName
+            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoOrItemName,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(bomMasterService.getBomItems(bomMasterId, itemNoOrItemName), HttpStatus.OK);
+        List<BomItemResponse> bomItems = bomMasterService.getBomItems(bomMasterId, itemNoOrItemName);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getBomItems.");
+        return new ResponseEntity<>(bomItems, HttpStatus.OK);
     }
     
     @Operation(summary = "BOM 품목 수정")
@@ -159,9 +191,13 @@ public class BomMasterController {
     public ResponseEntity<BomItemResponse> updateBomItem(
             @PathVariable(value = "bom-master-id") @Parameter(description = "BOM 마스터 id") Long bomMasterId,
             @PathVariable(value = "bom-item-id") @Parameter(description = "BOM 품목 id") Long bomItemId,
-            @RequestBody @Valid BomItemRequest bomMasterDetailRequest
+            @RequestBody @Valid BomItemRequest bomMasterDetailRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(bomMasterService.updateBomItem(bomMasterId, bomItemId, bomMasterDetailRequest), HttpStatus.OK);
+        BomItemResponse bomItem = bomMasterService.updateBomItem(bomMasterId, bomItemId, bomMasterDetailRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + bomItem.getId() + " from updateBomItem.");
+        return new ResponseEntity<>(bomItem, HttpStatus.OK);
     }
     
     @DeleteMapping("/{bom-master-id}/bom-items/{bom-item-id}")
@@ -175,9 +211,12 @@ public class BomMasterController {
     )
     public ResponseEntity deleteBomItem(
             @PathVariable(value = "bom-master-id") @Parameter(description = "BOM 마스터 id") Long bomMasterId,
-            @PathVariable(value = "bom-item-id") @Parameter(description = "BOM 품목 id") Long bomItemId
+            @PathVariable(value = "bom-item-id") @Parameter(description = "BOM 품목 id") Long bomItemId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String header
     ) throws NotFoundException {
         bomMasterService.deleteBomItem(bomMasterId, bomItemId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(header) + " is deleted the " + bomItemId + " from deleteBomItem.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -192,9 +231,13 @@ public class BomMasterController {
     )
     public ResponseEntity<BomItemResponse> getBomItem(
             @PathVariable(value = "bom-master-id") @Parameter(description = "BOM 마스터 id") Long bomMasterId,
-            @PathVariable(value = "bom-item-id") @Parameter(description = "BOM 품목 id") Long bomItemId
+            @PathVariable(value = "bom-item-id") @Parameter(description = "BOM 품목 id") Long bomItemId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(bomMasterService.getBomItem(bomMasterId, bomItemId), HttpStatus.OK);
+        BomItemResponse bomItem = bomMasterService.getBomItem(bomMasterId, bomItemId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + bomItem.getId() + " from getBomItem.");
+        return new ResponseEntity<>(bomItem, HttpStatus.OK);
     }
 
 //    @Operation(summary = "BOM 마스터 페이징 조회", description = "검색조건: 품목계정, 품목그룹, 품번|품명")

@@ -3,13 +3,19 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.WorkLineRequest;
 import com.mes.mesBackend.dto.response.WorkLineResponse;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.WorkLineService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +33,11 @@ import java.util.List;
 public class WorkLineController {
     @Autowired
     WorkLineService workLineService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(WorkLineController.class);
+    private CustomLogger cLogger;
 
     // 작업라인 생성
     @PostMapping
@@ -40,9 +51,13 @@ public class WorkLineController {
             }
     )
     public ResponseEntity<WorkLineResponse> createWorkLine(
-            @RequestBody @Valid WorkLineRequest workLineRequest
+            @RequestBody @Valid WorkLineRequest workLineRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(workLineService.createWorkLine(workLineRequest), HttpStatus.OK);
+        WorkLineResponse workLine = workLineService.createWorkLine(workLineRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + workLine.getId() + " from createWorkLine.");
+        return new ResponseEntity<>(workLine, HttpStatus.OK);
     }
 
     // 작업라인 단일 조회
@@ -56,17 +71,26 @@ public class WorkLineController {
             }
     )
     public ResponseEntity<WorkLineResponse> getWorkLine(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(workLineService.getWorkLine(id), HttpStatus.OK);
+        WorkLineResponse workLine = workLineService.getWorkLine(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + workLine.getId() + " from getWorkLine.");
+        return new ResponseEntity<>(workLine, HttpStatus.OK);
     }
 
     // 작업라인 전체 조회
     @GetMapping
     @ResponseBody()
     @Operation(summary = "작업라인 전체 조회")
-    public ResponseEntity<List<WorkLineResponse>> getWorkLines() {
-        return new ResponseEntity<>(workLineService.getWorkLines(), HttpStatus.OK);
+    public ResponseEntity<List<WorkLineResponse>> getWorkLines(
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<WorkLineResponse> workLines = workLineService.getWorkLines();
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkLines.");
+        return new ResponseEntity<>(workLines, HttpStatus.OK);
     }
 
     // 작업라인 수정
@@ -82,9 +106,13 @@ public class WorkLineController {
     )
     public ResponseEntity<WorkLineResponse> updateWorkLine(
             @PathVariable Long id,
-            @RequestBody @Valid WorkLineRequest workLineRequest
+            @RequestBody @Valid WorkLineRequest workLineRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(workLineService.updateWorkLine(id, workLineRequest), HttpStatus.OK);
+        WorkLineResponse workLine = workLineService.updateWorkLine(id, workLineRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + workLine.getId() + " from updateWorkLine.");
+        return new ResponseEntity<>(workLine, HttpStatus.OK);
     }
 
     // 작업라인 삭제
@@ -98,9 +126,12 @@ public class WorkLineController {
             }
     )
     public ResponseEntity<Void> deleteWorkLine(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         workLineService.deleteWorkLine(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteWorkLine.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

@@ -3,13 +3,19 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.HeaderRequest;
 import com.mes.mesBackend.dto.response.HeaderResponse;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.HeaderService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +33,11 @@ public class HeaderController {
 
     @Autowired
     HeaderService headerService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(HeaderController.class);
+    private CustomLogger cLogger;
 
     // 헤더조회
     @GetMapping("/{controller-name}")
@@ -39,9 +50,13 @@ public class HeaderController {
             }
     )
     public ResponseEntity<List<HeaderResponse>> getHeaders(
-            @PathVariable(value = "controller-name") String controllerName
+            @PathVariable(value = "controller-name") String controllerName,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(headerService.getHeaders(controllerName), HttpStatus.OK);
+        List<HeaderResponse> headers = headerService.getHeaders(controllerName);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the controllerName: " + controllerName + " from getHeaders.");
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
     // 헤더생성
@@ -55,8 +70,14 @@ public class HeaderController {
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity<HeaderResponse> createHeader(@RequestBody @Valid HeaderRequest headerRequest) {
-        return new ResponseEntity<>(headerService.createHeader(headerRequest), HttpStatus.OK);
+    public ResponseEntity<HeaderResponse> createHeader(
+            @RequestBody @Valid HeaderRequest headerRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        HeaderResponse header = headerService.createHeader(headerRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the header: " + headerRequest.getHeader()  + " from createHeader.");
+        return new ResponseEntity<>(header, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
@@ -71,9 +92,13 @@ public class HeaderController {
     )
     public ResponseEntity<HeaderResponse> updateHeader(
             @PathVariable Long id,
-            @RequestBody @Valid HeaderRequest headerRequest
+            @RequestBody @Valid HeaderRequest headerRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(headerService.updateHeader(id, headerRequest), HttpStatus.OK);
+        HeaderResponse header = headerService.updateHeader(id, headerRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + header.getId() + " from updateHeader.");
+        return new ResponseEntity<>(header, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -85,8 +110,13 @@ public class HeaderController {
                     @ApiResponse(responseCode = "404", description = "not found resource"),
             }
     )
-    public ResponseEntity deleteHeader(@PathVariable Long id) {
+    public ResponseEntity deleteHeader(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
         headerService.deleteHeader(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteHeader.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

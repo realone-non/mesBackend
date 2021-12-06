@@ -3,22 +3,20 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.DepartmentRequest;
 import com.mes.mesBackend.dto.response.DepartmentResponse;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.DepartmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +32,13 @@ import java.util.List;
 @SecurityRequirement(name = "Authorization")
 public class DepartmentController {
 
-    @Autowired DepartmentService departmentService;
+    @Autowired 
+    DepartmentService departmentService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(DepartmentController.class);
+    private CustomLogger cLogger;
 
     // 부서 생성
     @PostMapping
@@ -48,9 +52,13 @@ public class DepartmentController {
             }
     )
     public ResponseEntity<DepartmentResponse> createDepartment(
-            @RequestBody @Valid DepartmentRequest departmentRequest
+            @RequestBody @Valid DepartmentRequest departmentRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(departmentService.createDepartment(departmentRequest), HttpStatus.OK);
+        DepartmentResponse department = departmentService.createDepartment(departmentRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + department.getId() + " from createDepartment.");
+        return new ResponseEntity<>(department, HttpStatus.OK);
     }
 
     // 부서 단일 조회
@@ -63,16 +71,27 @@ public class DepartmentController {
                     @ApiResponse(responseCode = "404", description = "not found resource"),
             }
     )
-    public ResponseEntity<DepartmentResponse> getDepartment(@PathVariable Long id) throws NotFoundException {
-        return new ResponseEntity<>(departmentService.getDepartment(id), HttpStatus.OK);
+    public ResponseEntity<DepartmentResponse> getDepartment(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        DepartmentResponse department = departmentService.getDepartment(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + department.getId() + " from getDepartment.");
+        return new ResponseEntity<>(department, HttpStatus.OK);
     }
 
     // 부서 전체 조회
     @GetMapping
     @ResponseBody
     @Operation(summary = "부서 전체 조회")
-    public ResponseEntity<List<DepartmentResponse>> getDepartments() {
-        return new ResponseEntity<>(departmentService.getDepartments(), HttpStatus.OK);
+    public ResponseEntity<List<DepartmentResponse>> getDepartments(
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<DepartmentResponse> departments = departmentService.getDepartments();
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getDepartments.");
+        return new ResponseEntity<>(departments, HttpStatus.OK);
     }
 
     // 부서 수정
@@ -88,9 +107,13 @@ public class DepartmentController {
     )
     public ResponseEntity<DepartmentResponse> updateDepartment(
             @PathVariable Long id,
-            @RequestBody @Valid DepartmentRequest departmentRequest
+            @RequestBody @Valid DepartmentRequest departmentRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(departmentService.updateDepartment(id, departmentRequest), HttpStatus.OK);
+        DepartmentResponse department = departmentService.updateDepartment(id, departmentRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + department.getId() + " from updateDepartment.");
+        return new ResponseEntity<>(department, HttpStatus.OK);
     }
 
     // 부서 삭제
@@ -103,8 +126,13 @@ public class DepartmentController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) throws NotFoundException {
+    public ResponseEntity<Void> deleteDepartment(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
         departmentService.deleteDepartment(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteDepartment.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

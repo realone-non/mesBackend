@@ -5,22 +5,20 @@ import com.mes.mesBackend.dto.request.RoutingRequest;
 import com.mes.mesBackend.dto.response.RoutingDetailResponse;
 import com.mes.mesBackend.dto.response.RoutingResponse;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.RoutingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +36,11 @@ public class RoutingController {
 
     @Autowired
     RoutingService routingService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(RoutingController.class);
+    private CustomLogger cLogger;
 
     // 라우팅 생성
     @PostMapping
@@ -50,9 +53,13 @@ public class RoutingController {
             }
     )
     public ResponseEntity<RoutingResponse> createRouting(
-            @RequestBody @Valid RoutingRequest routingRequest
+            @RequestBody @Valid RoutingRequest routingRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(routingService.createRouting(routingRequest), HttpStatus.OK);
+        RoutingResponse routing = routingService.createRouting(routingRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + routing.getId() + " from createRouting.");
+        return new ResponseEntity<>(routing, HttpStatus.OK);
     }
 
     // 라우팅 단일 조회
@@ -66,17 +73,26 @@ public class RoutingController {
             }
     )
     public ResponseEntity<RoutingResponse> getRouting(
-            @PathVariable(value = "routing-id") Long id
+            @PathVariable(value = "routing-id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(routingService.getRouting(id), HttpStatus.OK);
+        RoutingResponse routing = routingService.getRouting(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + routing.getId() + " from getRouting.");
+        return new ResponseEntity<>(routing, HttpStatus.OK);
     }
 
     // 라우팅 전체 조회
     @GetMapping
     @ResponseBody
     @Operation(summary = "라우팅 전체 조회")
-    public ResponseEntity<List<RoutingResponse>> getRoutings() {
-        return new ResponseEntity<>(routingService.getRoutings(), HttpStatus.OK);
+    public ResponseEntity<List<RoutingResponse>> getRoutings(
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<RoutingResponse> routings = routingService.getRoutings();
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getRoutings.");
+        return new ResponseEntity<>(routings, HttpStatus.OK);
     }
 
     // 라우팅 수정
@@ -91,9 +107,13 @@ public class RoutingController {
     )
     public ResponseEntity<RoutingResponse> updateRouting(
             @PathVariable(value = "routing-id") Long id,
-            @RequestBody @Valid RoutingRequest routingRequest
+            @RequestBody @Valid RoutingRequest routingRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(routingService.updateRouting(id, routingRequest), HttpStatus.OK);
+        RoutingResponse routing = routingService.updateRouting(id, routingRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + routing.getId() + " from updateRouting.");
+        return new ResponseEntity<>(routing, HttpStatus.OK);
     }
 
     // 라우팅 삭제
@@ -106,8 +126,13 @@ public class RoutingController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity deleteRouting(@PathVariable(value = "routing-id") Long id) throws NotFoundException {
+    public ResponseEntity deleteRouting(
+            @PathVariable(value = "routing-id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
         routingService.deleteRouting(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteRouting.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -117,9 +142,13 @@ public class RoutingController {
     @Operation(summary = "라우팅 디테일 생성")
     public ResponseEntity<RoutingDetailResponse> createRoutingDetail(
             @PathVariable(value = "routing-id") Long routingId,
-            @RequestBody @Valid RoutingDetailRequest routingDetailRequest
+            @RequestBody @Valid RoutingDetailRequest routingDetailRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(routingService.createRoutingDetails(routingId, routingDetailRequest), HttpStatus.OK);
+        RoutingDetailResponse routingDetails = routingService.createRoutingDetails(routingId, routingDetailRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + routingDetails.getId() + " from createRoutingDetail.");
+        return new ResponseEntity<>(routingDetails, HttpStatus.OK);
     }
 
     // 라우팅 디테일 리스트 조회
@@ -134,9 +163,13 @@ public class RoutingController {
             }
     )
     public ResponseEntity<List<RoutingDetailResponse>> getRoutingDetails(
-            @PathVariable(value = "routing-id") Long routingId
+            @PathVariable(value = "routing-id") Long routingId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(routingService.getRoutingDetails(routingId), HttpStatus.OK);
+        List<RoutingDetailResponse> routingDetails = routingService.getRoutingDetails(routingId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of routingId: " + routingId + " from getRoutingDetails.");
+        return new ResponseEntity<>(routingDetails, HttpStatus.OK);
     }
 
     // 라우팅 디테일 수정
@@ -153,9 +186,13 @@ public class RoutingController {
     public ResponseEntity<RoutingDetailResponse> updateRoutingDetail(
             @PathVariable(value = "routing-id") Long routingId,
             @PathVariable(value = "routing-detail-id") Long routingDetailId,
-            @RequestBody @Valid RoutingDetailRequest routingDetailRequest
+            @RequestBody @Valid RoutingDetailRequest routingDetailRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(routingService.updateRoutingDetail(routingId, routingDetailId, routingDetailRequest), HttpStatus.OK);
+        RoutingDetailResponse routingDetail = routingService.updateRoutingDetail(routingId, routingDetailId, routingDetailRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + routingDetail.getId() + " from updateRoutingDetail.");
+        return new ResponseEntity<>(routingDetail, HttpStatus.OK);
     }
 
     // 라우팅 디테일 삭제
@@ -170,9 +207,12 @@ public class RoutingController {
     )
     public ResponseEntity deleteRoutingDetail(
             @PathVariable(value = "routing-id") Long routingId,
-            @PathVariable(value = "routing-detail-id") Long routingDetailId
+            @PathVariable(value = "routing-detail-id") Long routingDetailId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         routingService.deleteRoutingDetail(routingId, routingDetailId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + routingDetailId + " from deleteRoutingDetail.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

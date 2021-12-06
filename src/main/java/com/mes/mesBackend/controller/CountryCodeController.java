@@ -3,22 +3,20 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.CountryCodeRequest;
 import com.mes.mesBackend.dto.response.CountryCodeResponse;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.CountryCodeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +33,12 @@ public class CountryCodeController {
 
     @Autowired
     CountryCodeService countryCodeService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(CountryCodeController.class);
+    private CustomLogger cLogger;
+
 
     // 국가코드 생성
     @PostMapping
@@ -48,9 +52,13 @@ public class CountryCodeController {
             }
     )
     public ResponseEntity<CountryCodeResponse> createCountryCode(
-            @RequestBody @Valid CountryCodeRequest countryCodeRequest
+            @RequestBody @Valid CountryCodeRequest countryCodeRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(countryCodeService.createCountryCode(countryCodeRequest), HttpStatus.OK);
+        CountryCodeResponse countryCode = countryCodeService.createCountryCode(countryCodeRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + countryCode.getId() + " from createCountryCode.");
+        return new ResponseEntity<>(countryCode, HttpStatus.OK);
     }
 
     // 국가코드 단일 조회
@@ -64,17 +72,26 @@ public class CountryCodeController {
             }
     )
     public ResponseEntity<CountryCodeResponse> getCountryCode(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(countryCodeService.getCountryCode(id), HttpStatus.OK);
+        CountryCodeResponse countryCode = countryCodeService.getCountryCode(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + countryCode.getId() + " from getCountryCode.");
+        return new ResponseEntity<>(countryCode, HttpStatus.OK);
     }
 
 //    국가코드 전체 조회
     @GetMapping
     @ResponseBody
     @Operation(summary = "국가코드 전체 조회")
-    public ResponseEntity<List<CountryCodeResponse>> getCountryCodes() {
-        return new ResponseEntity<>(countryCodeService.getCountryCodes(), HttpStatus.OK);
+    public ResponseEntity<List<CountryCodeResponse>> getCountryCodes(
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<CountryCodeResponse> countryCodes = countryCodeService.getCountryCodes();
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getCountryCodes.");
+        return new ResponseEntity<>(countryCodes, HttpStatus.OK);
     }
 
     // 국가코드 수정
@@ -90,9 +107,13 @@ public class CountryCodeController {
     )
     public ResponseEntity<CountryCodeResponse> updateCountryCode(
             @PathVariable Long id,
-            @RequestBody @Valid CountryCodeRequest countryCodeRequest
+            @RequestBody @Valid CountryCodeRequest countryCodeRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(countryCodeService.updateCountryCode(id, countryCodeRequest), HttpStatus.OK);
+        CountryCodeResponse countryCode = countryCodeService.updateCountryCode(id, countryCodeRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + countryCode.getId() + " from updateCountryCode.");
+        return new ResponseEntity<>(countryCode, HttpStatus.OK);
     }
 
     // 국가코드 삭제
@@ -105,8 +126,13 @@ public class CountryCodeController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteCountryCode(@PathVariable Long id) throws NotFoundException {
+    public ResponseEntity<Void> deleteCountryCode(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
         countryCodeService.deleteCountryCode(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteCountryCode.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
