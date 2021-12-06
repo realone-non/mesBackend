@@ -24,18 +24,15 @@ public class MongoLogger extends CustomLogger {
 
     @Autowired
     private MongoTemplate mongoTemplate;
-
-    private MongoLogger(Logger logger) {
-        super(logger);
-    }
-
-    public MongoLogger(Logger logger, MongoTemplate mongoTemplate) {
-        super(logger);
-    }
-
-//    public MongoLogger(Logger logger, String mongoTemplateBeanName) {
+//
+//    private MongoLogger(Logger logger) {
 //        super(logger);
 //    }
+//
+//    public MongoLogger(Logger logger, MongoTemplate mongoTemplate) {
+//        super(logger);
+//    }
+
 
     public MongoLogger(Logger logger, String mongoTemplateBeanName) {
         super(logger);
@@ -70,14 +67,47 @@ public class MongoLogger extends CustomLogger {
     }
 
     @Override
-    protected void writeInfo(String msg, String userCode, Long resourceId) {
+    protected void createWriteInfo(String userCode, Long resourceId, String controllerName) {
         Log log = new Log();
         log.setLevel("INFO");
-//        log.setDateTime(LocalDateTime.now());
         log.setRequester(logger.getName());
-        log.setMessage(msg);
+        log.setUserCode(userCode);
+        log.setResourceId(resourceId);
+        log.setMessage(userCode + " is created the " + resourceId + " from " + controllerName);
         mongoTemplate.insert(log, "log");
     }
+
+    @Override
+    protected void getWriteInfo(String userCode, Long resourceId, String controllerName) {
+
+    }
+
+    @Override
+    protected void getListWriteInfo(String userCode, Long resourceId, String controllerName) {
+
+    }
+
+    @Override
+    protected void updateWriteInfo(String userCode, Long resourceId, String controllerName) {
+
+    }
+
+    @Override
+    protected void deleteWriteInfo(String userCode, Long resourceId, String controllerName) {
+
+    }
+
+//    @Override
+//    protected void writeInfo(String msg, String userCode, Long resourceId) {
+//        Log log = new Log();
+//        log.setLevel("INFO");
+////        log.setDateTime(LocalDateTime.now());
+//        log.setRequester(logger.getName());
+//        log.setMessage(msg);
+//        mongoTemplate.insert(log, "log");
+//    }
+
+
 
     @Override
     protected void writeWarn(String msg, String userCode, Long resourceId) {
