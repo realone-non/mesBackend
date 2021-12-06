@@ -105,23 +105,18 @@ public class JwtTokenProvider {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
         } catch (SecurityException ex) {
-            log.error(ex.getMessage());
             throw new CustomJwtException(ex.getMessage());
         } catch (MalformedJwtException ex) {
             // jwt 형식에 맞지 않을때
-            log.error("JWT " + tokenName + " is malformed.");
             throw new CustomJwtException("JWT " + tokenName + " is malformed.");
         } catch (ExpiredJwtException ex) {
             // 토큰 기간 만료
-            log.error("JWT " + tokenName + " is expired.");
             throw new CustomJwtException("JWT " + tokenName + " is expired.");
         } catch (IllegalArgumentException ex) {
             // 토큰이 null 이거나 empty 일때
-            log.error("JWT " + tokenName + " token is null or empty.");
             throw new CustomJwtException("JWT " + tokenName + " token is null or empty.");
         } catch (SignatureException ex) {
             // JWT 서명이 로컬 서명과 일치하지 않을때
-            log.error("JWT " + tokenName + " signature does not match signature.");
             throw new CustomJwtException("JWT " + tokenName + " signature does not match signature.");
         }
     }

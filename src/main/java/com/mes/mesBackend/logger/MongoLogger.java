@@ -1,15 +1,8 @@
 package com.mes.mesBackend.logger;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -18,21 +11,11 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.time.LocalDateTime;
 
 public class MongoLogger extends CustomLogger {
 
     @Autowired
     private MongoTemplate mongoTemplate;
-//
-//    private MongoLogger(Logger logger) {
-//        super(logger);
-//    }
-//
-//    public MongoLogger(Logger logger, MongoTemplate mongoTemplate) {
-//        super(logger);
-//    }
-
 
     public MongoLogger(Logger logger, String mongoTemplateBeanName) {
         super(logger);
@@ -49,9 +32,6 @@ public class MongoLogger extends CustomLogger {
     public void writeTrace(String msg, String userCode, Long resourceId) {
         Log log = new Log();
         log.setLevel("TRACE");
-        log.setRequester(logger.getName());
-        log.setUserCode(userCode);
-        log.setResourceId(resourceId);
         log.setMessage(msg);
         mongoTemplate.insert(log, "log");
     }
@@ -60,71 +40,30 @@ public class MongoLogger extends CustomLogger {
     protected void writeDebug(String msg, String userCode, Long resourceId) {
         Log log = new Log();
         log.setLevel("DEBUG");
-//        log.setrequester(LocalDateTime.now());
-        log.setRequester(logger.getName());
         log.setMessage(msg);
         mongoTemplate.insert(log, "log");
     }
 
     @Override
-    protected void createWriteInfo(String userCode, Long resourceId, String controllerName) {
+    protected void writeInfo(String msg) {
         Log log = new Log();
         log.setLevel("INFO");
-        log.setRequester(logger.getName());
-        log.setUserCode(userCode);
-        log.setResourceId(resourceId);
-        log.setMessage(userCode + " is created the " + resourceId + " from " + controllerName);
+        log.setMessage(msg);
         mongoTemplate.insert(log, "log");
     }
-
-    @Override
-    protected void getWriteInfo(String userCode, Long resourceId, String controllerName) {
-
-    }
-
-    @Override
-    protected void getListWriteInfo(String userCode, Long resourceId, String controllerName) {
-
-    }
-
-    @Override
-    protected void updateWriteInfo(String userCode, Long resourceId, String controllerName) {
-
-    }
-
-    @Override
-    protected void deleteWriteInfo(String userCode, Long resourceId, String controllerName) {
-
-    }
-
-//    @Override
-//    protected void writeInfo(String msg, String userCode, Long resourceId) {
-//        Log log = new Log();
-//        log.setLevel("INFO");
-////        log.setDateTime(LocalDateTime.now());
-//        log.setRequester(logger.getName());
-//        log.setMessage(msg);
-//        mongoTemplate.insert(log, "log");
-//    }
-
-
 
     @Override
     protected void writeWarn(String msg, String userCode, Long resourceId) {
         Log log = new Log();
         log.setLevel("WARN");
-//        log.setDateTime(LocalDateTime.now());
-        log.setRequester(logger.getName());
         log.setMessage(msg);
         mongoTemplate.insert(log, "log");
     }
 
     @Override
-    protected void writeError(String msg, String userCode, Long resourceId) {
+    protected void writeError(String msg) {
         Log log = new Log();
         log.setLevel("ERROR");
-//        log.setDateTime(LocalDateTime.now());
-        log.setRequester(logger.getName());
         log.setMessage(msg);
         mongoTemplate.insert(log, "log");
     }

@@ -4,22 +4,20 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.ClientTypeRequest;
 import com.mes.mesBackend.dto.response.ClientTypeResponse;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.ClientTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +34,12 @@ public class ClientTypeController {
 
     @Autowired
     ClientTypeService clientTypeService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(ClientTypeController.class);
+    private CustomLogger cLogger;
+
 
     // 거래처 유형 생성
     @PostMapping
@@ -49,9 +53,13 @@ public class ClientTypeController {
             }
     )
     public ResponseEntity<ClientTypeResponse> createClientType(
-            @RequestBody @Valid ClientTypeRequest clientTypeRequest
+            @RequestBody @Valid ClientTypeRequest clientTypeRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(clientTypeService.createClientType(clientTypeRequest), HttpStatus.OK);
+        ClientTypeResponse clientType = clientTypeService.createClientType(clientTypeRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + clientType.getId() + " from createClientType.");
+        return new ResponseEntity<>(clientType, HttpStatus.OK);
     }
 
     // 거래처 유형 단일 조회
@@ -65,16 +73,26 @@ public class ClientTypeController {
             }
     )
     public ResponseEntity<ClientTypeResponse> getClientType(
-            @PathVariable Long id) throws NotFoundException {
-        return new ResponseEntity<>(clientTypeService.getClientType(id), HttpStatus.OK);
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        ClientTypeResponse clientType = clientTypeService.getClientType(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + clientType.getId() + " from getClientType.");
+        return new ResponseEntity<>(clientType, HttpStatus.OK);
     }
 
     // 거래처 유형 전체 조회
     @Operation(summary = "거래처유형 전체 조회")
     @GetMapping
     @ResponseBody
-    public ResponseEntity<List<ClientTypeResponse>> getClientTypes() {
-        return new ResponseEntity<>(clientTypeService.getClientTypes(), HttpStatus.OK);
+    public ResponseEntity<List<ClientTypeResponse>> getClientTypes(
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<ClientTypeResponse> clientTypes = clientTypeService.getClientTypes();
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getClientTypes.");
+        return new ResponseEntity<>(clientTypes, HttpStatus.OK);
     }
 
     // 거래처 유형 수정
@@ -90,9 +108,13 @@ public class ClientTypeController {
     )
     public ResponseEntity<ClientTypeResponse> updateClientType(
             @PathVariable Long id,
-            @RequestBody @Valid ClientTypeRequest clientTypeRequest
+            @RequestBody @Valid ClientTypeRequest clientTypeRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(clientTypeService.updateClientType(id, clientTypeRequest), HttpStatus.OK);
+        ClientTypeResponse clientType = clientTypeService.updateClientType(id, clientTypeRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + clientType.getId() + " from updateClientType.");
+        return new ResponseEntity<>(clientType, HttpStatus.OK);
     }
 
     // 거래처유형 삭제
@@ -105,8 +127,13 @@ public class ClientTypeController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteClientType(@PathVariable Long id) throws NotFoundException {
+    public ResponseEntity<Void> deleteClientType(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
         clientTypeService.deleteClientType(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteClientType.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

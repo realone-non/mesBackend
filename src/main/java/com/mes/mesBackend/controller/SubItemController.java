@@ -4,22 +4,20 @@ import com.mes.mesBackend.dto.request.SubItemRequest;
 import com.mes.mesBackend.dto.response.SubItemResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.SubItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +35,11 @@ public class SubItemController {
 
     @Autowired
     SubItemService subItemService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(SubItemController.class);
+    private CustomLogger cLogger;
 
     // 대체품 생성
     @Operation(summary = "대체품 생성")
@@ -50,9 +53,13 @@ public class SubItemController {
             }
     )
     public ResponseEntity<SubItemResponse> createSubItem(
-            @RequestBody @Valid SubItemRequest subItemRequest
+            @RequestBody @Valid SubItemRequest subItemRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        return new ResponseEntity<>(subItemService.createSubItem(subItemRequest), HttpStatus.OK);
+        SubItemResponse subItem = subItemService.createSubItem(subItemRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + subItem.getId() + " from createSubItem.");
+        return new ResponseEntity<>(subItem, HttpStatus.OK);
     }
 
     // 대체품 단일 조회
@@ -66,9 +73,13 @@ public class SubItemController {
             }
     )
     public ResponseEntity<SubItemResponse> getSubItem(
-            @PathVariable @Parameter(description = "대체품 id") Long id
+            @PathVariable @Parameter(description = "대체품 id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(subItemService.getSubItem(id), HttpStatus.OK);
+        SubItemResponse subItem = subItemService.getSubItem(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + subItem.getId() + " from getSubItem.");
+        return new ResponseEntity<>(subItem, HttpStatus.OK);
     }
 
     // 대체품 전체 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
@@ -79,9 +90,14 @@ public class SubItemController {
             @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
             @RequestParam(required = false) @Parameter(description = "품목계정 id") Long itemAccountId,
             @RequestParam(required = false) @Parameter(description = "품번") String itemNo,
-            @RequestParam(required = false) @Parameter(description = "품명") String itemName
+            @RequestParam(required = false) @Parameter(description = "품명") String itemName,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(subItemService.getSubItems(itemGroupId, itemAccountId, itemNo, itemName), HttpStatus.OK);
+        List<SubItemResponse> subItems = subItemService.getSubItems(itemGroupId, itemAccountId, itemNo, itemName);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of itemGroupId: " + itemGroupId +
+                ", itemAccountId: " + itemAccountId + " from getSubItems.");
+        return new ResponseEntity<>(subItems, HttpStatus.OK);
     }
 
     // 대체품 수정
@@ -97,9 +113,13 @@ public class SubItemController {
     )
     public ResponseEntity<SubItemResponse> updateSubItem(
             @PathVariable @Parameter(description = "대체품 id") Long id,
-            @RequestBody @Valid SubItemRequest subItemRequest
+            @RequestBody @Valid SubItemRequest subItemRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        return new ResponseEntity<>(subItemService.updateSubItem(id, subItemRequest), HttpStatus.OK);
+        SubItemResponse subItem = subItemService.updateSubItem(id, subItemRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + subItem.getId() + " from updateSubItem.");
+        return new ResponseEntity<>(subItem, HttpStatus.OK);
     }
 
     // 대체품 삭제
@@ -112,8 +132,13 @@ public class SubItemController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity deleteSubItem(@PathVariable @Parameter(description = "대체품 id") Long id) throws NotFoundException {
+    public ResponseEntity deleteSubItem(
+            @PathVariable @Parameter(description = "대체품 id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
         subItemService.deleteSubItem(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteSubItem.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

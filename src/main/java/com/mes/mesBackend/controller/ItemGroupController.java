@@ -3,22 +3,20 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.ItemGroupRequest;
 import com.mes.mesBackend.dto.response.ItemGroupResponse;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.ItemGroupService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +33,11 @@ import java.util.List;
 public class ItemGroupController {
     @Autowired
     ItemGroupService itemGroupService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(ItemGroupController.class);
+    private CustomLogger cLogger;
 
     // 품목그룹 생성
     @PostMapping
@@ -48,9 +51,13 @@ public class ItemGroupController {
             }
     )
     public ResponseEntity<ItemGroupResponse> createItemGroup(
-            @RequestBody @Valid ItemGroupRequest itemGroupRequest
+            @RequestBody @Valid ItemGroupRequest itemGroupRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(itemGroupService.createItemGroup(itemGroupRequest), HttpStatus.OK);
+        ItemGroupResponse itemGroup = itemGroupService.createItemGroup(itemGroupRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + itemGroup.getId() + " from createItemGroup.");
+        return new ResponseEntity<>(itemGroup, HttpStatus.OK);
     }
 
     // 품목그룹 단일 조회
@@ -64,17 +71,26 @@ public class ItemGroupController {
             }
     )
     public ResponseEntity<ItemGroupResponse> getItemGroup(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(itemGroupService.getItemGroup(id), HttpStatus.OK);
+        ItemGroupResponse itemGroup = itemGroupService.getItemGroup(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + itemGroup.getId() + " from getItemGroup.");
+        return new ResponseEntity<>(itemGroup, HttpStatus.OK);
     }
 
     // 품목그룹 전체 조회
     @GetMapping
     @ResponseBody
     @Operation(summary = "품목그룹 전체 조회")
-    public ResponseEntity<List<ItemGroupResponse>> getItemGroups() {
-        return new ResponseEntity<>(itemGroupService.getItemGroups(), HttpStatus.OK);
+    public ResponseEntity<List<ItemGroupResponse>> getItemGroups(
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<ItemGroupResponse> itemGroups = itemGroupService.getItemGroups();
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getItemGroups.");
+        return new ResponseEntity<>(itemGroups, HttpStatus.OK);
     }
 
     // 품목그룹 수정
@@ -90,9 +106,13 @@ public class ItemGroupController {
     )
     public ResponseEntity<ItemGroupResponse> updateItemGroup(
             @PathVariable Long id,
-            @RequestBody @Valid ItemGroupRequest itemGroupRequest
+            @RequestBody @Valid ItemGroupRequest itemGroupRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(itemGroupService.updateItemGroup(id, itemGroupRequest), HttpStatus.OK);
+        ItemGroupResponse itemGroup = itemGroupService.updateItemGroup(id, itemGroupRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + itemGroup.getId() + " from updateItemGroup.");
+        return new ResponseEntity<>(itemGroup, HttpStatus.OK);
     }
 
     // 품목그룹 삭제
@@ -105,8 +125,13 @@ public class ItemGroupController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteItemGroup(@PathVariable Long id) throws NotFoundException {
+    public ResponseEntity<Void> deleteItemGroup(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
         itemGroupService.deleteItemGroup(id);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteItemGroup.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

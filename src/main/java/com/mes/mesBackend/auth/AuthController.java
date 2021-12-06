@@ -1,16 +1,21 @@
 package com.mes.mesBackend.auth;
 
-import com.mes.mesBackend.dto.request.UserLogin;
 import com.mes.mesBackend.dto.request.UserCreateRequest;
+import com.mes.mesBackend.dto.request.UserLogin;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.CustomJwtException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +33,12 @@ public class AuthController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private CustomLogger cLogger;
+
     // 직원(작업자) 생성
     @PostMapping("/signup")
     @ResponseBody
@@ -42,7 +53,10 @@ public class AuthController {
     public ResponseEntity<UserResponse> createUser(
             @RequestBody @Valid UserCreateRequest userRequest
     ) throws NotFoundException, NoSuchAlgorithmException, BadRequestException {
-        return new ResponseEntity<>(userService.createUser(userRequest), HttpStatus.OK);
+        UserResponse user = userService.createUser(userRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info("created user. userId: " + user.getId() + ", input username: " + userRequest.getUserCode() + ", korName: " + userRequest.getKorName() + ". from createUser");
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PostMapping(value = "/signin")
@@ -58,7 +72,10 @@ public class AuthController {
     public ResponseEntity<TokenResponse> getLoginInfo(
             @RequestBody @Valid UserLogin userLogin
     ) throws NotFoundException, BadRequestException {
-        return new ResponseEntity<>(userService.getLogin(userLogin), HttpStatus.OK);
+        TokenResponse login = userService.getLogin(userLogin);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info("login user. userCode: " + userLogin.getUserCode() + ". from getLoginInfo");
+        return new ResponseEntity<>(login, HttpStatus.OK);
     }
 
     @PatchMapping("/reissue")
@@ -72,6 +89,9 @@ public class AuthController {
             }
     )
     public ResponseEntity<TokenResponse> updateRefreshToken(@RequestBody TokenRequest tokenRequestDto) throws CustomJwtException {
-        return new ResponseEntity<>(userService.reissue(tokenRequestDto), HttpStatus.OK);
+        TokenResponse reissue = userService.reissue(tokenRequestDto);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromToken(tokenRequestDto.accessToken) + " is token reissue. from updateRefreshToken.");
+        return new ResponseEntity<>(reissue, HttpStatus.OK);
     }
 }

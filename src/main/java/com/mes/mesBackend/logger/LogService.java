@@ -14,8 +14,13 @@ public class LogService {
     @Autowired
     JwtTokenProvider jwtTokenProvider;
 
-    public String getUserCode(String header) {
+    public String getUserCodeFromHeader(String header) {
         String token = header.substring(7);
+        Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(token);
+        return authentication.getName();
+    }
+
+    public String getUserCodeFromToken(String token) {
         Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(token);
         return authentication.getName();
     }

@@ -6,21 +6,19 @@ import com.mes.mesBackend.dto.response.ItemCheckDetailResponse;
 import com.mes.mesBackend.dto.response.ItemCheckResponse;
 import com.mes.mesBackend.entity.enumeration.TestCategory;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogService;
+import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.ItemCheckService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +33,11 @@ import java.util.List;
 public class ItemCheckController {
     @Autowired
     ItemCheckService itemCheckService;
+    @Autowired
+    LogService logService;
+
+    private Logger logger = LoggerFactory.getLogger(ItemCheckController.class);
+    private CustomLogger cLogger;
 
     @Operation(summary = "품목별 검사항목 생성", description = "")
     @PostMapping
@@ -45,9 +48,13 @@ public class ItemCheckController {
             }
     )
     public ResponseEntity<ItemCheckResponse> createItemCheck(
-            @RequestBody @Valid ItemCheckRequest itemCheckRequest
+            @RequestBody @Valid ItemCheckRequest itemCheckRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(itemCheckService.createItemCheck(itemCheckRequest), HttpStatus.OK);
+        ItemCheckResponse itemCheck = itemCheckService.createItemCheck(itemCheckRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + itemCheck.getId() + " from createItemCheck.");
+        return new ResponseEntity<>(itemCheck, HttpStatus.OK);
     }
 
     @GetMapping("/{item-check-id}")
@@ -60,9 +67,13 @@ public class ItemCheckController {
             }
     )
     public ResponseEntity<ItemCheckResponse> getItemCheck(
-            @PathVariable(value = "item-check-id") @Parameter(description = "품목별 검사항목 id") Long itemCheckId
+            @PathVariable(value = "item-check-id") @Parameter(description = "품목별 검사항목 id") Long itemCheckId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(itemCheckService.getItemCheck(itemCheckId), HttpStatus.OK);
+        ItemCheckResponse itemCheck = itemCheckService.getItemCheck(itemCheckId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + itemCheck.getId() + " from getItemCheck.");
+        return new ResponseEntity<>(itemCheck, HttpStatus.OK);
     }
 
     @GetMapping
@@ -71,9 +82,14 @@ public class ItemCheckController {
     public ResponseEntity<List<ItemCheckResponse>> getItemChecks(
             @RequestParam(required = false) @Parameter(description = "검사유형") TestCategory testCategory,
             @RequestParam(required = false) @Parameter(description = "품목그룹") Long itemGroupId,
-            @RequestParam(required = false) @Parameter(description = "품목계정") Long itemAccountId
+            @RequestParam(required = false) @Parameter(description = "품목계정") Long itemAccountId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        return new ResponseEntity<>(itemCheckService.getItemChecks(testCategory, itemGroupId, itemAccountId), HttpStatus.OK);
+        List<ItemCheckResponse> itemChecks = itemCheckService.getItemChecks(testCategory, itemGroupId, itemAccountId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of testCategory: " + testCategory
+                + ", itemGroupId: " + itemGroupId + ", itemAccountId: " + itemAccountId + " from getItemChecks.");
+        return new ResponseEntity<>(itemChecks, HttpStatus.OK);
     }
 
     @PatchMapping("/{item-check-id}")
@@ -88,9 +104,13 @@ public class ItemCheckController {
     )
     public ResponseEntity<ItemCheckResponse> updateItemCheck(
             @PathVariable(value = "item-check-id") @Parameter(description = "품목별 검사항목 id") Long itemCheckId,
-            @RequestBody @Valid ItemCheckRequest itemCheckRequest
+            @RequestBody @Valid ItemCheckRequest itemCheckRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(itemCheckService.updateItemCheck(itemCheckId, itemCheckRequest), HttpStatus.OK);
+        ItemCheckResponse itemCheck = itemCheckService.updateItemCheck(itemCheckId, itemCheckRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + itemCheck.getId() + " from updateItemCheck.");
+        return new ResponseEntity<>(itemCheck, HttpStatus.OK);
     }
 
     @DeleteMapping("/{item-check-id}")
@@ -103,9 +123,12 @@ public class ItemCheckController {
             }
     )
     public ResponseEntity deleteItemCheck(
-            @PathVariable(value = "item-check-id") @Parameter(description = "품목별 검사항목 id")Long itemCheckId
+            @PathVariable(value = "item-check-id") @Parameter(description = "품목별 검사항목 id")Long itemCheckId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         itemCheckService.deleteItemCheck(itemCheckId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + itemCheckId + " from deleteItemCheck.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -120,9 +143,13 @@ public class ItemCheckController {
     )
     public ResponseEntity<ItemCheckDetailResponse> createItemCheckDetails(
             @PathVariable(value = "item-check-id") @Parameter(description = "품목별 검사항목 id")Long itemCheckId,
-            @RequestBody @Valid ItemCheckDetailRequest itemCheckDetailRequest
+            @RequestBody @Valid ItemCheckDetailRequest itemCheckDetailRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(itemCheckService.createItemCheckDetails(itemCheckId, itemCheckDetailRequest), HttpStatus.OK);
+        ItemCheckDetailResponse itemCheckDetails = itemCheckService.createItemCheckDetails(itemCheckId, itemCheckDetailRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + itemCheckDetails.getId() + " from createItemCheckDetails.");
+        return new ResponseEntity<>(itemCheckDetails, HttpStatus.OK);
     }
 
     @GetMapping("/{item-check-id}/item-check-details/{item-check-detail-id}")
@@ -136,9 +163,13 @@ public class ItemCheckController {
     )
     public ResponseEntity<ItemCheckDetailResponse> getItemCheckDetail(
             @PathVariable(value = "item-check-id") @Parameter(description = "품목별 검사항목 id") Long itemCheckId,
-            @PathVariable(value = "item-check-detail-id") @Parameter(description = "품목별 검사항목 디테일 id") Long itemCheckDetailId
+            @PathVariable(value = "item-check-detail-id") @Parameter(description = "품목별 검사항목 디테일 id") Long itemCheckDetailId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(itemCheckService.getItemCheckDetail(itemCheckId, itemCheckDetailId), HttpStatus.OK);
+        ItemCheckDetailResponse itemCheckDetail = itemCheckService.getItemCheckDetail(itemCheckId, itemCheckDetailId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + itemCheckDetail.getId() + " from getItemCheckDetail.");
+        return new ResponseEntity<>(itemCheckDetail, HttpStatus.OK);
     }
 
     @GetMapping("/{item-check-id}/item-check-details")
@@ -151,9 +182,13 @@ public class ItemCheckController {
             }
     )
     public ResponseEntity<List<ItemCheckDetailResponse>> getItemCheckDetails(
-            @PathVariable(value = "item-check-id") @Parameter(description = "품목별 검사항목 id") Long itemCheckId
+            @PathVariable(value = "item-check-id") @Parameter(description = "품목별 검사항목 id") Long itemCheckId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(itemCheckService.getItemCheckDetails(itemCheckId), HttpStatus.OK);
+        List<ItemCheckDetailResponse> itemCheckDetails = itemCheckService.getItemCheckDetails(itemCheckId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getItemCheckDetails.");
+        return new ResponseEntity<>(itemCheckDetails, HttpStatus.OK);
     }
 
     @PatchMapping("/{item-check-id}/item-check-details/{item-check-detail-id}")
@@ -169,9 +204,13 @@ public class ItemCheckController {
     public ResponseEntity<ItemCheckDetailResponse> updateItemCheckDetail(
             @PathVariable(value = "item-check-id") @Parameter(description = "품목별 검사항목 id") Long itemCheckId,
             @PathVariable(value = "item-check-detail-id") @Parameter(description = "품목별 검사항목 디테일 id") Long itemCheckDetailId,
-            @RequestBody @Valid ItemCheckDetailRequest itemCheckDetailRequest
+            @RequestBody @Valid ItemCheckDetailRequest itemCheckDetailRequest,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        return new ResponseEntity<>(itemCheckService.updateItemCheckDetail(itemCheckId, itemCheckDetailId, itemCheckDetailRequest), HttpStatus.OK);
+        ItemCheckDetailResponse checkDetail = itemCheckService.updateItemCheckDetail(itemCheckId, itemCheckDetailId, itemCheckDetailRequest);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + checkDetail.getId() + " from updateItemCheckDetail.");
+        return new ResponseEntity<>(checkDetail, HttpStatus.OK);
     }
 
     @DeleteMapping("/{item-check-id}/item-check-details/{item-check-detail-id}")
@@ -185,9 +224,12 @@ public class ItemCheckController {
     )
     public ResponseEntity deleteItemCheckDetail(
             @PathVariable(value = "item-check-id") @Parameter(description = "품목별 검사항목 id")Long itemCheckId,
-            @PathVariable(value = "item-check-detail-id") @Parameter(description = "품목별 검사항목 디테일 id")Long itemCheckDetailId
+            @PathVariable(value = "item-check-detail-id") @Parameter(description = "품목별 검사항목 디테일 id")Long itemCheckDetailId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         itemCheckService.deleteItemCheckDetail(itemCheckId, itemCheckDetailId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + itemCheckDetailId + " from deleteItemCheckDetail.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
