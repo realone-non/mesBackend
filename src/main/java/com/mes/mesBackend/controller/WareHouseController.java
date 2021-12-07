@@ -90,7 +90,7 @@ public class WareHouseController {
     ) {
         List<WareHouseResponse> wareHouses = wareHouseService.getWareHouses();
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromToken(tokenHeader) + " is viewed the list of from getWareHouses.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWareHouses.");
         return new ResponseEntity<>(wareHouses, HttpStatus.OK);
     }
 
