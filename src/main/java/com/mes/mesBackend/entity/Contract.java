@@ -1,16 +1,18 @@
 package com.mes.mesBackend.entity;
 
 import com.mes.mesBackend.entity.enumeration.ProductionType;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
 
 /*
  * 수주등록
@@ -38,12 +40,12 @@ import static javax.persistence.FetchType.LAZY;
  * 해당하는 품번들이 있음 -> 품번,품명,규격,수주단위,수주수량,단가,수주금액,수주금액,부가세,수주유형,납기일자,고객발주번호,규격화 품번,비고,첨부파일
  * */
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 @Entity(name = "CONTRACTS")
 @Data
 public class Contract extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '수주등록 고유아이디'")
     private Long id;
 
@@ -55,11 +57,11 @@ public class Contract extends BaseTimeEntity {
     @JoinColumn(name = "CLIENT", nullable = false, columnDefinition = "bigint COMMENT '고객사'")
     private Client client;          // 고객사, 고객사명
 
-    @Column(name = "CONTRACT_DATE", columnDefinition = "datetime COMMENT '수주일자'", nullable = false)
-    private LocalDateTime contractDate;     // 수주일자
+    @Column(name = "CONTRACT_DATE", columnDefinition = "date COMMENT '수주일자'", nullable = false)
+    private LocalDate contractDate;     // 수주일자
 
-    @Column(name = "CLIENT_ORDER_DATE", columnDefinition = "datetime COMMENT '고객발주일자'", nullable = false)
-    private LocalDateTime clientOrderDate;      // 고객발주일자
+    @Column(name = "CLIENT_ORDER_DATE", columnDefinition = "date COMMENT '고객발주일자'", nullable = false)
+    private LocalDate clientOrderDate;      // 고객발주일자
 
     @Enumerated(STRING)
     @Column(name = "PRODUCTION_TYPE", columnDefinition = "varchar(255) COMMENT '생산유형'", nullable = false)
@@ -68,12 +70,10 @@ public class Contract extends BaseTimeEntity {
     @Column(name = "CLIENT_ORDER_NO", columnDefinition = "varchar(255) COMMENT '고객발주번호'", nullable = false)
     private String clientOrderNo;       // 고객발주번호
 
-    // 다대일 단방향
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "USER", columnDefinition = "bigint COMMENT '담당자'", nullable = false)
     private User user;              // 담당자
 
-    // 다대일 단방향
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "CURRENCY", columnDefinition = "bigint COMMENT '화폐'", nullable = false)
     private Currency currency;          // 화폐
@@ -81,13 +81,12 @@ public class Contract extends BaseTimeEntity {
     @Column(name = "SURTAX", columnDefinition = "varchar(255) COMMENT '부가세 적용'", nullable = false)
     private String surtax;              // 부가세적용
 
-    // 다대일 단방향
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "OUTPUT_WAREHOUSE", columnDefinition = "bigint COMMENT '출고창고'", nullable = false)
     private WareHouse outputWareHouse;         // 출고창고
 
-    @Column(name = "PERIOD_DATE", columnDefinition = "datetime COMMENT '납기일자'", nullable = false)
-    private LocalDateTime periodDate;               // 납기일자
+    @Column(name = "PERIOD_DATE", columnDefinition = "date COMMENT '납기일자'", nullable = false)
+    private LocalDate periodDate;               // 납기일자
 
     @Column(name = "CHANGE_REASON", columnDefinition = "varchar(255) COMMENT '변경사유'")
     private String changeReason;        // 변경사유
@@ -115,4 +114,38 @@ public class Contract extends BaseTimeEntity {
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
+
+    public void addJoin(Client client, User user, Currency currency, WareHouse outPutWareHouse) {
+        setClient(client);
+        setUser(user);
+        setCurrency(currency);
+        setOutputWareHouse(outPutWareHouse);
+    }
+
+    public void update(
+            Contract newContract,
+            Client newClient,
+            User newUser,
+            Currency newCurrency,
+            WareHouse newOutPutWareHouse
+    ) {
+        setClient(newClient);
+        setContractDate(newContract.contractDate);
+        setClientOrderDate(newContract.clientOrderDate);
+        setProductionType(newContract.productionType);
+        setClientOrderNo(newContract.clientOrderNo);
+        setUser(newUser);
+        setCurrency(newCurrency);
+        setSurtax(newContract.surtax);
+        setOutputWareHouse(newOutPutWareHouse);
+        setPeriodDate(newContract.periodDate);
+        setChangeReason(newContract.changeReason);
+        setPaymentYn(newContract.paymentYn);
+        setPayCondition(newContract.payCondition);
+        setForwader(newContract.forwader);
+        setTransportCondition(newContract.transportCondition);
+        setShipmentService(newContract.shipmentService);
+        setShipmentWk(newContract.shipmentWk);
+        setNote(newContract.note);
+    }
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static javax.persistence.EnumType.STRING;
@@ -51,8 +52,8 @@ public class ContractItem extends BaseTimeEntity {
     @Column(name = "CONTRACT_TYPE", columnDefinition = "varchar(255) COMMENT '수주유형'", nullable = false)
     private ContractType contractType;
 
-    @Column(name = "PERIOD_DATE", columnDefinition = "datetime COMMENT '납기일자'", nullable = false)
-    private LocalDateTime periodDate;       // 납기일자
+    @Column(name = "PERIOD_DATE", columnDefinition = "date COMMENT '납기일자'", nullable = false)
+    private LocalDate periodDate;       // 납기일자
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "CONTRACT", nullable = false, columnDefinition = "bigint COMMENT '수주'")
@@ -66,4 +67,6 @@ public class ContractItem extends BaseTimeEntity {
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
+
+
 }

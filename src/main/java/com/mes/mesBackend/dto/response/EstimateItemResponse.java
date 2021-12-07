@@ -16,7 +16,7 @@ public class EstimateItemResponse {
     Long id;
 
     @Schema(description = "품목")
-    ItemResponse.toEstimateItem item;
+    ItemResponse.noAndNameAndStandardAndUnitAndPrice item;
 
     @Schema(description = "수량")
     int amount;

@@ -48,8 +48,10 @@ public class ClientResponse {
     @Getter
     @Setter
     public static class idAndName {
+        @Schema(description = "고유아이디")
         Long id;
-        String name;
+        @Schema(description = "거래처명")
+        String clientName;
     }
 
     @Getter
@@ -65,5 +67,18 @@ public class ClientResponse {
         String clientName;
         @Schema(description = "거래처담당자")
         String companyCharge;
+    }
+
+    @Getter
+    @Setter
+    @JsonInclude(NON_NULL)
+    @Schema(description = "거래처")
+    public static class CodeAndName {
+        @Schema(description = "고유아이디")
+        Long id;
+        @Schema(description = "거래처코드")
+        String clientCode;  // 거래처코드
+        @Schema(description = "거래처명")
+        String clientName;    // 거래처명
     }
 }

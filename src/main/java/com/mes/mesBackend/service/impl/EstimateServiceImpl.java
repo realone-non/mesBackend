@@ -119,8 +119,7 @@ public class EstimateServiceImpl implements EstimateService {
 
     // 견적번호 날짜형식으로 생성
     private String createEstimateNo() {
-        String dateTimeFormat = DATE_TIME_FORMAT;
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormat));
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
     }
 
     // ===================================== 견적 품목 정보 ======================================
