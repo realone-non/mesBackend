@@ -25,7 +25,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
-@Validated
 @Service
 public class ItemServiceImpl implements ItemService {
     @Autowired

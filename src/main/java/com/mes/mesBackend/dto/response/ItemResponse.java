@@ -145,7 +145,7 @@ public class ItemResponse {
     @Setter
     @JsonInclude(NON_NULL)
     @Schema(description = "품목")
-    public static class toEstimateItem {
+    public static class noAndNameAndStandardAndUnitAndPrice {
         @Schema(description = "고유아이디")
         Long id;
 

@@ -85,7 +85,7 @@ public class EstimateController {
     }
 
     // 견적 전체 조회 검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 거래처 담당자
-    @Operation(summary = "견적 전체 조회", description = "검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 거래처 담당자")
+    @Operation(summary = "견적 전체 조회", description = "검색조건: 거래처, 견적기간(fromDate~toDate), 화폐, 거래처 담당자")
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<EstimateResponse>> getEstimates(
