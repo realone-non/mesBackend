@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
@@ -68,5 +67,21 @@ public class ContractItem extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
+    public void addJoin(Contract contract, Item item) {
+        setContract(contract);
+        setItem(item);
+    }
 
+    public void update(ContractItem newContractItem, Item newItem) {
+        setItem(newItem);
+        setAmount(newContractItem.amount);
+        setContractType(newContractItem.contractType);
+        setPeriodDate(newContractItem.periodDate);
+        setStandardItemNo(newContractItem.standardItemNo);
+        setNote(newContractItem.note);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

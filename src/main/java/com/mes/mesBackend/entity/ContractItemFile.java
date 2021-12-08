@@ -8,11 +8,11 @@ import javax.persistence.*;
 
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
-import static lombok.AccessLevel.PROTECTED;
+import static lombok.AccessLevel.PUBLIC;
 
 // 수주 품목 파일 리스트
 @AllArgsConstructor
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = PUBLIC)
 @Entity(name = "CONTRACT_ITEM_FILES")
 @Data
 public class ContractItemFile extends BaseTimeEntity {
@@ -29,5 +29,14 @@ public class ContractItemFile extends BaseTimeEntity {
     private String fileUrl;
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
-    private boolean deleteYn;
+    private boolean deleteYn = false;
+
+    public void add(ContractItem contractItem, String fileUrl) {
+        setContractItem(contractItem);
+        setFileUrl(fileUrl);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

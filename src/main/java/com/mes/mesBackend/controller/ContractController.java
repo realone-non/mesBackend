@@ -59,13 +59,14 @@ public class ContractController {
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
-                    @ApiResponse(responseCode = "400", description = "bad request")
+                    @ApiResponse(responseCode = "400", description = "bad request"),
+                    @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
     public ResponseEntity<ContractResponse> createContract(
             @RequestBody @Valid ContractRequest contractRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws BadRequestException, NotFoundException {
+    ) throws NotFoundException {
         ContractResponse contract = contractService.createContract(contractRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + contract.getId() + " from createContract.");
@@ -79,7 +80,7 @@ public class ContractController {
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
-                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
     public ResponseEntity<ContractResponse> getContract(
@@ -95,7 +96,7 @@ public class ContractController {
     // 수주 리스트 조회
     @GetMapping
     @ResponseBody
-    @Operation(summary = "수주 리스트 조회", description = "")
+    @Operation(summary = "수주 리스트 조회", description = "검색조건: 거래처 명, 수주기간 fromDate~toDate, 화폐 id, 담당자 명")
     public ResponseEntity<List<ContractResponse>> getContracts(
             @RequestParam(required = false) @Parameter(description = "거래처 명") String clientName,
             @RequestParam(required = false) @Parameter(description = "담당자 명") String userName,
@@ -106,7 +107,7 @@ public class ContractController {
     ) {
         List<ContractResponse> contracts = contractService.getContracts(clientName, userName, fromDate, toDate, currencyId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getContracts.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of currencyId: " + currencyId + " from getContracts.");
         return new ResponseEntity<>(contracts, HttpStatus.OK);
     }
 
@@ -125,7 +126,7 @@ public class ContractController {
             @PathVariable(value = "contract-id") @Parameter(description = "수주 id") Long contractId,
             @RequestBody @Valid ContractRequest contractRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException, BadRequestException {
+    ) throws NotFoundException {
         ContractResponse contract = contractService.updateContract(contractId, contractRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + contract.getId() + " from updateContract.");
@@ -143,12 +144,12 @@ public class ContractController {
             }
     )
     public ResponseEntity<Void> deleteContract(
-            @PathVariable(value = "contract-id") @Parameter(description = "수주 id") Long id,
+            @PathVariable(value = "contract-id") @Parameter(description = "수주 id") Long contractId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        contractService.deleteContract(id);
+        contractService.deleteContract(contractId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteContract.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + contractId + " from deleteContract.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -159,19 +160,21 @@ public class ContractController {
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
-                    @ApiResponse(responseCode = "400", description = "bad request")
+                    @ApiResponse(responseCode = "400", description = "bad request"),
+                    @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
     public ResponseEntity<ContractItemResponse> createContractItem(
-            @PathVariable(value = "contract-id") @Parameter(description = "수주 id")
+            @PathVariable(value = "contract-id") @Parameter(description = "수주 id") Long contractId,
             @RequestBody @Valid ContractItemRequest contractItemRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws BadRequestException {
-        ContractItemResponse contractItem = contractService.createContractItem(contractItemRequest);
+    ) throws NotFoundException {
+        ContractItemResponse contractItem = contractService.createContractItem(contractId, contractItemRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + contractItem.getId() + " from createContractItem.");
         return new ResponseEntity<>(contractItem, HttpStatus.OK);
     }
+
     // 수주 품목 단일 조회
     @GetMapping("/{contract-id}/contract-items/{contract-item-id}")
     @ResponseBody
@@ -192,19 +195,27 @@ public class ContractController {
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + contractItem.getId() + " from getContractItem.");
         return new ResponseEntity<>(contractItem, HttpStatus.OK);
     }
+
     // 수주 품목 전체 조회
     @GetMapping("/{contract-id}/contract-items")
     @ResponseBody
     @Operation(summary = "수주 품목 전체 조회", description = "")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+            }
+    )
     public ResponseEntity<List<ContractItemResponse>> getContractItems(
             @PathVariable(value = "contract-id") @Parameter(description = "수주 id") Long contractId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
+    ) throws NotFoundException {
         List<ContractItemResponse> contractItems = contractService.getContractItems(contractId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of contractId: " + contractId + " from getContractItems.");
         return new ResponseEntity<>(contractItems, HttpStatus.OK);
     }
+
     // 수주 품목 수정
     @PatchMapping("/{contract-id}/contract-items/{contract-item-id}")
     @ResponseBody()
@@ -221,7 +232,7 @@ public class ContractController {
             @PathVariable(value = "contract-item-id") @Parameter(description = "수주 품목 id") Long contractItemId,
             @RequestBody @Valid ContractItemRequest contractItemRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException, BadRequestException {
+    ) throws NotFoundException {
         ContractItemResponse contractItem = contractService.updateContractItem(contractId, contractItemId, contractItemRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + contractItem.getId() + " from updateContractItem.");
@@ -253,7 +264,7 @@ public class ContractController {
     // 수주 품목 파일 추가
     @PutMapping(value = "/{contract-id}/contract-items/{contract-item-id}/contract-item-files",  consumes = MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    @Operation(summary = "수주 품목 파일 추가")
+    @Operation(summary = "수주 품목 파일 추가", hidden = true)
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -276,7 +287,7 @@ public class ContractController {
     // 수주 품목 파일 전체 조회
     @GetMapping("/{contract-id}/contract-items/{contract-item-id}/contract-item-files")
     @ResponseBody
-    @Operation(summary = "수주 품목 파일 전체 조회")
+    @Operation(summary = "수주 품목 파일 전체 조회", hidden = true)
     public ResponseEntity<List<ContractItemFileResponse>> getContractItemFiles(
             @PathVariable(value = "contract-id") @Parameter(description = "수주 id") Long contractId,
             @PathVariable(value = "contract-item-id") @Parameter(description = "수주 품목 id") Long contractItemId,
@@ -291,7 +302,7 @@ public class ContractController {
     // 수주 품목 파일 삭제
     @DeleteMapping("/{contract-id}/contract-items/{contract-item-id}/contract-item-files/{contract-item-file-id}")
     @ResponseBody
-    @Operation(summary = "수주 품목 파일 삭제")
+    @Operation(summary = "수주 품목 파일 삭제", hidden = true)
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "204", description = "no content"),

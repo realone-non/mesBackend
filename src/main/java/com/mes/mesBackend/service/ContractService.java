@@ -5,9 +5,11 @@ import com.mes.mesBackend.dto.request.ContractRequest;
 import com.mes.mesBackend.dto.response.ContractItemFileResponse;
 import com.mes.mesBackend.dto.response.ContractItemResponse;
 import com.mes.mesBackend.dto.response.ContractResponse;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 // 4-2. 수주 등록
@@ -22,25 +24,25 @@ public interface ContractService {
     // 수주 수정
     ContractResponse updateContract(Long contractId, ContractRequest contractRequest) throws NotFoundException;
     // 수주 삭제
-    void deleteContract(Long id);
+    void deleteContract(Long id) throws NotFoundException;
 
     // ======================================== 수주 품목 ===============================================
     // 수주 품목 생성
-    ContractItemResponse createContractItem(ContractItemRequest contractItemRequest);
+    ContractItemResponse createContractItem(Long contractId, ContractItemRequest contractItemRequest) throws NotFoundException;
     // 수주 품목 단일 조회
-    ContractItemResponse getContractItem(Long contractId, Long contractItemId);
+    ContractItemResponse getContractItem(Long contractId, Long contractItemId) throws NotFoundException;
     // 수주 품목 전체 조회
-    List<ContractItemResponse> getContractItems(Long contractId);
+    List<ContractItemResponse> getContractItems(Long contractId) throws NotFoundException;
     // 수주 품목 수정
-    ContractItemResponse updateContractItem(Long contractId, Long contractItemId, ContractItemRequest contractItemRequest);
+    ContractItemResponse updateContractItem(Long contractId, Long contractItemId, ContractItemRequest contractItemRequest) throws NotFoundException;
     // 수주 품목 삭제
-    void deleteContractItem(Long contractId, Long contractItemId);
+    void deleteContractItem(Long contractId, Long contractItemId) throws NotFoundException;
 
     // ======================================== 수주 품목 파일 ===============================================
     // 수주 품목 파일 추가
-    ContractItemFileResponse createBusinessFileToContractItemFile(Long contractId, Long contractItemId, MultipartFile file);
+    ContractItemFileResponse createBusinessFileToContractItemFile(Long contractId, Long contractItemId, MultipartFile file) throws NotFoundException, BadRequestException, IOException;
     // 수주 품목 파일 전체 조회
-    List<ContractItemFileResponse> getItemFiles(Long contractId, Long contractItemId);
+    List<ContractItemFileResponse> getItemFiles(Long contractId, Long contractItemId) throws NotFoundException;
     // 수주 품목 파일 삭제
-    void deleteItemFile(Long contractId, Long contractItemId, Long contractItemFileId);
+    void deleteItemFile(Long contractId, Long contractItemId, Long contractItemFileId) throws NotFoundException;
 }

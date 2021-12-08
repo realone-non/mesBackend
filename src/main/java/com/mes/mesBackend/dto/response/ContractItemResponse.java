@@ -32,7 +32,7 @@ public class ContractItemResponse {
     int contractAmountWon;
 
     @Schema(description = "부가세")
-    int surtax;
+    double surtax;
 
     @Schema(description = "수주유형")
     ContractType contractType;
@@ -42,14 +42,11 @@ public class ContractItemResponse {
     LocalDate periodDate;       // 납기일자
 
     @Schema(description = "고객발주번호")
-    ContractResponse.idAndClientOrderNo contract;
+    String contractNo;
 
     @Schema(description = "규격화 품번")
     String standardItemNo;      // 규격화 품번
 
     @Schema(description = "비고")
     String note;        // 비고
-
-    @Schema(description = "첨부파일")
-    String fileCnt;
 }

@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.text.DecimalFormat;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +35,7 @@ public class MapperConfig {
         modelMapper.addConverter(toSubItemResponseConvert);
         modelMapper.addConverter(toWorkLineResponse);
         modelMapper.addConverter(toEstimateItemResponse);
+        modelMapper.addConverter(toContractItemResponse);
 
         return modelMapper;
     }
@@ -208,6 +208,27 @@ public class MapperConfig {
             int price = estimateItemResponse.getItem().getInputUnitPrice() * estimateItemResponse.getAmount();
             estimateItemResponse.setPrice(price);
             return estimateItemResponse;
+        }
+    };
+
+    // 4-2. 수주 품목 등록
+    Converter<ContractItem, ContractItemResponse> toContractItemResponse = new Converter<ContractItem, ContractItemResponse>() {
+        @Override
+        public ContractItemResponse convert(MappingContext<ContractItem, ContractItemResponse> context) {
+            ModelMapper mapper = new ModelMapper();
+            ContractItem contractItem = context.getSource();
+            ContractItemResponse contractItemResponse = mapper.map(contractItem, ContractItemResponse.class);
+            // 수주금액: 수량 * 단가
+            int contractAmount = contractItem.getItem().getInputUnitPrice() * contractItem.getAmount();
+            contractItemResponse.setContractAmount(contractAmount);
+            // 수주금액(원화): 수량 * 단가
+            contractItemResponse.setContractAmountWon(contractAmount);
+            // 부가세 : 수주금액 * 0.1
+            double surtax = contractAmount * 0.1;
+            contractItemResponse.setSurtax(surtax);
+            // 고객발주번호: 수주의 고객발주번호
+            contractItemResponse.setContractNo(contractItem.getContract().getClientOrderNo());
+            return contractItemResponse;
         }
     };
 }
