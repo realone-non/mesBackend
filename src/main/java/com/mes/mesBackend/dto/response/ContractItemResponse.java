@@ -42,11 +42,13 @@ public class ContractItemResponse {
     LocalDate periodDate;       // 납기일자
 
     @Schema(description = "고객발주번호")
-    String contractNo;
+    String clientOrderNo;
 
     @Schema(description = "규격화 품번")
     String standardItemNo;      // 규격화 품번
 
     @Schema(description = "비고")
     String note;        // 비고
+
+
 }

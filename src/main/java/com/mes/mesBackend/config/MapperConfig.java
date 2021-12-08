@@ -227,7 +227,7 @@ public class MapperConfig {
             double surtax = contractAmount * 0.1;
             contractItemResponse.setSurtax(surtax);
             // 고객발주번호: 수주의 고객발주번호
-            contractItemResponse.setContractNo(contractItem.getContract().getClientOrderNo());
+            contractItemResponse.setClientOrderNo(contractItem.getContract().getClientOrderNo());
             return contractItemResponse;
         }
     };
