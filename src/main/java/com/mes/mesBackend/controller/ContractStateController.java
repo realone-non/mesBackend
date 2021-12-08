@@ -36,7 +36,7 @@ public class ContractStateController {
     @Autowired
     LogService logService;
 
-    private Logger logger = LoggerFactory.getLogger(ContractController.class);
+    private Logger logger = LoggerFactory.getLogger(ContractStateController.class);
     private CustomLogger cLogger;
 
     // 수주 리스트 조회
@@ -49,9 +49,9 @@ public class ContractStateController {
             @RequestParam(required = false) @Parameter(description = "수주 번호") String contractNo,
             @RequestParam(required = false) @Parameter(description = "담당자 명") String userName,
             @RequestParam(required = false) @Parameter(description = "기간 구분") PeriodType periodType,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "수주기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "수주기간 toDate") LocalDate toDate,
-            @RequestParam(required = false) @Parameter(description = "수주유형") ContractType contractType,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "기간 toDate") LocalDate toDate,
+            @RequestParam(required = false) @Parameter(description = "수주 유형") ContractType contractType,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<ContractItemStateResponse> contractItemStates = contractItemStateService.getContractItemStates(clientName, itemNoAndItemName, contractNo, userName, periodType, fromDate, toDate, contractType);
