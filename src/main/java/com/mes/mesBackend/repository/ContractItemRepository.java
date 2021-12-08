@@ -2,6 +2,7 @@ package com.mes.mesBackend.repository;
 
 import com.mes.mesBackend.entity.Contract;
 import com.mes.mesBackend.entity.ContractItem;
+import com.mes.mesBackend.repository.custom.ContractItemStateRepositoryCustom;
 import com.mes.mesBackend.repository.custom.JpaCustomRepository;
 import org.springframework.stereotype.Repository;
 

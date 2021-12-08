@@ -3,14 +3,10 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.entity.BomMaster;
 import com.mes.mesBackend.entity.QBomMaster;
 import com.mes.mesBackend.repository.custom.BomMasterRepositoryCustom;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
