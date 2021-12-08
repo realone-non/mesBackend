@@ -10,6 +10,5 @@ import java.util.Optional;
 @Repository
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
     List<RefreshToken> findAllByUserCodeAndUseYnTrue(String userCode);
-
     Optional<RefreshToken> findByUserCodeAndUseYnTrue(String userCode);
 }

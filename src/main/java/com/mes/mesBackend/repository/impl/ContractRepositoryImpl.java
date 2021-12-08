@@ -36,6 +36,7 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
                         isClientNameContaining(clientName),
                         isUserNameContaining(userName),
                         isCurrencyEq(currencyId),
+                        isContractDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
                 .fetch();
@@ -52,9 +53,9 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
     }
 
     // 수주기간 조회
-//    private BooleanExpression isContractDateBetween(LocalDate fromDate, LocalDate toDate) {
-//        return fromDate != null ? contract.contractDate.
-//    }
+    private BooleanExpression isContractDateBetween(LocalDate fromDate, LocalDate toDate) {
+        return fromDate != null ? contract.contractDate.between(fromDate, toDate) : null;
+    }
 
     // 화폐 조회
     private BooleanExpression isCurrencyEq(Long currencyId) {

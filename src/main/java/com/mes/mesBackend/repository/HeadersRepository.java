@@ -9,5 +9,4 @@ import java.util.List;
 @Repository
 public interface HeadersRepository extends JpaRepository<Header, Long> {
     List<Header> findAllByControllerNameOrderBySeq(String ControllerName);
-
 }

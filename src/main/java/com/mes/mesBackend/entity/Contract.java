@@ -148,4 +148,8 @@ public class Contract extends BaseTimeEntity {
         setShipmentWk(newContract.shipmentWk);
         setNote(newContract.note);
     }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }
