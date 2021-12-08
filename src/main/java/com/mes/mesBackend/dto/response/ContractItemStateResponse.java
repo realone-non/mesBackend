@@ -63,6 +63,9 @@ public class ContractItemStateResponse {
     @Schema(description = "화폐")
     String currency;          // 화폐
 
+    @Schema(description = "단가")
+    int price;
+
     @Schema(description = "수주금액")
     int contractAmount;
 
