@@ -20,64 +20,64 @@ public class ContractResponse {
     Long id;
 
     @Schema(description = "수주번호")
-    String contractNo;      // 수주번호
+    String contractNo;
 
     @Schema(description = "거래처")
-    ClientResponse.CodeAndName client;          // 고객사, 고객사명
+    ClientResponse.CodeAndName client;
 
     @Schema(description = "수주일자")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-    LocalDate contractDate;     // 수주일자
+    LocalDate contractDate;
 
     @Schema(description = "고객발주일자")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-    LocalDate clientOrderDate;      // 고객발주일자
+    LocalDate clientOrderDate;
 
     @Schema(description = "생산유형")
-    ProductionType productionType;  // 생산유형
+    ProductionType productionType;
 
     @Schema(description = "고객발주번호")
-    String clientOrderNo;       // 고객발주번호
+    String clientOrderNo;
 
     @Schema(description = "담당자")
-    UserResponse.idAndKorName user;              // 담당자
+    UserResponse.idAndKorName user;
 
     @Schema(description = "화폐")
-    CurrencyResponse.idAndUnit currency;          // 화폐
+    CurrencyResponse.idAndUnit currency;
 
     @Schema(description = "부가세적용")
-    String surtax;              // 부가세적용
+    String surtax;
 
     @Schema(description = "출고창고")
-    WareHouseResponse.idAndName outputWareHouse;         // 출고창고
+    WareHouseResponse.idAndName outputWareHouse;
 
     @Schema(description = "납기일자")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-    LocalDate periodDate;               // 납기일자
+    LocalDate periodDate;
 
     @Schema(description = "변경사유")
-    String changeReason;        // 변경사유
+    String changeReason;
 
     @Schema(description = "결제완료")
-    boolean paymentYn;          // 결제완료
+    boolean paymentYn;
 
     @Schema(description = "지불조건")
-    String payCondition;        // 지불조건
+    String payCondition;
 
     @Schema(description = "Forwader")
-    String forwader;                // Forwader
+    String forwader;
 
     @Schema(description = "운송조건")
-    String transportCondition;      // 운송조건
+    String transportCondition;
 
     @Schema(description = "Shipment Service")
-    String shipmentService;         // Shipment Service
+    String shipmentService;
 
     @Schema(description = "Shipment WK")
-    String shipmentWk;              // Shipment WK
+    String shipmentWk;
 
     @Schema(description = "비고")
-    String note;                    // 비고
+    String note;
 
     @Getter
     @Setter
@@ -87,6 +87,6 @@ public class ContractResponse {
         Long id;
 
         @Schema(description = "고객발주번호")
-        String clientOrderNo;       // 고객발주번호
+        String clientOrderNo;
     }
 }

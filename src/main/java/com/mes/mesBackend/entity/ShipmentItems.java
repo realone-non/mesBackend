@@ -1,11 +1,14 @@
 package com.mes.mesBackend.entity;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
 
 /*
  * 출하등록에 품목정보
@@ -25,33 +28,37 @@ import javax.persistence.*;
  * 비고
  * */
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 @Entity(name = "SHIPMENT_ITEMS")
 @Data
 public class ShipmentItems extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '출하등록 품목정보 고유아이디'")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CONTRACT", nullable = false, columnDefinition = "bigint COMMENT '수주'")
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "CONTRACT", columnDefinition = "bigint COMMENT '수주'", nullable = false)
     private Contract contract;      // 수주
 
-    @Column(name = "NOT_SHIPPED_AMOUNT", nullable = false, columnDefinition = "int COMMENT '수주 미출하수량'")
-    private int notShippedAmount;   // 수주미출하수량
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "CONTRACT_ITEM", columnDefinition = "bigint COMMENT '수주 품목'", nullable = false)
+    private ContractItem contractItem;
 
-    @Column(name = "SHIPMENT_AMOUNT", nullable = false, columnDefinition = "int COMMENT '출하수량'")
+//    @Column(name = "NOT_SHIPPED_AMOUNT", columnDefinition = "int COMMENT '수주 미출하수량'")
+//    private int notShippedAmount;   // 수주미출하수량
+
+    @Column(name = "SHIPMENT_AMOUNT", columnDefinition = "int COMMENT '출하수량'")
     private int shipmentAmount;     // 출하수량
 
-    @Column(name = "SHIPMENT_PRICE", nullable = false, columnDefinition = "int COMMENT '출하금액'")
-    private int shipmentPrice;      // 출하금액
+//    @Column(name = "SHIPMENT_PRICE", columnDefinition = "int COMMENT '출하금액'")
+//    private int shipmentPrice;      // 출하금액
+//
+//    @Column(name = "SHIPMENT_PRICE_WON", columnDefinition = "int COMMENT '출하금액(원화)'")
+//    private int shipmentPriceWon;   // 출하금액(원화)
 
-    @Column(name = "SHIPMENT_PRICE_WON", nullable = false, columnDefinition = "int COMMENT '출하금액(원화)'")
-    private int shipmentPriceWon;   // 출하금액(원화)
-
-    @Column(name = "INVENTORY_AMOUNT", nullable = false, columnDefinition = "int COMMENT '재고수량'")
-    private int inventoryAMOUNT;          // 재고수량
+    @Column(name = "INVENTORY_AMOUNT", columnDefinition = "int COMMENT '재고수량'")
+    private int inventoryAmount;          // 재고수량
 
     @Column(name = "PKGS", columnDefinition = "float COMMENT 'PKGS'")
     private float pkgs;                // PKGS
@@ -65,13 +72,10 @@ public class ShipmentItems extends BaseTimeEntity {
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;            // 비고
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
-    private boolean useYn = true;   // 사용여부
-
-    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN",  columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "SHIPMENT", columnDefinition = "bigint COMMENT '출하'")
     private Shipment shipment;          // 출하
 }
