@@ -59,7 +59,7 @@ public class BomMasterController {
     ) throws NotFoundException {
         BomMasterResponse bomMaster = bomMasterService.createBomMaster(bomMasterRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + bomMaster.getId() + " from createBomMaster.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + bomMaster.getId() + " from createBomMaster.");
         return new ResponseEntity<>(bomMaster, HttpStatus.OK);
     }
     

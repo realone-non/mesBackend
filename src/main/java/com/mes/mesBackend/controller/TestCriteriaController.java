@@ -57,7 +57,7 @@ public class TestCriteriaController {
     ) {
         TestCriteriaResponse testCriteria = testCriteriaService.createTestCriteria(testCriteriaRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + testCriteria.getId() + " from createTestCriteria.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + testCriteria.getId() + " from createTestCriteria.");
         return new ResponseEntity<>(testCriteria, HttpStatus.OK);
     }
 

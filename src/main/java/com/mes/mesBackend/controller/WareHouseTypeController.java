@@ -55,7 +55,7 @@ public class WareHouseTypeController {
     ) {
         WareHouseTypeResponse wareHouseType = wareHouseTypeService.createWareHouseType(wareHouseTypeRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + wareHouseType.getId() + " from createWareHouseType.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + wareHouseType.getId() + " from createWareHouseType.");
         return new ResponseEntity<>(wareHouseType, HttpStatus.OK);
     }
 

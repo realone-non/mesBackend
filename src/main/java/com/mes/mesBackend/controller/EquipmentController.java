@@ -54,7 +54,7 @@ public class EquipmentController {
     ) throws NotFoundException {
         EquipmentResponse equipment = equipmentService.createEquipment(equipmentRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + equipment.getId() + " from createEquipment.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + equipment.getId() + " from createEquipment.");
         return new ResponseEntity<>(equipment, HttpStatus.OK);
     }
 

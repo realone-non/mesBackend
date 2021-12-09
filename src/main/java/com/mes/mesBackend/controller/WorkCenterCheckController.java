@@ -60,7 +60,7 @@ public class WorkCenterCheckController {
     ) throws NotFoundException {
         WorkCenterCheckResponse workCenterCheck = workCenterCheckService.createWorkCenterCheck(workCenterId, checkTypeId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + workCenterCheck.getId() + " from createWorkCenterCheck.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workCenterCheck.getId() + " from createWorkCenterCheck.");
         return new ResponseEntity<>(workCenterCheck, HttpStatus.OK);
     }
 
@@ -163,7 +163,7 @@ public class WorkCenterCheckController {
     ) throws NotFoundException, BadRequestException {
         WorkCenterCheckDetailResponse workCenterCheckDetail = workCenterCheckService.createWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + workCenterCheckDetail.getId()
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workCenterCheckDetail.getId()
                 + " from createWorkCenterCheckDetail.");
         return new ResponseEntity<>(workCenterCheckDetail, HttpStatus.OK);
     }

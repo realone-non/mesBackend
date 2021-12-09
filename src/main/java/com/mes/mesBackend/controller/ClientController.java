@@ -61,7 +61,7 @@ public class ClientController {
     ) throws NotFoundException {
         ClientResponse client = clientService.createClient(clientRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + client.getId() + " from createClient.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + client.getId() + " from createClient.");
         return new ResponseEntity<>(client, HttpStatus.OK);
     }
 
@@ -161,7 +161,7 @@ public class ClientController {
     ) throws NotFoundException, IOException, BadRequestException {
         ClientResponse fileToClient = clientService.createBusinessFileToClient(id, businessFile);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + fileToClient.getId() + " from createBusinessFileToClient.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + fileToClient.getId() + " from createBusinessFileToClient.");
         return new ResponseEntity<>(fileToClient, HttpStatus.OK);
     }
 }

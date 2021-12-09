@@ -58,7 +58,7 @@ public class CheckTypeController {
     ) {
         CheckTypeResponse checkType = checkTypeService.createCheckType(checkTypeRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + checkType.getId() + " from createCheckType.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + checkType.getId() + " from createCheckType.");
         return new ResponseEntity<>(checkType, HttpStatus.OK);
     }
 

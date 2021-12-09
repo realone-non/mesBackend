@@ -53,7 +53,7 @@ public class BusinessTypeController {
     ) {
         BusinessTypeResponse businessType = businessTypeService.createBusinessType(businessTypeRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + businessType.getId() + " from createBusinessType.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + businessType.getId() + " from createBusinessType.");
         return new ResponseEntity<>(businessType, HttpStatus.OK);
     }
 
@@ -72,7 +72,7 @@ public class BusinessTypeController {
     ) throws NotFoundException {
         BusinessTypeResponse businessType = businessTypeService.getBusinessType(id);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + businessType.getId() + " from getBusinessType.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + businessType.getId() + " from getBusinessType.");
         return new ResponseEntity<>(businessType, HttpStatus.OK);
     }
 

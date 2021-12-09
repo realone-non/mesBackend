@@ -57,7 +57,7 @@ public class UnitController {
     ) throws NotFoundException, BadRequestException {
         UnitResponse unit = unitService.createUnit(unitRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + unit.getId() + " from createUnit.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + unit.getId() + " from createUnit.");
         return new ResponseEntity<>(unit, HttpStatus.OK);
     }
 

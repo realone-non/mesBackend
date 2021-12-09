@@ -64,7 +64,7 @@ public class ItemController {
     ) throws NotFoundException {
         ItemResponse item = itemService.createItem(itemRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + item.getId() + " from createItem.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + item.getId() + " from createItem.");
         return new ResponseEntity<>(item, HttpStatus.OK);
     }
 
@@ -167,7 +167,7 @@ public class ItemController {
     ) throws NotFoundException {
         ItemFileResponse itemFileInfo = itemService.createItemFileInfo(itemId, itemFileRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + itemFileInfo.getId() + " from createItemFileInfo.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + itemFileInfo.getId() + " from createItemFileInfo.");
         return new ResponseEntity<>(itemFileInfo, HttpStatus.OK);
     }
 
@@ -190,7 +190,7 @@ public class ItemController {
     ) throws NotFoundException, IOException, BadRequestException {
         ItemFileResponse fileResponse = itemService.createFile(itemId, itemFileId, file);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + fileResponse.getId() + " from createItemFile.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + fileResponse.getId() + " from createItemFile.");
         return new ResponseEntity<>(fileResponse, HttpStatus.OK);
     }
 

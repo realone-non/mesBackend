@@ -59,7 +59,7 @@ public class ItemGroupCodeController {
     ) {
         CodeResponse itemGroupCode = itemGroupCodeService.createItemGroupCode(codeRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + itemGroupCode.getId() + " from createItemGroupCode.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + itemGroupCode.getId() + " from createItemGroupCode.");
         return new ResponseEntity<>(itemGroupCode, HttpStatus.OK);
     }
 

@@ -52,7 +52,7 @@ public class GaugeTypeController {
     ) {
         GaugeTypeResponse gaugeType = gaugeTypeService.createGaugeType(gaugeTypeRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + gaugeType.getId() + " from createGaugeType.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + gaugeType.getId() + " from createGaugeType.");
         return new ResponseEntity<>(gaugeType, HttpStatus.OK);
     }
 

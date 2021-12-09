@@ -71,7 +71,7 @@ public class NavigationController {
     ) {
         MainNavResponse mainNavigation = navigationService.createMainNavigation(mainNavRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + mainNavigation.getId() + " from createMainNavigation.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + mainNavigation.getId() + " from createMainNavigation.");
         return new ResponseEntity<>(mainNavigation, HttpStatus.OK);
     }
 
@@ -156,7 +156,7 @@ public class NavigationController {
     ) {
         SubNavResponse subNavigation = navigationService.createSubNavigation(mainNavId, subNavRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + subNavigation.getId() + " from createSubNavigation.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + subNavigation.getId() + " from createSubNavigation.");
         return new ResponseEntity<>(subNavigation, HttpStatus.OK);
     }
 
@@ -234,7 +234,7 @@ public class NavigationController {
     ) {
         DetailNavResponse detailNavigation = navigationService.createDetailNavigation(subNavId, detailNavRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + detailNavigation.getId() + " from createDetailNavigation.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + detailNavigation.getId() + " from createDetailNavigation.");
         return new ResponseEntity<>(detailNavigation, HttpStatus.OK);
     }
 

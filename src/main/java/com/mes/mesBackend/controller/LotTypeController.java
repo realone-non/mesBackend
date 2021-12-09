@@ -58,7 +58,7 @@ public class LotTypeController {
     ) {
         LotTypeResponse lotType = lotTypeService.createLotType(lotTypeRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + lotType.getId() + " from createLotType.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + lotType.getId() + " from createLotType.");
         return new ResponseEntity<>(lotType, HttpStatus.OK);
     }
 

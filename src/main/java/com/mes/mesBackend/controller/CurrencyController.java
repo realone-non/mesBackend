@@ -53,7 +53,7 @@ public class CurrencyController {
     ) {
         CurrencyResponse currency = currencyService.createCurrency(currencyRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + currency.getId() + " from createCurrency.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + currency.getId() + " from createCurrency.");
         return new ResponseEntity<>(currency, HttpStatus.OK);
     }
 

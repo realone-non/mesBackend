@@ -56,7 +56,7 @@ public class ItemGroupController {
     ) throws NotFoundException {
         ItemGroupResponse itemGroup = itemGroupService.createItemGroup(itemGroupRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + itemGroup.getId() + " from createItemGroup.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + itemGroup.getId() + " from createItemGroup.");
         return new ResponseEntity<>(itemGroup, HttpStatus.OK);
     }
 

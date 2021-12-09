@@ -57,7 +57,7 @@ public class CountryCodeController {
     ) {
         CountryCodeResponse countryCode = countryCodeService.createCountryCode(countryCodeRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + countryCode.getId() + " from createCountryCode.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is  created the " + countryCode.getId() + " from createCountryCode.");
         return new ResponseEntity<>(countryCode, HttpStatus.OK);
     }
 

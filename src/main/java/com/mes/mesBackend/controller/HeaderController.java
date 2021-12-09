@@ -76,7 +76,7 @@ public class HeaderController {
     ) {
         HeaderResponse header = headerService.createHeader(headerRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the header: " + headerRequest.getHeader()  + " from createHeader.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the header: " + headerRequest.getHeader()  + " from createHeader.");
         return new ResponseEntity<>(header, HttpStatus.OK);
     }
 

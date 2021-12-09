@@ -57,7 +57,7 @@ public class WorkCenterController {
     ) throws NotFoundException {
         WorkCenterResponse workCenter = workCenterService.createWorkCenter(workCenterRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + workCenter.getId() + " from createWorkCenter.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workCenter.getId() + " from createWorkCenter.");
         return new ResponseEntity<>(workCenter, HttpStatus.OK);
     }
 

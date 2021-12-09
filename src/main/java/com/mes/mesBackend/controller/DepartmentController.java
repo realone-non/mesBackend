@@ -57,7 +57,7 @@ public class DepartmentController {
     ) {
         DepartmentResponse department = departmentService.createDepartment(departmentRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + department.getId() + " from createDepartment.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + department.getId() + " from createDepartment.");
         return new ResponseEntity<>(department, HttpStatus.OK);
     }
 

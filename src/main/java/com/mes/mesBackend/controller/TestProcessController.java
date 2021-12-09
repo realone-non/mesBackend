@@ -57,7 +57,7 @@ public class TestProcessController {
     ) {
         TestProcessResponse testProcess = testProcessService.createTestProcess(testProcessRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + testProcess.getId() + " from createTestProcess.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + testProcess.getId() + " from createTestProcess.");
         return new ResponseEntity<>(testProcess, HttpStatus.OK);
     }
 

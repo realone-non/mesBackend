@@ -56,7 +56,7 @@ public class WorkLineController {
     ) throws NotFoundException {
         WorkLineResponse workLine = workLineService.createWorkLine(workLineRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + workLine.getId() + " from createWorkLine.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workLine.getId() + " from createWorkLine.");
         return new ResponseEntity<>(workLine, HttpStatus.OK);
     }
 

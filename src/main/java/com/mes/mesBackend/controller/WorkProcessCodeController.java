@@ -57,7 +57,7 @@ public class WorkProcessCodeController {
     ) {
         CodeResponse workProcessCode = workProcessCodeService.createWorkProcessCode(codeRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + workProcessCode.getId() + " from createWorkProcessCode.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workProcessCode.getId() + " from createWorkProcessCode.");
         return new ResponseEntity<>(workProcessCode, HttpStatus.OK);
     }
 

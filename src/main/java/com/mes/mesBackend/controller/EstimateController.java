@@ -197,7 +197,7 @@ public class EstimateController {
     ) throws NotFoundException {
         EstimateItemResponse estimateItem = estimateService.createEstimateItem(estimateId, estimateItemRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + estimateItem.getId() + " from createEstimateItem.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + estimateItem.getId() + " from createEstimateItem.");
         return new ResponseEntity<>(estimateItem, HttpStatus.OK);
     }
 
@@ -310,7 +310,7 @@ public class EstimateController {
     ) throws NotFoundException, BadRequestException {
         EstimatePiResponse estimatePi = estimateService.createEstimatePi(estimateId, estimatePiRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + estimatePi.getId() + " from createEstimatePi.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + estimatePi.getId() + " from createEstimatePi.");
         return new ResponseEntity<>(estimatePi, HttpStatus.OK);
     }
 

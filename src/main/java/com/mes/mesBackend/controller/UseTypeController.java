@@ -57,7 +57,7 @@ public class UseTypeController {
     ) {
         UseTypeResponse useType = useTypeService.createUseType(useTypeRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + useType.getId() + " from createUseType.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + useType.getId() + " from createUseType.");
         return new ResponseEntity<>(useType, HttpStatus.OK);
     }
 

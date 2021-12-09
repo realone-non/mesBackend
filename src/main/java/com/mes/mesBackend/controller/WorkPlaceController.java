@@ -57,7 +57,7 @@ public class WorkPlaceController {
     ) throws NotFoundException {
         WorkPlaceResponse workPlace = workPlaceService.createWorkPlace(workPlaceRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + workPlace.getId() + " from createWorkPlace.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workPlace.getId() + " from createWorkPlace.");
         return new ResponseEntity<>(workPlace, HttpStatus.OK);
     }
 
