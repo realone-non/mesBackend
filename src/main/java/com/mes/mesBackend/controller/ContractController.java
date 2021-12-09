@@ -67,7 +67,7 @@ public class ContractController {
     ) throws NotFoundException {
         ContractResponse contract = contractService.createContract(contractRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + contract.getId() + " from createContract.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + contract.getId() + " from createContract.");
         return new ResponseEntity<>(contract, HttpStatus.OK);
     }
 
@@ -169,7 +169,7 @@ public class ContractController {
     ) throws NotFoundException {
         ContractItemResponse contractItem = contractService.createContractItem(contractId, contractItemRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + contractItem.getId() + " from createContractItem.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + contractItem.getId() + " from createContractItem.");
         return new ResponseEntity<>(contractItem, HttpStatus.OK);
     }
 
@@ -278,7 +278,7 @@ public class ContractController {
     ) throws NotFoundException, IOException, BadRequestException {
         ContractItemFileResponse fileToContractItemFile = contractService.createBusinessFileToContractItemFile(contractId,contractItemId, file);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + fileToContractItemFile + " from createFileToContractItem.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + fileToContractItemFile + " from createFileToContractItem.");
         return new ResponseEntity<>(fileToContractItemFile, HttpStatus.OK);
     }
 

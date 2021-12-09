@@ -53,7 +53,7 @@ public class ItemCheckController {
     ) throws NotFoundException {
         ItemCheckResponse itemCheck = itemCheckService.createItemCheck(itemCheckRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + itemCheck.getId() + " from createItemCheck.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + itemCheck.getId() + " from createItemCheck.");
         return new ResponseEntity<>(itemCheck, HttpStatus.OK);
     }
 
@@ -148,7 +148,7 @@ public class ItemCheckController {
     ) throws NotFoundException {
         ItemCheckDetailResponse itemCheckDetails = itemCheckService.createItemCheckDetails(itemCheckId, itemCheckDetailRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + itemCheckDetails.getId() + " from createItemCheckDetails.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + itemCheckDetails.getId() + " from createItemCheckDetails.");
         return new ResponseEntity<>(itemCheckDetails, HttpStatus.OK);
     }
 

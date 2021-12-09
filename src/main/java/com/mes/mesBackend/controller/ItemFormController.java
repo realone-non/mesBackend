@@ -58,7 +58,7 @@ public class ItemFormController {
     ) {
         ItemFormResponse itemForm = itemFormService.createItemForm(itemFormRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + itemForm.getId() + " from createItemForm.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + itemForm.getId() + " from createItemForm.");
         return new ResponseEntity<>(itemForm, HttpStatus.OK);
     }
 

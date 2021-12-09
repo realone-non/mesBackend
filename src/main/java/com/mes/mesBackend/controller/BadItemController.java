@@ -54,7 +54,7 @@ public class BadItemController {
     ) throws BadRequestException {
         BadItemResponse badItem = badItemService.createBadItem(badItemRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + badItem.getId() + " from createBadItem.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + badItem.getId() + " from createBadItem.");
         return new ResponseEntity<>(badItem, HttpStatus.OK);
     }
 

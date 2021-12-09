@@ -59,7 +59,7 @@ public class GridOptionController {
     ) throws NotFoundException {
         GridOptionResponse gridOption = gridOptionService.createGridOption(headerId, gridOptionRequest, userId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + headerId + " from createGridOption.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + headerId + " from createGridOption.");
         return new ResponseEntity<>(gridOption, HttpStatus.OK);
     }
 

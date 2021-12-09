@@ -54,7 +54,7 @@ public class EquipmentMaintenanceController {
     ) {
         EquipmentMaintenanceResponse equipmentMaintenance = equipmentMaintenanceService.createEquipmentMaintenance(equipmentMaintenanceRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + equipmentMaintenance.getId() + " from createEquipmentMaintenance.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + equipmentMaintenance.getId() + " from createEquipmentMaintenance.");
         return new ResponseEntity<>(equipmentMaintenance, HttpStatus.OK);
     }
 

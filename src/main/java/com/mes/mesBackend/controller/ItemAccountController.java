@@ -56,7 +56,7 @@ public class ItemAccountController {
     ) {
         ItemAccountResponse itemAccount = itemAccountService.createItemAccount(itemAccountRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + itemAccount.getId() + " from createItemAccount.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + itemAccount.getId() + " from createItemAccount.");
         return new ResponseEntity<>(itemAccount, HttpStatus.OK);
     }
 

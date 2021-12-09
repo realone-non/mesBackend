@@ -57,7 +57,7 @@ public class WorkProcessController {
     ) throws NotFoundException {
         WorkProcessResponse workProcess = workProcessService.createWorkProcess(workProcessRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + workProcess.getId() + " from createWorkProcess.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workProcess.getId() + " from createWorkProcess.");
         return new ResponseEntity<>(workProcess, HttpStatus.OK);
     }
 

@@ -54,7 +54,7 @@ public class MeasureController {
     ) throws NotFoundException {
         MeasureResponse measure = measureService.createMeasure(measureRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + measure.getId() + " from createMeasure.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + measure.getId() + " from createMeasure.");
         return new ResponseEntity<>(measure, HttpStatus.OK);
     }
 

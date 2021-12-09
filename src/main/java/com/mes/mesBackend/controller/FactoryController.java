@@ -59,7 +59,7 @@ public class FactoryController {
     ) throws NotFoundException {
         FactoryResponse factory = factoryService.createFactory(factoryRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + factory.getId() + " from createFactory.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + factory.getId() + " from createFactory.");
         return new ResponseEntity<>(factory, HttpStatus.OK);
     }
 

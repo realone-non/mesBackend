@@ -58,7 +58,7 @@ public class SubItemController {
     ) throws NotFoundException, BadRequestException {
         SubItemResponse subItem = subItemService.createSubItem(subItemRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + subItem.getId() + " from createSubItem.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + subItem.getId() + " from createSubItem.");
         return new ResponseEntity<>(subItem, HttpStatus.OK);
     }
 

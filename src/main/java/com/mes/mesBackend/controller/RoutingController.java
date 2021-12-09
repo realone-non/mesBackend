@@ -58,7 +58,7 @@ public class RoutingController {
     ) {
         RoutingResponse routing = routingService.createRouting(routingRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + routing.getId() + " from createRouting.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + routing.getId() + " from createRouting.");
         return new ResponseEntity<>(routing, HttpStatus.OK);
     }
 
@@ -147,7 +147,7 @@ public class RoutingController {
     ) throws NotFoundException {
         RoutingDetailResponse routingDetails = routingService.createRoutingDetails(routingId, routingDetailRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + routingDetails.getId() + " from createRoutingDetail.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + routingDetails.getId() + " from createRoutingDetail.");
         return new ResponseEntity<>(routingDetails, HttpStatus.OK);
     }
 

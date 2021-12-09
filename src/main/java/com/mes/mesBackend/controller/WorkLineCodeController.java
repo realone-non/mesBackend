@@ -54,7 +54,7 @@ public class WorkLineCodeController {
     ) {
         CodeResponse workLineCode = workLineCodeService.createWorkLineCode(codeRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + workLineCode.getId() + " from createWorkLineCode.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workLineCode.getId() + " from createWorkLineCode.");
         return new ResponseEntity<>(workLineCode, HttpStatus.OK);
     }
 

@@ -59,7 +59,7 @@ public class WorkCenterCodeController {
     ) {
         CodeResponse workCenterCode = workCenterService.createWorkCenterCode(codeRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + workCenterCode.getId() + " from createWorkCenterCode.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workCenterCode.getId() + " from createWorkCenterCode.");
         return new ResponseEntity<>(workCenterCode, HttpStatus.OK);
     }
 

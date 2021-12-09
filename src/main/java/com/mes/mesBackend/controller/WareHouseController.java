@@ -57,7 +57,7 @@ public class WareHouseController {
     ) throws NotFoundException {
         WareHouseResponse wareHouse = wareHouseService.createWareHouse(wareHouseRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + wareHouse.getId() + " from createWareHouse.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + wareHouse.getId() + " from createWareHouse.");
         return new ResponseEntity<>(wareHouse, HttpStatus.OK);
     }
 

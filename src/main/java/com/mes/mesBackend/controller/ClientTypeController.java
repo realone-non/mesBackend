@@ -58,7 +58,7 @@ public class ClientTypeController {
     ) {
         ClientTypeResponse clientType = clientTypeService.createClientType(clientTypeRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + clientType.getId() + " from createClientType.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + clientType.getId() + " from createClientType.");
         return new ResponseEntity<>(clientType, HttpStatus.OK);
     }
 

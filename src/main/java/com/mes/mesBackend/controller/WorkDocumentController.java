@@ -58,7 +58,7 @@ public class WorkDocumentController {
     ) throws NotFoundException {
         WorkDocumentResponse workDocument = workDocumentService.createWorkDocument(workDocumentRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + workDocument.getId() + " from createWorkDocument.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workDocument.getId() + " from createWorkDocument.");
         return new ResponseEntity<>(workDocument, HttpStatus.OK);
     }
 
@@ -160,7 +160,7 @@ public class WorkDocumentController {
     ) throws NotFoundException, BadRequestException, IOException {
         WorkDocumentResponse fileToWorkDocument = workDocumentService.createFileToWorkDocument(id, file);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + fileToWorkDocument.getId() + " from createFileToWorkDocument.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + fileToWorkDocument.getId() + " from createFileToWorkDocument.");
         return new ResponseEntity<>(fileToWorkDocument, HttpStatus.OK);
     }
 
