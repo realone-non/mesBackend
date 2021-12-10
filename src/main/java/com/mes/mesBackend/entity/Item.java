@@ -45,6 +45,10 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "ITEMS")
 @Data
+@Table(indexes = {
+        @Index(name = "item_no", columnList = "ITEM_NO"),
+        @Index(name = "item_name", columnList = "ITEM_NAME")
+})
 public class Item extends BaseTimeEntity {
 
     @Id

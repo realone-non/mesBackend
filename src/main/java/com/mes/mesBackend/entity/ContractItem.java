@@ -1,6 +1,7 @@
 package com.mes.mesBackend.entity;
 
 import com.mes.mesBackend.entity.enumeration.ContractType;
+import com.querydsl.core.annotations.QueryInit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+import static lombok.AccessLevel.PUBLIC;
 
 /*
  * 수주 품목 리스트
@@ -32,7 +34,7 @@ import static lombok.AccessLevel.PROTECTED;
  * 첨부파일 (2 Files)       -> 미구현
  * */
 @AllArgsConstructor
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = PUBLIC)
 @Entity(name = "CONTRACT_ITEMS")
 @Data
 public class ContractItem extends BaseTimeEntity {

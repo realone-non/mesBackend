@@ -1,12 +1,19 @@
 package com.mes.mesBackend.entity;
 
-import lombok.AccessLevel;
+import com.mes.mesBackend.entity.enumeration.InstructionStatus;
+import com.querydsl.core.annotations.QueryInit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+
+import static javax.persistence.EnumType.STRING;
+import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
+import static lombok.AccessLevel.PUBLIC;
 
 /*
  * 6-1. 제조오더 등록
@@ -28,54 +35,61 @@ import java.time.LocalDate;
  * */
 
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PUBLIC)
 @Entity(name = "PRODUCE_ORDERS")
 @Data
 public class ProduceOrder extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '제조오더등록 고유아이디'")
     private Long id;
 
-    @Column(name = "PRODUCE_ORDER_NO", nullable = false, unique = true, columnDefinition = "varchar(255) COMMENT '제조오더번호'")
+    @Column(name = "PRODUCE_ORDER_NO", unique = true, columnDefinition = "varchar(255) COMMENT '제조오더번호'", nullable = false)
     private String produceOrderNo;      // 제조오더번호
 
-    // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CONTRACT", nullable = false, columnDefinition = "bigint COMMENT '수주'")
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "CONTRACT", columnDefinition = "bigint COMMENT '수주'", nullable = false)
     private Contract contract;          // 수주
 
-    @Column(name = "START_DATE", columnDefinition = "date COMMENT '칙수예정일'")
-    private LocalDate startDate;        // 착수예정일
+    @QueryInit("item.itemGroup")
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "CONTRACT_ITEM", columnDefinition = "bigint COMMENT '수주 품목'", nullable = false)
+    private ContractItem contractItem;
 
-    @Column(name = "END_DATE", columnDefinition = "date COMMENT '완료예정일'")
-    private LocalDate endDate;          // 완료예정일
+    @Column(name = "EXPECTED_STARTED_DATE", columnDefinition = "date COMMENT '칙수예정일'", nullable = false)
+    private LocalDate expectedStartedDate;        // 착수예정일
 
-    @Column(name = "CONTRACT_AMOUNT", columnDefinition = "int COMMENT '수주수량'")
-    private int contractAmount;         // 수주수량
+    @Column(name = "EXPECTED_COMPLETED_DATE", columnDefinition = "date COMMENT '완료예정일'", nullable = false)
+    private LocalDate expectedCompletedDate;          // 완료예정일
 
-    // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "INSTRUCTION_STATUS", columnDefinition = "bigint COMMENT '지시상태'")
-    private InstructionStatus instructionStatus;    // 지시상태
+    @Enumerated(STRING)
+    @Column(name = "INSTRUCTION_STATUS", columnDefinition = "varchar(255) COMMENT '지시상태'", nullable = false)
+    private InstructionStatus instructionStatus = InstructionStatus.SCHEDULE;    // 지시상태
 
-    @Column(name = "PRODUCE_TYPE", columnDefinition = "varchar(255) COMMENT '수주유형'")
-    private String produceType;         // 수주유형
-
-    @Column(name = "RATE", columnDefinition = "int COMMENT '보정율'")
-    private int rate;                   // 보정율
+    @Column(name = "RATE", columnDefinition = "int COMMENT '보정율'", nullable = false)
+    private int rate = 0;                   // 보정율
 
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                // 비고
 
-    @Column(name = "USE_YN", columnDefinition = "bit(1) COMMENT '사용여부'")
-    private boolean useYn = true;   // 사용여부
-
-    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
-    // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
-    private Factory factory;                // 공장
+    public void add(Contract contract, ContractItem contractItem) {
+        setContract(contract);
+        setContractItem(contractItem);
+    }
+
+    public void update(ProduceOrder newProduceOrder, Contract newContract, ContractItem newContractItem) {
+        setContract(newContract);
+        setContractItem(newContractItem);
+        setExpectedStartedDate(newProduceOrder.expectedStartedDate);
+        setExpectedCompletedDate(newProduceOrder.expectedCompletedDate);
+        setInstructionStatus(newProduceOrder.instructionStatus);
+        setRate(newProduceOrder.rate);
+        setNote(newProduceOrder.note);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

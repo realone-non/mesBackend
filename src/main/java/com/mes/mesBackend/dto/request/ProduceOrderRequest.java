@@ -1,50 +1,45 @@
 package com.mes.mesBackend.dto.request;
 
+import com.mes.mesBackend.entity.enumeration.InstructionStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 import static com.mes.mesBackend.exception.Message.*;
 
 @Getter
 @Setter
-@Schema(description = "BOM 품목")
-public class BomItemRequest {
-
-    @Schema(description = "레벨")
+@Schema(description = "제조오더")
+public class ProduceOrderRequest {
+    @Schema(description = "수주 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
-    int level;
+    Long contract;
 
-    @Schema(description = "품목 id")
+    @Schema(description = "수주 품목 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
-    Long item;
+    Long contractItem;
 
-    @Schema(description = "수량")
+    @Schema(description = "착수예정일")
     @NotNull(message = NOT_NULL)
-    int amount;
+    LocalDate expectedStartedDate;
 
-    @Schema(description = "거래처 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @Schema(description = "완료예정일")
     @NotNull(message = NOT_NULL)
-    Long toBuy;
+    LocalDate expectedCompletedDate;
 
-    @Schema(description = "단위 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @Schema(description = "지시상태")
     @NotNull(message = NOT_NULL)
-    Long unit;
+    InstructionStatus instructionStatus;
 
-    @Schema(description = "공정 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    Long workProcess;
-
-    @Schema(description = "사용여부")
+    @Schema(description = "지시상태")
     @NotNull(message = NOT_NULL)
-    boolean useYn;
+    int rate = 0;
 
     @Schema(description = "비고")
     String note;

@@ -36,6 +36,8 @@ public class MapperConfig {
         modelMapper.addConverter(toWorkLineResponse);
         modelMapper.addConverter(toEstimateItemResponse);
         modelMapper.addConverter(toContractItemResponse);
+        modelMapper.addConverter(contractToProduceOrderConverter);
+        modelMapper.addConverter(contractItemToProduceOrderConverter);
 
         return modelMapper;
     }
@@ -229,6 +231,32 @@ public class MapperConfig {
             // 고객발주번호: 수주의 고객발주번호
             contractItemResponse.setClientOrderNo(contractItem.getContract().getClientOrderNo());
             return contractItemResponse;
+        }
+    };
+
+    Converter<Contract, ContractResponse.toProduceOrder> contractToProduceOrderConverter = new Converter<Contract, ContractResponse.toProduceOrder>() {
+        @Override
+        public ContractResponse.toProduceOrder convert(MappingContext<Contract, ContractResponse.toProduceOrder> context) {
+            ModelMapper mapper = new ModelMapper();
+            Contract contract = context.getSource();
+            ContractResponse.toProduceOrder produceOrder = mapper.map(contract, ContractResponse.toProduceOrder.class);
+            produceOrder.setContractNo(contract.getContractNo());
+            produceOrder.setCName(contract.getClient().getClientName());
+            produceOrder.setPeriodDate(contract.getPeriodDate());
+            return produceOrder;
+        }
+    };
+
+    Converter<ContractItem, ContractItemResponse.toProduceOrder> contractItemToProduceOrderConverter = new Converter<ContractItem, ContractItemResponse.toProduceOrder>() {
+        @Override
+        public ContractItemResponse.toProduceOrder convert(MappingContext<ContractItem, ContractItemResponse.toProduceOrder> context) {
+            ModelMapper mapper = new ModelMapper();
+            ContractItem contractItem = context.getSource();
+            ContractItemResponse.toProduceOrder produceOrder = mapper.map(contractItem, ContractItemResponse.toProduceOrder.class);
+            produceOrder.setItemNo(contractItem.getItem().getItemNo());
+            produceOrder.setItemName(contractItem.getItem().getItemName());
+            produceOrder.setAmount(contractItem.getAmount());
+            return produceOrder;
         }
     };
 }

@@ -5,6 +5,8 @@ import com.mes.mesBackend.dto.request.ContractRequest;
 import com.mes.mesBackend.dto.response.ContractItemFileResponse;
 import com.mes.mesBackend.dto.response.ContractItemResponse;
 import com.mes.mesBackend.dto.response.ContractResponse;
+import com.mes.mesBackend.entity.Contract;
+import com.mes.mesBackend.entity.ContractItem;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +27,8 @@ public interface ContractService {
     ContractResponse updateContract(Long contractId, ContractRequest contractRequest) throws NotFoundException;
     // 수주 삭제
     void deleteContract(Long id) throws NotFoundException;
+    // 수주 단일 조회 및 예외
+    Contract getContractOrThrow(Long id)throws NotFoundException;
 
     // ======================================== 수주 품목 ===============================================
     // 수주 품목 생성
@@ -37,6 +41,8 @@ public interface ContractService {
     ContractItemResponse updateContractItem(Long contractId, Long contractItemId, ContractItemRequest contractItemRequest) throws NotFoundException;
     // 수주 품목 삭제
     void deleteContractItem(Long contractId, Long contractItemId) throws NotFoundException;
+    // 수주 품목 단일 조회 및 예외
+     ContractItem getContractItemOrThrow(Long contractId, Long contractItemId) throws NotFoundException;
 
     // ======================================== 수주 품목 파일 ===============================================
     // 수주 품목 파일 추가

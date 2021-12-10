@@ -25,8 +25,6 @@ public class ContractItemStateRepositoryImpl implements ContractItemStateReposit
     final QContract contract = QContract.contract;
     final QContractItem contractItem = QContractItem.contractItem;
 
-    ContractItemStateResponse co = new ContractItemStateResponse();
-
     @Override
     public List<ContractItemStateResponse> findAllByCondition(
             String clientName,
