@@ -1,4 +1,4 @@
-package com.mes.mesBackend.exception;
+package com.mes.mesBackend.exception.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PUBLIC)

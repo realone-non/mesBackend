@@ -1,4 +1,4 @@
-package com.mes.mesBackend.exception;
+package com.mes.mesBackend.exception.response;
 
 import lombok.*;
 import org.springframework.http.HttpStatus;

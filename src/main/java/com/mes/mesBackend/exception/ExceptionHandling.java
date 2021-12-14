@@ -1,5 +1,7 @@
 package com.mes.mesBackend.exception;
 
+import com.mes.mesBackend.exception.response.ErrorResponse;
+import com.mes.mesBackend.exception.response.HttpResponse;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

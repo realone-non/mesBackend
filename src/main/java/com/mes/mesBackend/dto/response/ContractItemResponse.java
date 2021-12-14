@@ -67,6 +67,9 @@ public class ContractItemResponse {
 
         @Schema(description = "수주수량")
         int amount;     // 수주수량
+
+        @Schema(description = "수주유형")
+        ContractType contractType;
     }
 
 }

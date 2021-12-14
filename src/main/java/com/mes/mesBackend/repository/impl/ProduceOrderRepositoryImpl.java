@@ -74,7 +74,7 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
                 .leftJoin(bomMaster).on(bomMaster.id.eq(bomItemDetail.bomMaster.id))
                 .leftJoin(item).on(item.id.eq(bomMaster.item.id))
                 .leftJoin(workProcess).on(workProcess.id.eq(bomItemDetail.workProcess.id))
-                .leftJoin(unit).on(unit.id.eq(bomItemDetail.unit.id))
+                .leftJoin(unit).on(unit.id.eq(item.unit.id))
                 .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
                 .where(
                         bomMaster.item.id.eq(itemId)
