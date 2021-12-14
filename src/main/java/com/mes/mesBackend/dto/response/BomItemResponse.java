@@ -36,9 +36,6 @@ public class BomItemResponse {
     @Schema(description = "사용")
     boolean useYn;
 
-    @Schema(description = "단위")
-    UnitResponse.idAndName unit;
-
     @Schema(description = "비고")
     String note;
 }

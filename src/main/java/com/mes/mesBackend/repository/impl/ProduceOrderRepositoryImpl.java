@@ -1,16 +1,14 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
-import com.mes.mesBackend.entity.ProduceOrder;
-import com.mes.mesBackend.entity.QBomItemDetail;
-import com.mes.mesBackend.entity.QBomMaster;
-import com.mes.mesBackend.entity.QProduceOrder;
+import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.InstructionStatus;
 import com.mes.mesBackend.repository.custom.ProduceOrderRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,10 +20,14 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
     final QProduceOrder produceOrder = QProduceOrder.produceOrder;
     final QBomMaster bomMaster = QBomMaster.bomMaster;
     final QBomItemDetail bomItemDetail = QBomItemDetail.bomItemDetail;
-
+    final QItem item = QItem.item;
+    final QWorkProcess workProcess = QWorkProcess.workProcess;
+    final QUnit unit = QUnit.unit;
+    final QItemAccount itemAccount = QItemAccount.itemAccount;
 
     // 제조 오더 리스트 조회, 검색조건 : 품목그룹 id, 품명|품번, 지시상태, 제조오더번호, 수주번호, 착수예정일 fromDate~toDate, 자재납기일자(보류)
     @Override
+    @Transactional(readOnly = true)
     public List<ProduceOrder> findAllByCondition(
             Long itemGroupId,
             String itemNoAndName,
@@ -53,39 +55,33 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
     // where: produceOrder.contractItem.item = bomMaster.item
     // produceOrder.contractItem.item = bomMaster.item 랑 같은걸 찾으면 ? list로
     @Override
-    public List<ProduceOrderDetailResponse> findAllProduceOrderDetail(Long produceOrderId) {
+    @Transactional(readOnly = true)
+    public List<ProduceOrderDetailResponse> findAllProduceOrderDetail(Long itemId) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(ProduceOrderDetailResponse.class,
-                                bomItemDetail.item.itemNo.as("itemNo"),
-                                bomItemDetail.item.itemName.as("itemName"),
-                                bomItemDetail.item.itemAccount.account.as("itemAccount"),
+                                bomItemDetail.id.as("id"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                itemAccount.account.as("itemAccount"),
                                 bomItemDetail.amount.as("bomAmount"),
-                                bomItemDetail.workProcess.workProcessName.as("workProcess"),
-                                bomItemDetail.amount.multiply(produceOrder.contractItem.amount).as("reservationAmount"),
-                                bomItemDetail.unit.unitCodeName.as("orderUnit")
+                                workProcess.workProcessName.as("workProcess"),
+                                unit.unitCodeName.as("orderUnit"),
+                                bomItemDetail.level.as("level")
                         )
                 )
-                .from(produceOrder)
-                .innerJoin(produceOrder.contractItem.item, bomMaster.item)
+                .from(bomItemDetail)
+                .leftJoin(bomMaster).on(bomMaster.id.eq(bomItemDetail.bomMaster.id))
+                .leftJoin(item).on(item.id.eq(bomMaster.item.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(bomItemDetail.workProcess.id))
+                .leftJoin(unit).on(unit.id.eq(bomItemDetail.unit.id))
+                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
                 .where(
-                        isProduceOrderId(produceOrderId),
-                        ddd()
+                        bomMaster.item.id.eq(itemId)
                 )
                 .fetch();
     }
 
-    // bomItemDetail 에서 BomMaster랑 같은걸 찾음.
-    private BooleanExpression ddd() {
-        return bomItemDetail.bomMaster.id.eq(bomMaster.item.id);
-    }
-
-    // produceOrederId 와 같은 row를 찾음.
-    private BooleanExpression isProduceOrderId(Long produceOrderId) {
-        return produceOrder.id.eq(produceOrderId);
-    }
-
-    // 품목그룹 id
     /*
     * > contract.item.itemGroup -> NullPointerException
     * QueryPath 를 이용해서 쿼리를 빌드할 때 QueryDSL은 기본적으로 현재 엔티티의 속성값에 대해서만 참조 가능.

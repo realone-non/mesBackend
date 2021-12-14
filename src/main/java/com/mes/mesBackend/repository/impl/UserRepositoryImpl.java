@@ -6,20 +6,20 @@ import com.mes.mesBackend.repository.custom.UserRepositoryCustom;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepositoryCustom {
 
-    @Autowired
-    JPAQueryFactory jpaQueryFactory;
+    private final JPAQueryFactory jpaQueryFactory;
 
     final QUser user = QUser.user;
 
     // 직원(작업자) 전체 조회 검색조건: 부서, 사번, 이름
     @Override
+    @Transactional(readOnly = true)
     public List<User> findAllCondition(Long departmentId, String userCode, String korName) {
         return jpaQueryFactory
                 .selectFrom(user)

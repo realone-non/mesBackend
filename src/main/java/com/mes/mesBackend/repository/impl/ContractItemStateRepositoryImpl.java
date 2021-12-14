@@ -11,6 +11,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,6 +27,7 @@ public class ContractItemStateRepositoryImpl implements ContractItemStateReposit
     final QContractItem contractItem = QContractItem.contractItem;
 
     @Override
+    @Transactional(readOnly = true)
     public List<ContractItemStateResponse> findAllByCondition(
             String clientName,
             String itemNoAndItemName,

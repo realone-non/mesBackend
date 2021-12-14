@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
  * 7-1. Lot 마스터 조회
@@ -46,10 +48,6 @@ public class LotMaster extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM",columnDefinition = "bigint COMMENT '품목'")
     private Item item;      // 품목
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
-    private Factory factory;        // 공장
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '창고'")
@@ -102,4 +100,15 @@ public class LotMaster extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "QUALITY_LEVEL", columnDefinition = "varchar(255) COMMENT '품질등급'")
     private QualityLevel qualityLevel;      // 품질등급
+
+//    @Column(name = "BEFORE_LOT_NO", columnDefinition = "varchar(255) COMMENT '직전 로트번호'")
+//    private LotMaster beforeLotNo;     // 직전 로트번호
+    // 이거 안되면 String
+
+//    @Column(name = "END_YN", columnDefinition = "bit(1) COMMENT '로트 엔드'")
+//    private boolean endYn;      // 로트엔드
+
+//    @ManyToMany(mappedBy = "lotMasters")
+//    @JoinColumn(name = "CONTRACTS")
+//    private List<Contract> contracts = new ArrayList<>();
 }

@@ -7,20 +7,19 @@ import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 public class CodeMasterRepositoryImpl implements CodeMasterRepositoryCustom {
 
-    @Autowired
-    JPAQueryFactory jpaQueryFactory;
-
-
+    private final JPAQueryFactory jpaQueryFactory;
     final QCodeMaster codeMaster = QCodeMaster.codeMaster;
+
     // 코드 마스터 조회
+    @Transactional(readOnly = true)
     public Page<CodeMaster> findByMainCodeAndCodeName(
             String mainCode,
             String codeName,

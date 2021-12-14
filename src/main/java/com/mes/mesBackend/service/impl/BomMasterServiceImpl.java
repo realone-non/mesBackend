@@ -2,6 +2,7 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.BomItemRequest;
 import com.mes.mesBackend.dto.request.BomMasterRequest;
+import com.mes.mesBackend.dto.response.BomItemDetailResponse;
 import com.mes.mesBackend.dto.response.BomItemResponse;
 import com.mes.mesBackend.dto.response.BomMasterResponse;
 import com.mes.mesBackend.entity.*;
@@ -121,10 +122,11 @@ public class BomMasterServiceImpl implements BomMasterService {
 
     // BOM 품목 리스트 조회
     @Override
-    public List<BomItemResponse> getBomItems(Long bomMasterId, String itemNoOrItemName) throws NotFoundException {
+    public List<BomItemDetailResponse> getBomItems(Long bomMasterId, String itemNoOrItemName) throws NotFoundException {
         BomMaster bomMaster = getBomMasterOrThrow(bomMasterId);
-        List<BomItemDetail> bomItemDetails = bomItemDetailRepository.findAllByCondition(bomMaster, itemNoOrItemName);
-        return mapper.toListResponses(bomItemDetails, BomItemResponse.class);
+//        List<BomItemResponse> bomItemDetails = bomItemDetailRepository.findAllByCondition(bomMaster, itemNoOrItemName);
+//        return mapper.toListResponses(bomItemDetails, BomItemResponse.class);
+        return bomItemDetailRepository.findAllByCondition(bomMaster.getId(), itemNoOrItemName);
     }
 
     // BOM 품목 수정

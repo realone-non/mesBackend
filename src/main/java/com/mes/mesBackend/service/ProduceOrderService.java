@@ -30,5 +30,5 @@ public interface ProduceOrderService {
     // 제조 오더 삭제
     void deleteProduceOrder(Long produceOrderId) throws NotFoundException;
     // 제조 오더 디테일 리스트 조회
-    List<ProduceOrderDetailResponse> getProduceOrderDetails(Long produceOrderId);
+    List<ProduceOrderDetailResponse> getProduceOrderDetails(Long produceOrderId) throws NotFoundException;
 }

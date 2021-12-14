@@ -4,14 +4,10 @@ import com.mes.mesBackend.entity.ItemCheck;
 import com.mes.mesBackend.entity.QItemCheck;
 import com.mes.mesBackend.entity.enumeration.TestCategory;
 import com.mes.mesBackend.repository.custom.ItemCheckRepositoryCustom;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,12 +15,11 @@ import java.util.List;
 public class ItemCheckRepositoryImpl implements ItemCheckRepositoryCustom {
     // 품목별 검사항목 전체 조회 /  검색조건: 검사유형, 품목그룹, 품목계정
 
-    @Autowired
-    JPAQueryFactory jpaQueryFactory;
+    private final JPAQueryFactory jpaQueryFactory;
 
     final QItemCheck itemCheck = QItemCheck.itemCheck;
 
-    @Override
+    @Override @Transactional(readOnly = true)
     public List<ItemCheck> findAllCondition(
             TestCategory testCategory,
             Long itemGroup,

@@ -94,8 +94,18 @@ public class ProduceOrderServiceImpl implements ProduceOrderService {
                 .orElseThrow(() -> new NotFoundException("produceOrder does not exist. id : " + id));
     }
 
+    // 제조 오더 품목 디테일 리스트 조회
     @Override
-    public List<ProduceOrderDetailResponse> getProduceOrderDetails(Long produceOrderId) {
-        return produceOrderRepo.findAllProduceOrderDetail(produceOrderId);
+    public List<ProduceOrderDetailResponse> getProduceOrderDetails(Long produceOrderId) throws NotFoundException {
+        ProduceOrderResponse produceOrder = getProduceOrder(produceOrderId);
+        ContractItem contractItem =
+                contractService.getContractItemOrThrow(produceOrder.getContract().getId(), produceOrder.getContractItem().getId());
+        Long itemId = contractItem.getItem().getId();
+
+        List<ProduceOrderDetailResponse> orderDetails = produceOrderRepo.findAllProduceOrderDetail(itemId);
+        orderDetails.forEach(orderDetail ->
+                orderDetail.setReservationAmount(orderDetail.getBomAmount(), contractItem.getAmount()));
+
+        return orderDetails;
     }
 }

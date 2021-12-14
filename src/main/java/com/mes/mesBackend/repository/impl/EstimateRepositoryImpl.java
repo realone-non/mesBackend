@@ -6,7 +6,7 @@ import com.mes.mesBackend.repository.custom.EstimateRepositoryCustom;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,12 +15,11 @@ import java.util.List;
 public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
     // 견적 페이징 조회 검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 담당자
 
-    @Autowired
-    JPAQueryFactory jpaQueryFactory;
+    private final JPAQueryFactory jpaQueryFactory;
 
     final QEstimate estimate = QEstimate.estimate;
 
-    @Override
+    @Override @Transactional(readOnly = true)
     public List<Estimate> findAllByCondition(
             String clientName,
             LocalDate fromDate,

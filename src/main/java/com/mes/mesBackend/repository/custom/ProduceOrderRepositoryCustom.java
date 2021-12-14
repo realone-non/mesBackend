@@ -18,5 +18,5 @@ public interface ProduceOrderRepositoryCustom {
                                           LocalDate toDate);
 
     // 제조 오더 디테일 리스트 조회
-    List<ProduceOrderDetailResponse> findAllProduceOrderDetail(Long produceOrderId);
+    List<ProduceOrderDetailResponse> findAllProduceOrderDetail(Long itemId);
 }

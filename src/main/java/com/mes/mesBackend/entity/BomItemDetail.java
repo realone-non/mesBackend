@@ -32,6 +32,9 @@ import static javax.persistence.FetchType.LAZY;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity(name = "BOM_ITEM_DETAILS")
 @Data
+@Table(indexes = {
+        @Index(name = "bom_master", columnList = "BOM_MASTERS_ID")
+})
 public class BomItemDetail extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

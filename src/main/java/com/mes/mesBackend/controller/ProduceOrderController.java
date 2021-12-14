@@ -154,7 +154,7 @@ public class ProduceOrderController {
     public ResponseEntity<List<ProduceOrderDetailResponse>> getProduceOrderDetails(
             @PathVariable(value = "produce-order-id") @Parameter(description = "제조 오더 id") Long produceOrderId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
+    ) throws NotFoundException {
         List<ProduceOrderDetailResponse> produceOrderDetails = produceOrderService.getProduceOrderDetails(produceOrderId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProduceOrderDetails.");

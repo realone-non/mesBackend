@@ -3,26 +3,22 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.entity.QWorkCenterCheck;
 import com.mes.mesBackend.entity.WorkCenterCheck;
 import com.mes.mesBackend.repository.custom.WorkCenterCheckRepositoryCustom;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 public class WorkCenterCheckRepositoryImpl implements WorkCenterCheckRepositoryCustom {
 
-    @Autowired
-    JPAQueryFactory jpaQueryFactory;
+    private final JPAQueryFactory jpaQueryFactory;
 
     final QWorkCenterCheck workCenterCheck = QWorkCenterCheck.workCenterCheck;
 
     // 작업장별 검유형 전체 조회/ 검색: 작업장, 점검유형
+    @Transactional(readOnly = true)
     public List<WorkCenterCheck> findByWorkCenterAndCheckTypes(
             Long workCenterId,
             Long checkTypeId

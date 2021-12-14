@@ -3,14 +3,10 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.entity.QWorkDocument;
 import com.mes.mesBackend.entity.WorkDocument;
 import com.mes.mesBackend.repository.custom.WorkDocumentRepositoryCustom;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,12 +14,12 @@ import java.util.List;
 public class WorkDocumentRepositoryImpl implements WorkDocumentRepositoryCustom {
     // 작업표준서 전체 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
 
-    @Autowired
-    JPAQueryFactory jpaQueryFactory;
 
+    private final JPAQueryFactory jpaQueryFactory;
     final QWorkDocument workDocument = QWorkDocument.workDocument;
 
     @Override
+    @Transactional(readOnly = true)
     public List<WorkDocument> findAllByCondition(
             Long itemGroupId,
             Long itemAccountId,

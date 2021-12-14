@@ -2,16 +2,11 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.entity.Measure;
 import com.mes.mesBackend.entity.QMeasure;
-import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.custom.MeasureRepositoryCustom;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,14 +14,12 @@ import java.util.List;
 public class MeasureRepositoryImpl implements MeasureRepositoryCustom {
     // 계측기 전체 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
 
-    @Autowired
-    JPAQueryFactory jpaQueryFactory;
-    @Autowired
-    ModelMapper mapper;
+    private final JPAQueryFactory jpaQueryFactory;
 
     final QMeasure measure = QMeasure.measure;
 
     @Override
+    @Transactional(readOnly = true)
     public List<Measure> findAllByCondition(Long gaugeTypeId, Long month) {
         return jpaQueryFactory
                 .selectFrom(measure)

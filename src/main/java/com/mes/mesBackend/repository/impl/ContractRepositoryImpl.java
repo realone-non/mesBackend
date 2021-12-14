@@ -1,14 +1,12 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.entity.Contract;
-import com.mes.mesBackend.entity.Estimate;
 import com.mes.mesBackend.entity.QContract;
 import com.mes.mesBackend.repository.custom.ContractRepositoryCustom;
-import com.mes.mesBackend.repository.custom.EstimateRepositoryCustom;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,12 +15,12 @@ import java.util.List;
 public class ContractRepositoryImpl implements ContractRepositoryCustom {
     // 수주 리스트 조회 검색조건 : 거래처, 수주기간, 화폐, 담당자
 
-    @Autowired
-    JPAQueryFactory jpaQueryFactory;
+    private final JPAQueryFactory jpaQueryFactory;
 
     final QContract contract = QContract.contract;
 
     @Override
+    @Transactional(readOnly = true)
     public List<Contract> findAllByCondition(
             String clientName,
             String userName,
