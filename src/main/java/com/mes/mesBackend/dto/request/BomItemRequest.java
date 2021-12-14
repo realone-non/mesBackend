@@ -33,11 +33,6 @@ public class BomItemRequest {
     @NotNull(message = NOT_NULL)
     Long toBuy;
 
-    @Schema(description = "단위 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
-    Long unit;
-
     @Schema(description = "공정 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long workProcess;

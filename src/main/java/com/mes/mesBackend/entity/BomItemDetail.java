@@ -68,10 +68,6 @@ public class BomItemDetail extends BaseTimeEntity {
     @JoinColumn(name = "BOM_MASTERS_ID", columnDefinition = "bigint COMMENT 'BomMaster'", nullable = false)
     private BomMaster bomMaster;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "UNIT", columnDefinition = "bigint COMMENT '단위'", nullable = false)
-    private Unit unit;
-
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;      //  사용여부
 
@@ -82,22 +78,19 @@ public class BomItemDetail extends BaseTimeEntity {
             BomMaster bomMaster,
             Item item,
             Client toBuy,
-            WorkProcess workProcess,
-            Unit unit
+            WorkProcess workProcess
     ) {
         setBomMaster(bomMaster);
         setItem(item);
         setToBuy(toBuy);
         setWorkProcess(workProcess);
-        setUnit(unit);
     }
 
     public void update(
             Item newItem,
             Client newToBuy,
             WorkProcess newWorkProcess,
-            BomItemDetail newBomItemDetail,
-            Unit newUnit
+            BomItemDetail newBomItemDetail
     ) {
         setLevel(newBomItemDetail.level);
         setItem(newItem);
@@ -106,7 +99,6 @@ public class BomItemDetail extends BaseTimeEntity {
         setWorkProcess(newWorkProcess);
         setUseYn(newBomItemDetail.useYn);
         setNote(newBomItemDetail.note);
-        setUnit(newUnit);
     }
 
     public void delete() {
