@@ -14,6 +14,10 @@ import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
+
+/*
+* 출하 로트 번호는 완제품 기준으로 생성되야함.
+* */
 /*
  * 4-5. 출하등록
  * 검색: 공장(드롭),거래처(체크),출하기간(캘린더),화폐(체크박스),담당자(체크)

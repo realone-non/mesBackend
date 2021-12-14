@@ -2,6 +2,7 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.BomItemRequest;
 import com.mes.mesBackend.dto.request.BomMasterRequest;
+import com.mes.mesBackend.dto.response.BomItemDetailResponse;
 import com.mes.mesBackend.dto.response.BomItemResponse;
 import com.mes.mesBackend.dto.response.BomMasterResponse;
 import com.mes.mesBackend.entity.*;
@@ -10,30 +11,22 @@ import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.BomItemDetailRepository;
 import com.mes.mesBackend.repository.BomMasterRepository;
 import com.mes.mesBackend.service.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class BomMasterServiceImpl implements BomMasterService {
 
-    @Autowired
-    BomMasterRepository bomMasterRepository;
-    @Autowired
-    ModelMapper mapper;
-    @Autowired
-    ItemService itemService;
-    @Autowired
-    ClientService clientService;
-    @Autowired
-    WareHouseService wareHouseService;
-    @Autowired
-    WorkProcessService workProcessService;
-    @Autowired
-    BomItemDetailRepository bomItemDetailRepository;
+    private final BomMasterRepository bomMasterRepository;
+    private final ModelMapper mapper;
+    private final ItemService itemService;
+    private final ClientService clientService;
+    private final WorkProcessService workProcessService;
+    private final BomItemDetailRepository bomItemDetailRepository;
+    private final UnitService unitService;
 
     // BOM 마스터 생성
     @Override
@@ -117,10 +110,11 @@ public class BomMasterServiceImpl implements BomMasterService {
         Item item = itemService.getItemOrThrow(bomItemRequest.getItem());
         WorkProcess workProcess = bomItemRequest.getWorkProcess() != null ?
                 workProcessService.getWorkProcessOrThrow(bomItemRequest.getWorkProcess()) : null;
+        Unit unit = unitService.getUnitOrThrow(bomItemRequest.getUnit());
 
         BomItemDetail bomItemDetail = mapper.toEntity(bomItemRequest, BomItemDetail.class);
 
-        bomItemDetail.addJoin(bomMaster, item, toBuy, workProcess);
+        bomItemDetail.addJoin(bomMaster, item, toBuy, workProcess, unit);
 
         bomItemDetailRepository.save(bomItemDetail);
         return mapper.toResponse(bomItemDetail, BomItemResponse.class);
@@ -128,10 +122,11 @@ public class BomMasterServiceImpl implements BomMasterService {
 
     // BOM 품목 리스트 조회
     @Override
-    public List<BomItemResponse> getBomItems(Long bomMasterId, String itemNoOrItemName) throws NotFoundException {
+    public List<BomItemDetailResponse> getBomItems(Long bomMasterId, String itemNoOrItemName) throws NotFoundException {
         BomMaster bomMaster = getBomMasterOrThrow(bomMasterId);
-        List<BomItemDetail> bomItemDetails = bomItemDetailRepository.findAllByCondition(bomMaster, itemNoOrItemName);
-        return mapper.toListResponses(bomItemDetails, BomItemResponse.class);
+//        List<BomItemResponse> bomItemDetails = bomItemDetailRepository.findAllByCondition(bomMaster, itemNoOrItemName);
+//        return mapper.toListResponses(bomItemDetails, BomItemResponse.class);
+        return bomItemDetailRepository.findAllByCondition(bomMaster.getId(), itemNoOrItemName);
     }
 
     // BOM 품목 수정
@@ -142,10 +137,11 @@ public class BomMasterServiceImpl implements BomMasterService {
         Client newToBuy = clientService.getClientOrThrow(bomItemRequest.getToBuy());
         Item newItem = itemService.getItemOrThrow(bomItemRequest.getItem());
         WorkProcess newWorkProcess = bomItemRequest.getWorkProcess() != null ? workProcessService.getWorkProcessOrThrow(bomItemRequest.getWorkProcess()) : null;
+        Unit newUnit = unitService.getUnitOrThrow(bomItemRequest.getUnit());
 
         BomItemDetail newBomItemDetail = mapper.toEntity(bomItemRequest, BomItemDetail.class);
 
-        findBomItemDetail.update(newItem, newToBuy, newWorkProcess, newBomItemDetail);
+        findBomItemDetail.update(newItem, newToBuy, newWorkProcess, newBomItemDetail, newUnit);
         bomItemDetailRepository.save(findBomItemDetail);
         return mapper.toResponse(findBomItemDetail, BomItemResponse.class);
     }

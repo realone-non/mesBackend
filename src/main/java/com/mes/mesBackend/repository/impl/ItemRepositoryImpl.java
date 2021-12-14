@@ -3,27 +3,24 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.entity.Item;
 import com.mes.mesBackend.entity.QItem;
 import com.mes.mesBackend.repository.custom.ItemRepositoryCustom;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
-    @Autowired
-    JPAQueryFactory jpaQueryFactory;
+
+    private final JPAQueryFactory jpaQueryFactory;
 
     final QItem item = QItem.item;
 
     // 품목그룹, 품목계정, 품번, 품명, 검색어
     @Override
+    @Transactional(readOnly = true)
     public List<Item> findAllByCondition(
             Long itemGroupId,
             Long itemAccountId,

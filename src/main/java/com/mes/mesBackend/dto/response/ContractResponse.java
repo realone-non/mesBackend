@@ -89,4 +89,22 @@ public class ContractResponse {
         @Schema(description = "고객발주번호")
         String clientOrderNo;
     }
+
+    @Getter
+    @Setter
+    @Schema(description = "수주")
+    public static class toProduceOrder {
+        @Schema(description = "고유아이디")
+        Long id;
+
+        @Schema(description = "수주번호")
+        String contractNo;
+
+        @Schema(description = "거래처")
+        String cName;
+
+        @Schema(description = "납기일자")
+        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        LocalDate periodDate;
+    }
 }

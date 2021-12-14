@@ -6,19 +6,18 @@ import com.mes.mesBackend.repository.custom.ClientRepositoryCustom;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 public class ClientRepositoryImpl implements ClientRepositoryCustom {
 
-    @Autowired
-    JPAQueryFactory jpaQueryFactory;
-
+    private final JPAQueryFactory jpaQueryFactory;
     final QClient client = QClient.client;
 
     // 거래처 유형, 거래처 코드, 거래처 명
+    @Transactional(readOnly = true)
     public List<Client> findByTypeAndCodeAndName(
             Long type,
             String clientCode,

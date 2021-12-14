@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.BomItemRequest;
 import com.mes.mesBackend.dto.request.BomMasterRequest;
+import com.mes.mesBackend.dto.response.BomItemDetailResponse;
 import com.mes.mesBackend.dto.response.BomItemResponse;
 import com.mes.mesBackend.dto.response.BomMasterResponse;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -167,12 +168,12 @@ public class BomMasterController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<List<BomItemResponse>> getBomItems(
+    public ResponseEntity<List<BomItemDetailResponse>> getBomItems(
             @PathVariable(value = "bom-master-id") @Parameter(description = "BOM 마스터 id") Long bomMasterId,
             @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoOrItemName,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        List<BomItemResponse> bomItems = bomMasterService.getBomItems(bomMasterId, itemNoOrItemName);
+        List<BomItemDetailResponse> bomItems = bomMasterService.getBomItems(bomMasterId, itemNoOrItemName);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getBomItems.");
         return new ResponseEntity<>(bomItems, HttpStatus.OK);

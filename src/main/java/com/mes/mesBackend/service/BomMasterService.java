@@ -2,6 +2,7 @@ package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.BomItemRequest;
 import com.mes.mesBackend.dto.request.BomMasterRequest;
+import com.mes.mesBackend.dto.response.BomItemDetailResponse;
 import com.mes.mesBackend.dto.response.BomItemResponse;
 import com.mes.mesBackend.dto.response.BomMasterResponse;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -28,7 +29,7 @@ public interface BomMasterService {
     // BOM 품목 생성
     BomItemResponse createBomItem(Long bomMasterId, BomItemRequest bomMasterDetailRequest) throws NotFoundException;
     // BOM 품목 리스트 조회
-    List<BomItemResponse> getBomItems(Long bomMasterId, String itemNoOrItemName) throws NotFoundException;
+    List<BomItemDetailResponse> getBomItems(Long bomMasterId, String itemNoOrItemName) throws NotFoundException;
     // BOM 품목 수정
     BomItemResponse updateBomItem(Long bomMasterId, Long bomItemId, BomItemRequest bomMasterDetailRequest) throws NotFoundException;
     // BOM 품목 삭제

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 /*
- * 6-2. 제조오더 등록
+ * 6-2. 작업지시 등록
  * 검색: 공장,품목그룹,품목,수주번호,제조오더번호,작업공정,착수예정일,지시상태
  * 제조오더번호                                            -> ProduceOrder
  * 품번                                                  -> ProduceOrder
@@ -32,7 +32,7 @@ import javax.persistence.*;
 public class WorkOrder extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", columnDefinition = "bigint COMMENT '제조오더 고유아이디'")
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '작업지시 고유아이디'")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

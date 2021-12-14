@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static com.mes.mesBackend.helper.Constants.DATE_TIME_FORMAT;
+import static com.mes.mesBackend.helper.Constants.NUMBER_FORMAT;
 
 @Service
 @RequiredArgsConstructor
@@ -88,7 +88,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     // 출하 번호 생성
     private String createShipmentNo() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(NUMBER_FORMAT));
     }
 
     // =================================================== 출하 품목 ====================================================

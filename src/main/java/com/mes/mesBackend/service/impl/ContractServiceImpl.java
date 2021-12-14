@@ -8,6 +8,7 @@ import com.mes.mesBackend.dto.response.ContractResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.NumberAutomatic;
 import com.mes.mesBackend.helper.S3Uploader;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.ContractItemFileRepository;
@@ -24,7 +25,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static com.mes.mesBackend.helper.Constants.DATE_TIME_FORMAT;
+import static com.mes.mesBackend.helper.Constants.NUMBER_FORMAT;
 
 // 4-2. 수주 등록
 @Service
@@ -49,6 +50,8 @@ public class ContractServiceImpl implements ContractService {
     S3Uploader s3Uploader;
     @Autowired
     ContractItemFileRepository contractItemFileRepo;
+    @Autowired
+    NumberAutomatic na;
     // ======================================== 수주 ===============================================
     // 수주 생성
     @Override
@@ -59,7 +62,7 @@ public class ContractServiceImpl implements ContractService {
         WareHouse outPutWareHouse = wareHouseService.getWareHouseOrThrow(contractRequest.getOutputWareHouse());
         Contract contract = mapper.toEntity(contractRequest, Contract.class);
         contract.addJoin(client, user, currency, outPutWareHouse);
-        contract.setContractNo(createContractNo());
+        contract.setContractNo(na.createDateTimeNo());
         contractRepo.save(contract);
         return mapper.toResponse(contract, ContractResponse.class);
     }
@@ -112,14 +115,10 @@ public class ContractServiceImpl implements ContractService {
     }
 
     // 수주 단일 조회 및 예외
-    private Contract getContractOrThrow(Long id) throws NotFoundException {
+    @Override
+    public Contract getContractOrThrow(Long id) throws NotFoundException {
         return contractRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("contract does not exist. input id: " + id));
-    }
-
-    // 수주 번호 생성
-    private String createContractNo() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
     }
 
     // ======================================== 수주 품목 ===============================================
@@ -138,8 +137,7 @@ public class ContractServiceImpl implements ContractService {
     // 수주 품목 단일 조회
     @Override
     public ContractItemResponse getContractItem(Long contractId, Long contractItemId) throws NotFoundException {
-        Contract contract = getContractOrThrow(contractId);
-        ContractItem contractItem = getContractItemOrThrow(contractId, contract);
+        ContractItem contractItem = getContractItemOrThrow(contractId, contractItemId);
         return mapper.toResponse(contractItem, ContractItemResponse.class);
     }
 
@@ -154,8 +152,7 @@ public class ContractServiceImpl implements ContractService {
     // 수주 품목 수정
     @Override
     public ContractItemResponse updateContractItem(Long contractId, Long contractItemId, ContractItemRequest contractItemRequest) throws NotFoundException {
-        Contract contract = getContractOrThrow(contractId);
-        ContractItem findContractItem = getContractItemOrThrow(contractItemId, contract);
+        ContractItem findContractItem = getContractItemOrThrow(contractId, contractItemId);
         Item newItem = itemService.getItemOrThrow(contractItemRequest.getItem());
         ContractItem newContractItem = mapper.toEntity(contractItemRequest, ContractItem.class);
         findContractItem.update(newContractItem, newItem);
@@ -166,16 +163,17 @@ public class ContractServiceImpl implements ContractService {
     // 수주 품목 삭제
     @Override
     public void deleteContractItem(Long contractId, Long contractItemId) throws NotFoundException {
-        Contract contract = getContractOrThrow(contractId);
-        ContractItem contractItem = getContractItemOrThrow(contractItemId, contract);
+        ContractItem contractItem = getContractItemOrThrow(contractId, contractItemId);
         contractItem.delete();
         contractItemRepo.save(contractItem);
     }
 
     // 수주 품목 단일 조회 및 예외
-    private ContractItem getContractItemOrThrow(Long id, Contract contract) throws NotFoundException {
-        return contractItemRepo.findByIdAndContractAndDeleteYnFalse(id, contract)
-                .orElseThrow(() -> new NotFoundException("contract item does not exist. input id: " + id));
+    @Override
+    public ContractItem getContractItemOrThrow(Long contractId, Long contractItemId) throws NotFoundException {
+        Contract contract = getContractOrThrow(contractId);
+        return contractItemRepo.findByIdAndContractAndDeleteYnFalse(contractItemId, contract)
+                .orElseThrow(() -> new NotFoundException("contract item does not exist. input id: " + contractItemId));
     }
 
     // ======================================== 수주 품목 파일 ===============================================
@@ -184,7 +182,7 @@ public class ContractServiceImpl implements ContractService {
     @Override
     public ContractItemFileResponse createBusinessFileToContractItemFile(Long contractId, Long contractItemId, MultipartFile file) throws NotFoundException, BadRequestException, IOException {
         Contract contract = getContractOrThrow(contractId);
-        ContractItem contractItem = getContractItemOrThrow(contractItemId, contract);
+        ContractItem contractItem = getContractItemOrThrow(contractId, contractItemId);
 
         String fileName = "contract-items/" + contract.getContractNo() + "/" + contract.getClientOrderNo() + "/";
         ContractItemFile contractItemFile = new ContractItemFile();
@@ -199,8 +197,7 @@ public class ContractServiceImpl implements ContractService {
     // 수주 품목 파일 전체 조회
     @Override
     public List<ContractItemFileResponse> getItemFiles(Long contractId, Long contractItemId) throws NotFoundException {
-        Contract contract = getContractOrThrow(contractId);
-        ContractItem contractItem = getContractItemOrThrow(contractItemId, contract);
+        ContractItem contractItem = getContractItemOrThrow(contractId, contractItemId);
         List<ContractItemFile> contractItemFiles = contractItemFileRepo.findAllByContractItemAndDeleteYnFalse(contractItem);
         return mapper.toListResponses(contractItemFiles, ContractItemFileResponse.class);
     }
@@ -208,18 +205,9 @@ public class ContractServiceImpl implements ContractService {
     // 수주 품목 파일 삭제
     @Override
     public void deleteItemFile(Long contractId, Long contractItemId, Long contractItemFileId) throws NotFoundException {
-        Contract contract = getContractOrThrow(contractId);
-        ContractItem contractItem = getContractItemOrThrow(contractItemId, contract);
+        ContractItem contractItem = getContractItemOrThrow(contractId, contractItemId);
         ContractItemFile contractItemFile = contractItemFileRepo.findByIdAndContractItemAndDeleteYnFalse(contractItemFileId, contractItem);
         contractItemFile.delete();
         contractItemFileRepo.save(contractItemFile);
     }
-
-    // ContractItem 의 file 갯수
-//    private String getContractItemFileCnt(Long contractId, Long contractItemId) throws NotFoundException {
-//        Contract contract = getContractOrThrow(contractId);
-//        ContractItem contractItem = getContractItemOrThrow(contractItemId, contract);
-//        int fileCnt = contractItemFileRepo.countAllByContractItemAndDeleteYnFalse(contractItem);
-//        return fileCnt + " Files";
-//    }
 }

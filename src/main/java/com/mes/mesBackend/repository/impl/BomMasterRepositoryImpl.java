@@ -6,7 +6,7 @@ import com.mes.mesBackend.repository.custom.BomMasterRepositoryCustom;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,11 +14,11 @@ import java.util.List;
 public class BomMasterRepositoryImpl implements BomMasterRepositoryCustom {
     // 검색조건: 품목계정, 품목그룹, 품번|품명
 
-    @Autowired
-    JPAQueryFactory jpaQueryFactory;
+    private final JPAQueryFactory jpaQueryFactory;
 
     final QBomMaster bomMaster = QBomMaster.bomMaster;
 
+    @Transactional(readOnly = true)
     @Override
     public List<BomMaster> findAllByCondition(
             Long itemAccountId,

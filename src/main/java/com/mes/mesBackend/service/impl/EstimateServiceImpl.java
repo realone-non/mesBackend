@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static com.mes.mesBackend.helper.Constants.DATE_TIME_FORMAT;
+import static com.mes.mesBackend.helper.Constants.NUMBER_FORMAT;
 
 @Service
 public class EstimateServiceImpl implements EstimateService {
@@ -119,7 +119,7 @@ public class EstimateServiceImpl implements EstimateService {
 
     // 견적번호 날짜형식으로 생성
     private String createEstimateNo() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(NUMBER_FORMAT));
     }
 
     // ===================================== 견적 품목 정보 ======================================
@@ -230,7 +230,7 @@ public class EstimateServiceImpl implements EstimateService {
 
     // Invoice No 생성
     public String createInvoiceNo() {
-        String dateTimeFormat = DATE_TIME_FORMAT;
+        String dateTimeFormat = NUMBER_FORMAT;
         return "EPI"+LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormat));
     }
 

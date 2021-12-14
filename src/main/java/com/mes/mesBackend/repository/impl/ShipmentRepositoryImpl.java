@@ -6,6 +6,7 @@ import com.mes.mesBackend.repository.custom.ShipmentRepositoryCustom;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +18,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
     private final QShipment shipment = QShipment.shipment;
 
     @Override
+    @Transactional(readOnly = true)
     public List<Shipment> findAllCondition(
             String clientName,
             LocalDate fromDate,

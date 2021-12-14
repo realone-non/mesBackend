@@ -51,4 +51,22 @@ public class ContractItemResponse {
     String note;        // 비고
 
 
+    @Getter
+    @Setter
+    @Schema(description = "수주 품목")
+    @JsonInclude(NON_NULL)
+    public static class toProduceOrder {
+        @Schema(description = "고유아이디")
+        Long id;
+
+        @Schema(description = "품번")
+        String itemNo;
+
+        @Schema(description = "품명")
+        String itemName;
+
+        @Schema(description = "수주수량")
+        int amount;     // 수주수량
+    }
+
 }
