@@ -3,6 +3,7 @@ package com.mes.mesBackend.service;
 import com.mes.mesBackend.dto.request.WorkOrderRequest;
 import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
 import com.mes.mesBackend.dto.response.WorkOrderResponse;
+import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.InstructionStatus;
 import com.mes.mesBackend.exception.NotFoundException;
 
@@ -32,4 +33,6 @@ public interface WorkOrderService {
     WorkOrderResponse updateWorkOrder(Long produceOrderId, Long workOrderId, WorkOrderRequest workOrderRequest) throws NotFoundException;
     // 작업지시 삭제
     void deleteWorkOrder(Long produceOrderId, Long workOrderId) throws NotFoundException;
+    // 작업지시 단일 조회 및 예외
+    WorkOrderDetail getWorkOrderDetailOrThrow(Long id, Long produceOrderId) throws NotFoundException;
 }

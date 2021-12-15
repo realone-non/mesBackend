@@ -108,7 +108,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     }
 
     // 작업지시 단일 조회 및 예외
-    private WorkOrderDetail getWorkOrderDetailOrThrow(Long id, Long produceOrderId) throws NotFoundException {
+    @Override
+    public WorkOrderDetail getWorkOrderDetailOrThrow(Long id, Long produceOrderId) throws NotFoundException {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
         return workOrderDetailRepo.findByIdAndProduceOrderAndDeleteYnFalse(id, produceOrder)
                 .orElseThrow(() -> new NotFoundException("workOrderDetail does not exist. input id: " + id));

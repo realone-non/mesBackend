@@ -45,12 +45,12 @@ public class ProduceOrder extends BaseTimeEntity {
     @Column(name = "PRODUCE_ORDER_NO", unique = true, columnDefinition = "varchar(255) COMMENT '제조오더번호'", nullable = false)
     private String produceOrderNo;      // 제조오더번호
 
-    @QueryInit("client.*")
+    @QueryInit("*.*")
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "CONTRACT", columnDefinition = "bigint COMMENT '수주'", nullable = false)
     private Contract contract;          // 수주
 
-    @QueryInit("item.*")
+    @QueryInit("*.*")
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "CONTRACT_ITEM", columnDefinition = "bigint COMMENT '수주 품목'", nullable = false)
     private ContractItem contractItem;

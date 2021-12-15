@@ -2,6 +2,7 @@ package com.mes.mesBackend.entity;
 
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.entity.enumeration.TestType;
+import com.querydsl.core.annotations.QueryInit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -105,12 +106,16 @@ public class WorkOrderDetail extends BaseTimeEntity {
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                    // 비고
 
+    @QueryInit("*.*")
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "PRODUCE_ORDER", columnDefinition = "bigint COMMENT '제조오더'")
     private ProduceOrder produceOrder;
 
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean deleteYn = false;  // 삭제여부
+
+    @Column(name = "ORDERS", nullable = false, columnDefinition = "int COMMENT '작업순번'")
+    private int orders;
 
     public void add(
             WorkProcess workProcess,
