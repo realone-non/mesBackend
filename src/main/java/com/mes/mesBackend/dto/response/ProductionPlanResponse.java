@@ -41,7 +41,7 @@ public class ProductionPlanResponse {
     LocalDate expectedWorkDate;
 
     @Schema(description = "예정시간")
-    Long expectedWorkTime;
+    String expectedWorkTime;
 
     @Schema(description = "준비시간")
     int readyTime;

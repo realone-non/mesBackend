@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -57,8 +58,8 @@ public class WorkOrderRequest {
     LocalDate expectedWorkDate;
 
     @Schema(description = "예정시간")
-    @NotNull(message = NOT_NULL)
-    Long expectedWorkTime;
+    @NotBlank(message = NOT_EMPTY)
+    String expectedWorkTime;
 
     @Schema(description = "지시상태")
     @NotNull(message = NOT_NULL)
@@ -70,6 +71,7 @@ public class WorkOrderRequest {
 
     @Schema(description = "검사유형")
     @NotNull(message = NOT_NULL)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long testProcess;
 
     @Schema(description = "최종공정")
