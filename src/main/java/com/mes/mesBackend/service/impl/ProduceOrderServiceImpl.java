@@ -89,7 +89,8 @@ public class ProduceOrderServiceImpl implements ProduceOrderService {
     }
 
     // 제조 오더 단일 조회 및 예외
-    private ProduceOrder getProduceOrderOrThrow(Long id) throws NotFoundException {
+    @Override
+    public ProduceOrder getProduceOrderOrThrow(Long id) throws NotFoundException {
         return produceOrderRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("produceOrder does not exist. id : " + id));
     }

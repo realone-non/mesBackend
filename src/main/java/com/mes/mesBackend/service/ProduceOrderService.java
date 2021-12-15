@@ -3,6 +3,7 @@ package com.mes.mesBackend.service;
 import com.mes.mesBackend.dto.request.ProduceOrderRequest;
 import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
 import com.mes.mesBackend.dto.response.ProduceOrderResponse;
+import com.mes.mesBackend.entity.ProduceOrder;
 import com.mes.mesBackend.entity.enumeration.InstructionStatus;
 import com.mes.mesBackend.exception.NotFoundException;
 
@@ -31,4 +32,6 @@ public interface ProduceOrderService {
     void deleteProduceOrder(Long produceOrderId) throws NotFoundException;
     // 제조 오더 디테일 리스트 조회
     List<ProduceOrderDetailResponse> getProduceOrderDetails(Long produceOrderId) throws NotFoundException;
+    // 제조 오더 단일 조회 및 예외
+    ProduceOrder getProduceOrderOrThrow(Long id) throws NotFoundException;
 }

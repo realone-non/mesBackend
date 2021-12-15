@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
-import static lombok.AccessLevel.PROTECTED;
 import static lombok.AccessLevel.PUBLIC;
 
 /*
@@ -46,11 +45,12 @@ public class ProduceOrder extends BaseTimeEntity {
     @Column(name = "PRODUCE_ORDER_NO", unique = true, columnDefinition = "varchar(255) COMMENT '제조오더번호'", nullable = false)
     private String produceOrderNo;      // 제조오더번호
 
+    @QueryInit("client.*")
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "CONTRACT", columnDefinition = "bigint COMMENT '수주'", nullable = false)
     private Contract contract;          // 수주
 
-    @QueryInit("item.itemGroup")
+    @QueryInit("item.*")
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "CONTRACT_ITEM", columnDefinition = "bigint COMMENT '수주 품목'", nullable = false)
     private ContractItem contractItem;
