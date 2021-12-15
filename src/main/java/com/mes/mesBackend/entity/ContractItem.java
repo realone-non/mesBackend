@@ -44,6 +44,7 @@ public class ContractItem extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '수주 품목 리스트 고유아이디'")
     private Long id;
 
+    @QueryInit("*.*")
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "ITEM", nullable = false, columnDefinition = "bigint COMMENT '품목'")
     private Item item;      // 품번, 품명, 규격, 수주단위, 단가
@@ -62,7 +63,7 @@ public class ContractItem extends BaseTimeEntity {
     @JoinColumn(name = "CONTRACT", nullable = false, columnDefinition = "bigint COMMENT '수주'")
     private Contract contract;      // 수주
 
-    @Column(name = "STANDART_ITEM_NO", columnDefinition = "varchar(255) COMMENT '규격화 품번'")
+    @Column(name = "STANDARD_ITEM_NO", columnDefinition = "varchar(255) COMMENT '규격화 품번'")
     private String standardItemNo;      // 규격화 품번
 
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")

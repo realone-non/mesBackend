@@ -2,6 +2,7 @@ package com.mes.mesBackend.entity;
 
 import com.mes.mesBackend.entity.enumeration.DevelopStatus;
 import com.mes.mesBackend.entity.enumeration.TestType;
+import com.querydsl.core.annotations.QueryInit;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -66,6 +67,7 @@ public class Item extends BaseTimeEntity {
     private String standard;    // 규격
 
     // 다대일 단방향
+    @QueryInit("*.*")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM_ACCOUNT",  nullable = false, columnDefinition = "bigint COMMENT '품목계정'")
     private ItemAccount itemAccount;    // 품목계정

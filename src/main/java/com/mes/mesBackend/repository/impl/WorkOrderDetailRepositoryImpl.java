@@ -1,7 +1,8 @@
 package com.mes.mesBackend.repository.impl;
 
+import com.mes.mesBackend.dto.response.ProductionPlanResponse;
 import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
-import com.mes.mesBackend.entity.QProduceOrder;
+import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.InstructionStatus;
 import com.mes.mesBackend.repository.custom.WorkOrderDetailRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -12,12 +13,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
     final QProduceOrder produceOrder = QProduceOrder.produceOrder;
+    final QWorkOrderDetail workOrderDetail = QWorkOrderDetail.workOrderDetail;
+    final QContractItem contractItem = QContractItem.contractItem;
+    final QContract contract = QContract.contract;
+    final QItem item = QItem.item;
+    final QItemAccount itemAccount = QItemAccount.itemAccount;
+    final QClient client = QClient.client;
+    final QWorkLine workLine = QWorkLine.workLine;
+
 
     // 검색조건: 품목그룹 id, 품명|품번, 수주번호, 제조오더번호, 작업공정 id, 착수예정일 fromDate~endDate, 지시상태
     @Override
@@ -61,6 +71,92 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .fetch();
     }
 
+    // 생산계획 수립 조회
+    // 생산계획 수립 전체 조회, 검색조건: 작업라인, 작업예정일
+    @Override
+    public List<ProductionPlanResponse> findAllProductionPlanByCondition(Long workLineId, LocalDate fromDate, LocalDate toDate) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                ProductionPlanResponse.class,
+                                workOrderDetail.id.as("id"),
+                                workOrderDetail.orderNo.as("orderNo"),
+                                workOrderDetail.orders.as("orders"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                itemAccount.account.as("itemAccount"),
+                                workLine.workLineName.as("workLine"),
+                                workOrderDetail.expectedWorkDate.as("expectedWorkDate"),
+                                workOrderDetail.expectedWorkTime.as("expectedWorkTime"),
+                                workOrderDetail.readyTime.as("readyTime"),
+                                workOrderDetail.uph.as("uph"),
+                                workOrderDetail.costTime.as("costTime"),
+                                workOrderDetail.orderAmount.as("orderAmount"),
+                                contract.contractNo.as("contractNo"),
+                                contractItem.periodDate.as("periodDate"),
+                                client.clientName.as("cName"),
+                                produceOrder.instructionStatus.as("instructionStatus"),
+                                workOrderDetail.productionAmount.as("productionAmount")
+                                )
+                )
+                .from(workOrderDetail)
+                .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                .leftJoin(client).on(client.id.eq(contract.client.id))
+                .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
+                .where(
+                        isWorkLineIdEq(workLineId),
+                        isExpectedWorkDateBetween(fromDate, toDate),
+                        workOrderDetail.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+
+    // 생산계획 수립 단일 조회
+    @Override
+    public Optional<ProductionPlanResponse> findProductionPlanByIdAndDeleteYnFalse(Long id) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                ProductionPlanResponse.class,
+                                workOrderDetail.id.as("id"),
+                                workOrderDetail.orderNo.as("orderNo"),
+                                workOrderDetail.orders.as("orders"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                itemAccount.account.as("itemAccount"),
+                                workLine.workLineName.as("workLine"),
+                                workOrderDetail.expectedWorkDate.as("expectedWorkDate"),
+                                workOrderDetail.expectedWorkTime.as("expectedWorkTime"),
+                                workOrderDetail.readyTime.as("readyTime"),
+                                workOrderDetail.uph.as("uph"),
+                                workOrderDetail.costTime.as("costTime"),
+                                workOrderDetail.orderAmount.as("orderAmount"),
+                                contract.contractNo.as("contractNo"),
+                                contractItem.periodDate.as("periodDate"),
+                                client.clientName.as("cName"),
+                                produceOrder.instructionStatus.as("instructionStatus"),
+                                workOrderDetail.productionAmount.as("productionAmount")
+                        )
+                )
+                .from(workOrderDetail)
+                .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                .leftJoin(client).on(client.id.eq(contract.client.id))
+                .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
+                .where(
+                        workOrderDetail.id.eq(id),
+                        workOrderDetail.deleteYn.isFalse()
+                )
+                .fetchOne());
+    }
+
     // 품목그룹
     private BooleanExpression isItemGroupEq(Long itemGroupId) {
         return itemGroupId != null ? produceOrder.contractItem.item.itemGroup.id.eq(itemGroupId) : null;
@@ -89,5 +185,15 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     // 지시상태
     private BooleanExpression isInstructionStatusEq(InstructionStatus instructionStatus) {
         return instructionStatus != null ? produceOrder.instructionStatus.eq(instructionStatus) : null;
+    }
+
+    // 작업라인
+    private BooleanExpression isWorkLineIdEq(Long workLineId) {
+        return workLineId != null ? workLine.id.eq(workLineId) :  null;
+    }
+
+    // 작업예정일
+    private BooleanExpression isExpectedWorkDateBetween(LocalDate fromDate, LocalDate toDate) {
+        return fromDate != null ? workOrderDetail.expectedWorkDate.between(fromDate, toDate) : null;
     }
 }

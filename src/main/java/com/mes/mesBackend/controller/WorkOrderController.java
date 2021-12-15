@@ -107,7 +107,7 @@ public class WorkOrderController {
     }
 
     // 작업지시 리스트 조회
-    @GetMapping("/produce-orders{produce-order-id}/work-orders")
+    @GetMapping("/produce-orders/{produce-order-id}/work-orders")
     @ResponseBody
     @Operation(summary = "작업지시 리스트 조회", description = "")
     public ResponseEntity<List<WorkOrderResponse>> getWorkOrders(
