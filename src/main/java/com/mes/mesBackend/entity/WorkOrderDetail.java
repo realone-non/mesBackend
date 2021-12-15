@@ -79,8 +79,8 @@ public class WorkOrderDetail extends BaseTimeEntity {
     @Column(name = "EXPECTED_WORK_DATE", nullable = false, columnDefinition = "date COMMENT '작업예정일'")
     private LocalDate expectedWorkDate;         // 작업예정일
 
-    @Column(name = "EXPECTED_WORK_TIME", nullable = false, columnDefinition = "bigint COMMENT '예정시간'")
-    private Long expectedWorkTime;              // 예정시간
+    @Column(name = "EXPECTED_WORK_TIME", nullable = false, columnDefinition = "varchar(255) COMMENT '예정시간'")
+    private String expectedWorkTime;              // 예정시간
 
     @Enumerated(STRING)
     @Column(name = "ORDER_STATE",nullable = false, columnDefinition = "varchar(255) COMMENT '지시상태'")

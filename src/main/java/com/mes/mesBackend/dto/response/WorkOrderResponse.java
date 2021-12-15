@@ -50,7 +50,7 @@ public class WorkOrderResponse {
     LocalDate expectedWorkDate;
 
     @Schema(description = "예정시간")
-    Long expectedWorkTime;
+    String expectedWorkTime;
 
     @Schema(description = "지시상태")
     OrderState orderState;
