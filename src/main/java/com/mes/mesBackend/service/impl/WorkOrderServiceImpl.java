@@ -5,15 +5,19 @@ import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
 import com.mes.mesBackend.dto.response.WorkOrderResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.InstructionStatus;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.NumberAutomatic;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
+import com.mes.mesBackend.repository.WorkOrderStateRepository;
 import com.mes.mesBackend.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,6 +32,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private final ModelMapper mapper;
     private final NumberAutomatic numberAutomatic;
     private final TestProcessService testProcessService;
+    private final WorkOrderStateService workOrderStateService;
 
 
     // 제조오더 정보 리스트 조회
@@ -66,6 +71,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         workOrderDetail.setOrderAmount(orderAmount);
 
         workOrderDetailRepo.save(workOrderDetail);
+        // 지시상태 상태 이력 생성
+        workOrderStateService.createWorkOrderStateDetail(workOrderDetail);
         return mapper.toResponse(workOrderDetail, WorkOrderResponse.class);
     }
 
@@ -88,6 +95,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     @Override
     public WorkOrderResponse updateWorkOrder(Long produceOrderId, Long workOrderId, WorkOrderRequest newWorkOrderRequest) throws NotFoundException {
         WorkOrderDetail findWorkOrderDetail = getWorkOrderDetailOrThrow(workOrderId, produceOrderId);
+        OrderState orderState = findWorkOrderDetail.getOrderState();
         WorkProcess newWorkProcess = workProcessService.getWorkProcessOrThrow(newWorkOrderRequest.getWorkProcess());
         WorkLine newWorkLine = workLineService.getWorkLineOrThrow(newWorkOrderRequest.getWorkLine());
         User newUser = newWorkOrderRequest.getUser() != null ? userService.getUserOrThrow(newWorkOrderRequest.getUser()) : null;
@@ -96,6 +104,12 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         WorkOrderDetail newWorkOrderDetail = mapper.toEntity(newWorkOrderRequest, WorkOrderDetail.class);
         findWorkOrderDetail.update(newWorkOrderDetail, newWorkProcess, newWorkLine, newUser, testProcess, newUnit);
         workOrderDetailRepo.save(findWorkOrderDetail);
+
+        // 지시상태 변경 상태 이력생성 (기존값 -> 바뀐값 변경 시에 이력 생성)
+        if (orderState != newWorkOrderRequest.getOrderState()) {
+            workOrderStateService.createWorkOrderStateDetail(findWorkOrderDetail);
+        }
+
         return mapper.toResponse(findWorkOrderDetail, WorkOrderResponse.class);
     }
 
