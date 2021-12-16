@@ -75,6 +75,7 @@ public class WorkOrderStateRepositoryImpl implements WorkOrderStateRepositoryCus
                         isContractNoContain(contractNo),
                         isDeleteYnFalse()
                 )
+                .distinct()
                 .fetch();
     }
 
