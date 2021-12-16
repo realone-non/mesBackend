@@ -4,7 +4,7 @@ import com.mes.mesBackend.dto.request.ProduceOrderRequest;
 import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
 import com.mes.mesBackend.dto.response.ProduceOrderResponse;
 import com.mes.mesBackend.entity.ProduceOrder;
-import com.mes.mesBackend.entity.enumeration.InstructionStatus;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.NotFoundException;
 
 import java.time.LocalDate;
@@ -20,7 +20,7 @@ public interface ProduceOrderService {
     List<ProduceOrderResponse> getProduceOrders(
             Long itemGroupId, String
             itemNoAndName,
-            InstructionStatus instructionStatus,
+            OrderState orderState,
             String produceOrderNo,
             String contractNo,
             LocalDate fromDate,

@@ -4,7 +4,7 @@ import com.mes.mesBackend.dto.request.WorkOrderRequest;
 import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
 import com.mes.mesBackend.dto.response.WorkOrderResponse;
 import com.mes.mesBackend.entity.WorkOrderDetail;
-import com.mes.mesBackend.entity.enumeration.InstructionStatus;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.NotFoundException;
 
 import java.time.LocalDate;
@@ -21,7 +21,7 @@ public interface WorkOrderService {
             String produceOrderNo,
             LocalDate fromDate,
             LocalDate toDate,
-            InstructionStatus instructionStatus
+            OrderState orderState
     );
     // 작업지시 생성
     WorkOrderResponse createWorkOrder(Long produceOrderId, WorkOrderRequest workOrderRequest) throws NotFoundException;

@@ -1,6 +1,6 @@
 package com.mes.mesBackend.entity;
 
-import com.mes.mesBackend.entity.enumeration.InstructionStatus;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.querydsl.core.annotations.QueryInit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -62,8 +62,8 @@ public class ProduceOrder extends BaseTimeEntity {
     private LocalDate expectedCompletedDate;          // 완료예정일
 
     @Enumerated(STRING)
-    @Column(name = "INSTRUCTION_STATUS", columnDefinition = "varchar(255) COMMENT '지시상태'", nullable = false)
-    private InstructionStatus instructionStatus = InstructionStatus.SCHEDULE;    // 지시상태
+    @Column(name = "ORDER_STATE", columnDefinition = "varchar(255) COMMENT '지시상태'", nullable = false)
+    private OrderState orderState = OrderState.SCHEDULE;    // 지시상태
 
     @Column(name = "RATE", columnDefinition = "int COMMENT '보정율'", nullable = false)
     private int rate = 0;                   // 보정율
@@ -84,7 +84,7 @@ public class ProduceOrder extends BaseTimeEntity {
         setContractItem(newContractItem);
         setExpectedStartedDate(newProduceOrder.expectedStartedDate);
         setExpectedCompletedDate(newProduceOrder.expectedCompletedDate);
-        setInstructionStatus(newProduceOrder.instructionStatus);
+        setOrderState(newProduceOrder.orderState);
         setRate(newProduceOrder.rate);
         setNote(newProduceOrder.note);
     }

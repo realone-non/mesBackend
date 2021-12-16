@@ -2,7 +2,7 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.InstructionStatus;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.ProduceOrderRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -31,7 +31,7 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
     public List<ProduceOrder> findAllByCondition(
             Long itemGroupId,
             String itemNoAndName,
-            InstructionStatus instructionStatus,
+            OrderState orderState,
             String produceOrderNo,
             String contractNo,
             LocalDate fromDate,
@@ -42,7 +42,7 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
                 .where(
                         isItemGroupEq(itemGroupId),
                         isItemNoAndItemNameContain(itemNoAndName),
-                        isInstructionStatus(instructionStatus),
+                        isInstructionStatus(orderState),
                         isProduceOrderNoContain(produceOrderNo),
                         isContractNoContain(contractNo),
                         isExpectedCompletedDateBetween(fromDate, toDate),
@@ -97,8 +97,8 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
                 .or(produceOrder.contractItem.item.itemName.contains(itemNoAndName)) : null;
     }
     // 지시상태
-    private BooleanExpression isInstructionStatus(InstructionStatus instructionStatus) {
-        return instructionStatus != null ? produceOrder.instructionStatus.eq(instructionStatus) : null;
+    private BooleanExpression isInstructionStatus(OrderState orderState) {
+        return orderState != null ? produceOrder.orderState.eq(orderState) : null;
     }
     // 제조오더 번호
     private BooleanExpression isProduceOrderNoContain(String produceOrderNo) {

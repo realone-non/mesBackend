@@ -3,7 +3,7 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.ProduceOrderRequest;
 import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
 import com.mes.mesBackend.dto.response.ProduceOrderResponse;
-import com.mes.mesBackend.entity.enumeration.InstructionStatus;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -92,14 +92,14 @@ public class ProduceOrderController {
     public ResponseEntity<List<ProduceOrderResponse>> getProduceOrders(
             @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
-            @RequestParam(required = false) @Parameter(description = "지시상태") InstructionStatus instructionStatus,
+            @RequestParam(required = false) @Parameter(description = "지시상태") OrderState orderState,
             @RequestParam(required = false) @Parameter(description = "제조오더번호") String produceOrderNo,
             @RequestParam(required = false) @Parameter(description = "수주번호") String contractNo,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "착수예정일 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "착수예정일 toDate") LocalDate toDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<ProduceOrderResponse> produceOrders = produceOrderService.getProduceOrders(itemGroupId, itemNoAndName, instructionStatus, produceOrderNo, contractNo, fromDate, toDate);
+        List<ProduceOrderResponse> produceOrders = produceOrderService.getProduceOrders(itemGroupId, itemNoAndName, orderState, produceOrderNo, contractNo, fromDate, toDate);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProduceOrders.");
         return new ResponseEntity<>(produceOrders, HttpStatus.OK);

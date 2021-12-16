@@ -4,20 +4,16 @@ import com.mes.mesBackend.dto.request.WorkOrderRequest;
 import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
 import com.mes.mesBackend.dto.response.WorkOrderResponse;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.InstructionStatus;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.NumberAutomatic;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
-import com.mes.mesBackend.repository.WorkOrderStateRepository;
 import com.mes.mesBackend.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -45,9 +41,9 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             String produceOrderNo,
             LocalDate fromDate,
             LocalDate toDate,
-            InstructionStatus instructionStatus
+            OrderState orderState
     ) {
-        return workOrderDetailRepo.findAllByCondition(itemGroupId, itemNoAndName, contractNo, produceOrderNo, fromDate, toDate, instructionStatus);
+        return workOrderDetailRepo.findAllByCondition(itemGroupId, itemNoAndName, contractNo, produceOrderNo, fromDate, toDate, orderState);
     }
 
     // 작업지시 생성
