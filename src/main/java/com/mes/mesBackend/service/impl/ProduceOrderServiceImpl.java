@@ -6,7 +6,7 @@ import com.mes.mesBackend.dto.response.ProduceOrderResponse;
 import com.mes.mesBackend.entity.Contract;
 import com.mes.mesBackend.entity.ContractItem;
 import com.mes.mesBackend.entity.ProduceOrder;
-import com.mes.mesBackend.entity.enumeration.InstructionStatus;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.NumberAutomatic;
 import com.mes.mesBackend.mapper.ModelMapper;
@@ -56,14 +56,14 @@ public class ProduceOrderServiceImpl implements ProduceOrderService {
     public List<ProduceOrderResponse> getProduceOrders(
             Long itemGroupId,
             String itemNoAndName,
-            InstructionStatus instructionStatus,
+            OrderState orderState,
             String produceOrderNo,
             String contractNo,
             LocalDate fromDate,
             LocalDate toDate
     ) {
         List<ProduceOrder> produceOrders =
-                produceOrderRepo.findAllByCondition(itemGroupId, itemNoAndName, instructionStatus, produceOrderNo, contractNo, fromDate, toDate);
+                produceOrderRepo.findAllByCondition(itemGroupId, itemNoAndName, orderState, produceOrderNo, contractNo, fromDate, toDate);
         return mapper.toListResponses(produceOrders, ProduceOrderResponse.class);
     }
 

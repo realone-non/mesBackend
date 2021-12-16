@@ -2,7 +2,7 @@ package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mes.mesBackend.entity.enumeration.InstructionStatus;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -66,7 +66,7 @@ public class ProductionPlanResponse {
     String cName;
 
     @Schema(description = "지시상태")
-    InstructionStatus instructionStatus;
+    OrderState orderState;
 
     @Schema(description = "생산수량")
     int productionAmount;

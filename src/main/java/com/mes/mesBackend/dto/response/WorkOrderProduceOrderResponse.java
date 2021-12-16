@@ -3,7 +3,7 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.ContractType;
-import com.mes.mesBackend.entity.enumeration.InstructionStatus;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,7 +41,7 @@ public class WorkOrderProduceOrderResponse {
     String unitCodeName;
 
     @Schema(description = "지시상태")
-    InstructionStatus instructionStatus = InstructionStatus.SCHEDULE;
+    OrderState orderState = OrderState.SCHEDULE;
 
     @Schema(description = "수주유형")
     ContractType contractType;

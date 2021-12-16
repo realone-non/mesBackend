@@ -3,8 +3,9 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.ProductionPlanResponse;
 import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.InstructionStatus;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.WorkOrderDetailRepositoryCustom;
+import com.querydsl.core.types.Order;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -39,7 +40,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
             String produceOrderNo,
             LocalDate fromDate,
             LocalDate toDate,
-            InstructionStatus instructionStatus
+            OrderState orderState
     ) {
         return jpaQueryFactory
                 .select(
@@ -66,7 +67,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isContractNoContain(contractNo),
                         isProduceOrderNoContain(produceOrderNo),
                         isExpectedCompletedDateBetween(fromDate, toDate),
-                        isInstructionStatusEq(instructionStatus)
+                        isInstructionStatusEq(orderState)
                 )
                 .fetch();
     }
@@ -183,8 +184,9 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
         return fromDate != null ? produceOrder.expectedStartedDate.between(fromDate, toDate) :  null;
     }
     // 지시상태
-    private BooleanExpression isInstructionStatusEq(InstructionStatus instructionStatus) {
-        return instructionStatus != null ? produceOrder.instructionStatus.eq(instructionStatus) : null;
+    private BooleanExpression isInstructionStatusEq(OrderState orderState) {
+//        return orderState != null ? produceOrder.orderState.eq(orderState) : null;
+        return null;
     }
 
     // 작업라인

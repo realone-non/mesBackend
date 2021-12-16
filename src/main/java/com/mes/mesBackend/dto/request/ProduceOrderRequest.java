@@ -1,6 +1,6 @@
 package com.mes.mesBackend.dto.request;
 
-import com.mes.mesBackend.entity.enumeration.InstructionStatus;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +35,7 @@ public class ProduceOrderRequest {
 
     @Schema(description = "지시상태")
     @NotNull(message = NOT_NULL)
-    InstructionStatus instructionStatus;
+    OrderState orderState;
 
     @Schema(description = "지시상태")
     @NotNull(message = NOT_NULL)

@@ -2,7 +2,7 @@ package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.ProductionPlanResponse;
 import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
-import com.mes.mesBackend.entity.enumeration.InstructionStatus;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,7 +17,7 @@ public interface WorkOrderDetailRepositoryCustom {
             String produceOrderNo,
             LocalDate fromDate,
             LocalDate toDate,
-            InstructionStatus instructionStatus
+            OrderState orderState
     );
 
     // 생산계획 수립 조회

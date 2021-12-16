@@ -3,7 +3,7 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.WorkOrderRequest;
 import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
 import com.mes.mesBackend.dto.response.WorkOrderResponse;
-import com.mes.mesBackend.entity.enumeration.InstructionStatus;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -54,10 +54,10 @@ public class WorkOrderController {
             @RequestParam(required = false) @Parameter(description = "제조오더번호") String produceOrderNo,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "착수예정일 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "착수예정일 toDate") LocalDate toDate,
-            @RequestParam(required = false) @Parameter(description = "지시상태") InstructionStatus instructionStatus,
+            @RequestParam(required = false) @Parameter(description = "지시상태") OrderState orderState,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<WorkOrderProduceOrderResponse> produceOrders = workOrderService.getProduceOrders(itemGroupId, itemNoAndName, contractNo, produceOrderNo, fromDate, toDate, instructionStatus);
+        List<WorkOrderProduceOrderResponse> produceOrders = workOrderService.getProduceOrders(itemGroupId, itemNoAndName, contractNo, produceOrderNo, fromDate, toDate, orderState);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProduceOrders.");
         return new ResponseEntity<>(produceOrders, HttpStatus.OK);
