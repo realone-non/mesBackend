@@ -5,7 +5,6 @@ import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.WorkOrderDetailRepositoryCustom;
-import com.querydsl.core.types.Order;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -52,7 +51,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 produceOrder.expectedStartedDate.as("expectedStartedDate"),
                                 produceOrder.contractItem.amount.as("orderAmount"),
                                 produceOrder.contractItem.item.unit.unitCodeName.as("unitCodeName"),
-                                produceOrder.instructionStatus.as("instructionStatus"),
+                                produceOrder.orderState.as("orderState"),
                                 produceOrder.contractItem.contractType.as("contractType"),
                                 produceOrder.contract.client.clientName.as("contractClient"),
                                 produceOrder.contract.contractNo.as("contractNo"),
@@ -96,7 +95,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 contract.contractNo.as("contractNo"),
                                 contractItem.periodDate.as("periodDate"),
                                 client.clientName.as("cName"),
-                                produceOrder.instructionStatus.as("instructionStatus"),
+                                produceOrder.orderState.as("orderState"),
                                 workOrderDetail.productionAmount.as("productionAmount")
                                 )
                 )
@@ -139,7 +138,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 contract.contractNo.as("contractNo"),
                                 contractItem.periodDate.as("periodDate"),
                                 client.clientName.as("cName"),
-                                produceOrder.instructionStatus.as("instructionStatus"),
+                                produceOrder.orderState.as("orderState"),
                                 workOrderDetail.productionAmount.as("productionAmount")
                         )
                 )
@@ -185,8 +184,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     }
     // 지시상태
     private BooleanExpression isInstructionStatusEq(OrderState orderState) {
-//        return orderState != null ? produceOrder.orderState.eq(orderState) : null;
-        return null;
+        return orderState != null ? produceOrder.orderState.eq(orderState) : null;
     }
 
     // 작업라인
