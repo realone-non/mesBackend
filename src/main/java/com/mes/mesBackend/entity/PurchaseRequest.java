@@ -29,12 +29,10 @@ public class PurchaseRequest extends BaseTimeEntity {
     @JoinColumn(name = "PRODUCE_ORDER", columnDefinition = "bigint COMMENT '제조오더번호'", nullable = false)
     private ProduceOrder produceOrder;
 
-    // 수주처
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '거래처'", nullable = false)
     private Client client;
 
-    // 품번, 품명, 규격, 제조사품번, 구매단위
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목'", nullable = false)
     private Item item;

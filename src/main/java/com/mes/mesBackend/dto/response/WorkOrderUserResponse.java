@@ -23,6 +23,9 @@ public class WorkOrderUserResponse {
     @Schema(description = "고유아이디")
     Long id;
 
+    @Schema(description = "작업자 고유아이디")
+    Long userId;
+
     @Schema(description = "작업자Id")
     String userCode;     // 사번
 

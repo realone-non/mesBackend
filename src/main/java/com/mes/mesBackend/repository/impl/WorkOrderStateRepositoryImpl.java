@@ -137,6 +137,7 @@ public class WorkOrderStateRepositoryImpl implements WorkOrderStateRepositoryCus
                         Projections.fields(
                                 WorkOrderUserResponse.class,
                                 workOrderDetail.id.as("id"),
+                                user.id.as("userId"),
                                 user.userCode.as("userCode"),
                                 user.korName.as("korName"),
                                 workLine.workLineName.as("workLine"),
@@ -189,6 +190,7 @@ public class WorkOrderStateRepositoryImpl implements WorkOrderStateRepositoryCus
                         Projections.fields(
                                 WorkOrderUserResponse.class,
                                 workOrderDetail.id.as("id"),
+                                user.id.as("userId"),
                                 user.userCode.as("userCode"),
                                 user.korName.as("korName"),
                                 workLine.workLineName.as("workLine"),
