@@ -5,6 +5,7 @@ import com.mes.mesBackend.dto.response.WorkOrderUserResponse;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,12 +31,13 @@ public interface WorkOrderStateRepositoryCustom {
             Long workLineId,
             String produceOrderNo,
             Long itemAccountId,
-            OrderState orderState,
             LocalDate fromDate,
             LocalDate toDate,
             String contractNo
     );
+    // 작업지시 정보 상태 조회
+    LocalDateTime findWorkOrderUserState(Long workOrderDetailId, OrderState orderState);
 
     // 작업자 투입 단일 조회
-    WorkOrderUserResponse findWorkOrderUserByIdAndDeleteYn(Long workOrderId);
+    Optional<WorkOrderUserResponse> findWorkOrderUserByIdAndDeleteYn(Long workOrderId);
 }

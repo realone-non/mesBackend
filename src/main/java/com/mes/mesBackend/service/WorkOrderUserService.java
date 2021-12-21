@@ -2,6 +2,8 @@ package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.response.WorkOrderUserResponse;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.exception.BadRequestException;
+import com.mes.mesBackend.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,8 +20,8 @@ public interface WorkOrderUserService {
             LocalDate toDate,
             String contractNo
     );
-    // 작업자 투입 단일 조회
-    WorkOrderUserResponse getWorkOrderUser(Long workOrderId);
     // 작업자 투입 수정  작업자, 시작일시, 종료일시 수정가능
-    WorkOrderUserResponse updateWorkOrderUser(Long userId, LocalDateTime startDate, LocalDateTime endDate);
+    WorkOrderUserResponse updateWorkOrderUser(Long workOrderDetailId, Long userId, LocalDateTime startDate, LocalDateTime endDate) throws NotFoundException, BadRequestException;
+    // 작업자 투입 단일 조회
+    WorkOrderUserResponse getWorkOrderUser(Long workOrderId) throws NotFoundException;
 }

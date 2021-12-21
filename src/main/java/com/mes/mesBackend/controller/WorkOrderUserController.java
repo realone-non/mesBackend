@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.WorkOrderUserResponse;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -94,13 +95,13 @@ public class WorkOrderUserController {
             }
     )
     public ResponseEntity<WorkOrderUserResponse> updateWorkOrderUser(
-            @PathVariable(value = "work-order-id") Long workOrderId,
+            @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
             @RequestParam(required = false) @Parameter(description = "작업자 id") Long userId,
-            @RequestParam(required = false) @Parameter(description = "시작일시") LocalDateTime startDate,
-            @RequestParam(required = false) @Parameter(description = "종료일시") LocalDateTime endDate,
+            @RequestParam(required = false) @Parameter(description = "시작일시") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime startDate,
+            @RequestParam(required = false) @Parameter(description = "종료일시") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")LocalDateTime endDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        WorkOrderUserResponse workOrderUser = workOrderUserService.updateWorkOrderUser(userId, startDate, endDate);
+    ) throws NotFoundException, BadRequestException {
+        WorkOrderUserResponse workOrderUser = workOrderUserService.updateWorkOrderUser(workOrderId, userId, startDate, endDate);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is update the " + workOrderUser.getId() + " from updateWorkOrderUser.");
         return new ResponseEntity<>(workOrderUser, HttpStatus.OK);

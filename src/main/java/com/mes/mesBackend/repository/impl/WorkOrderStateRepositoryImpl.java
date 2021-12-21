@@ -5,11 +5,8 @@ import com.mes.mesBackend.dto.response.WorkOrderUserResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.WorkOrderStateRepositoryCustom;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +15,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
-import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 
 @RequiredArgsConstructor
 public class WorkOrderStateRepositoryImpl implements WorkOrderStateRepositoryCustom {
@@ -133,7 +128,6 @@ public class WorkOrderStateRepositoryImpl implements WorkOrderStateRepositoryCus
             Long workLineId,
             String produceOrderNo,
             Long itemAccountId,
-            OrderState orderState,
             LocalDate fromDate,
             LocalDate toDate,
             String contractNo
@@ -148,36 +142,8 @@ public class WorkOrderStateRepositoryImpl implements WorkOrderStateRepositoryCus
                                 workLine.workLineName.as("workLine"),
                                 workOrderDetail.note.as("note"),
                                 contract.contractNo.as("contractNo"),
-                                produceOrder.produceOrderNo.as("produceOrderNo"),
-                                ExpressionUtils.as(
-                                        JPAExpressions.select(workOrderState.workOrderDateTime)
-                                                .from(workOrderState)
-                                                .where(
-                                                        workOrderState.workOrderDetail.id.eq(workOrderDetail.id),
-                                                        workOrderState.orderState.eq(ONGOING)
-                                                )
-                                        , "startDateTime"
-                                ),
-                                ExpressionUtils.as(
-                                        JPAExpressions.select(workOrderState.workOrderDateTime)
-                                                .from(workOrderState)
-                                                .where(
-                                                        workOrderState.workOrderDetail.id.eq(workOrderDetail.id),
-                                                        workOrderState.orderState.eq(COMPLETION)
-                                                )
-                                        , "endDateTime"
-                                ),
-                                ExpressionUtils.as(
-                                        JPAExpressions.select(workOrderState.workOrderDateTime)
-                                                .from(workOrderState)
-                                                .where(
-                                                        workOrderState.workOrderDetail.id.eq(workOrderDetail.id),
-                                                        workOrderState.orderState.eq(SCHEDULE)
-                                                )
-                                        , "scheduleDateTime"
-                                )
+                                produceOrder.produceOrderNo.as("produceOrderNo")
                         )
-
                 )
                 .from(workOrderDetail)
                 .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
@@ -192,7 +158,6 @@ public class WorkOrderStateRepositoryImpl implements WorkOrderStateRepositoryCus
                         isWorkLineIdEq(workLineId),
                         isProduceOrderNoContain(produceOrderNo),
                         isItemAccountIdEq(itemAccountId),
-                        isOrderStateEq(orderState),
                         isContractNoContain(contractNo),
                         isDeleteYnFalse()
                 )
@@ -200,29 +165,53 @@ public class WorkOrderStateRepositoryImpl implements WorkOrderStateRepositoryCus
                 .fetch();
     }
 
+
+    @Transactional(readOnly = true)
+    @Override
+    public LocalDateTime findWorkOrderUserState(Long workOrderDetailId, OrderState orderState) {
+        return jpaQueryFactory
+                .select(workOrderState.workOrderDateTime)
+                .from(workOrderState)
+                .where(
+                        workOrderState.workOrderDetail.id.eq(workOrderDetailId),
+                        workOrderState.orderState.eq(orderState)
+                )
+                .orderBy(workOrderState.modifiedDate.desc())
+                .fetchFirst();
+    }
+
     // 작업자 투입 단일 조회
     @Transactional(readOnly = true)
     @Override
-    public WorkOrderUserResponse findWorkOrderUserByIdAndDeleteYn(Long workOrderId) {
-        return null;
-    }
-
-    private BooleanExpression isStartDateTime(LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        // 진행중 시간이 종료 시간보다 후에
-        if (startDateTime != null && startDateTime.isAfter(endDateTime)) {
-            return workOrderState.orderState.eq(COMPLETION);
-        }
-        return null;
-//        if (startDateTime.isAfter(endDateTime)) {
-//            return null;
-//        }
-//        return workOrderState.orderState.eq(COMPLETION);
-    }
-
-
-    // workOrderDetail 의 workOrderState에 값이 있는것만 조회
-    private BooleanExpression isWorkOrderState(Long workOrderDetailId) {
-        return workOrderState.workOrderDetail.id.eq(workOrderDetailId);
+    public Optional<WorkOrderUserResponse> findWorkOrderUserByIdAndDeleteYn(Long workOrderId) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                WorkOrderUserResponse.class,
+                                workOrderDetail.id.as("id"),
+                                user.userCode.as("userCode"),
+                                user.korName.as("korName"),
+                                workLine.workLineName.as("workLine"),
+                                workOrderDetail.note.as("note"),
+                                contract.contractNo.as("contractNo"),
+                                produceOrder.produceOrderNo.as("produceOrderNo")
+                        )
+                )
+                .from(workOrderDetail)
+                .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
+                .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
+                .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
+                .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                .innerJoin(workOrderState).on(workOrderState.workOrderDetail.id.eq(workOrderDetail.id))
+                .where(
+                        workOrderDetail.id.eq(workOrderId),
+                        isDeleteYnFalse()
+                )
+                .groupBy(workOrderDetail.id)
+                .fetchOne());
     }
 
     // 작업장
@@ -255,6 +244,7 @@ public class WorkOrderStateRepositoryImpl implements WorkOrderStateRepositoryCus
     private BooleanExpression isContractNoContain(String contractNo) {
         return contractNo != null ? contract.contractNo.contains(contractNo) : null;
     }
+    // 삭제여부
     private BooleanExpression isDeleteYnFalse() {
         return workOrderDetail.deleteYn.isFalse();
     }
