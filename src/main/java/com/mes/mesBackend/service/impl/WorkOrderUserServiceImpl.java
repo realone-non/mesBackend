@@ -98,8 +98,7 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
                 workOrderStateRepository.findTopByOrderStateAndWorkOrderDateTimeAndWorkOrderDetailOrderByModifiedDateDesc(OrderState.COMPLETION, workOrderUser.getEndDateTime(), workOrderDetail)
                 .orElse(workOrderStateRepository.save(new WorkOrderState(workOrderDetail, endDate, OrderState.COMPLETION)));
 
-        User newUser = userService.getUserOrThrow(userId);
-        workOrderDetail.setUser(newUser);
+
 
         if (startDate != null) {
             findOnGoing.setWorkOrderDateTime(startDate);
@@ -109,7 +108,11 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
             findEndDateTime.setWorkOrderDateTime(endDate);
             workOrderStateRepository.save(findEndDateTime);
         }
-        workOrderDetailRepository.save(workOrderDetail);
+        if (userId != null) {
+            User newUser = userService.getUserOrThrow(userId);
+            workOrderDetail.setUser(newUser);
+            workOrderDetailRepository.save(workOrderDetail);
+        }
         return getWorkOrderUser(workOrderDetailId);
     }
 
