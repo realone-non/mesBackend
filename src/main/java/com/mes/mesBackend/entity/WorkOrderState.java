@@ -1,7 +1,6 @@
 package com.mes.mesBackend.entity;
 
 import com.mes.mesBackend.entity.enumeration.OrderState;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +13,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PUBLIC;
 
 // 8-1. 작업지시 상태 이력 정보
-@AllArgsConstructor
+//@AllArgsConstructor
 @NoArgsConstructor(access = PUBLIC)
 @Entity(name = "WORK_ORDER_STATES")
 @Data
@@ -33,4 +32,10 @@ public class WorkOrderState extends BaseTimeEntity {
     @Enumerated(STRING)
     @Column(name = "ORDER_STATE", columnDefinition = "varchar(255) COMMENT '지시상태'")
     private OrderState orderState;
+
+    public WorkOrderState(WorkOrderDetail workOrderDetail, LocalDateTime workOrderDateTime, OrderState orderState) {
+        this.workOrderDetail = workOrderDetail;
+        this.workOrderDateTime = workOrderDateTime;
+        this.orderState = orderState;
+    }
 }
