@@ -6,6 +6,7 @@ public enum OrderState {
     * 완료: COMPLETION
     * 진행중: ONGOING
     * 예정: SCHEDULE
+    * 취소: CANCEL
     * */
-    COMPLETION, ONGOING, SCHEDULE
+    COMPLETION, ONGOING, SCHEDULE, CANCEL
 }

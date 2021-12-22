@@ -66,7 +66,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isContractNoContain(contractNo),
                         isProduceOrderNoContain(produceOrderNo),
                         isExpectedCompletedDateBetween(fromDate, toDate),
-                        isInstructionStatusEq(orderState)
+                        isInstructionStatusEq(orderState),
+                        produceOrder.deleteYn.isFalse()
                 )
                 .fetch();
     }
@@ -110,7 +111,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .where(
                         isWorkLineIdEq(workLineId),
                         isExpectedWorkDateBetween(fromDate, toDate),
-                        workOrderDetail.deleteYn.isFalse()
+                        isDeleteYnFalse()
                 )
                 .fetch();
     }
@@ -152,7 +153,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
                 .where(
                         workOrderDetail.id.eq(id),
-                        workOrderDetail.deleteYn.isFalse()
+                        isDeleteYnFalse()
                 )
                 .fetchOne());
     }
@@ -195,5 +196,9 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     // 작업예정일
     private BooleanExpression isExpectedWorkDateBetween(LocalDate fromDate, LocalDate toDate) {
         return fromDate != null ? workOrderDetail.expectedWorkDate.between(fromDate, toDate) : null;
+    }
+
+    private BooleanExpression isDeleteYnFalse() {
+        return workOrderDetail.deleteYn.isFalse();
     }
 }

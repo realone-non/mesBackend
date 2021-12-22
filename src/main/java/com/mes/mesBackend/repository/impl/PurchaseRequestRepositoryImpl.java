@@ -1,0 +1,181 @@
+package com.mes.mesBackend.repository.impl;
+
+import com.mes.mesBackend.dto.response.PurchaseRequestResponse;
+import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.repository.custom.PurchaseRequestRepositoryCustom;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
+import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
+
+@RequiredArgsConstructor
+public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryCustom {
+
+    private final JPAQueryFactory jpaQueryFactory;
+    final QProduceOrder produceOrder = QProduceOrder.produceOrder;
+    final QBomItemDetail bomItemDetail = QBomItemDetail.bomItemDetail;
+    final QItem item = QItem.item;
+    final QUnit unit = QUnit.unit;
+    final QPurchaseRequest purchaseRequest = QPurchaseRequest.purchaseRequest;
+    final QContractItem contractItem = QContractItem.contractItem;
+    final QContract contract = QContract.contract;
+    final QClient client = QClient.client;
+
+        /*
+        * 구매요청 품목정보는 produceOrder 의 contractItem 의 item 을 찾아서
+        * item 에 해당하는 bomMaster 의 데이터에 해당되는
+        * bomMasterDetail 의 item 만 등록 할 수 있다.
+        */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Long> findItemIdByContractItemId(Long itemId) {
+        return jpaQueryFactory
+                .select(bomItemDetail.item.id)
+                .from(bomItemDetail)
+                .where(
+                        bomItemDetail.bomMaster.item.id.eq(itemId),
+                        bomItemDetail.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+
+    // 단일조회
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<PurchaseRequestResponse> findByIdAndOrderStateSchedule(Long id) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(
+                        Projections.fields(PurchaseRequestResponse.class,
+                                purchaseRequest.id.as("id"),
+                                produceOrder.id.as("produceOrderId"),
+                                client.clientName.as("contractClient"),
+                                produceOrder.produceOrderNo.as("produceOrderNo"),
+                                item.id.as("itemId"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                item.standard.as("itemStandard"),
+                                item.manufacturerPartNo.as("itemManufacturerPartNo"),
+                                unit.unitCodeName.as("itemUnitCodeName"),
+                                purchaseRequest.requestDate.as("requestDate"),
+                                purchaseRequest.requestAmount.as("requestAmount"),
+                                purchaseRequest.orderAmount.as("orderAmount"),
+                                purchaseRequest.periodDate.as("purchasePeriodDate"),
+                                item.inputTest.as("inputTest"),
+                                item.manufacturer.clientName.as("itemManufacturerName"),
+                                purchaseRequest.note.as("note"),
+                                contractItem.item.itemNo.as("modelItemNo"),
+                                contract.periodDate.as("periodDate")
+                        )
+                )
+                .from(purchaseRequest)
+                .leftJoin(produceOrder).on(produceOrder.id.eq(purchaseRequest.produceOrder.id))
+                .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
+                .leftJoin(client).on(client.id.eq(contract.client.id))
+                .leftJoin(item).on(item.id.eq(purchaseRequest.item.id))
+                .leftJoin(unit).on(unit.id.eq(item.unit.id))
+                .where(
+                        purchaseRequest.id.eq(id),
+                        isDeleteYnFalse(),
+                        purchaseRequest.ordersState.eq(SCHEDULE)
+                )
+                .fetchOne());
+    }
+
+    // 구매요청 리스트 조회, 검색조건: 요청기간, 제조오더번호, 품목그룹, 품번|품명, 제조사 품번, 완료포함(check)
+    @Override
+    @Transactional(readOnly = true)
+    public List<PurchaseRequestResponse> findAllByCondition(
+            LocalDate fromDate,
+            LocalDate toDate,
+            String produceOrderNo,
+            Long itemGroupId,
+            String itemNoAndName,
+            String manufacturerPartNo,
+            boolean orderCompletion
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(PurchaseRequestResponse.class,
+                                purchaseRequest.id.as("id"),
+                                produceOrder.id.as("produceOrderId"),
+                                client.clientName.as("contractClient"),
+                                produceOrder.produceOrderNo.as("produceOrderNo"),
+                                item.id.as("itemId"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                item.standard.as("itemStandard"),
+                                item.manufacturerPartNo.as("itemManufacturerPartNo"),
+                                unit.unitCodeName.as("itemUnitCodeName"),
+                                purchaseRequest.requestDate.as("requestDate"),
+                                purchaseRequest.requestAmount.as("requestAmount"),
+                                purchaseRequest.orderAmount.as("orderAmount"),
+                                purchaseRequest.periodDate.as("purchasePeriodDate"),
+                                item.inputTest.as("inputTest"),
+                                item.manufacturer.clientName.as("itemManufacturerName"),
+                                purchaseRequest.note.as("note"),
+                                contractItem.item.itemNo.as("modelItemNo"),
+                                contract.periodDate.as("periodDate")
+                        )
+                )
+                .from(purchaseRequest)
+                .leftJoin(produceOrder).on(produceOrder.id.eq(purchaseRequest.produceOrder.id))
+                .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
+                .leftJoin(client).on(client.id.eq(contract.client.id))
+                .leftJoin(item).on(item.id.eq(purchaseRequest.item.id))
+                .leftJoin(unit).on(unit.id.eq(item.unit.id))
+                .where(
+                        isRequestDateBetween(fromDate, toDate),
+                        isProduceOrderNoContain(produceOrderNo),
+                        isItemGroupEq(itemGroupId),
+                        isItemNoAndItemNameContain(itemNoAndName),
+                        isManufacturerPartNoContain(manufacturerPartNo),
+                        isOrderCompletionEq(orderCompletion),
+                        isDeleteYnFalse()
+                )
+                .fetch();
+    }
+
+    // 요청기간
+    private BooleanExpression isRequestDateBetween(LocalDate fromDate, LocalDate toDate) {
+        return fromDate != null ? purchaseRequest.requestDate.between(fromDate, toDate) : null;
+    }
+    // 제조오더번호
+    private BooleanExpression isProduceOrderNoContain(String produceOrderNo) {
+        return produceOrderNo != null ? produceOrder.produceOrderNo.contains(produceOrderNo) : null;
+    }
+    // 품목그룹
+    // 원자재 품목에 대한 조건
+    private BooleanExpression isItemGroupEq(Long itemGroupId) {
+        return itemGroupId != null ? item.itemGroup.id.eq(itemGroupId) : null;
+    }
+    // 품번|품명
+    // 원자재 품목에 대한 조건
+    private BooleanExpression isItemNoAndItemNameContain(String itemNoAndName) {
+        return itemNoAndName != null ? item.itemNo.contains(itemNoAndName).or(item.itemName.contains(itemNoAndName)) : null;
+    }
+    // 제조사 품번
+    // 원자재 품목에 대한 조건
+    private BooleanExpression isManufacturerPartNoContain(String manufacturerPartNo) {
+        return manufacturerPartNo != null ? item.manufacturerPartNo.contains(manufacturerPartNo) : null;
+    }
+    // 완료포함(check)
+    private BooleanExpression isOrderCompletionEq(boolean orderCompletion) {
+        // 인자 값이 false 일 때 지시상태의 값이 Schedule 인 데이터 검색
+        // true 일 땐 Completion
+        return orderCompletion ? purchaseRequest.ordersState.eq(COMPLETION) : purchaseRequest.ordersState.eq(SCHEDULE);
+    }
+    // 삭제여부 false
+    private BooleanExpression isDeleteYnFalse() {
+        return purchaseRequest.deleteYn.isFalse();
+    }
+}
