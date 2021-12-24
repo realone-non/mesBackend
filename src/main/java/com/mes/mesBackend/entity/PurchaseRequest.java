@@ -1,8 +1,6 @@
 package com.mes.mesBackend.entity;
 
-import com.mes.mesBackend.dto.response.PurchaseRequestResponse;
 import com.mes.mesBackend.entity.enumeration.OrderState;
-import com.querydsl.core.annotations.QueryInit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,7 +27,6 @@ public class PurchaseRequest extends BaseTimeEntity {
     private Long id;
 
     // 제조오더번호
-    @QueryInit("*.*")
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "PRODUCE_ORDER", columnDefinition = "bigint COMMENT '제조오더번호'", nullable = false)
     private ProduceOrder produceOrder;
@@ -80,6 +77,10 @@ public class PurchaseRequest extends BaseTimeEntity {
     @Column(name = "ORDER_STATE", columnDefinition = "varchar(255) COMMENT '지시상태'")
     private OrderState ordersState = OrderState.SCHEDULE;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "PURCHASE_ORDER", columnDefinition = "bigint COMMENT '구매발주'")
+    private PurchaseOrder purchaseOrder;
+
     public void update(
             PurchaseRequest newPurchaseRequest,
             ProduceOrder newProduceOrder,
@@ -103,5 +104,16 @@ public class PurchaseRequest extends BaseTimeEntity {
 
     public void delete() {
         setDeleteYn(true);
+    }
+
+    public void deleteFromPurchaseOrderAndOrderStateChangedSchedule() {
+        setPurchaseOrder(null);
+//        orderState 변경 ONGOING -> SCHEDULE
+        setOrdersState(OrderState.SCHEDULE);
+    }
+
+    public void putPurchaseOrderAndOrderStateChangedOngoing(PurchaseOrder purchaseOrder) {
+        setPurchaseOrder(purchaseOrder);
+        setOrdersState(OrderState.ONGOING);
     }
 }

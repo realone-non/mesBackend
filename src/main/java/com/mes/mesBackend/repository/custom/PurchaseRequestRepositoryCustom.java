@@ -19,4 +19,8 @@ public interface PurchaseRequestRepositoryCustom {
             String manufacturerPartNo,
             boolean orderCompletion
     );
+
+    // 구매발주에 해당하는 구매요청이 있는지.
+    // return: clientId
+    List<Long> findClientIdsByPurchaseOrder(Long purchaseOrderId);
 }

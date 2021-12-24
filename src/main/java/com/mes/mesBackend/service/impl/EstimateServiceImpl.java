@@ -14,7 +14,7 @@ import com.mes.mesBackend.repository.EstimateItemDetailRepository;
 import com.mes.mesBackend.repository.EstimateRepository;
 import com.mes.mesBackend.repository.PiRepository;
 import com.mes.mesBackend.service.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,26 +22,19 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static com.mes.mesBackend.helper.Constants.NUMBER_FORMAT;
+import static com.mes.mesBackend.helper.Constants.YYMMDDHHMMSSSS;
 
 @Service
+@RequiredArgsConstructor
 public class EstimateServiceImpl implements EstimateService {
-    @Autowired
-    EstimateRepository estimateRepository;
-    @Autowired
-    ClientService clientService;
-    @Autowired
-    CurrencyService currencyService;
-    @Autowired
-    ModelMapper mapper;
-    @Autowired
-    EstimateItemDetailRepository estimateItemRepository;
-    @Autowired
-    ItemService itemService;
-    @Autowired
-    PiRepository piRepository;
-    @Autowired
-    UserService userService;
+    private final EstimateRepository estimateRepository;
+    private final ClientService clientService;
+    private final CurrencyService currencyService;
+    private final ModelMapper mapper;
+    private final EstimateItemDetailRepository estimateItemRepository;
+    private final ItemService itemService;
+    private final PiRepository piRepository;
+    private final UserService userService;
 
     // 견적 생성
     @Override
@@ -119,7 +112,7 @@ public class EstimateServiceImpl implements EstimateService {
 
     // 견적번호 날짜형식으로 생성
     private String createEstimateNo() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(NUMBER_FORMAT));
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(YYMMDDHHMMSSSS));
     }
 
     // ===================================== 견적 품목 정보 ======================================
@@ -230,7 +223,7 @@ public class EstimateServiceImpl implements EstimateService {
 
     // Invoice No 생성
     public String createInvoiceNo() {
-        String dateTimeFormat = NUMBER_FORMAT;
+        String dateTimeFormat = YYMMDDHHMMSSSS;
         return "EPI"+LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormat));
     }
 

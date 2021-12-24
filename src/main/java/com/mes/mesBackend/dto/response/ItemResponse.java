@@ -79,7 +79,7 @@ public class ItemResponse {
     String manufacturerPartNo;        // 제조사품번
 
     @Schema(description = "제조사")
-    ClientResponse.idAndName Manufacturer;      // 제조사
+    ClientResponse.idAndName manufacturer;      // 제조사
 
     @Schema(description = "검사기준")
     TestCriteriaResponse testCriteria;      // 검사기준
