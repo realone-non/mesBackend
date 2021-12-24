@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.request.PurchaseOrderDetailRequest;
 import com.mes.mesBackend.dto.request.PurchaseOrderRequest;
 import com.mes.mesBackend.dto.response.PurchaseOrderDetailResponse;
 import com.mes.mesBackend.dto.response.PurchaseOrderResponse;
+import com.mes.mesBackend.dto.response.PurchaseOrderStatusResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 
@@ -33,4 +34,8 @@ public interface PurchaseOrderService {
     PurchaseOrderDetailResponse updatePurchaseOrderDetail(Long purchaseOrderId, Long purchaseOrderDetailId, String note) throws NotFoundException, BadRequestException;
     // 구매발주상세 삭제
     void deletePurchaseOrderDetail(Long purchaseOrderId, Long purchaseOrderDetailId) throws NotFoundException, BadRequestException;
+
+    // ================================================================ 9-3. 구매발주현황조회 ================================================================
+    // 발주현황 리스트 검색 조회, 검색조건: 화폐 id, 담당자 id, 거래처 id, 입고창고 id, 발주기간 fromDate~toDate
+    List<PurchaseOrderStatusResponse> getPurchaseOrderStatuses(Long currencyId, Long userId, Long clientId, Long wareHouseId, LocalDate fromDate, LocalDate toDate);
 }

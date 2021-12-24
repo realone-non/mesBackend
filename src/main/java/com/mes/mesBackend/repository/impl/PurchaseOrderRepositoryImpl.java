@@ -2,6 +2,7 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.PurchaseOrderDetailResponse;
 import com.mes.mesBackend.dto.response.PurchaseOrderResponse;
+import com.mes.mesBackend.dto.response.PurchaseOrderStatusResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.PurchaseOrderRepositoryCustom;
@@ -242,6 +243,59 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                 .where(
                         purchaseRequest.purchaseOrder.id.eq(purchaseOrderId),
                         purchaseRequest.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+
+    // 9-3. 발주현황조회
+    // 검색조건: 화폐 id, 담당자 id, 거래처 id, 입고창고 id, 발주기간 fromDate~toDate
+    @Override
+    public List<PurchaseOrderStatusResponse> findPurchaseOrderStatusResponseAllByCondition(
+            Long currencyId,
+            Long userId,
+            Long clientId,
+            Long wareHouseId,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                PurchaseOrderStatusResponse.class,
+                                purchaseRequest.id.as("id"),
+                                purchaseRequest.purchaseOrder.purchaseOrderNo.as("purchaseOrderNo"),
+                                purchaseRequest.purchaseOrder.client.clientCode.as("clientCode"),
+                                purchaseRequest.purchaseOrder.client.clientName.as("clientName"),
+                                purchaseRequest.item.itemNo.as("itemNo"),
+                                purchaseRequest.item.itemName.as("itemName"),
+                                purchaseRequest.item.standard.as("itemStandard"),
+                                purchaseRequest.item.manufacturerPartNo.as("itemManufacturerPartNo"),
+                                purchaseRequest.orderAmount.as("orderAmount"),
+                                purchaseRequest.item.unit.unitCodeName.as("orderUnitCodeName"),
+                                purchaseRequest.item.inputUnitPrice.as("unitPrice"),
+                                purchaseRequest.item.inputUnitPrice.multiply(purchaseRequest.orderAmount).as("orderPrice"),
+                                (purchaseRequest.orderAmount.multiply(purchaseRequest.item.inputUnitPrice).doubleValue()).multiply(0.1).as("vat"),
+                                purchaseRequest.periodDate.as("orderPeriodDate"),
+                                purchaseRequest.purchaseOrder.user.korName.as("userName"),
+                                purchaseRequest.purchaseOrder.note.as("note"),
+                                purchaseRequest.purchaseOrder.wareHouse.wareHouseName.as("wareHouseName"),
+                                purchaseRequest.purchaseOrder.currency.currency.as("currencyUnit"),
+                                purchaseRequest.cancelAmount.as("cancelAmount"),
+                                purchaseRequest.ordersState.as("orderState")
+                        )
+                )
+                .from(purchaseRequest)
+                .innerJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
+                .leftJoin(item).on(item.id.eq(purchaseRequest.item.id))
+                .leftJoin(unit).on(unit.id.eq(item.unit.id))
+                .leftJoin(client).on(client.id.eq(item.manufacturer.id))
+                .where(
+                        isCurrencyEq(currencyId),
+                        isUserEq(userId),
+                        isClientEq(clientId),
+                        isWareHouseEq(wareHouseId),
+                        isPeriodDateBetween(fromDate, toDate),
+                        isDeleteYnFalse()
                 )
                 .fetch();
     }
