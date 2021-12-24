@@ -111,7 +111,8 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
     }
 
     // 구매요청 단일 조회 및 예외
-    private PurchaseRequest getPurchaseRequestOrThrow(Long id) throws NotFoundException {
+    @Override
+    public PurchaseRequest getPurchaseRequestOrThrow(Long id) throws NotFoundException {
         return purchaseRequestRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("purchaseRequest does not exist. input putchaseReqeust id: " + id));
     }

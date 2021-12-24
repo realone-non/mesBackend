@@ -15,43 +15,29 @@ import com.mes.mesBackend.repository.ContractItemFileRepository;
 import com.mes.mesBackend.repository.ContractItemRepository;
 import com.mes.mesBackend.repository.ContractRepository;
 import com.mes.mesBackend.service.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-
-import static com.mes.mesBackend.helper.Constants.NUMBER_FORMAT;
 
 // 4-2. 수주 등록
 @Service
+@RequiredArgsConstructor
 public class ContractServiceImpl implements ContractService {
-    @Autowired
-    ContractRepository contractRepo;
-    @Autowired
-    ModelMapper mapper;
-    @Autowired
-    ClientService clientService;
-    @Autowired
-    UserService userService;
-    @Autowired
-    CurrencyService currencyService;
-    @Autowired
-    WareHouseService wareHouseService;
-    @Autowired
-    ContractItemRepository contractItemRepo;
-    @Autowired
-    ItemService itemService;
-    @Autowired
-    S3Uploader s3Uploader;
-    @Autowired
-    ContractItemFileRepository contractItemFileRepo;
-    @Autowired
-    NumberAutomatic na;
+    private final ContractRepository contractRepo;
+    private final ModelMapper mapper;
+    private final ClientService clientService;
+    private final UserService userService;
+    private final CurrencyService currencyService;
+    private final WareHouseService wareHouseService;
+    private final ContractItemRepository contractItemRepo;
+    private final ItemService itemService;
+    private final S3Uploader s3Uploader;
+    private final ContractItemFileRepository contractItemFileRepo;
+    private final NumberAutomatic numberAutomatic;
     // ======================================== 수주 ===============================================
     // 수주 생성
     @Override
@@ -62,7 +48,7 @@ public class ContractServiceImpl implements ContractService {
         WareHouse outPutWareHouse = wareHouseService.getWareHouseOrThrow(contractRequest.getOutputWareHouse());
         Contract contract = mapper.toEntity(contractRequest, Contract.class);
         contract.addJoin(client, user, currency, outPutWareHouse);
-        contract.setContractNo(na.createDateTimeNo());
+        contract.setContractNo(numberAutomatic.createDateTimeNo());
         contractRepo.save(contract);
         return mapper.toResponse(contract, ContractResponse.class);
     }
