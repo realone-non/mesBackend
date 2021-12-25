@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -7,11 +8,13 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 // 9-3. 발주현황조회
 @Getter
 @Setter
 @Schema(description = "발주현황조회")
-//@JsonInclude(NON_NULL)
+@JsonInclude(NON_NULL)
 public class PurchaseOrderStatusResponse {
     @Schema(description = "고유아이디")
     Long id;

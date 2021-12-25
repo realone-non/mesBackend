@@ -250,6 +250,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
     // 9-3. 발주현황조회
     // 검색조건: 화폐 id, 담당자 id, 거래처 id, 입고창고 id, 발주기간 fromDate~toDate
     @Override
+    @Transactional(readOnly = true)
     public List<PurchaseOrderStatusResponse> findPurchaseOrderStatusResponseAllByCondition(
             Long currencyId,
             Long userId,
@@ -263,32 +264,35 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                         Projections.fields(
                                 PurchaseOrderStatusResponse.class,
                                 purchaseRequest.id.as("id"),
-                                purchaseRequest.purchaseOrder.purchaseOrderNo.as("purchaseOrderNo"),
-                                purchaseRequest.purchaseOrder.client.clientCode.as("clientCode"),
-                                purchaseRequest.purchaseOrder.client.clientName.as("clientName"),
-                                purchaseRequest.item.itemNo.as("itemNo"),
-                                purchaseRequest.item.itemName.as("itemName"),
-                                purchaseRequest.item.standard.as("itemStandard"),
-                                purchaseRequest.item.manufacturerPartNo.as("itemManufacturerPartNo"),
+                                purchaseOrder.purchaseOrderNo.as("purchaseOrderNo"),
+                                client.clientCode.as("clientCode"),
+                                client.clientName.as("clientName"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                item.standard.as("itemStandard"),
+                                item.manufacturerPartNo.as("itemManufacturerPartNo"),
                                 purchaseRequest.orderAmount.as("orderAmount"),
-                                purchaseRequest.item.unit.unitCodeName.as("orderUnitCodeName"),
-                                purchaseRequest.item.inputUnitPrice.as("unitPrice"),
-                                purchaseRequest.item.inputUnitPrice.multiply(purchaseRequest.orderAmount).as("orderPrice"),
-                                (purchaseRequest.orderAmount.multiply(purchaseRequest.item.inputUnitPrice).doubleValue()).multiply(0.1).as("vat"),
+                                unit.unitCodeName.as("orderUnitCodeName"),
+                                item.inputUnitPrice.as("unitPrice"),
+                                item.inputUnitPrice.multiply(purchaseRequest.orderAmount).as("orderPrice"),
+                                (purchaseRequest.orderAmount.multiply(item.inputUnitPrice).doubleValue()).multiply(0.1).as("vat"),
                                 purchaseRequest.periodDate.as("orderPeriodDate"),
-                                purchaseRequest.purchaseOrder.user.korName.as("userName"),
-                                purchaseRequest.purchaseOrder.note.as("note"),
-                                purchaseRequest.purchaseOrder.wareHouse.wareHouseName.as("wareHouseName"),
-                                purchaseRequest.purchaseOrder.currency.currency.as("currencyUnit"),
+                                user.korName.as("userName"),
+                                purchaseOrder.note.as("note"),
+                                wareHouse.wareHouseName.as("wareHouseName"),
+                                currency.currency.as("currencyUnit"),
                                 purchaseRequest.cancelAmount.as("cancelAmount"),
                                 purchaseRequest.ordersState.as("orderState")
                         )
                 )
                 .from(purchaseRequest)
-                .innerJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
+                .leftJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
                 .leftJoin(item).on(item.id.eq(purchaseRequest.item.id))
                 .leftJoin(unit).on(unit.id.eq(item.unit.id))
-                .leftJoin(client).on(client.id.eq(item.manufacturer.id))
+                .leftJoin(client).on(client.id.eq(purchaseOrder.client.id))
+                .leftJoin(user).on(user.id.eq(purchaseOrder.user.id))
+                .leftJoin(wareHouse).on(wareHouse.id.eq(purchaseOrder.wareHouse.id))
+                .leftJoin(currency).on(currency.id.eq(purchaseOrder.currency.id))
                 .where(
                         isCurrencyEq(currencyId),
                         isUserEq(userId),
