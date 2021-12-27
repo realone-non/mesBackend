@@ -2,6 +2,7 @@ package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.PurchaseOrderDetailResponse;
 import com.mes.mesBackend.dto.response.PurchaseOrderResponse;
+import com.mes.mesBackend.dto.response.PurchaseOrderStatusResponse;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 
 import java.time.LocalDate;
@@ -33,4 +34,15 @@ public interface PurchaseOrderRepositoryCustom {
 
     // 발주등록상세 리스트 전체조회
     List<PurchaseOrderDetailResponse> findAllByPurchaseOrderIdAndDeleteYnFalse(Long purchaseOrderId);
+
+    // 9-3. 발주현황조회
+    // 검색조건: 화폐 id, 담당자 id, 거래처 id, 입고창고 id, 발주기간 fromDate~toDate
+    List<PurchaseOrderStatusResponse> findPurchaseOrderStatusResponseAllByCondition(
+            Long currencyId,
+            Long userId,
+            Long clientId,
+            Long wareHouseId,
+            LocalDate fromDate,
+            LocalDate toDate
+    );
 }

@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.request.PurchaseOrderDetailRequest;
 import com.mes.mesBackend.dto.request.PurchaseOrderRequest;
 import com.mes.mesBackend.dto.response.PurchaseOrderDetailResponse;
 import com.mes.mesBackend.dto.response.PurchaseOrderResponse;
+import com.mes.mesBackend.dto.response.PurchaseOrderStatusResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -246,5 +247,19 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         return purchaseRequestRepo.findByIdAndPurchaseOrderAndDeleteYnFalse(purchaseRequest.getId(), purchaseOrder)
                 .orElseThrow(() -> new BadRequestException("해당 구매발주에 해당하는 구매발주상세 정보가 없습니다. input purchaseOrderId: " + purchaseOrderId
                         + ", input purchaseRequestId: " + purchaseOrderDetailId));
+    }
+
+    // ================================================================ 9-3. 구매발주현황조회 ================================================================
+    // 발주현황 리스트 검색 조회, 검색조건: 화폐 id, 담당자 id, 거래처 id, 입고창고 id, 발주기간 fromDate~toDate
+    @Override
+    public List<PurchaseOrderStatusResponse> getPurchaseOrderStatuses(
+            Long currencyId,
+            Long userId,
+            Long clientId,
+            Long wareHouseId,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) {
+        return purchaseOrderRepo.findPurchaseOrderStatusResponseAllByCondition(currencyId, userId, clientId, wareHouseId, fromDate, toDate);
     }
 }
