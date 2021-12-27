@@ -158,6 +158,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                         purchaseRequest.purchaseOrder.id.eq(purchaseOrderId)
                 )
                 .orderBy(purchaseRequest.periodDate.desc())
+                .limit(1)
                 .fetchOne();
     }
 
