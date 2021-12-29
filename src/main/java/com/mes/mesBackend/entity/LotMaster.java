@@ -10,6 +10,12 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PURCHASE_INPUT;
+import static javax.persistence.EnumType.STRING;
+import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PUBLIC;
+
 /*
  * 7-1. Lot 마스터 조회
  * 검색: 공장,품목그룹,품목,LOT번호,창고,등록유형,재고유무,LOT유형,검사증여부,유효여부
@@ -36,20 +42,20 @@ import java.util.List;
  * 생성일시             -> BaseTimeEntity
  * */
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@NoArgsConstructor(access = PUBLIC)
 @Entity(name = "LOT_MASTERS")
 @Data
 public class LotMaster extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT 'LOT마스터 고유아이디'")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "ITEM",columnDefinition = "bigint COMMENT '품목'")
     private Item item;      // 품목
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '창고'")
     private WareHouse wareHouse;        // 창고
 
@@ -59,16 +65,22 @@ public class LotMaster extends BaseTimeEntity {
     @Column(name = "SERIAL_NO", columnDefinition = "varchar(255) COMMENT '시리얼 번호'")
     private String serialNo;        // 시리얼번호
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "LOT_TYPE", columnDefinition = "bigint COMMENT 'LOT 유형'")
     private LotType lotType;        // LOT 유형
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(STRING)
     @Column(name = "ENROLLMENT_TYPE", columnDefinition = "varchar(255) COMMENT '등록유형'")
     private EnrollmentType enrollmentType;      // 등록유형
 
-    @Column(name = "CREATED_AMOUNT", columnDefinition = "int COMMENT '생산수량'")
-    private int createdAmount;       // 생산수량
+    @Column(name = "PROCESS_YN", columnDefinition = "bit(1) COMMENT '공정용'")
+    private boolean processYn;      // 공정용
+
+    @Column(name = "STOCK_AMOUNT", columnDefinition = "int COMMENT '재고수량'")
+    private int stockAmount;        // 재고수량
+
+    @Column(name = "CREATED_AMOUNT", columnDefinition = "int COMMENT '생성수량'")
+    private int createdAmount;       // 생성수량
 
     @Column(name = "BAD_ITEM_AMOUNT", columnDefinition = "int COMMENT '불량수량'")
     private int badItemAmount;      // 불량수량
@@ -97,9 +109,17 @@ public class LotMaster extends BaseTimeEntity {
     @Column(name = "CHECK_AMOUNT", columnDefinition = "int COMMENT '검사수량'")
     private int checkAmount;            // 검사수량
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(STRING)
     @Column(name = "QUALITY_LEVEL", columnDefinition = "varchar(255) COMMENT '품질등급'")
     private QualityLevel qualityLevel;      // 품질등급
+
+    // 구매입고
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "PURCHASE_INPUT", columnDefinition = "bigint COMMENT '구매입고'")
+    private PurchaseInput purchaseInput;
+
+    @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
+    private boolean deleteYn = false;
 
 //    @Column(name = "BEFORE_LOT_NO", columnDefinition = "varchar(255) COMMENT '직전 로트번호'")
 //    private LotMaster beforeLotNo;     // 직전 로트번호
@@ -111,4 +131,24 @@ public class LotMaster extends BaseTimeEntity {
 //    @ManyToMany(mappedBy = "lotMasters")
 //    @JoinColumn(name = "CONTRACTS")
 //    private List<Contract> contracts = new ArrayList<>();
+
+    public void putPurchaseInput(
+            LotType lotType,
+            PurchaseInput purchaseInput,
+            String lotNo
+    ) {
+        setLotType(lotType);
+        setPurchaseInput(purchaseInput);
+        setEnrollmentType(PURCHASE_INPUT);
+        setLotNo(lotNo);
+    }
+
+    public void updatePurchaseInput(int inputAmount) {
+        setStockAmount(inputAmount);
+        setCreatedAmount(inputAmount);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

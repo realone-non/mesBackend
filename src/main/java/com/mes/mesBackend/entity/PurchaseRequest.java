@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDate;
 
+import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
+import static com.mes.mesBackend.entity.enumeration.OrderState.ONGOING;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -114,6 +116,10 @@ public class PurchaseRequest extends BaseTimeEntity {
 
     public void putPurchaseOrderAndOrderStateChangedOngoing(PurchaseOrder purchaseOrder) {
         setPurchaseOrder(purchaseOrder);
-        setOrdersState(OrderState.ONGOING);
+        setOrdersState(ONGOING);
+    }
+
+    public void putOrderStateChangedCompletion() {
+        setOrdersState(COMPLETION);
     }
 }

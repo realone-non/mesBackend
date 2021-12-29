@@ -5,10 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
 
-import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 /*
@@ -24,9 +26,9 @@ public class PurchaseReturn extends BaseTimeEntity {
     private Long id;
 
     //구매입고정보
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "PURCHASE_INPUT", columnDefinition = "bigint COMMENT '구매입고정보'", nullable = false)
-    private PurchaseInput purchaseInput;
+//    @OneToOne(fetch = LAZY)
+//    @JoinColumn(name = "PURCHASE_INPUT", columnDefinition = "bigint COMMENT '구매입고정보'", nullable = false)
+//    private PurchaseInput purchaseInput;
 
     // 반품일시
     @Column(name = "RETURN_DATE", columnDefinition = "datetime(6) COMMENT '반품일시'", nullable = false)

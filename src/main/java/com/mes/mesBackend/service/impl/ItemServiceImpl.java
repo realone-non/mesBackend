@@ -12,8 +12,8 @@ import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.ItemFileRepository;
 import com.mes.mesBackend.repository.ItemRepository;
 import com.mes.mesBackend.service.*;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,46 +21,38 @@ import java.io.IOException;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    @Autowired
-    ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
 
-    @Autowired
-    ItemAccountService itemAccountService;
-    @Autowired
-    ItemGroupService itemGroupService;
-    @Autowired
-    ItemFormService itemFormService;
-    @Autowired
-    UseTypeService useTypeService;
-    @Autowired
-    RoutingService routingService;
-    @Autowired
-    UnitService unitService;
-    @Autowired
-    LotTypeService lotTypeService;
-    @Autowired
-    ClientService clientService;
-    @Autowired
-    TestCriteriaService testCriteriaService;
-    @Autowired
-    TestProcessService testProcessService;
+    private final ItemAccountService itemAccountService;
+    private final ItemGroupService itemGroupService;
+    private final ItemFormService itemFormService;
+    private final UseTypeService useTypeService;
+    private final RoutingService routingService;
+    private final UnitService unitService;
+    private final LotTypeService lotTypeService;
+    private final ClientService clientService;
+    private final TestCriteriaService testCriteriaService;
+    private final TestProcessService testProcessService;
+    private final ItemAccountCodeService itemAccountCodeService;
 
-    @Autowired
-    ItemFileRepository itemFileRepository;
+    private final ItemFileRepository itemFileRepository;
 
-    @Autowired
-    UserService userService;
-    @Autowired
-    ModelMapper mapper;
-    @Autowired
-    S3Uploader s3Uploader;
+    private final UserService userService;
+    private final ModelMapper mapper;
+    private final S3Uploader s3Uploader;
 
 
     // 품목 생성
     @Override
-    public ItemResponse createItem(ItemRequest itemRequest) throws NotFoundException {
+    public ItemResponse createItem(ItemRequest itemRequest) throws NotFoundException, BadRequestException {
         ItemAccount itemAccount = itemAccountService.getItemAccountOrThrow(itemRequest.getItemAccount());
+        ItemAccountCode itemAccountCode = itemAccountCodeService.getItemAccountCodeOrThrow(itemRequest.getItemAccountCode());
+
+        // 입력한 품목계정이 입력받은 품목계정코드의 품목계정이랑 다를 경우 예외
+        ifItemAccountDifferentFromItemAccountCodeThrow(itemAccount.getId(), itemAccountCode.getItemAccount().getId());
+
         ItemGroup itemGroup = itemRequest.getItemGroup() != null ? itemGroupService.getItemGroupOrThrow(itemRequest.getItemGroup()) : null;
         ItemForm itemForm = itemRequest.getItemForm() != null ? itemFormService.getItemFormOrThrow(itemRequest.getItemForm()) : null;
         UseType useType = itemRequest.getUseType() != null ? useTypeService.getUseTypeOrThrow(itemRequest.getUseType()) : null;
@@ -73,10 +65,18 @@ public class ItemServiceImpl implements ItemService {
 
         Item item = mapper.toEntity(itemRequest, Item.class);
 
-        item.addJoin(itemAccount, itemGroup, itemForm, useType, routing, unit, lotType, manufacturer, testCriteria, testProcess);
+        item.mapping(itemAccount, itemGroup, itemForm, useType, routing, unit, lotType, manufacturer, testCriteria, testProcess, itemAccountCode);
 
         itemRepository.save(item);
         return mapper.toResponse(item, ItemResponse.class);
+    }
+
+    // 입력한 품목계정이 입력받은 품목계정코드의 품목계정이랑 다를 경우 예외
+    private void ifItemAccountDifferentFromItemAccountCodeThrow(Long itemAccountId, Long itemAccountIdFromItemAccountCode) throws BadRequestException {
+        if (!itemAccountId.equals(itemAccountIdFromItemAccountCode)) {
+            throw new BadRequestException("itemAccount included in the itemAccountCode is different from the itemAccount entered." +
+                    " input itemAccount id: " + itemAccountId + ", itemAccount id from itemAccountCode " + itemAccountIdFromItemAccountCode);
+        }
     }
 
     // 품목 단일 조회
@@ -114,10 +114,14 @@ public class ItemServiceImpl implements ItemService {
 
     // 품목 수정
     @Override
-    public ItemResponse updateItem(Long id, ItemRequest itemRequest) throws NotFoundException {
+    public ItemResponse updateItem(Long id, ItemRequest itemRequest) throws NotFoundException, BadRequestException {
         Item findItem = getItemOrThrow(id);
 
         ItemAccount newItemAccount = itemAccountService.getItemAccountOrThrow(itemRequest.getItemAccount());
+        ItemAccountCode newItemAccountCode = itemAccountCodeService.getItemAccountCodeOrThrow(itemRequest.getItemAccountCode());
+
+        ifItemAccountDifferentFromItemAccountCodeThrow(newItemAccount.getId(), newItemAccountCode.getId());
+
         ItemGroup newItemGroup = itemRequest.getItemGroup() != null ? itemGroupService.getItemGroupOrThrow(itemRequest.getItemGroup()) : null;
         ItemForm newItemForm = itemRequest.getItemForm() != null ? itemFormService.getItemFormOrThrow(itemRequest.getItemForm()) : null;
         UseType newUseType = itemRequest.getUseType() != null ? useTypeService.getUseTypeOrThrow(itemRequest.getUseType()) : null;
@@ -130,7 +134,7 @@ public class ItemServiceImpl implements ItemService {
 
         Item newItem = mapper.toEntity(itemRequest, Item.class);
 
-        findItem.update(newItem, newItemAccount, newItemGroup, newItemForm, newUseType, newRouting, newUnit, newLotType, newManufacturer, newTestCriteria, newTestProcess);
+        findItem.update(newItem, newItemAccount, newItemGroup, newItemForm, newUseType, newRouting, newUnit, newLotType, newManufacturer, newTestCriteria, newTestProcess, newItemAccountCode);
         itemRepository.save(findItem);
         return mapper.toResponse(findItem, ItemResponse.class);
     }
