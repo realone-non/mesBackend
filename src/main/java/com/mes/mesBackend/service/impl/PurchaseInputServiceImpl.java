@@ -57,7 +57,7 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
             purchaseRequest.setInputAmount(inputAmountSum);
 
             // 입고금액
-            int inputPrice = purchaseRequest.getInputPrice() * inputAmountSum;
+            int inputPrice = purchaseRequest.getUnitPrice() * inputAmountSum;
             purchaseRequest.setInputPrice(inputPrice);
 
             // 부가세
