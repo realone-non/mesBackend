@@ -1,7 +1,12 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.LotMasterRequest;
-import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.dto.response.LotMasterResponse;
+import com.mes.mesBackend.entity.ItemAccountCode;
+import com.mes.mesBackend.entity.LotMaster;
+import com.mes.mesBackend.entity.LotType;
+import com.mes.mesBackend.entity.PurchaseInput;
+import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
@@ -16,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.LOT_DEFAULT_SEQ;
 import static com.mes.mesBackend.helper.Constants.YYMMDD;
@@ -88,5 +94,21 @@ public class LotMasterServiceImpl implements LotMasterService {
     public PurchaseInput getPurchaseInputOrThrow(Long id) throws NotFoundException {
         return purchaseInputRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("purchaseInput does not exist. input purchaseInput id: " + id));
+    }
+
+    // 7-1
+    // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부
+    @Override
+    public List<LotMasterResponse> getLotMasters(
+            Long itemGroupId,
+            String lotNo,
+            String itemNoAndItemName,
+            Long wareHouseId,
+            EnrollmentType enrollmentType,
+            Boolean stockYn,
+            Long lotTypeId,
+            Boolean testingYn
+    ) {
+        return lotMasterRepo.findLotMastersByCondition(itemGroupId, lotNo, itemNoAndItemName, wareHouseId, enrollmentType, stockYn, lotTypeId, testingYn);
     }
 }
