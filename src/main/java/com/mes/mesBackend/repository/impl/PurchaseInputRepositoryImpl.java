@@ -2,6 +2,7 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.PurchaseInputDetailResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputResponse;
+import com.mes.mesBackend.dto.response.PurchaseStatusCheckResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.PurchaseInputRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -214,6 +215,51 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
 
     }
 
+    //  9-4. 구매현황조회
+    // 구매현황 리스트 조회 / 검색조건: 거래처 id, 품명|품목, 입고기간 fromDate~toDate
+    @Override
+    public List<PurchaseStatusCheckResponse> findPurchaseStatusCheckByCondition(
+            Long clientId,
+            String itemNoAndItemName,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                PurchaseStatusCheckResponse.class,
+                                purchaseInput.id.as("id"),
+                                purchaseInput.createdDate.as("inputDate"),
+                                client.clientCode.as("clientCode"),
+                                client.clientName.as("clientName"),
+                                purchaseOrder.purchaseOrderNo.as("purchaseOrderNo"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                item.standard.as("itemStandard"),
+                                item.manufacturerPartNo.as("itemManufacturerPartNo"),
+                                purchaseInput.inputAmount.as("inputAmount"),
+                                purchaseInput.inputAmount.multiply(item.inputUnitPrice).as("inputPrice"),
+                                unit.unitCodeName.as("orderUnitCodeName"),
+                                (purchaseInput.inputAmount.multiply(item.inputUnitPrice).doubleValue()).multiply(0.1).as("vat"),
+                                lotMaster.lotNo.as("lotNo")
+                        )
+                )
+                .from(purchaseInput)
+                .innerJoin(purchaseRequest).on(purchaseRequest.id.eq(purchaseInput.purchaseRequest.id))
+                .innerJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
+                .innerJoin(item).on(item.id.eq(purchaseRequest.item.id))
+                .leftJoin(unit).on(unit.id.eq(item.unit.id))
+                .innerJoin(lotMaster).on(lotMaster.purchaseInput.id.eq(purchaseInput.id))
+                .leftJoin(client).on(client.id.eq(purchaseOrder.client.id))
+                .where(
+                        isInputDateBetween(fromDate, toDate),
+                        isClientEq(clientId),
+                        isItemNoOrItemNameContain(itemNoAndItemName),
+                        isPurchaseInputDeleteYnFalse()
+                )
+                .fetch();
+    }
+
     // 입고기간
     private BooleanExpression isInputDateBetween(LocalDate fromDate, LocalDate toDate) {
         return fromDate != null ? purchaseRequest.inputDate.between(fromDate, toDate) : null;
@@ -239,9 +285,7 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
         return purchaseRequest.deleteYn.isFalse();
     }
     // 구매요청 id
-    public BooleanExpression isPurchaseRequestIdEq(Long purchaseRequestId) {
-        return purchaseRequest.id.eq(purchaseRequestId);
-    }
+    public BooleanExpression isPurchaseRequestIdEq(Long purchaseRequestId) { return purchaseRequest.id.eq(purchaseRequestId); }
     // 구매입고 id
     public BooleanExpression isPurchaseInputIdEq(Long purchaseInputId) {
         return purchaseInput.id.eq(purchaseInputId);
