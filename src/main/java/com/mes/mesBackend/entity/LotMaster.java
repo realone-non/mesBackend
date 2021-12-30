@@ -52,14 +52,14 @@ public class LotMaster extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "ITEM",columnDefinition = "bigint COMMENT '품목'")
+    @JoinColumn(name = "ITEM",columnDefinition = "bigint COMMENT '품목'", nullable = false)
     private Item item;      // 품목
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '창고'")
+    @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '창고'", nullable = false)
     private WareHouse wareHouse;        // 창고
 
-    @Column(name = "LOT_NO", columnDefinition = "varchar(255) COMMENT 'LOT 번호'")
+    @Column(name = "LOT_NO", columnDefinition = "varchar(255) COMMENT 'LOT 번호'", nullable = false)
     private String lotNo;       // LOT 번호
 
     @Column(name = "SERIAL_NO", columnDefinition = "varchar(255) COMMENT '시리얼 번호'")
@@ -70,10 +70,10 @@ public class LotMaster extends BaseTimeEntity {
     private LotType lotType;        // LOT 유형
 
     @Enumerated(STRING)
-    @Column(name = "ENROLLMENT_TYPE", columnDefinition = "varchar(255) COMMENT '등록유형'")
+    @Column(name = "ENROLLMENT_TYPE", columnDefinition = "varchar(255) COMMENT '등록유형'", nullable = false)
     private EnrollmentType enrollmentType;      // 등록유형
 
-    @Column(name = "PROCESS_YN", columnDefinition = "bit(1) COMMENT '공정용'")
+    @Column(name = "PROCESS_YN", columnDefinition = "bit(1) COMMENT '공정용'", nullable = false)
     private boolean processYn;      // 공정용
 
     @Column(name = "STOCK_AMOUNT", columnDefinition = "int COMMENT '재고수량'")
@@ -121,9 +121,13 @@ public class LotMaster extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;
 
-//    @Column(name = "BEFORE_LOT_NO", columnDefinition = "varchar(255) COMMENT '직전 로트번호'")
-//    private LotMaster beforeLotNo;     // 직전 로트번호
-    // 이거 안되면 String
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "BEFORE_LOT_NO", columnDefinition = "bigint(1) COMMENT '직전 로트번호'")
+    private LotMaster beforeLotNo;     // 직전 로트번호
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "NEXT_LOT_NO", columnDefinition = "bigint(1) COMMENT '다음 로트번호'")
+    private LotMaster nextLotNo;     // 다음 로트번호
 
 //    @Column(name = "END_YN", columnDefinition = "bit(1) COMMENT '로트 엔드'")
 //    private boolean endYn;      // 로트엔드
