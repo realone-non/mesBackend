@@ -2,6 +2,7 @@ package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.PurchaseInputDetailResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputResponse;
+import com.mes.mesBackend.dto.response.PurchaseStatusCheckResponse;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,4 +34,13 @@ public interface PurchaseInputRepositoryCustom {
 
     // 구매요청에 해당하는 구매발주상세의 제일 최근 등록된 날짜 조회
     Optional<LocalDateTime> findCreatedDateByPurchaseRequestId(Long purchaseRequestId);
+
+    //  9-4. 구매현황조회
+    // 구매현황 리스트 조회 / 검색조건: 거래처 id, 품명|품목, 입고기간 fromDate~toDate
+    List<PurchaseStatusCheckResponse> findPurchaseStatusCheckByCondition(
+            Long clientId,
+            String itemNoAndItemName,
+            LocalDate fromDate,
+            LocalDate toDate
+    );
 }

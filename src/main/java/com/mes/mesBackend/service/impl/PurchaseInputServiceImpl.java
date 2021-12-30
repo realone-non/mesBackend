@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.request.LotMasterRequest;
 import com.mes.mesBackend.dto.request.PurchaseInputRequest;
 import com.mes.mesBackend.dto.response.PurchaseInputDetailResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputResponse;
+import com.mes.mesBackend.dto.response.PurchaseStatusCheckResponse;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.PurchaseInput;
 import com.mes.mesBackend.entity.PurchaseRequest;
@@ -186,5 +187,18 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
         LocalDate inputDate = findInputDate != null ? LocalDate.from(findInputDate) : null;
         purchaseRequest.setInputDate(inputDate);
         purchaseRequestRepos.save(purchaseRequest);
+    }
+
+    // ================================================= 9-4. 구매현황조회 =================================================
+    // 구매현황 리스트 조회
+    // 검색조건: 거래처 id, 품명|품목, 입고기간 fromDate~toDate
+    @Override
+    public List<PurchaseStatusCheckResponse> getPurchaseStatusChecks(
+            Long clientId,
+            String itemNoAndItemName,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) {
+        return purchaseInputRepo.findPurchaseStatusCheckByCondition(clientId, itemNoAndItemName, fromDate, toDate);
     }
 }

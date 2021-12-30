@@ -96,4 +96,5 @@ public class PurchaseInputResponse {
     // 미입고수량 = 발주수량 - 입고수량
     public void setAlreadyInput(int orderAmount, int inputAmountSum) {
         this.alreadyInput = orderAmount - inputAmountSum;
-    }}
+    }
+}
