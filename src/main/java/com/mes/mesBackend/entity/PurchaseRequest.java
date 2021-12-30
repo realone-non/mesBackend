@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDate;
 
+import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
+import static com.mes.mesBackend.entity.enumeration.OrderState.ONGOING;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -81,6 +83,10 @@ public class PurchaseRequest extends BaseTimeEntity {
     @JoinColumn(name = "PURCHASE_ORDER", columnDefinition = "bigint COMMENT '구매발주'")
     private PurchaseOrder purchaseOrder;
 
+    // 9-5. 입고일시
+    @Column(name = "INPUT_DATE", columnDefinition = "datetime COMMENT '입고일시'")
+    private LocalDate inputDate;    // 구매입고의 가장 최근 createdDate
+
     public void update(
             PurchaseRequest newPurchaseRequest,
             ProduceOrder newProduceOrder,
@@ -114,6 +120,10 @@ public class PurchaseRequest extends BaseTimeEntity {
 
     public void putPurchaseOrderAndOrderStateChangedOngoing(PurchaseOrder purchaseOrder) {
         setPurchaseOrder(purchaseOrder);
-        setOrdersState(OrderState.ONGOING);
+        setOrdersState(ONGOING);
+    }
+
+    public void putOrderStateChangedCompletion() {
+        setOrdersState(COMPLETION);
     }
 }

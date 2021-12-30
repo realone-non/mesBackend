@@ -61,7 +61,7 @@ public class ItemController {
     public ResponseEntity<ItemResponse> createItem(
             @Valid @RequestBody ItemRequest itemRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         ItemResponse item = itemService.createItem(itemRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + item.getId() + " from createItem.");
@@ -122,7 +122,7 @@ public class ItemController {
             @PathVariable(value = "item-id") Long id,
             @RequestBody @Valid ItemRequest itemRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         ItemResponse itemResponse = itemService.updateItem(id, itemRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + itemResponse.getId() + " from updateItem.");

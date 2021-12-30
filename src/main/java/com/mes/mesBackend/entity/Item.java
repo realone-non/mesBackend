@@ -2,6 +2,7 @@ package com.mes.mesBackend.entity;
 
 import com.mes.mesBackend.entity.enumeration.DevelopStatus;
 import com.mes.mesBackend.entity.enumeration.TestType;
+import com.mes.mesBackend.service.ItemAccountCodeService;
 import com.querydsl.core.annotations.QueryInit;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import static javax.persistence.FetchType.LAZY;
 
 // 품목등록
 /*
@@ -68,32 +71,32 @@ public class Item extends BaseTimeEntity {
 
     // 다대일 단방향
     @QueryInit("*.*")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "ITEM_ACCOUNT",  nullable = false, columnDefinition = "bigint COMMENT '품목계정'")
     private ItemAccount itemAccount;    // 품목계정
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "ITEM_GROUP", columnDefinition = "bigint COMMENT '품목그룹'")
     private ItemGroup itemGroup ;        // 품목그룹
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "ITEM_FORM", columnDefinition = "bigint COMMENT '품목형태'")
     private ItemForm itemForm = new ItemForm();          // 품목형태
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "USE_TYPE", columnDefinition = "bigint COMMENT '용도유형'")
     private UseType useType;            // 용도유형
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "ROUTING", columnDefinition = "bigint COMMENT '라우팅'")
     private Routing routing;            // 라우팅 (라우팅 명)
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "UNIT", nullable = false, columnDefinition = "bigint COMMENT '재고단위'")
     private Unit unit;        // 재고단위
 
@@ -104,7 +107,7 @@ public class Item extends BaseTimeEntity {
     private int validDay;       // 유효일수
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "LOT_TYPES_ID", nullable = false, columnDefinition = "bigint COMMENT 'LOT유형'")
     private LotType lotType;    // LOT유형
 
@@ -139,17 +142,17 @@ public class Item extends BaseTimeEntity {
     private String manufacturerPartNo;        // 제조사품번
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "MANUFACTURER", nullable = false,columnDefinition = "bigint COMMENT '제조사'")
     private Client manufacturer;        // 제조사
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "TEST_CRITERIA", columnDefinition = "bigint COMMENT '검사기준'")
     private TestCriteria testCriteria;      // 검사기준
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "TEST_PROCESS", columnDefinition = "bigint COMMENT '검사방법'")
     private TestProcess testProcess;        // 검사방법
 
@@ -165,7 +168,11 @@ public class Item extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    public void addJoin(
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "ITEM_ACCOUNT_CODE", columnDefinition = "bigint COMMENT '품목계정코드'")
+    private ItemAccountCode itemAccountCode;
+
+    public void mapping(
             ItemAccount itemAccount,
             ItemGroup itemGroup,
             ItemForm itemForm,
@@ -175,7 +182,8 @@ public class Item extends BaseTimeEntity {
             LotType lotType,
             Client  manufacturer,
             TestCriteria testCriteria,
-            TestProcess testProcess
+            TestProcess testProcess,
+            ItemAccountCode itemAccountCode
     ) {
         setItemAccount(itemAccount);
         setItemGroup(itemGroup);
@@ -187,6 +195,7 @@ public class Item extends BaseTimeEntity {
         setManufacturer(manufacturer);
         setTestCriteria(testCriteria);
         setTestProcess(testProcess);
+        setItemAccountCode(itemAccountCode);
     }
 
     public void update(
@@ -200,7 +209,8 @@ public class Item extends BaseTimeEntity {
             LotType newLotType,
             Client newClient,
             TestCriteria newTestCriteria,
-            TestProcess newTestProcess
+            TestProcess newTestProcess,
+            ItemAccountCode newItemAccountCode
     ) {
         setItemNo(newItem.itemNo);
         setItemName(newItem.itemName);
@@ -229,6 +239,7 @@ public class Item extends BaseTimeEntity {
         setUseYn(newItem.useYn);
         setSearchWord(newItem.searchWord);
         setAgingMaterialYn(newItem.agingMaterialYn);
+        setItemAccountCode(newItemAccountCode);
     }
 
     public void delete() {

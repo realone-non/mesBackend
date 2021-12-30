@@ -34,6 +34,11 @@ public class ItemRequest {
     @NotNull(message = NOT_NULL)
     Long itemAccount;
 
+    @Schema(description = "품목계정코드 id")
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
+    Long itemAccountCode;
+
     @Schema(description = "품목그룹 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long itemGroup;
@@ -64,6 +69,7 @@ public class ItemRequest {
     int validDay;
 
     @Schema(description = "LOT유형 id")
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long lotType;
 
