@@ -29,20 +29,27 @@ public class PurchaseInputRequest {
 
     @Schema(description = "긴급여부")
     @NotNull(message = NOT_NULL)
-    boolean urgentYn;
+    boolean urgentYn = false;
 
     @Schema(description = "시험성적서")
     @NotNull(message = NOT_NULL)
-    boolean testReportYn;
+    boolean testReportYn = false;
 
     @Schema(description = "COC")
     @NotNull(message = NOT_NULL)
-    boolean coc;
+    boolean coc = false;
 
     // lot 관련
+    @Schema(description = "LOT 유형 id")
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
     Long lotType;
+
+    @Schema(description = "공정용")
+    @NotNull(message = NOT_NULL)
     boolean processYn;
 
+    // 구매입고 수정
     @Getter
     @Setter
     @Schema(description = "구매입고 수정")

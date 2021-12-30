@@ -20,7 +20,7 @@ public interface PurchaseInputRepositoryCustom {
     );
 
     // 구매입고 LOT 정보 단일 조회
-    Optional<PurchaseInputDetailResponse> findPurchaseInputDetailByIdAndPurchaseInputId(Long purchaseInputId, Long purchaseRequestId);
+    Optional<PurchaseInputDetailResponse> findPurchaseInputDetailByIdAndPurchaseInputId(Long purchaseRequestId, Long purchaseInputId);
 
     // 구매입고에 들어갈 item 조회 lot 번호 생성할때 쓰임
     Long findItemIdByPurchaseInputId(Long purchaseInputId);

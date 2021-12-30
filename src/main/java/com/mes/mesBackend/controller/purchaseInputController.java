@@ -154,7 +154,7 @@ public class purchaseInputController {
             @PathVariable(value = "purchase-request-id") @Parameter(description = "구매입고(구매요청) id") Long purchaseRequestId,
             @PathVariable(value = "purchase-input-id") @Parameter(description = "구매입고 상세 id") Long purchaseInputId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException, BadRequestException {
+    ) throws NotFoundException {
         purchaseInputService.deletePurchaseInputDetail(purchaseRequestId, purchaseInputId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + purchaseInputId + " from deletePurchaseInputDetail.");

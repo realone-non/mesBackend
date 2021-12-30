@@ -83,6 +83,10 @@ public class PurchaseRequest extends BaseTimeEntity {
     @JoinColumn(name = "PURCHASE_ORDER", columnDefinition = "bigint COMMENT '구매발주'")
     private PurchaseOrder purchaseOrder;
 
+    // 9-5. 입고일시
+    @Column(name = "INPUT_DATE", columnDefinition = "datetime COMMENT '입고일시'")
+    private LocalDate inputDate;    // 구매입고의 가장 최근 createdDate
+
     public void update(
             PurchaseRequest newPurchaseRequest,
             ProduceOrder newProduceOrder,

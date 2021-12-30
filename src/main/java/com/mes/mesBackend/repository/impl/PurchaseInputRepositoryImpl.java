@@ -53,6 +53,7 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                                 item.itemName.as("itemName"),
                                 item.standard.as("itemStandard"),
                                 item.manufacturerPartNo.as("itemManufacturerPartNo"),
+                                purchaseRequest.inputDate.as("inputDate"),
                                 unit.unitCodeName.as("orderUnitCodeName"),
                                 item.inputUnitPrice.as("unitPrice"),
                                 wareHouse.wareHouseName.as("wareHouseName"),
@@ -66,8 +67,6 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                 )
                 .from(purchaseRequest)
                 .innerJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
-//                .innerJoin(purchaseInput).on(purchaseInput.purchaseRequest.id.eq(purchaseRequest.id))
-//                .innerJoin(lotMaster).on(lotMaster.purchaseInput.id.eq(purchaseRequest.id))
                 .leftJoin(client).on(client.id.eq(purchaseOrder.client.id))
                 .leftJoin(item).on(item.id.eq(purchaseRequest.item.id))
                 .leftJoin(unit).on(unit.id.eq(item.unit.id))
@@ -75,6 +74,7 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                 .leftJoin(user).on(user.id.eq(purchaseOrder.user.id))
                 .leftJoin(currency).on(currency.id.eq(purchaseOrder.currency.id))
                 .where(
+                        isInputDateBetween(fromDate, toDate),
                         isWareHouseEq(wareHouseId),
                         isClientEq(clientId),
                         isItemNoOrItemNameContain(itemNoOrItemName),
@@ -86,7 +86,7 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
     // 구매입고 LOT 정보 단일 조회
     @Override
     @Transactional(readOnly = true)
-    public Optional<PurchaseInputDetailResponse> findPurchaseInputDetailByIdAndPurchaseInputId(Long purchaseInputId, Long purchaseRequestId) {
+    public Optional<PurchaseInputDetailResponse> findPurchaseInputDetailByIdAndPurchaseInputId(Long purchaseRequestId, Long purchaseInputId) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .select(
@@ -215,9 +215,8 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
     }
 
     // 입고기간
-    // lotMaster에 있는 생성일시 기준 제일 최근으로 보여주는거임
     private BooleanExpression isInputDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? purchaseInput.createdDate.between(fromDate.atStartOfDay(), toDate.atStartOfDay()) : null;
+        return fromDate != null ? purchaseRequest.inputDate.between(fromDate, toDate) : null;
     }
     // 입고창고
     private BooleanExpression isWareHouseEq(Long wareHouseId) {

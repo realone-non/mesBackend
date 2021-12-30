@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,6 +10,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 @Getter
 @Setter
@@ -34,7 +36,8 @@ public class PurchaseInputResponse {
     String itemManufacturerPartNo;
 
     // 어떤 입고일시 ?
-//    lot생성된 날짜를 기준
+    // 구매입고가 제일 최근에 생성 된 createdDate
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = "Asia/Seoul")
     @Schema(description = "입고일시")
     LocalDate inputDate;
 
@@ -57,8 +60,9 @@ public class PurchaseInputResponse {
     String wareHouseName;
 
     // 어디에 납기일자 ?
-//    구매발주등록 디테일에 보여주는 데이터
+    // 구매발주등록 디테일에 보여주는 데이터
     @Schema(description = "납기일자")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = "Asia/Seoul")
     LocalDate periodDate;
 
     @Schema(description = "발주번호")
@@ -77,5 +81,19 @@ public class PurchaseInputResponse {
     String note;
 
     @JsonIgnore
-    int orderAmount;            // 구매요청 발주수량
-}
+    int orderAmount;// 구매요청 발주수량
+
+    // 입고금액
+    public void setInputPrice() {
+        this.inputPrice = this.unitPrice * this.inputAmount;
+    }
+
+    // 부가세
+    public void setVat() {
+        this.vat = this.inputPrice * 0.1;
+    }
+
+    // 미입고수량 = 발주수량 - 입고수량
+    public void setAlreadyInput(int orderAmount, int inputAmountSum) {
+        this.alreadyInput = orderAmount - inputAmountSum;
+    }}

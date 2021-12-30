@@ -3,7 +3,6 @@ package com.mes.mesBackend.service;
 import com.mes.mesBackend.dto.request.PurchaseInputRequest;
 import com.mes.mesBackend.dto.response.PurchaseInputDetailResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputResponse;
-import com.mes.mesBackend.entity.PurchaseInput;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 
@@ -24,7 +23,7 @@ public interface PurchaseInputService {
     // 구매입고 LOT 생성
     PurchaseInputDetailResponse createPurchaseInputDetail(Long purchaseRequestId, PurchaseInputRequest purchaseInputRequest) throws NotFoundException, BadRequestException;
     // 구매입고 LOT 전체 조회
-    List<PurchaseInputDetailResponse> getPurchaseInputDetails(Long purchaseRequestId);
+    List<PurchaseInputDetailResponse> getPurchaseInputDetails(Long purchaseRequestId) throws NotFoundException;
     // 구메입고 LOT 단일 조회
     PurchaseInputDetailResponse getPurchaseInputDetailResponse(Long purchaseRequestId, Long purchaseInputId) throws NotFoundException;
     // 구매입고 LOT 수정

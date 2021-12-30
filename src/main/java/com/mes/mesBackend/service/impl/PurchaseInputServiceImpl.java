@@ -44,30 +44,17 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
             Long clientId,
             String itemNoOrItemName
     ) {
-        List<PurchaseInputResponse> purchaseRequests = purchaseInputRepo.findPurchaseRequestsByCondition(fromDate, toDate, wareHouseId, clientId, itemNoOrItemName);
+        List<PurchaseInputResponse> purchaseRequests =
+                purchaseInputRepo.findPurchaseRequestsByCondition(fromDate, toDate, wareHouseId, clientId, itemNoOrItemName);
         for (PurchaseInputResponse purchaseRequest : purchaseRequests) {
-            // 입고일시
-            LocalDateTime findInputDate = purchaseInputRepo.findCreatedDateByPurchaseRequestId(purchaseRequest.getId()).orElse(null);
-            LocalDate inputDate = findInputDate != null ? LocalDate.from(findInputDate) : null;
-            purchaseRequest.setInputDate(inputDate);
-
             // 입고수량
             List<Integer> purchaserInputAmounts = purchaseInputRepo.findInputAmountByPurchaseRequestId(purchaseRequest.getId());    // 현재 입고된 수량
             int inputAmountSum = purchaserInputAmounts.stream().mapToInt(Integer::intValue).sum();  // 현재 입고된 수량
             purchaseRequest.setInputAmount(inputAmountSum);
 
-            // 입고금액
-            int inputPrice = purchaseRequest.getUnitPrice() * inputAmountSum;
-            purchaseRequest.setInputPrice(inputPrice);
-
-            // 부가세
-            double vat = inputPrice * 0.1;
-            purchaseRequest.setVat(vat);
-
-            // 미입고수량
-            int orderAmount = purchaseRequest.getOrderAmount();     // 발주수량 - 입고수량
-            int alreadyInput = orderAmount - inputAmountSum;
-            purchaseRequest.setAlreadyInput(alreadyInput);
+            purchaseRequest.setInputPrice();    // 입고금액
+            purchaseRequest.setVat();           // 부가세
+            purchaseRequest.setAlreadyInput(purchaseRequest.getOrderAmount(), inputAmountSum);      // 미입고수량 = 발주수량 - 입고수량
         }
         return purchaseRequests;
     }
@@ -117,13 +104,17 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
             throw new BadRequestException("lot 번호가 생성되지 않았습니다.");
         }
 
-        return getPurchaseInputDetailResponse(purchaseInput.getId(), purchaseRequest.getId());
+        // 구매요청에 입고일시 생성
+        putInputDateToPurchaseRequest(purchaseRequest);
+
+        return getPurchaseInputDetailResponse(purchaseRequest.getId(), purchaseInput.getId());
     }
 
     // 구매입고 LOT 전체 조회
     @Override
-    public List<PurchaseInputDetailResponse> getPurchaseInputDetails(Long purchaseRequestId) {
-        return purchaseInputRepo.findPurchaseInputDetailByPurchaseRequestId(purchaseRequestId);
+    public List<PurchaseInputDetailResponse> getPurchaseInputDetails(Long purchaseRequestId) throws NotFoundException {
+        PurchaseRequest purchaseRequest = purchaseRequestService.getPurchaseRequestOrThrow(purchaseRequestId);
+        return purchaseInputRepo.findPurchaseInputDetailByPurchaseRequestId(purchaseRequest.getId());
     }
 
     // 구메입고 LOT 단일 조회
@@ -132,18 +123,18 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
             Long purchaseRequestId,
             Long purchaseInputId
     ) throws NotFoundException {
-        return purchaseInputRepo.findPurchaseInputDetailByIdAndPurchaseInputId(purchaseInputId, purchaseRequestId)
-                .orElseThrow(() -> new NotFoundException("purchaseInputDetail does not exist"));
+        return purchaseInputRepo.findPurchaseInputDetailByIdAndPurchaseInputId(purchaseRequestId, purchaseInputId)
+                .orElseThrow(() -> new NotFoundException("purchaseInputDetail does not exist."));
     }
 
     // 구매입고 LOT 수정
     @Override
     public PurchaseInputDetailResponse updatePurchaseInputDetail(
-            Long purchaseRequestId,   // 구매입고
-            Long purchaseInputId,     // 구매입고 상세
+            Long purchaseRequestId,
+            Long purchaseInputId,
             PurchaseInputRequest.updateRequest purchaseInputUpdateRequest
     ) throws NotFoundException {
-        PurchaseInput findPurchaseInput = getPurchaseInputOrThrow(purchaseInputId, purchaseRequestId);
+        PurchaseInput findPurchaseInput = getPurchaseInputOrThrow(purchaseRequestId, purchaseInputId);
         PurchaseInput newPurchaseInput = mapper.toEntity(purchaseInputUpdateRequest, PurchaseInput.class);
         findPurchaseInput.put(newPurchaseInput);
 
@@ -152,29 +143,48 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
         lotMaster.updatePurchaseInput(findPurchaseInput.getInputAmount());
         lotMasterRepo.save(lotMaster);
 
+        // 구매요청에 입고일시 생성
+        PurchaseRequest purchaseRequest = purchaseRequestService.getPurchaseRequestOrThrow(purchaseRequestId);
+        putInputDateToPurchaseRequest(purchaseRequest);
+
         return getPurchaseInputDetailResponse(purchaseRequestId, purchaseInputId);
     }
 
     // 구매입고 LOT 삭제
     @Override
     public void deletePurchaseInputDetail(Long purchaseRequestId, Long purchaseInputId) throws NotFoundException {
-        PurchaseInput purchaseInput = getPurchaseInputOrThrow(purchaseInputId, purchaseRequestId);
+        // 구매입고 삭제
+        PurchaseInput purchaseInput = getPurchaseInputOrThrow(purchaseRequestId, purchaseInputId);
         purchaseInput.delete();
+        // 구매입고 등록 시 생성되었던 lotMaster 삭제
         LotMaster lotMaster = getLotMasterOrThrow(purchaseInput);
         lotMaster.delete();
         purchaseInputRepo.save(purchaseInput);
         lotMasterRepo.save(lotMaster);
+        // 구매요청에 입고 일시 생성
+        PurchaseRequest purchaseRequest = purchaseRequestService.getPurchaseRequestOrThrow(purchaseRequestId);
+        putInputDateToPurchaseRequest(purchaseRequest);
     }
 
     // 구매입고 LOT 단일 조회 및 예외
-    private PurchaseInput getPurchaseInputOrThrow(Long purchaseInputId, Long purchaseRequestId) throws NotFoundException {      // 구매입고, 구매요청
+    private PurchaseInput getPurchaseInputOrThrow(Long purchaseRequestId, Long purchaseInputId) throws NotFoundException {      // 구매입고, 구매요청
         PurchaseRequest purchaseRequest = purchaseRequestService.getPurchaseRequestOrThrow(purchaseRequestId);    // 구매요청 조회
         return purchaseInputRepo.findByIdAndPurchaseRequestAndDeleteYnFalse(purchaseInputId, purchaseRequest)
                 .orElseThrow(() -> new NotFoundException("purchaseInput does not exist. input purchaseInput id: " + purchaseInputId));
     }
 
+    // LotMaster 단일 조회 및 예외
     private LotMaster getLotMasterOrThrow(PurchaseInput purchaseInput) throws NotFoundException {
         return lotMasterRepo.findByPurchaseInputAndDeleteYnFalse(purchaseInput)
                 .orElseThrow(() -> new NotFoundException("lotMaster does not exist. input purchaseInputId: " + purchaseInput.getId()));
+    }
+
+    // 구매요청에 입고일시 생성
+    // 구매요청에 해당하는 구매입고 중 제일 최근에 등록된 날짜
+    private void putInputDateToPurchaseRequest(PurchaseRequest purchaseRequest) {
+        LocalDateTime findInputDate = purchaseInputRepo.findCreatedDateByPurchaseRequestId(purchaseRequest.getId()).orElse(null);
+        LocalDate inputDate = findInputDate != null ? LocalDate.from(findInputDate) : null;
+        purchaseRequest.setInputDate(inputDate);
+        purchaseRequestRepos.save(purchaseRequest);
     }
 }
