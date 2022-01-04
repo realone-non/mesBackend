@@ -239,6 +239,7 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                                 item.manufacturerPartNo.as("itemManufacturerPartNo"),
                                 purchaseInput.inputAmount.as("inputAmount"),
                                 purchaseInput.inputAmount.multiply(item.inputUnitPrice).as("inputPrice"),
+                                purchaseInput.id.as("purchaseInputNo"),
                                 unit.unitCodeName.as("orderUnitCodeName"),
                                 (purchaseInput.inputAmount.multiply(item.inputUnitPrice).doubleValue()).multiply(0.1).as("vat"),
                                 lotMaster.lotNo.as("lotNo")

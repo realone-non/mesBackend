@@ -1,6 +1,5 @@
 package com.mes.mesBackend.dto.request;
 
-import com.mes.mesBackend.entity.LotType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -68,14 +67,14 @@ public class PurchaseInputRequest {
 
         @Schema(description = "긴급여부")
         @NotNull(message = NOT_NULL)
-        boolean urgentYn;
+        boolean urgentYn = false;
 
         @Schema(description = "시험성적서")
         @NotNull(message = NOT_NULL)
-        boolean testReportYn;
+        boolean testReportYn = false;
 
         @Schema(description = "COC")
         @NotNull(message = NOT_NULL)
-        boolean coc;
+        boolean coc = false;
     }
 }

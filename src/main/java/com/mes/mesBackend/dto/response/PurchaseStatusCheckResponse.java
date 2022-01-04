@@ -51,6 +51,9 @@ public class PurchaseStatusCheckResponse {
     @Schema(description = "입고금액")
     int inputPrice;
 
+    @Schema(description = "입고번호(구매입고 id)")
+    Long purchaseInputNo;
+
     @Schema(description = "발주단위")
     String orderUnitCodeName;
 

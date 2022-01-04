@@ -33,10 +33,10 @@ import java.util.List;
 @RestController
 @SecurityRequirement(name = "Authorization")
 @RequiredArgsConstructor
-public class purchaseInputController {
+public class PurchaseInputController {
     private final PurchaseInputService purchaseInputService;
     private final LogService logService;
-    private Logger logger = LoggerFactory.getLogger(purchaseInputController.class);
+    private Logger logger = LoggerFactory.getLogger(PurchaseInputController.class);
     private CustomLogger cLogger;
 
     // 구매입고 리스트 조회, 검색조건: 입고기간 fromDate~toDate, 입고창고, 거래처, 품명|품번

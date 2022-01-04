@@ -60,7 +60,8 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
         return jpaQueryFactory
                 .select(
                         Projections.fields(ProduceOrderDetailResponse.class,
-                                bomItemDetail.id.as("id"),
+                                bomItemDetail.id.as("bomItemDetailId"),
+                                item.id.as("itemId"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
                                 itemAccount.account.as("itemAccount"),
@@ -72,7 +73,7 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
                 )
                 .from(bomItemDetail)
                 .leftJoin(bomMaster).on(bomMaster.id.eq(bomItemDetail.bomMaster.id))
-                .leftJoin(item).on(item.id.eq(bomMaster.item.id))
+                .leftJoin(item).on(item.id.eq(bomItemDetail.item.id))
                 .leftJoin(workProcess).on(workProcess.id.eq(bomItemDetail.workProcess.id))
                 .leftJoin(unit).on(unit.id.eq(item.unit.id))
                 .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))

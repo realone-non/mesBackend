@@ -40,7 +40,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         * produceOrder.contract.Item: 완재품
         * bomMasterDetail: 원자재, 부자재 등등
          * */
-        List<Long> findItemIds = purchaseRequestRepo.findItemIdByContractItemId(produceOrder.getContractItem().getId());
+        List<Long> findItemIds = purchaseRequestRepo.findItemIdByContractItemId(produceOrder.getContractItem().getItem().getId());
 
         // 입력받은 itemId 가 findItemIds 에 해당되는지 체크
         Item item = getItemAndCheckItemId(purchaseRequestRequest.getItemId(), findItemIds);
