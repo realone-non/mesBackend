@@ -2,6 +2,7 @@ package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.entity.ItemAccountCode;
+import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 
 import java.util.List;

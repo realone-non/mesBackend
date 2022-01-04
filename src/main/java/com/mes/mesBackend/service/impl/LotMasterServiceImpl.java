@@ -33,8 +33,6 @@ public class LotMasterServiceImpl implements LotMasterService {
     private final PurchaseInputRepository purchaseInputRepo;
     private final ModelMapper modelMapper;
     private final LotTypeService lotTypeService;
-    private final ItemService itemService;
-    private final WareHouseService wareHouseService;
 
     // LOT master 생성
     @Override
@@ -110,5 +108,12 @@ public class LotMasterServiceImpl implements LotMasterService {
             Boolean testingYn
     ) {
         return lotMasterRepo.findLotMastersByCondition(itemGroupId, lotNo, itemNoAndItemName, wareHouseId, enrollmentType, stockYn, lotTypeId, testingYn);
+    }
+
+    // lotMaster 단일 조회 및 예외
+    @Override
+    public LotMaster getLotMasterOrThrow(Long id) throws NotFoundException {
+        return lotMasterRepo.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("lotMaster does not exist. input id:" + id));
     }
 }

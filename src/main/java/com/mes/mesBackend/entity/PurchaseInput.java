@@ -43,15 +43,15 @@ public class PurchaseInput extends BaseTimeEntity {
 
     // 긴급여부
     @Column(name = "URGENT_YN", columnDefinition = "bit(1) COMMENT '긴급여부'")
-    private boolean urgentYn;
+    private boolean urgentYn = false;
 
     // 시험성적서
     @Column(name = "TEST_REPORT_YN", columnDefinition = "bit(1) COMMENT '시험성적서'")
-    private boolean testReportYn;
+    private boolean testReportYn = false;
 
     // COC
     @Column(name = "COC", columnDefinition = "bit(1) COMMENT 'COC'")
-    private boolean coc;
+    private boolean coc = false;
 
     // 삭제여부
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)

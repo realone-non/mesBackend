@@ -2,6 +2,7 @@ package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.LotMasterRequest;
 import com.mes.mesBackend.dto.response.LotMasterResponse;
+import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -22,4 +23,6 @@ public interface LotMasterService {
             Long lotTypeId,
             Boolean testingYn
     );
+    // lot master 단일 조회 및 예외
+    LotMaster getLotMasterOrThrow(Long id) throws NotFoundException;
 }

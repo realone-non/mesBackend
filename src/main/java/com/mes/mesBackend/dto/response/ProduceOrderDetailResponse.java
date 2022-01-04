@@ -13,6 +13,11 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Schema(description = "제조오더 디테일")
 @JsonInclude(NON_NULL)
 public class ProduceOrderDetailResponse {
+
+    Long bomItemDetailId;
+    @Schema(description = "품목 id")
+    Long itemId;
+
     @Schema(description = "품번")
     String itemNo;
 

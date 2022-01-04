@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
-// 9-2. 발주현황 조회
+// 9-3. 발주현황 조회
 @RequestMapping(value = "/purchase-order-statuses")
 @Tag(name = "purchase-order-status", description = "발주현황 조회 API")
 @RestController
