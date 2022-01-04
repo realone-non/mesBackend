@@ -99,7 +99,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                 InputTestRequestResponse.class,
                                 inputTestRequest.id.as("id"),
                                 lotMaster.id.as("lotId"),
-                                lotMaster.lotNo.as("loNo"),
+                                lotMaster.lotNo.as("lotNo"),
                                 purchaseInput.id.as("purchaseInputNo"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
