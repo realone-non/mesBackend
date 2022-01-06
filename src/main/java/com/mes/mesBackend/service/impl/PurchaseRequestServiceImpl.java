@@ -33,6 +33,14 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
     @Override
     public PurchaseRequestResponse createPurchaseRequest(PurchaseRequestRequest purchaseRequestRequest) throws NotFoundException, BadRequestException {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(purchaseRequestRequest.getProduceOrder());
+
+        // 총 구매요청수량이 수주수량을 초과하면 예외
+        throwIfPurchaseRequestAmountGreaterThanContractItemAmount(
+                produceOrder.getId(),
+                purchaseRequestRequest.getRequestAmount(),
+                produceOrder.getContractItem().getAmount()
+        );
+
         /*
         * 구매요청 품목정보는 produceOrder 의 contractItem 의 item 을 찾아서
         * item 에 해당하는 bomMaster 의 데이터에 해당되는
@@ -91,6 +99,13 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         PurchaseRequest findPurchaseRequest = getPurchaseRequestOrThrow(id);
         ProduceOrder newProduceOrder = produceOrderService.getProduceOrderOrThrow(newPurchaseRequestRequest.getProduceOrder());
 
+        // 총 구매요청수량이 수주수량을 초과하면 예외
+        throwIfPurchaseRequestAmountGreaterThanContractItemAmount(
+                newProduceOrder.getId(),
+                newPurchaseRequestRequest.getRequestAmount(),
+                newProduceOrder.getContractItem().getAmount()
+        );
+
         List<Long> findItemIds = purchaseRequestRepo.findItemIdByContractItemId(newProduceOrder.getContractItem().getId());
 
         Item newItem = getItemAndCheckItemId(newPurchaseRequestRequest.getItemId(), findItemIds);
@@ -115,5 +130,17 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
     public PurchaseRequest getPurchaseRequestOrThrow(Long id) throws NotFoundException {
         return purchaseRequestRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("purchaseRequest does not exist. input purchaseRequest id: " + id));
+    }
+
+    private void throwIfPurchaseRequestAmountGreaterThanContractItemAmount(Long produceOrderId, int requestAmount, int contractItemAmount) throws BadRequestException {
+        // 총 구매요청수량이 수주수량을 초과하면 예외
+        List<Integer> orderAmounts = purchaseRequestRepo.findRequestAmountByProduceOrderId(produceOrderId);
+        int orderAmountSum = orderAmounts.stream().mapToInt(Integer::intValue).sum();
+        if (orderAmountSum+requestAmount > contractItemAmount) {
+            throw new BadRequestException("total purchaseRequestAmount cannot be greater than contractItemAmount. " +
+                    "input requestAmount: " + requestAmount + ", " +
+                    "total requestAmount: " + orderAmountSum + ", " +
+                    "contractItemAmount: " + contractItemAmount);
+        }
     }
 }

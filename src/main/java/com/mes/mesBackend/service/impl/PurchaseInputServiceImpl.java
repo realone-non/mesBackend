@@ -78,9 +78,8 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
             purchaseRequest.putOrderStateChangedCompletion();       // 지시상태 값 변경
             purchaseRequestRepos.save(purchaseRequest);
         } else if (inputAmountSum > orderAmount) {
-            throw new BadRequestException("입고수량이 등록되어있는 발주수량을 초과했습니다. " +
+            throw new BadRequestException("등록 발주수량보다 입고수량이 클 수 없습니다." +
                     " input 입고수량: " + purchaseInput.getInputAmount()
-                    + ", 기존 입고수량 + input 입고수량: " + inputAmountSum
                     + " , 발주수량 : " + orderAmount);
         }
 

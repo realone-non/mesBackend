@@ -1,22 +1,21 @@
 package com.mes.mesBackend.entity;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-
 import java.time.LocalDate;
 
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
 
 /*
 * 9-5. 구매입고 등록
 * */
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 @Entity(name = "PURCHASE_INPUTS")
 @Data
 public class PurchaseInput extends BaseTimeEntity {

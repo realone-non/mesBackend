@@ -23,4 +23,8 @@ public interface PurchaseRequestRepositoryCustom {
     // 구매발주에 해당하는 구매요청이 있는지.
     // return: clientId
     List<Long> findClientIdsByPurchaseOrder(Long purchaseOrderId);
+    // 구매발주에 해당하는 구매요청의 orderAmount 모두
+    List<Integer> findOrderAmountByPurchaseOrderId(Long purchaseOrderId);
+    // 제조오더에 해당하는 구매요청의 requestAmount 모두
+    List<Integer> findRequestAmountByProduceOrderId(Long produceOrderId);
 }

@@ -58,8 +58,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                         purchaseInput.coc.as("coc"),
                                         inputTestRequest.createdDate.as("requestDate"),
                                         inputTestRequest.requestType.as("requestType"),
-                                        inputTestRequest.requestAmount.as("requestAmount"),
-                                        inputTestRequest.testAmount.as("testAmount")
+                                        inputTestRequest.requestAmount.as("requestAmount")
                                 )
                         )
                         .from(inputTestRequest)
@@ -116,8 +115,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                 purchaseInput.coc.as("coc"),
                                 inputTestRequest.createdDate.as("requestDate"),
                                 inputTestRequest.requestType.as("requestType"),
-                                inputTestRequest.requestAmount.as("requestAmount"),
-                                inputTestRequest.testAmount.as("testAmount")
+                                inputTestRequest.requestAmount.as("requestAmount")
                         )
                 )
                 .from(inputTestRequest)
