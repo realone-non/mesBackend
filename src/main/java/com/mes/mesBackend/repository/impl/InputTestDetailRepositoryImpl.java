@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.InputTestDetailResponse;
+import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
 import com.mes.mesBackend.dto.response.InputTestRequestInfoResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.InputTestDetailRepositoryCustom;
@@ -193,6 +194,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
 
     // 검사요청정보에 해당하는 검사상세정보 모든 불량수량
     @Override
+    @Transactional(readOnly = true)
     public List<Integer> findBadItemAmountByInputTestRequestId(Long inputTestRequestId) {
         return jpaQueryFactory
                 .select(lotMaster.badItemAmount)
@@ -207,6 +209,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     }
     // 검사요청정보에 해당하는 검사상세정보 모든 재고수량
     @Override
+    @Transactional(readOnly = true)
     public List<Integer> findStockAmountByInputTestRequestId(Long inputTestRequestId) {
         return jpaQueryFactory
                 .select(lotMaster.stockAmount)
@@ -216,6 +219,70 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                         inputTestRequest.id.eq(inputTestRequestId),
                         inputTestRequest.deleteYn.isFalse(),
                         lotMaster.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+
+    // ================================================= 14-3. 검사실적조회 =================================================
+    // 검사실적조회
+    // 검색조건: 검사기간 fromDate~toDate, 품명|품목, 거래처 id, 입고번호(구매입고 id)
+    @Override
+    @Transactional(readOnly = true)
+    public List<InputTestPerformanceResponse> findInputTestPerformanceResponseByCondition(
+            LocalDate fromDate,
+            LocalDate toDate,
+            String itemNoAndName,
+            Long clientId,
+            Long purchaseInputNo
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                InputTestPerformanceResponse.class,
+                                inputTestDetail.id.as("inputTestDetailId"),
+                                inputTestRequest.createdDate.as("requestDate"),
+                                inputTestDetail.testDate.as("testDate"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                itemForm.form.as("itemForm"),
+                                purchaseOrder.purchaseOrderNo.as("purchaseOrderNo"),
+                                lotMaster.lotNo.as("lotNo"),
+                                item.clientItemNo.as("itemClientPartNo"), // 고객사품번
+                                item.manufacturerPartNo.as("itemManufacturerPartNo"),    // 제조사품번
+                                client.clientName.as("manufacturerName"), // 제조사
+                                client.clientName.as("clientName"), // 고객사
+                                testProcess.testProcess.as("testProcess"),
+                                testCriteria.testCriteria.as("testCriteria"),
+                                inputTestDetail.testAmount.as("testAmount"),
+                                inputTestDetail.fairQualityAmount.as("fairQualityAmount"),
+                                inputTestDetail.incongruityAmount.as("incongruityAmount"),
+                                user.korName.as("user"),
+                                purchaseInput.testReportYn.as("testReportYn"),
+                                purchaseInput.coc.as("cocYn"),
+                                inputTestDetail.testReportFileUrl.as("testReportFileUrl"),
+                                inputTestDetail.cocFileUrl.as("cocFileUrl"),
+                                inputTestDetail.note.as("note")
+                        )
+                )
+                .from(inputTestDetail)
+                .leftJoin(inputTestRequest).on(inputTestRequest.id.eq(inputTestDetail.inputTestRequest.id))
+                .leftJoin(lotMaster).on(lotMaster.id.eq(inputTestRequest.lotMaster.id))
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))
+                .leftJoin(purchaseInput).on(purchaseInput.id.eq(lotMaster.purchaseInput.id))
+                .leftJoin(purchaseRequest).on(purchaseRequest.id.eq(purchaseInput.purchaseRequest.id))
+                .leftJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
+                .leftJoin(testProcess).on(testProcess.id.eq(item.testProcess.id))
+                .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
+                .leftJoin(client).on(client.id.eq(item.manufacturer.id))
+                .leftJoin(user).on(user.id.eq(inputTestDetail.user.id))
+                .where(
+                        isTestDateBetween(fromDate, toDate),
+                        isItemNoAndItemNameContain(itemNoAndName),
+                        isManufactureEq(clientId),
+                        isPurchaseInputNoEq(purchaseInputNo),
+                        isInputTestDetailDeleteYnFalse(),
+                        isInputTestRequestDeleteYnFalse()
                 )
                 .fetch();
     }
@@ -257,5 +324,9 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     }
     private BooleanExpression isInputTestDetailDeleteYnFalse() {
         return inputTestDetail.deleteYn.isFalse();
+    }
+    // 검사기간
+    private BooleanExpression isTestDateBetween(LocalDate fromDate, LocalDate toDate) {
+        return fromDate != null ? inputTestDetail.testDate.between(fromDate, toDate) : null;
     }
 }
