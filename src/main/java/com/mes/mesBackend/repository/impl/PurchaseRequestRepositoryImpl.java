@@ -100,7 +100,7 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
             Long itemGroupId,
             String itemNoAndName,
             String manufacturerPartNo,
-            boolean orderCompletion
+            Boolean orderCompletion
     ) {
         return jpaQueryFactory
                 .select(
@@ -213,10 +213,11 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
         return manufacturerPartNo != null ? item.manufacturerPartNo.contains(manufacturerPartNo) : null;
     }
     // 완료포함(check)
-    private BooleanExpression isOrderCompletionEq(boolean orderCompletion) {
+    private BooleanExpression isOrderCompletionEq(Boolean orderCompletion) {
         // 인자 값이 false 일 때 지시상태의 값이 Schedule 인 데이터 검색
         // true 일 땐 Completion
-        return orderCompletion ? purchaseRequest.ordersState.eq(COMPLETION) : purchaseRequest.ordersState.eq(SCHEDULE);
+//        return orderCompletion ? purchaseRequest.ordersState.eq(COMPLETION) : purchaseRequest.ordersState.eq(SCHEDULE);
+        return orderCompletion != null ? (orderCompletion ? purchaseRequest.ordersState.eq(COMPLETION) : purchaseRequest.ordersState.eq(SCHEDULE)) : null;
     }
     // 삭제여부 false
     private BooleanExpression isDeleteYnFalse() {

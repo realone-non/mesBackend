@@ -91,7 +91,7 @@ public class PurchaseRequestController {
             @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
             @RequestParam(required = false) @Parameter(description = "제조사 품번") String manufacturerPartNo,
-            @RequestParam(required = false) @Parameter(description = "완료포함") boolean orderCompletion,
+            @RequestParam(required = false) @Parameter(description = "완료포함") Boolean orderCompletion,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<PurchaseRequestResponse> purchaseRequests = purchaseRequestService.getPurchaseRequests(fromDate, toDate, produceOrderNo, itemGroupId, itemNoAndName, manufacturerPartNo, orderCompletion);
