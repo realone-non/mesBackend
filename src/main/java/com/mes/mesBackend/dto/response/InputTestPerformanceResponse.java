@@ -1,6 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,13 +9,14 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM;
 
 @Getter
 @Setter
 @Schema(description = "14-3. 검사실적조회")
-//@JsonInclude(NON_NULL)
+@JsonInclude(NON_NULL)
 public class InputTestPerformanceResponse {
     @Schema(description = "검사등록 고유아이디")
     Long inputTestDetailId;
