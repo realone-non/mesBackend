@@ -1,9 +1,11 @@
 package com.mes.mesBackend.entity;
 
+import com.mes.mesBackend.dto.request.OutsourcingProductionRequestRequest;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.tomcat.jni.Local;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -56,14 +58,22 @@ public class OutSourcingProductionRequest extends BaseTimeEntity {
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                        // 비고
 
-    // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
-    private Factory factory;                // 공장
-
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
-    private boolean useYn;
+    private boolean useYn = true;
 
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
+
+    public void update(BomMaster bomMaster, OutsourcingProductionRequestRequest request){
+        setBomMaster(bomMaster);
+        setProductionAmount(request.getProductionAmount());
+        setMaterialRequestDate(request.getMaterialRequestDate());
+        setPeriodDate(request.getPeriodDate());
+        setInputTestYn(request.isInputTestYn());
+        setNote(request.getNote());
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }
