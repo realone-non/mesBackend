@@ -88,7 +88,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
             Long itemGroupId,
             String itemNoAndName,
             String manufacturerPartNo,
-            boolean orderCompletion
+            Boolean orderCompletion
     ) {
         return purchaseRequestRepo.findAllByCondition(fromDate, toDate, produceOrderNo, itemGroupId, itemNoAndName, manufacturerPartNo, orderCompletion);
     }
