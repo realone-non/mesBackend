@@ -1,5 +1,7 @@
 package com.mes.mesBackend.entity;
 
+import com.mes.mesBackend.dto.request.OutsourcingMaterialReleaseRequest;
+import com.mes.mesBackend.dto.request.OutsourcingProductionRequestRequest;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,14 +31,8 @@ public class OutSourcingProductionRawMaterialOutputInfo extends BaseTimeEntity {
 
     // 다대일 단방향
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "BOM_MASTER", columnDefinition = "bigint COMMENT 'BomMaster'")
-    private BomMaster bomMaster;        // BOM
-
-    @Column(name = "USE_AMOUNT", columnDefinition = "int COMMENT '소요량'")
-    private int useAmount;              // 소요량
-
-    @Column(name = "LOSS_AMOUNT", columnDefinition = "int COMMENT '손실율'")
-    private int lossAmount;            // 손실율
+    @JoinColumn(name = "BOM_ITEM_DETAIL", columnDefinition = "bigint COMMENT 'BomItemDetail'")
+    private BomItemDetail bomItemDetail;        // BOM
 
     @Column(name = "OUTPUT_REQUEST_AMOUNT", columnDefinition = "int COMMENT '출고요청량'")
     private int outputRequestAmount;        // 출고요청량
@@ -47,4 +43,20 @@ public class OutSourcingProductionRawMaterialOutputInfo extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "OUT_SOURCING_PRODUCTION_REQUEST", columnDefinition = "bigint COMMENT '외주생산의뢰'")
     private OutSourcingProductionRequest outSourcingProductionRequest;
+
+    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
+    private boolean useYn = true;
+
+    @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
+    private boolean deleteYn = false;  // 삭제여부
+
+    public void update(OutsourcingMaterialReleaseRequest request, BomItemDetail itemDetail){
+        setOutputRequestAmount(request.getOutputRequestAmount());
+        setOutputAmount(request.getOutputAmount());
+        setBomItemDetail(itemDetail);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.InputTestDetailResponse;
+import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
 import com.mes.mesBackend.dto.response.InputTestRequestInfoResponse;
 
 import java.time.LocalDate;
@@ -32,4 +33,15 @@ public interface InputTestDetailRepositoryCustom {
     List<Integer> findBadItemAmountByInputTestRequestId(Long inputTestRequestId);
     // 검사요청정보에 해당하는 검사상세정보 모든 재고수량
     List<Integer> findStockAmountByInputTestRequestId(Long inputTestRequestId);
+
+    // ================================================= 14-3. 검사실적조회 =================================================
+    // 검사실적조회
+    // 검색조건: 검사기간 fromDate~toDate, 품명|품목, 거래처 id, 입고번호(구매입고 id)
+    List<InputTestPerformanceResponse> findInputTestPerformanceResponseByCondition(
+            LocalDate fromDate,
+            LocalDate toDate,
+            String itemNoAndName,
+            Long clientId,
+            Long purchaseInputNo
+    );
 }
