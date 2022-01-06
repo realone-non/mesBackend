@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-import static com.mes.mesBackend.entity.enumeration.InputTestState.SCHEDULE;
+import static com.mes.mesBackend.entity.enumeration.InputTestState.*;
 import static com.mes.mesBackend.entity.enumeration.TestType.NO_TEST;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
@@ -38,16 +38,13 @@ public class InputTestRequest extends BaseTimeEntity {
     @Column(name = "REQUEST_AMOUNT", columnDefinition = "int COMMENT '요청수량'")
     private int requestAmount;                      // 요청수량
 
-    @Column(name = "TEST_AMOUNT", columnDefinition = "int COMMENT '검사수량'")
-    private int testAmount;     // 검사수량
-
     @Enumerated(STRING)
     @Column(name = "INPUT_TEST_STATE", columnDefinition = "varchar(255) COMMENT '부품수입검사 상태값'")
     private InputTestState inputTestState = SCHEDULE;      // 수입검사의뢰 상태값
 
     @Enumerated(STRING)
     @Column(name = "TEST_TYPE", columnDefinition = "varchar(255) COMMENT '검사유형'")
-    private TestType testType = NO_TEST;   // 검사유형
+    private TestType testType = NO_TEST;   // 검사유형 수정해야됨
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
@@ -66,5 +63,17 @@ public class InputTestRequest extends BaseTimeEntity {
 
     public void delete() {
         setDeleteYn(true);
+    }
+
+    public void changedOngoing() {
+        setInputTestState(ONGOING);
+    }
+
+    public void changedCompletion() {
+        setInputTestState(COMPLETION);
+    }
+
+    public void changedSchedule() {
+        setInputTestState(SCHEDULE);
     }
 }

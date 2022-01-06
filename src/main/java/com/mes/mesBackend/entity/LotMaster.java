@@ -2,13 +2,10 @@ package com.mes.mesBackend.entity;
 
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.QualityLevel;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PURCHASE_INPUT;
 import static javax.persistence.EnumType.STRING;
@@ -154,5 +151,11 @@ public class LotMaster extends BaseTimeEntity {
 
     public void delete() {
         setDeleteYn(true);
+    }
+
+    public void putStockAmountAndBadItemAmountAndCheckAmount(int stockAmount, int badItemAmount, int checkAmount) {
+        setStockAmount(stockAmount);     // 재고수량 = 새로운 재고수량
+        setBadItemAmount(badItemAmount);   // 불량수량 = 새로운 불량수량
+        setCheckAmount(checkAmount);     // 검사수량 = 새로운 검사수량
     }
 }

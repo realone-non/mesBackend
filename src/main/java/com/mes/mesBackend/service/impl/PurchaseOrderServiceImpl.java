@@ -169,6 +169,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             throw new BadRequestException("해당 구매요청정보는 다른 구매발주에 등록되어 있습니다. " +
                     "input purchaseOrderId: " + purchaseOrderId + ", input purchaseRequestId: " + purchaseRequest.getId());
 
+        // 구매발주에 해당하는 구매요청의 orderAmount 필요.
+        List<Integer> orderAmounts = purchaseRequestRepo.findOrderAmountByPurchaseOrderId(purchaseOrderId);
+        int orderAmountSum = orderAmounts.stream().mapToInt(Integer::intValue).sum();
+        if (orderAmountSum > purchaseOrderDetailRequest.getPurchaseAmount()) {
+            throw new BadRequestException("total orderAmount cannot be greater than purchaseAmount.");
+        }
+
         /*
         * 생성 전 체크 항목
         * if 해당 구매발주에 해당하는 구매요청이 있는지 ?
@@ -178,8 +185,10 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         * -> 구매발주에 등록 된 거래처를 기준으로 삼아서 해당 거래처에 해당하는 구매요청만 등록가능
         * */
         List<Long> clientIds = purchaseRequestRepo.findClientIdsByPurchaseOrder(purchaseOrder.getId());
+
         // 구매요청에 해당하는 구매발주를 집어넣고 구매요청의 orderState 의 상태값을 SCHEDULE -> ONGOING 으로 변경
         purchaseRequest.putPurchaseOrderAndOrderStateChangedOngoing(purchaseOrder);
+        purchaseRequest.setOrderAmount(purchaseOrderDetailRequest.getPurchaseAmount());
 
         if (clientIds.isEmpty()) {
             purchaseRequestRepo.save(purchaseRequest);
@@ -195,9 +204,9 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             else
                 throw new BadRequestException("기존에 등록한 구매발주상세 거래처와 현재 입력한 구매발주상세의 거래처가 다릅니다.");
         }
+        purchaseRequestRepo.save(purchaseRequest);
         return getPurchaseOrderDetailResponse(purchaseOrder.getId(), purchaseRequest.getId());
     }
-
 
     // 구매발주상세 단일 조회
     @Override

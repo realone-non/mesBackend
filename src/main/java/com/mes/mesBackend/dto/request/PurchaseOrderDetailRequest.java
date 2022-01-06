@@ -21,5 +21,5 @@ public class PurchaseOrderDetailRequest {
     @Schema(description = "발주수량")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
-    Long purchaseAmount;
+    int purchaseAmount;
 }

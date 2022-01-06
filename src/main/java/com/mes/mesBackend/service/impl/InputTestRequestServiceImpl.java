@@ -8,6 +8,7 @@ import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
+import com.mes.mesBackend.repository.InputTestDetailRepository;
 import com.mes.mesBackend.repository.InputTestRequestRepository;
 import com.mes.mesBackend.repository.LotMasterRepository;
 import com.mes.mesBackend.service.InputTestRequestService;
@@ -26,6 +27,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     private final InputTestRequestRepository inputTestRequestRepo;
     private final ModelMapper modelMapper;
     private final LotMasterRepository lotMasterRepo;
+    private final InputTestDetailRepository inputTestDetailRepo;
 
     /*
     * 검사의뢰 생성
@@ -35,12 +37,12 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     * */
     @Override
     public InputTestRequestResponse createInputTestRequest(InputTestRequestRequest inputTestRequestRequest) throws NotFoundException, BadRequestException {
-        ifThrowRequestAmountGreaterThanInputAmount(inputTestRequestRequest.getLotId(), inputTestRequestRequest.getRequestAmount());       // 요청수량 재고수량 비교
+        throwIfRequestAmountGreaterThanInputAmount(inputTestRequestRequest.getLotId(), inputTestRequestRequest.getRequestAmount());       // 요청수량 재고수량 비교
         LotMaster lotMaster = lotMasterService.getLotMasterOrThrow(inputTestRequestRequest.getLotId());
         InputTestRequest inputTest = modelMapper.toEntity(inputTestRequestRequest, InputTestRequest.class);
         inputTest.create(lotMaster);                // 상태값: SCHEDULE
         inputTestRequestRepo.save(inputTest);       // lotMaster, 요청유형, 요청수량, 검사유형, 상태값 생성
-        lotMaster.setCheckRequestAmount(inputTestRequestRequest.getRequestAmount());    // lotMaster 검사요청수량 변경
+        lotMaster.setCheckRequestAmount(lotMaster.getCheckRequestAmount() + inputTestRequestRequest.getRequestAmount());    // lotMaster 검사요청수량 변경 = 기존 검사요청수량 + 새로들어온 검사요청수량
         lotMasterRepo.save(lotMaster);
         return getInputTestRequestResponse(inputTest.getId());
     }
@@ -59,20 +61,30 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
             LocalDate fromDate,
             LocalDate toDate
     ) {
-        return inputTestRequestRepo.findAllByCondition(warehouseId, lotTypeId, itemNoAndName, testType, itemGroupId, requestType, fromDate, toDate);
+        List<InputTestRequestResponse> inputTestRequestResponses = inputTestRequestRepo.findAllByCondition(warehouseId, lotTypeId, itemNoAndName, testType, itemGroupId, requestType, fromDate, toDate);
+        for (InputTestRequestResponse inputTestRequestResponse : inputTestRequestResponses) {
+            List<Integer> testAmount = inputTestDetailRepo.findTestAmountByInputTestRequestId(inputTestRequestResponse.getId());
+            int testAmountSum = testAmount.stream().mapToInt(Integer::intValue).sum();
+            inputTestRequestResponse.setTestAmount(testAmountSum);
+        }
+        return inputTestRequestResponses;
     }
 
     // 검사의뢰 단일 조회
     @Override
     public InputTestRequestResponse getInputTestRequestResponse(Long id) throws NotFoundException {
-        return inputTestRequestRepo.findResponseByIdAndDeleteYnFalse(id)
+        InputTestRequestResponse inputTestRequestResponse = inputTestRequestRepo.findResponseByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("inputTestRequest does not exist. input id: " + id));
+        List<Integer> testAmount = inputTestDetailRepo.findTestAmountByInputTestRequestId(inputTestRequestResponse.getId());
+        int testAmountSum = testAmount.stream().mapToInt(Integer::intValue).sum();
+        inputTestRequestResponse.setTestAmount(testAmountSum);
+        return inputTestRequestResponse;
     }
 
     // 검사의뢰 수정
     @Override
     public InputTestRequestResponse updateInputTestRequest(Long id, InputTestRequestRequest inputTestRequestRequest) throws NotFoundException, BadRequestException {
-        ifThrowRequestAmountGreaterThanInputAmount(inputTestRequestRequest.getLotId(), inputTestRequestRequest.getRequestAmount());     // 요청수량 재고수량 비교
+        throwIfRequestAmountGreaterThanInputAmount(inputTestRequestRequest.getLotId(), inputTestRequestRequest.getRequestAmount());     // 요청수량 재고수량 비교
         InputTestRequest findInputTestRequest = getInputTestRequestOrThrow(id);
         InputTestRequest newInputTestRequest = modelMapper.toEntity(inputTestRequestRequest, InputTestRequest.class);
         LotMaster newLotMaster = lotMasterService.getLotMasterOrThrow(inputTestRequestRequest.getLotId());
@@ -92,14 +104,15 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     }
 
     // 검사의뢰 단일 조회 및 예외
-    private InputTestRequest getInputTestRequestOrThrow(Long id) throws NotFoundException {
+    @Override
+    public InputTestRequest getInputTestRequestOrThrow(Long id) throws NotFoundException {
         return inputTestRequestRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("inputTestRequest does not exist. input id: " + id));
     }
 
     // 입고된 갯수만큼만 요청수량을 등록 할 수 있음.
     // 요청수량 재고수량 비교
-    private void ifThrowRequestAmountGreaterThanInputAmount(Long lotId, int requestAmount) throws BadRequestException {
+    private void throwIfRequestAmountGreaterThanInputAmount(Long lotId, int requestAmount) throws BadRequestException {
         Integer stockAmountFromLotMaster = inputTestRequestRepo.findLotMasterInputAmountByLotMasterId(lotId);
         if (requestAmount > stockAmountFromLotMaster)
             throw new BadRequestException("input requestAmount must not be greater than inputAmount. " +
