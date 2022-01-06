@@ -106,7 +106,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
                 newProduceOrder.getContractItem().getAmount()
         );
 
-        List<Long> findItemIds = purchaseRequestRepo.findItemIdByContractItemId(newProduceOrder.getContractItem().getId());
+        List<Long> findItemIds = purchaseRequestRepo.findItemIdByContractItemId(newProduceOrder.getContractItem().getItem().getId());
 
         Item newItem = getItemAndCheckItemId(newPurchaseRequestRequest.getItemId(), findItemIds);
 
