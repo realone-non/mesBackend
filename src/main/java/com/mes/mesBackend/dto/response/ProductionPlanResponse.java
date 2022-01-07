@@ -1,6 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -50,7 +53,7 @@ public class ProductionPlanResponse {
     int uph = 1;
 
     @Schema(description = "소요시간")
-    int costTime;
+    Long costTime;
 
     @Schema(description = "지시수량")
     int orderAmount;
@@ -70,4 +73,17 @@ public class ProductionPlanResponse {
 
     @Schema(description = "생산수량")
     int productionAmount;
+
+    @JsonIgnore
+    LocalDateTime startDateTime;
+
+    @JsonIgnore
+    LocalDateTime endDateTime;
+
+    public void setCostTime() {
+        if (startDateTime != null && endDateTime != null) {
+            long costTime = ChronoUnit.MINUTES.between(startDateTime, endDateTime);
+            setCostTime(costTime);
+        }
+    }
 }

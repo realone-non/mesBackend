@@ -99,7 +99,7 @@ public class WorkOrderController {
             @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        WorkOrderResponse workOrder = workOrderService.getWorkOrder(produceOrderId, workOrderId);
+        WorkOrderResponse workOrder = workOrderService.getWorkOrderResponseOrThrow(produceOrderId, workOrderId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + workOrder.getId() + " from getWorkOrder.");
         return new ResponseEntity<>(workOrder, HttpStatus.OK);

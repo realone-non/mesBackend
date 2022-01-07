@@ -1,7 +1,6 @@
 package com.mes.mesBackend.repository.impl;
 
-import com.mes.mesBackend.dto.response.ProductionPlanResponse;
-import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.WorkOrderDetailRepositoryCustom;
@@ -12,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +28,10 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     final QItemAccount itemAccount = QItemAccount.itemAccount;
     final QClient client = QClient.client;
     final QWorkLine workLine = QWorkLine.workLine;
+    final QWorkProcess workProcess = QWorkProcess.workProcess;
+    final QUser user = QUser.user;
+    final QTestProcess testProcess = QTestProcess.testProcess1;
+    final QUnit unit = QUnit.unit;
 
 
     // 검색조건: 품목그룹 id, 품명|품번, 수주번호, 제조오더번호, 작업공정 id, 착수예정일 fromDate~endDate, 지시상태
@@ -91,13 +96,14 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.expectedWorkTime.as("expectedWorkTime"),
                                 workOrderDetail.readyTime.as("readyTime"),
                                 workOrderDetail.uph.as("uph"),
-                                workOrderDetail.costTime.as("costTime"),
                                 workOrderDetail.orderAmount.as("orderAmount"),
                                 contract.contractNo.as("contractNo"),
                                 contractItem.periodDate.as("periodDate"),
                                 client.clientName.as("cName"),
                                 produceOrder.orderState.as("orderState"),
-                                workOrderDetail.productionAmount.as("productionAmount")
+                                workOrderDetail.productionAmount.as("productionAmount"),
+                                workOrderDetail.startDate.as("startDateTime"),
+                                workOrderDetail.endDate.as("endDateTime")
                                 )
                 )
                 .from(workOrderDetail)
@@ -134,13 +140,14 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.expectedWorkTime.as("expectedWorkTime"),
                                 workOrderDetail.readyTime.as("readyTime"),
                                 workOrderDetail.uph.as("uph"),
-                                workOrderDetail.costTime.as("costTime"),
                                 workOrderDetail.orderAmount.as("orderAmount"),
                                 contract.contractNo.as("contractNo"),
                                 contractItem.periodDate.as("periodDate"),
                                 client.clientName.as("cName"),
                                 produceOrder.orderState.as("orderState"),
-                                workOrderDetail.productionAmount.as("productionAmount")
+                                workOrderDetail.productionAmount.as("productionAmount"),
+                                workOrderDetail.startDate.as("startDateTime"),
+                                workOrderDetail.endDate.as("endDateTime")
                         )
                 )
                 .from(workOrderDetail)
@@ -158,6 +165,326 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .fetchOne());
     }
 
+    // 제조오더에 해당하는 작업지시의 orderState 들
+    @Override
+    public List<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId) {
+        return jpaQueryFactory
+                .select(workOrderDetail.orderState)
+                .from(workOrderDetail)
+                .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                .where(
+                        workOrderDetail.produceOrder.id.eq(produceOrderId)
+                )
+                .fetch();
+    }
+
+    // 작업지시 리시트 조회
+    @Override
+    public List<WorkOrderResponse> findWorkOrderResponseByProduceOrderIdAndDeleteYnFalse(Long produceOrderId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                WorkOrderResponse.class,
+                                workOrderDetail.id.as("id"),
+                                workOrderDetail.orderNo.as("orderNo"),
+                                workProcess.id.as("workProcessId"),
+                                workProcess.workProcessName.as("workProcessName"),
+                                workLine.id.as("workLineId"),
+                                workLine.workLineName.as("workLineName"),
+                                workOrderDetail.orderAmount.as("orderAmount"),
+                                workOrderDetail.user.id.as("userId"),
+                                user.korName.as("userKorName"),
+                                unit.id.as("unitCodeId"),
+                                unit.unitCodeName.as("unitCodeName"),
+                                workOrderDetail.readyTime.as("readyTime"),
+                                workOrderDetail.uph.as("uph"),
+                                workOrderDetail.expectedWorkDate.as("expectedWorkDate"),
+                                workOrderDetail.expectedWorkTime.as("expectedWorkTime"),
+                                workOrderDetail.orderState.as("orderState"),
+                                workOrderDetail.testType.as("testType"),
+                                testProcess.id.as("testProcessId"),
+                                testProcess.testProcess.as("testProcess"),
+                                workOrderDetail.lastProcessYn.as("lastProcessYn"),
+                                workOrderDetail.productionAmount.as("productionAmount"),
+                                workOrderDetail.inputUser.as("inputUser"),
+                                workOrderDetail.note.as("note")
+                        )
+                )
+                .from(workOrderDetail)
+                .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
+                .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
+                .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
+                .leftJoin(testProcess).on(testProcess.id.eq(workOrderDetail.testProcess.id))
+                .leftJoin(unit).on(unit.id.eq(workOrderDetail.unit.id))
+                .where(
+                        isDeleteYnFalse(),
+                        workOrderDetail.produceOrder.id.eq(produceOrderId)
+                )
+                .fetch();
+    }
+
+    // 작업지시 단일 조회
+    @Override
+    public Optional<WorkOrderResponse> findWorkOrderResponseByProduceOrderIdAndWorkOrderId(
+            Long produceOrderId,
+            Long workOrderId
+    ) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(
+                                Projections.fields(
+                                        WorkOrderResponse.class,
+                                        workOrderDetail.id.as("id"),
+                                        workOrderDetail.orderNo.as("orderNo"),
+                                        workProcess.id.as("workProcessId"),
+                                        workProcess.workProcessName.as("workProcessName"),
+                                        workLine.id.as("workLineId"),
+                                        workLine.workLineName.as("workLineName"),
+                                        workOrderDetail.orderAmount.as("orderAmount"),
+                                        workOrderDetail.user.id.as("userId"),
+                                        user.korName.as("userKorName"),
+                                        unit.id.as("unitCodeId"),
+                                        unit.unitCodeName.as("unitCodeName"),
+                                        workOrderDetail.readyTime.as("readyTime"),
+                                        workOrderDetail.uph.as("uph"),
+                                        workOrderDetail.expectedWorkDate.as("expectedWorkDate"),
+                                        workOrderDetail.expectedWorkTime.as("expectedWorkTime"),
+                                        workOrderDetail.orderState.as("orderState"),
+                                        workOrderDetail.testType.as("testType"),
+                                        testProcess.id.as("testProcessId"),
+                                        testProcess.testProcess.as("testProcess"),
+                                        workOrderDetail.lastProcessYn.as("lastProcessYn"),
+                                        workOrderDetail.productionAmount.as("productionAmount"),
+                                        workOrderDetail.inputUser.as("inputUser"),
+                                        workOrderDetail.note.as("note")
+                                )
+                        )
+                        .from(workOrderDetail)
+                        .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
+                        .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
+                        .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
+                        .leftJoin(testProcess).on(testProcess.id.eq(workOrderDetail.testProcess.id))
+                        .leftJoin(unit).on(unit.id.eq(workOrderDetail.unit.id))
+                        .where(
+                                workOrderDetail.produceOrder.id.eq(produceOrderId),
+                                workOrderDetail.id.eq(workOrderId),
+                                isDeleteYnFalse()
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // =============================================== 8-1. 작지상태 확인 ===============================================
+    // 쟉업지시 정보 조회 , 검색조건: 작업장 id, 작업라인 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
+    @Override
+    @Transactional(readOnly = true)
+    public List<WorkOrderStateResponse> findWorkOrderStateResponsesByCondition(
+            Long workProcessId,
+            Long workLineId,
+            String produceOrderNo,
+            Long itemAccountId,
+            OrderState orderState,
+            LocalDate fromDate,
+            LocalDate toDate,
+            String contractNo
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(WorkOrderStateResponse.class,
+                                workOrderDetail.id.as("id"),
+                                workOrderDetail.orderNo.as("orderNo"),
+                                workProcess.workProcessName.as("workProcess"),
+                                workLine.workLineName.as("workLine"),
+                                workOrderDetail.orderState.as("orderState"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                itemAccount.account.as("itemAccount"),
+                                contract.periodDate.as("periodDate"),
+                                workOrderDetail.orderAmount.as("orderAmount"),
+                                workOrderDetail.productionAmount.as("productionAmount"),
+                                contract.contractNo.as("contractNo")
+                        )
+                )
+                .from(workOrderDetail)
+                .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
+                .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
+                .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
+                .where(
+                        isWorkProcessIdEq(workProcessId),
+                        isWorkLineIdEq(workLineId),
+                        isProduceOrderNoContain(produceOrderNo),
+                        isItemAccountIdEq(itemAccountId),
+                        isOrderStateEq(orderState),
+                        isWorkDateBetween(fromDate, toDate),
+                        isContractNoContain(contractNo),
+                        isDeleteYnFalse()
+                )
+                .fetch();
+    }
+
+    // 작업지시 정보 단일 조회
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<WorkOrderStateResponse> findWorkOrderStateResponseById(Long id) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(
+                                Projections.fields(WorkOrderStateResponse.class,
+                                        workOrderDetail.id.as("id"),
+                                        workOrderDetail.orderNo.as("orderNo"),
+                                        workProcess.workProcessName.as("workProcess"),
+                                        workLine.workLineName.as("workLine"),
+                                        workOrderDetail.orderState.as("orderState"),
+                                        item.itemNo.as("itemNo"),
+                                        item.itemName.as("itemName"),
+                                        itemAccount.account.as("itemAccount"),
+                                        contract.periodDate.as("periodDate"),
+                                        workOrderDetail.orderAmount.as("orderAmount"),
+                                        workOrderDetail.productionAmount.as("productionAmount"),
+                                        contract.contractNo.as("contractNo")
+                                )
+                        )
+                        .from(workOrderDetail)
+                        .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
+                        .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
+                        .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                        .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                        .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                        .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                        .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
+                        .where(
+                                workOrderDetail.id.eq(id),
+                                isDeleteYnFalse()
+                        )
+                        .fetchOne());
+    }
+
+    // 작업지시 상태 이력 정보 조회
+    @Override
+    public WorkOrderStateDetailResponse findWorkOrderStateDetailById(Long id) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                WorkOrderStateDetailResponse.class,
+                                workOrderDetail.endDate.as("completionDateTime"),
+                                workOrderDetail.startDate.as("ongoingDateTime"),
+                                workOrderDetail.scheduleDate.as("scheduleTime")
+                        )
+                )
+                .from(workOrderDetail)
+                .where(
+                        workOrderDetail.id.eq(id),
+                        isDeleteYnFalse()
+                )
+                .fetchOne();
+    }
+
+    // =============================================== 8-2. 작업자 투입 수정 ===============================================
+    // 작업자 투입 리스트 검색 조회, 검색조건: 작업라인 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
+    @Override
+    public List<WorkOrderUserResponse> findWorkOrderUserResponsesByCondition(
+            Long workLineId,
+            String produceOrderNo,
+            Long itemAccountId,
+            OrderState orderState,
+            LocalDate fromDate,
+            LocalDate toDate,
+            String contractNo
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                WorkOrderUserResponse.class,
+                                workOrderDetail.id.as("id"),
+                                user.id.as("userId"),
+                                user.userCode.as("userCode"),
+                                user.korName.as("korName"),
+                                workOrderDetail.startDate.as("startDateTime"),
+                                workOrderDetail.endDate.as("endDateTime"),
+                                workLine.workLineName.as("workLine"),
+                                workOrderDetail.note.as("note"),
+                                contract.contractNo.as("contractNo"),
+                                produceOrder.produceOrderNo.as("produceOrderNo")
+                        )
+                )
+                .from(workOrderDetail)
+                .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
+                .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
+                .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
+                .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                .where(
+                        isWorkLineIdEq(workLineId),
+                        isProduceOrderNoContain(produceOrderNo),
+                        isItemAccountIdEq(itemAccountId),
+                        isContractNoContain(contractNo),
+                        isWorkDateBetween(fromDate, toDate),
+                        isOrderStateEq(orderState),
+                        isDeleteYnFalse()
+                )
+                .fetch();
+    }
+
+    // 작업자 투입 단일 조회
+    @Override
+    public Optional<WorkOrderUserResponse> findWorkOrderUserResponseByIdAndDeleteYn(Long workOrderId) {
+                return Optional.ofNullable(
+                        jpaQueryFactory
+                        .select(
+                                Projections.fields(
+                                        WorkOrderUserResponse.class,
+                                        workOrderDetail.id.as("id"),
+                                        user.id.as("userId"),
+                                        user.userCode.as("userCode"),
+                                        user.korName.as("korName"),
+                                        workOrderDetail.startDate.as("startDateTime"),
+                                        workOrderDetail.endDate.as("endDateTime"),
+                                        workLine.workLineName.as("workLine"),
+                                        workOrderDetail.note.as("note"),
+                                        contract.contractNo.as("contractNo"),
+                                        produceOrder.produceOrderNo.as("produceOrderNo")
+                                )
+                        )
+                        .from(workOrderDetail)
+                        .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
+                        .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
+                        .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                        .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
+                        .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                        .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                        .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                        .where(
+                                workOrderDetail.id.eq(workOrderId),
+                                isDeleteYnFalse()
+                        )
+                .fetchOne());
+    }
+
+    // 작업장
+    private BooleanExpression isWorkProcessIdEq(Long workProcessId) {
+        return workProcessId != null ? workProcess.id.eq(workProcessId) : null;
+    }
+    // 품목계정
+    private BooleanExpression isItemAccountIdEq(Long itemAccountId) {
+        return itemAccountId != null ? itemAccount.id.eq(itemAccountId) : null;
+    }
+    // 지시상태
+    private BooleanExpression isOrderStateEq(OrderState orderState) {
+        return orderState != null ? workOrderDetail.orderState.eq(orderState) : null;
+    }
+    // 작업기간
+    private BooleanExpression isWorkDateBetween(LocalDate fromDate, LocalDate toDate) {
+        // fromDate ~ toDate 사이에 진행중과 완료가 포함되어 있는거를 조회
+        return fromDate != null ?
+                (workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).and(workOrderDetail.endDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
+                        .or(workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).or(workOrderDetail.endDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))))) : null;
+    }
     // 품목그룹
     private BooleanExpression isItemGroupEq(Long itemGroupId) {
         return itemGroupId != null ? produceOrder.contractItem.item.itemGroup.id.eq(itemGroupId) : null;
@@ -197,7 +524,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     private BooleanExpression isExpectedWorkDateBetween(LocalDate fromDate, LocalDate toDate) {
         return fromDate != null ? workOrderDetail.expectedWorkDate.between(fromDate, toDate) : null;
     }
-
+    // 삭제여부
     private BooleanExpression isDeleteYnFalse() {
         return workOrderDetail.deleteYn.isFalse();
     }

@@ -20,14 +20,18 @@ public class ProductionPlanServiceImpl implements ProductionPlanService {
     // 생산계획 수립 전체 조회, 검색조건: 작업라인, 작업예정일
     @Override
     public List<ProductionPlanResponse> getProductionPlans(Long workLineId, LocalDate fromDate, LocalDate toDate) {
-        return workOrderDetailRepo.findAllProductionPlanByCondition(workLineId, fromDate, toDate);
+        List<ProductionPlanResponse> productionPlans = workOrderDetailRepo.findAllProductionPlanByCondition(workLineId, fromDate, toDate);
+        productionPlans.forEach(ProductionPlanResponse::setCostTime);
+        return productionPlans;
     }
 
     // 생산계획 수립 단일조회
     @Override
     public ProductionPlanResponse getProductionPlan(Long workOrderId) throws NotFoundException {
-        return workOrderDetailRepo.findProductionPlanByIdAndDeleteYnFalse(workOrderId)
+        ProductionPlanResponse productionPlanResponse = workOrderDetailRepo.findProductionPlanByIdAndDeleteYnFalse(workOrderId)
                 .orElseThrow(() -> new NotFoundException("workOrderDetail does not exist. input id: " + workOrderId));
+        productionPlanResponse.setCostTime();
+        return productionPlanResponse;
     }
 
     // 생산계획 수립 등록(작업순번만)

@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -73,8 +75,9 @@ public class WorkOrderDetail extends BaseTimeEntity {
     @Column(name = "UHP", columnDefinition = "int COMMENT 'UPH'", nullable = false)
     private int uph;                        // UPH
 
-    @Column(name = "COST_TIME", nullable = false, columnDefinition = "int COMMENT '소요시간'")
-    private int costTime;                  // 소요시간
+    // 삭제이유? 계산하면 되서 삭제
+//    @Column(name = "COST_TIME", nullable = false, columnDefinition = "int COMMENT '소요시간'")
+//    private int costTime;                  // 소요시간
 
     @Column(name = "EXPECTED_WORK_DATE", nullable = false, columnDefinition = "date COMMENT '작업예정일'")
     private LocalDate expectedWorkDate;         // 작업예정일
@@ -117,6 +120,18 @@ public class WorkOrderDetail extends BaseTimeEntity {
     @Column(name = "ORDERS", nullable = false, columnDefinition = "int COMMENT '작업순번'")
     private int orders;
 
+    // orderState 가 schedule 로 변경된 시점
+    @Column(name = "SCHEDULE_DATE", columnDefinition = "datetime COMMENT '예정 날짜'")
+    private LocalDateTime scheduleDate;
+
+    // orderState 가 ONGOING 로 변경된 시점
+    @Column(name = "START_DATE", columnDefinition = "datetime COMMENT '진행중 날짜'")
+    private LocalDateTime startDate;
+
+    // orderState 가 COMPLETION 로 변경된 시점
+    @Column(name = "END_DATE", columnDefinition = "datetime COMMENT '완료 날짜'")
+    private LocalDateTime endDate;
+
     public void add(
             WorkProcess workProcess,
             WorkLine workLine,
@@ -148,7 +163,6 @@ public class WorkOrderDetail extends BaseTimeEntity {
         setUnit(newUnit);
         setReadyTime(newWorkOrderDetail.readyTime);
         setUph(newWorkOrderDetail.uph);
-        setCostTime(newWorkOrderDetail.costTime);
         setExpectedWorkDate(newWorkOrderDetail.expectedWorkDate);
         setExpectedWorkTime(newWorkOrderDetail.expectedWorkTime);
         setOrderState(newWorkOrderDetail.orderState);
@@ -163,5 +177,12 @@ public class WorkOrderDetail extends BaseTimeEntity {
 
     public void delete() {
         setDeleteYn(true);
+    }
+
+    // 지시상태 별 날짜 변경
+    public void changeOrderStateDate() {
+        if (this.orderState.equals(SCHEDULE)) setScheduleDate(LocalDateTime.now());
+        if (this.orderState.equals(ONGOING)) setStartDate(LocalDateTime.now());
+        if (this.orderState.equals(COMPLETION)) setEndDate(LocalDateTime.now());
     }
 }

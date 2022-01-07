@@ -1,8 +1,8 @@
 package com.mes.mesBackend.repository.custom;
 
-import com.mes.mesBackend.dto.response.ProductionPlanResponse;
-import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.querydsl.core.types.Order;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,4 +30,44 @@ public interface WorkOrderDetailRepositoryCustom {
 
     // 생산계획 수립 단일 조회
     Optional<ProductionPlanResponse> findProductionPlanByIdAndDeleteYnFalse(Long id);
+    // 제조오더에 해당하는 작업지시의 orderState 들
+    List<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId);
+
+//    6-2.
+    // 작업지시 리시트 조회
+    List<WorkOrderResponse> findWorkOrderResponseByProduceOrderIdAndDeleteYnFalse(Long produceOrderId);
+    // 작업지시 단일 조회
+    Optional<WorkOrderResponse> findWorkOrderResponseByProduceOrderIdAndWorkOrderId(Long produceOrderId, Long workOrderId);
+
+    // =============================================== 8-1. 작지상태 확인 ===============================================
+    // 쟉업지시 정보 조회 , 검색조건: 작업장 id, 작업라인 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
+    List<WorkOrderStateResponse> findWorkOrderStateResponsesByCondition(
+            Long workProcessId,
+            Long workLineId,
+            String produceOrderNo,
+            Long itemAccountId,
+            OrderState orderState,
+            LocalDate fromDate,
+            LocalDate toDate,
+            String contractNo
+    );
+
+    // 작업지시 정보 단일 조회
+    Optional<WorkOrderStateResponse> findWorkOrderStateResponseById(Long id);
+    // 작업지시 상태 이력 정보 조회
+    WorkOrderStateDetailResponse findWorkOrderStateDetailById(Long id);
+
+    // =============================================== 8-1. 작지상태 확인 ===============================================
+    // 작업자 투입 리스트 검색 조회, 검색조건: 작업라인 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
+    List<WorkOrderUserResponse> findWorkOrderUserResponsesByCondition(
+            Long workLineId,
+            String produceOrderNo,
+            Long itemAccountId,
+            OrderState orderState,
+            LocalDate fromDate,
+            LocalDate toDate,
+            String contractNo
+    );
+    // 작업자 투입 단일 조회
+    Optional<WorkOrderUserResponse> findWorkOrderUserResponseByIdAndDeleteYn(Long workOrderId);
 }

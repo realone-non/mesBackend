@@ -12,5 +12,4 @@ import java.util.Optional;
 @Repository
 public interface WorkOrderDetailRepository extends JpaCustomRepository<WorkOrderDetail, Long>, WorkOrderDetailRepositoryCustom {
     Optional<WorkOrderDetail> findByIdAndProduceOrderAndDeleteYnFalse(Long id, ProduceOrder produceOrder);
-    List<WorkOrderDetail> findAllByProduceOrderAndDeleteYnFalse(ProduceOrder produceOrder);
 }

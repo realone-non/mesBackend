@@ -84,8 +84,7 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                 .leftJoin(unit).on(unit.id.eq(item.unit.id))
                 .where(
                         purchaseRequest.id.eq(id),
-                        isDeleteYnFalse(),
-                        purchaseRequest.ordersState.eq(SCHEDULE)
+                        isDeleteYnFalse()
                 )
                 .fetchOne());
     }
