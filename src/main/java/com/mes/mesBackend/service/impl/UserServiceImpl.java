@@ -5,7 +5,9 @@ import com.mes.mesBackend.auth.TokenRequest;
 import com.mes.mesBackend.auth.TokenResponse;
 import com.mes.mesBackend.dto.request.UserCreateRequest;
 import com.mes.mesBackend.dto.request.UserLogin;
+import com.mes.mesBackend.dto.request.UserRegistrationRequest;
 import com.mes.mesBackend.dto.request.UserUpdateRequest;
+import com.mes.mesBackend.dto.response.UserRegistrationResponse;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.entity.Department;
 import com.mes.mesBackend.entity.RefreshToken;
@@ -20,6 +22,7 @@ import com.mes.mesBackend.repository.RefreshTokenRepository;
 import com.mes.mesBackend.repository.UserRepository;
 import com.mes.mesBackend.service.DepartmentService;
 import com.mes.mesBackend.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,28 +37,19 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    UserRepository userRepository;
 
-    @Autowired
-    DepartmentService departmentService;
-
-    @Autowired
-    ModelMapper mapper;
-
-    @Autowired
-    JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    RefreshTokenRepository refreshTokenRepository;
-
+    private final UserRepository userRepository;
+    private final DepartmentService departmentService;
+    private final ModelMapper mapper;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
     private static final int SALT_SIZE = 16;
 
     private Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
     private CustomLogger cLogger;
-
 
     public User getUserOrThrow(Long id) throws NotFoundException {
         return userRepository.findByIdAndDeleteYnFalse(id)
@@ -249,6 +243,64 @@ public class UserServiceImpl implements UserService {
             password = md.digest();                         // md 객체의 다이제스트를 얻어 pass를 갱신.
         }
         return byteToString(password);
+    }
+
+    // =============================== 18-3. 사용자 등록 ===============================
+    // 사용자 생성
+    @Override
+    public UserRegistrationResponse createUserRegistration(UserRegistrationRequest userRegistrationRequest) throws BadRequestException, NotFoundException {
+        // userCode 가 중복되지 않게 확인
+        checkUserCode(userRegistrationRequest.getUserCode());
+
+        Department department = departmentService.getDepartmentOrThrow(userRegistrationRequest.getDepartment());
+        User user = mapper.toEntity(userRegistrationRequest, User.class);
+
+        // salt 생성
+        String salt = createSalt();
+        // 솔트값, 해싱된 Password
+        user.setSalt(salt);
+        user.setPassword(passwordHashing(userRegistrationRequest.getUserCode().getBytes(), salt));
+        user.addJoin(department);
+
+        userRepository.save(user);
+        return getUserRegistration(user.getId());
+    }
+
+    // 사용자 단일 조회
+    @Override
+    public UserRegistrationResponse getUserRegistration(Long id) throws NotFoundException {
+        return userRepository.findUserRegistrationByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("user does not exist. input id: " + id));
+    }
+
+    // 사용자 리스트 검색 조회
+    // 검색조건: 사용자 ID(사번), 이름, 공장(X)
+    @Override
+    public List<UserRegistrationResponse> getUserRegistrations(String userCode, String korName) {
+        return userRepository.findUserRegistrationByCondition(userCode, korName);
+    }
+
+    // 사용자 수정
+    @Override
+    public UserRegistrationResponse updateUserRegistration(Long id, UserRegistrationRequest userRegistrationRequest) throws NotFoundException {
+        User findUser = getUserOrThrow(id);
+        User newUser = mapper.toEntity(userRegistrationRequest, User.class);
+        Department newDepartment = departmentService.getDepartmentOrThrow(userRegistrationRequest.getDepartment());
+        findUser.setUserCode(newUser.getUserCode());
+        findUser.setKorName(newUser.getKorName());
+        findUser.setDepartment(newDepartment);
+        findUser.setUseYn(newUser.isUseYn());
+
+        userRepository.save(findUser);
+        return getUserRegistration(findUser.getId());
+    }
+
+    // 사용자 삭제
+    @Override
+    public void deleteUserRegistration(Long id) throws NotFoundException {
+        User user = getUserOrThrow(id);
+        user.delete();
+        userRepository.save(user);
     }
 }
 

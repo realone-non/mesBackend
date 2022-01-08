@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.UserAuthorityResponse;
+import com.mes.mesBackend.dto.response.UserRegistrationResponse;
 import com.mes.mesBackend.entity.QDepartment;
 import com.mes.mesBackend.entity.QUser;
 import com.mes.mesBackend.entity.User;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepositoryCustom {
@@ -59,6 +61,60 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                         isDeleteYnFalse()
                 )
                 .fetch();
+    }
+
+    // ======================================= 18-3. 사용자 등록 =======================================
+    // 사용자 리스트 검색 조회
+    // 검색조건: 사용자 ID(사번), 이름, 공장(X)
+    @Override
+    public List<UserRegistrationResponse> findUserRegistrationByCondition(String userCode, String korName) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                UserRegistrationResponse.class,
+                                user.id.as("id"),
+                                user.userCode.as("userCode"),
+                                user.korName.as("korName"),
+                                user.department.id.as("deptId"),
+                                user.department.deptCode.as("deptCode"),
+                                user.department.deptName.as("deptName"),
+                                user.useYn.as("useYn")
+                        )
+                )
+                .from(user)
+                .leftJoin(department).on(department.id.eq(user.department.id))
+                .where(
+                        isUserCodeContaining(userCode),
+                        isKorNameContaining(korName),
+                        isDeleteYnFalse()
+                )
+                .fetch();
+    }
+
+    // 사용자 단일 조회
+    @Override
+    public Optional<UserRegistrationResponse> findUserRegistrationByIdAndDeleteYnFalse(Long id) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(
+                                Projections.fields(
+                                        UserRegistrationResponse.class,
+                                        user.id.as("id"),
+                                        user.userCode.as("userCode"),
+                                        user.korName.as("korName"),
+                                        user.department.id.as("deptId"),
+                                        user.department.deptCode.as("deptCode"),
+                                        user.department.deptName.as("deptName"),
+                                        user.useYn.as("useYn")
+                                )
+                        )
+                        .from(user)
+                        .leftJoin(department).on(department.id.eq(user.department.id))
+                        .where(
+                                user.id.eq(id),
+                                isDeleteYnFalse()
+                        )
+                        .fetchOne());
     }
 
     // 부서로 검색
