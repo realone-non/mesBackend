@@ -29,7 +29,7 @@ public class WorkOrderResponse {
     Long workProcessId;
 
     @Schema(description = "작업공정명")
-    Long workProcessName;
+    String workProcessName;
 
     @Schema(description = "고유아이디")
     Long workLineId;

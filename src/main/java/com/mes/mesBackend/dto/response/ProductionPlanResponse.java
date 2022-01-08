@@ -74,6 +74,9 @@ public class ProductionPlanResponse {
     @Schema(description = "생산수량")
     int productionAmount;
 
+    @Schema(description = "작업라인")
+    String workLineName;
+
     @JsonIgnore
     LocalDateTime startDateTime;
 

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
+// 6-3. 생산계획 수립
 @Service
 @RequiredArgsConstructor
 public class ProductionPlanServiceImpl implements ProductionPlanService {

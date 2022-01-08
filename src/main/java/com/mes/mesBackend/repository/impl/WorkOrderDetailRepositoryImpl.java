@@ -103,8 +103,9 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 produceOrder.orderState.as("orderState"),
                                 workOrderDetail.productionAmount.as("productionAmount"),
                                 workOrderDetail.startDate.as("startDateTime"),
-                                workOrderDetail.endDate.as("endDateTime")
-                                )
+                                workOrderDetail.endDate.as("endDateTime"),
+                                workLine.workLineName.as("workLineName")
+                        )
                 )
                 .from(workOrderDetail)
                 .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
@@ -147,7 +148,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 produceOrder.orderState.as("orderState"),
                                 workOrderDetail.productionAmount.as("productionAmount"),
                                 workOrderDetail.startDate.as("startDateTime"),
-                                workOrderDetail.endDate.as("endDateTime")
+                                workOrderDetail.endDate.as("endDateTime"),
+                                workLine.workLineName.as("workLineName")
                         )
                 )
                 .from(workOrderDetail)
@@ -178,7 +180,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .fetch();
     }
 
-    // 작업지시 리시트 조회
+    // ==================================== 6-2. 작업지시 등록 ====================================
+    // 작업지시 리스트 조회
     @Override
     public List<WorkOrderResponse> findWorkOrderResponseByProduceOrderIdAndDeleteYnFalse(Long produceOrderId) {
         return jpaQueryFactory
@@ -207,7 +210,9 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.lastProcessYn.as("lastProcessYn"),
                                 workOrderDetail.productionAmount.as("productionAmount"),
                                 workOrderDetail.inputUser.as("inputUser"),
-                                workOrderDetail.note.as("note")
+                                workOrderDetail.note.as("note"),
+                                workOrderDetail.startDate.as("startDateTime"),
+                                workOrderDetail.endDate.as("endDateTime")
                         )
                 )
                 .from(workOrderDetail)
@@ -256,7 +261,9 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                         workOrderDetail.lastProcessYn.as("lastProcessYn"),
                                         workOrderDetail.productionAmount.as("productionAmount"),
                                         workOrderDetail.inputUser.as("inputUser"),
-                                        workOrderDetail.note.as("note")
+                                        workOrderDetail.note.as("note"),
+                                        workOrderDetail.startDate.as("startDateTime"),
+                                        workOrderDetail.endDate.as("endDateTime")
                                 )
                         )
                         .from(workOrderDetail)
@@ -464,6 +471,19 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 isDeleteYnFalse()
                         )
                 .fetchOne());
+    }
+
+    // 제조오더에 해당된 작업지시 정보의 지시수량 모두
+    @Override
+    public List<Integer> findOrderAmountsByProduceOrderId(Long produceOrderId) {
+        return jpaQueryFactory
+                .select(workOrderDetail.orderAmount)
+                .from(workOrderDetail)
+                .where(
+                        workOrderDetail.produceOrder.id.eq(produceOrderId),
+                        isDeleteYnFalse()
+                )
+                .fetch();
     }
 
     // 작업장

@@ -2,12 +2,14 @@ package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
-import com.querydsl.core.types.Order;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+// 6-3. 생산계획 수립
+// 6-2. 작업지시 등록
+// 8-1. 작지상태 확인
 public interface WorkOrderDetailRepositoryCustom {
     // 검색조건: 품목그룹 id, 품명|품번, 수주번호, 제조오더번호, 작업공정 id, 착수예정일 fromDate~endDate, 지시상태
     List<WorkOrderProduceOrderResponse> findAllByCondition(
@@ -33,7 +35,7 @@ public interface WorkOrderDetailRepositoryCustom {
     // 제조오더에 해당하는 작업지시의 orderState 들
     List<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId);
 
-//    6-2.
+    // ==================================== 6-2. 작업지시 등록 ====================================
     // 작업지시 리시트 조회
     List<WorkOrderResponse> findWorkOrderResponseByProduceOrderIdAndDeleteYnFalse(Long produceOrderId);
     // 작업지시 단일 조회
@@ -70,4 +72,7 @@ public interface WorkOrderDetailRepositoryCustom {
     );
     // 작업자 투입 단일 조회
     Optional<WorkOrderUserResponse> findWorkOrderUserResponseByIdAndDeleteYn(Long workOrderId);
+
+    // 제조오더에 해당된 작업지시 정보의 지시수량 모두
+    List<Integer> findOrderAmountsByProduceOrderId(Long produceOrderId);
 }

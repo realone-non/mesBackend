@@ -55,7 +55,8 @@ public class WorkOrderStateController {
             @RequestParam(required = false) @Parameter(description = "수주번호") String contractNo,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<WorkOrderStateResponse> workOrderStates = workOrderStateService.getWorkOrderStates(workProcessId, workLineId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
+        List<WorkOrderStateResponse> workOrderStates =
+                workOrderStateService.getWorkOrderStates(workProcessId, workLineId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkOrderStates.");
         return new ResponseEntity<>(workOrderStates, HttpStatus.OK);
