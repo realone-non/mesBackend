@@ -29,6 +29,7 @@ public class OutSourcingProductionRawMaterialOutputInfoRepositoryImpl implements
                         Projections.fields(
                                 OutsourcingMaterialReleaseResponse.class,
                                 material.id.as("id"),
+                                item.id.as("itemId"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
                                 bomItem.amount.as("amount"),
