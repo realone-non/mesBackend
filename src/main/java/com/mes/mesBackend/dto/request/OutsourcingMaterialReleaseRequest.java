@@ -22,7 +22,4 @@ public class OutsourcingMaterialReleaseRequest {
 
     @Schema(description = "출고요청량")
     int outputAmount;
-
-    @Schema(description = "외주생산의뢰 id")
-    Long requestId;
 }

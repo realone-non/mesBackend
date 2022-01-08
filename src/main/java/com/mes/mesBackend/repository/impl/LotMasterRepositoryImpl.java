@@ -1,8 +1,10 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.LotMasterResponse;
+import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
+import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.repository.custom.LotMasterRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -10,6 +12,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +28,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     final QItemGroup itemGroup = QItemGroup.itemGroup;
     final QWareHouse wareHouse = QWareHouse.wareHouse;
     final QLotType lotType = QLotType.lotType1;
+    final QOutSourcingInput outSourcingInput = QOutSourcingInput.outSourcingInput;
 
     // id 로 itemAccountCode 의 symbol 조회
     @Override
@@ -56,6 +62,20 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         isDeleteYnFalse()
                 )
                 .orderBy(lotMaster.lotNo.desc())
+                .limit(1)
+                .fetchOne());
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<String> findLotNoByGoodsType(GoodsType goodsType, LocalDate startDate, LocalDate endDate){
+        return Optional.ofNullable(jpaQueryFactory
+                .select(lotMaster.lotNo)
+                .from(lotMaster)
+                .where(
+                        lotMaster.goodsType.eq(goodsType),
+                        lotMaster.createdDate.between(startDate.atStartOfDay(), endDate.atStartOfDay())
+                )
+                .orderBy(lotMaster.createdDate.desc())
                 .limit(1)
                 .fetchOne());
     }
@@ -119,6 +139,84 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 )
                 .fetch();
     }
+
+    //외주입고정보로 LOT마스터 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<OutsourcingInputLOTResponse> findLotMastersByOutsourcing(Long input) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                OutsourcingInputLOTResponse.class,
+                                outSourcingInput.id.as("id"),
+                                lotMaster.id.as("lotId"),
+                                lotType.lotType.as("lotType"),
+                                lotMaster.lotNo.as("lotNo"),
+                                lotMaster.stockAmount.as("inputAmount"),
+                                outSourcingInput.testRequestType.as("testRequestType")
+                        )
+                )
+                .from(lotMaster)
+                .innerJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
+                .innerJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
+                .where(
+                    outSourcingInput.id.eq(input),
+                        isDeleteYnFalse()
+                )
+                .fetch();
+    }
+
+    //id로 LOT마스터 조회
+    @Transactional(readOnly = true)
+    public OutsourcingInputLOTResponse findLotMasterById(Long id){
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                OutsourcingInputLOTResponse.class,
+                                outSourcingInput.id.as("id"),
+                                lotMaster.id.as("lotId"),
+                                lotType.lotType.as("lotType"),
+                                lotMaster.lotNo.as("lotNo"),
+                                lotMaster.stockAmount.as("inputAmount"),
+                                outSourcingInput.testRequestType.as("testRequestType")
+                        )
+                )
+                .from(lotMaster)
+                .innerJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
+                .innerJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
+                .where(
+                        lotMaster.id.eq(id),
+                        isDeleteYnFalse()
+                )
+                .fetchOne();
+    }
+
+    //외주입고정보와 id로 LOT마스터 조회
+    @Transactional(readOnly = true)
+    public OutsourcingInputLOTResponse findLotMasterByInputAndId(OutSourcingInput input, Long id){
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                OutsourcingInputLOTResponse.class,
+                                outSourcingInput.id.as("id"),
+                                lotMaster.id.as("lotId"),
+                                lotType.lotType.as("lotType"),
+                                lotMaster.lotNo.as("lotNo"),
+                                lotMaster.stockAmount.as("inputAmount"),
+                                outSourcingInput.testRequestType.as("testRequestType")
+                        )
+                )
+                .from(lotMaster)
+                .innerJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
+                .innerJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
+                .where(
+                        lotMaster.id.eq(id),
+                        outSourcingInput.eq(input),
+                        isDeleteYnFalse()
+                )
+                .fetchOne();
+    }
+
     // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 유효여부
     // 품목그룹
     private BooleanExpression isItemGroupEq(Long itemGroupId) {

@@ -36,7 +36,8 @@ public class LotMasterRequest {
     int checkAmount;            // 검사수량
     QualityLevel qualityLevel;      // 품질등급
 
-    Long purchaseInputId;
+    Long purchaseInputId;       //구매입고 ID
+    Long outsourcingInputId;        //외주입고 ID
 
     public void putPurchaseInput(
             Item item,
@@ -54,5 +55,21 @@ public class LotMasterRequest {
         setCreatedAmount(createdAmount);
         setLotTypeId(lotType);
         setProcessYn(processYn);
+    }
+
+    public void putOutsourcingInput(
+            Item item,
+            WareHouse wareHouse,
+            Long outsourcingInputId,
+            int stockAmount,
+            Long lotType
+    ) {
+        setItem(item);
+        setWareHouse(wareHouse);
+        setOutsourcingInputId(outsourcingInputId);
+        setStockAmount(stockAmount);
+        setCreatedAmount(stockAmount);
+        setCreatedAmount(stockAmount);
+        setLotTypeId(lotType);
     }
 }
