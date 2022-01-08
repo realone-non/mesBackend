@@ -38,6 +38,7 @@ public class MapperConfig {
         modelMapper.addConverter(toContractItemResponse);
         modelMapper.addConverter(contractToProduceOrderConverter);
         modelMapper.addConverter(contractItemToProduceOrderConverter);
+        modelMapper.addConverter(toOutsourcingInputConverter);
 
         return modelMapper;
     }
@@ -257,6 +258,19 @@ public class MapperConfig {
             produceOrder.setItemName(contractItem.getItem().getItemName());
             produceOrder.setAmount(contractItem.getAmount());
             return produceOrder;
+        }
+    };
+
+    //LOT마스터 외주입고 LOT정보 변환
+    Converter<LotMaster, OutsourcingInputLOTResponse> toOutsourcingInputConverter = new Converter<LotMaster, OutsourcingInputLOTResponse>() {
+        @Override
+        public OutsourcingInputLOTResponse convert(MappingContext<LotMaster, OutsourcingInputLOTResponse> context) {
+            ModelMapper mapper = new ModelMapper();
+            LotMaster lotMaster = context.getSource();
+            OutsourcingInputLOTResponse response = mapper.map(lotMaster, OutsourcingInputLOTResponse.class);
+            response.setInputAmount(lotMaster.getStockAmount());
+            response.setTestRequestType(lotMaster.getOutSourcingInput().getTestRequestType());
+            return response;
         }
     };
 }

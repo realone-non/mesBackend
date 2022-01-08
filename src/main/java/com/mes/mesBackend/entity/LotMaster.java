@@ -1,12 +1,14 @@
 package com.mes.mesBackend.entity;
 
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
+import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.QualityLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
+import static com.mes.mesBackend.entity.enumeration.EnrollmentType.OUTSOURCING_INPUT;
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PURCHASE_INPUT;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
@@ -107,6 +109,10 @@ public class LotMaster extends BaseTimeEntity {
     private int checkAmount;            // 검사수량
 
     @Enumerated(STRING)
+    @Column(name = "GOODS_TYPE", columnDefinition = "varchar(255) COMMENT '제품 타입'" )
+    private GoodsType goodsType;
+
+    @Enumerated(STRING)
     @Column(name = "QUALITY_LEVEL", columnDefinition = "varchar(255) COMMENT '품질등급'")
     private QualityLevel qualityLevel;      // 품질등급
 
@@ -114,6 +120,14 @@ public class LotMaster extends BaseTimeEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "PURCHASE_INPUT", columnDefinition = "bigint COMMENT '구매입고'")
     private PurchaseInput purchaseInput;
+
+    // 외주입고
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "OUTSOURCING_INPUT", columnDefinition = "bigint COMMENT '외주입고'")
+    private OutSourcingInput outSourcingInput;
+
+    @Column(name = "USE_YN", columnDefinition = "bit(1) COMMENT '사용여부'", nullable = false)
+    private boolean useYn = true;
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;
@@ -136,17 +150,36 @@ public class LotMaster extends BaseTimeEntity {
     public void putPurchaseInput(
             LotType lotType,
             PurchaseInput purchaseInput,
-            String lotNo
+            String lotNo,
+            GoodsType goodsType
     ) {
         setLotType(lotType);
         setPurchaseInput(purchaseInput);
         setEnrollmentType(PURCHASE_INPUT);
         setLotNo(lotNo);
+        setGoodsType(goodsType);
     }
 
     public void updatePurchaseInput(int inputAmount) {
         setStockAmount(inputAmount);
         setCreatedAmount(inputAmount);
+    }
+
+    public void putOutsourcingInput(
+            LotType lotType,
+            OutSourcingInput input,
+            String lotNo,
+            GoodsType goodsType
+    ) {
+        setLotType(lotType);
+        setOutSourcingInput(input);
+        setEnrollmentType(OUTSOURCING_INPUT);
+        setLotNo(lotNo);
+        setGoodsType(goodsType);
+    }
+
+    public void updateOutsourcingInput(int inputAmount) {
+        setStockAmount(inputAmount);
     }
 
     public void delete() {

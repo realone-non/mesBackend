@@ -33,8 +33,8 @@ import java.util.List;
 import java.util.Optional;
 
 // 품목형태
-@Tag(name = "outsourcing", description = "외주관리 API")
-@RequestMapping(value = "/outsourcing")
+@Tag(name = "outsourcing", description = "외주생산관리 API")
+@RequestMapping(value = "/outsourcings")
 @RestController
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Authorization")
@@ -149,7 +149,7 @@ public class OutSourcingController {
     }
 
     // 외주생산 원재료 출고 대상 등록
-    @PostMapping("/material")
+    @PostMapping("/{request-id}/material")
     @ResponseBody
     @Operation(summary = "외주생산 원재료 출고 대상 등록")
     @ApiResponses(
@@ -160,17 +160,18 @@ public class OutSourcingController {
             }
     )
     public ResponseEntity<Optional<OutsourcingMaterialReleaseResponse>> createOutsourcingMaterialRelease(
+            @PathVariable(value = "request-id") @Parameter(description = "외주생산 ID") Long id,
             @RequestBody @Valid OutsourcingMaterialReleaseRequest request,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        Optional<OutsourcingMaterialReleaseResponse> response = outsourcingService.createOutsourcingMaterial(request);
+        Optional<OutsourcingMaterialReleaseResponse> response = outsourcingService.createOutsourcingMaterial(id,request);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + response.get().getId() + " from createOutsourcingMaterialRelase.");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // 외주생산 원재료 출고 대상 리스트 조회
-    @GetMapping("/{productionId}/material")
+    @GetMapping("/{request-id}/material")
     @ResponseBody
     @Operation(summary = "외주생산 원재료 출고 대상 리스트 조회")
     @ApiResponses(
@@ -180,31 +181,32 @@ public class OutSourcingController {
             }
     )
     public ResponseEntity<List<OutsourcingMaterialReleaseResponse>> getOutsourcingMaterialReleaseList(
-            @PathVariable Long productionId,
+            @PathVariable(value = "request-id") @Parameter(description = "외주생산 ID") Long id,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        List<OutsourcingMaterialReleaseResponse> responses = outsourcingService.getOutsourcingMeterials(productionId);
+        List<OutsourcingMaterialReleaseResponse> responses = outsourcingService.getOutsourcingMeterials(id);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getOutsourcingMaterialReleaseList.");
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 
     // 외주생산 원재료 출고 대상 단일 조회
-    @GetMapping("/material/{id}")
+    @GetMapping("/{request-id}/material/{id}")
     @ResponseBody
     @Operation(summary = "외주생산 원재료 출고 대상 단일 조회")
-    public ResponseEntity<Optional<OutsourcingMaterialReleaseResponse>> getOutsourcingMaterialRelease(
-            @PathVariable Long id,
+    public ResponseEntity<OutsourcingMaterialReleaseResponse> getOutsourcingMaterialRelease(
+            @PathVariable(value = "request-id") @Parameter(description = "외주생산의뢰 ID") Long requestId,
+            @PathVariable(value = "id") @Parameter(description = "원재료 출고 대상 ID") Long id,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        Optional<OutsourcingMaterialReleaseResponse> response = outsourcingService.getOutsourcingMaterial(id);
+    ) throws NotFoundException {
+        OutsourcingMaterialReleaseResponse response = outsourcingService.getOutsourcingMaterial(requestId,id);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getItemForms.");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // 외주생산 원재료 출고 대상 수정
-    @PatchMapping("/material/{id}")
+    @PatchMapping("/{request-id}/material/{id}")
     @ResponseBody
     @Operation(summary = "외주생산원재료 출고 대상 수정")
     @ApiResponses(
@@ -214,19 +216,20 @@ public class OutSourcingController {
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity<Optional<OutsourcingMaterialReleaseResponse>> modifyOutsourcingMaterialRelease (
-            @PathVariable Long id,
+    public ResponseEntity<OutsourcingMaterialReleaseResponse> modifyOutsourcingMaterialRelease (
+            @PathVariable(value = "request-id") @Parameter(description = "외주 생산 의뢰 ID") long requestId,
+            @PathVariable(value = "id") @Parameter(description = "원재료 출고 ID") long id,
             @RequestBody @Valid OutsourcingMaterialReleaseRequest request,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        Optional<OutsourcingMaterialReleaseResponse> response = outsourcingService.modifyOutsourcingMaterial(id, request);
+        OutsourcingMaterialReleaseResponse response = outsourcingService.modifyOutsourcingMaterial(requestId, id, request);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + id + " from modifyOutsourcingMaterialRelease.");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // 외주생산원재료 출고 대상 삭제
-    @DeleteMapping("/material/{id}")
+    @DeleteMapping("/{request-id}/material/{id}")
     @ResponseBody
     @Operation(summary = "외주생산원재료 출고 대상 삭제")
     @ApiResponses(
@@ -236,10 +239,11 @@ public class OutSourcingController {
             }
     )
     public ResponseEntity deleteOutsourcingMaterialRelease(
-            @PathVariable Long id,
+            @PathVariable(value = "request-id") @Parameter(description = "외주생산 ID") Long requestId,
+            @PathVariable(value = "id") @Parameter(description = "원재료 출고대상 ID") Long id,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        outsourcingService.deleteOutsourcingMaterial(id);
+        outsourcingService.deleteOutsourcingMaterial(requestId, id);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteOutsourcingMaterialRelease.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);

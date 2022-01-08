@@ -8,5 +8,5 @@ public enum EnrollmentType {
     * 생산: PRODUCTION
     * 분할: SPLIT
     * */
-    ERROR, PURCHASE_INPUT, PRODUCTION, SPLIT
+    ERROR, PURCHASE_INPUT, OUTSOURCING_INPUT, PRODUCTION, SPLIT
 }
