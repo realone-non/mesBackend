@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.entity.enumeration.TestType;
@@ -8,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -22,20 +25,32 @@ public class WorkOrderResponse {
     @Schema(description = "지시번호")
     String orderNo;
 
-    @Schema(description = "작업공정")
-    WorkProcessResponse.idAndName workProcess;
+    @Schema(description = "고유아이디")
+    Long workProcessId;
 
-    @Schema(description = "작업라인")
-    WorkLineResponse.idAndName workLine;
+    @Schema(description = "작업공정명")
+    String workProcessName;
+
+    @Schema(description = "고유아이디")
+    Long workLineId;
+
+    @Schema(description = "작업라인명")
+    String workLineName;
 
     @Schema(description = "지시수량")
     int orderAmount;
 
-    @Schema(description = "생산담당자")
-    UserResponse.idAndKorName user;
+    @Schema(description = "생산담장자 id")
+    Long userId;
 
-    @Schema(description = "단위")
-    UnitResponse.idAndName unit;
+    @Schema(description = "생산담당자 이름")
+    String userKorName;
+
+    @Schema(description = "단위 고유아이디")
+    Long unitCodeId;
+
+    @Schema(description = "단위명")
+    String unitCodeName;
 
     @Schema(description = "준비시간")
     int readyTime;
@@ -44,7 +59,7 @@ public class WorkOrderResponse {
     int uph = 1;
 
     @Schema(description = "소요시간")
-    int costTime;
+    Long costTime;
 
     @Schema(description = "작업예정일")
     LocalDate expectedWorkDate;
@@ -58,8 +73,11 @@ public class WorkOrderResponse {
     @Schema(description = "검사의뢰")
     TestType testType;
 
-    @Schema(description = "검사유형")
-    TestProcessResponse testProcess;
+    @Schema(description = "검사유형 고유아이디")
+    Long testProcessId;
+
+    @Schema(description = "검사방법")
+    String testProcess;
 
     @Schema(description = "최종공정")
     boolean lastProcessYn;
@@ -72,4 +90,17 @@ public class WorkOrderResponse {
 
     @Schema(description = "비고")
     String note;
+
+    @JsonIgnore
+    LocalDateTime startDateTime;
+    @JsonIgnore
+    LocalDateTime endDateTime;
+
+    // costTime 변경
+    public void setCostTime() {
+        if (startDateTime != null && endDateTime != null) {
+            long costTime = ChronoUnit.MINUTES.between(startDateTime, endDateTime);
+            setCostTime(costTime);
+        }
+    }
 }

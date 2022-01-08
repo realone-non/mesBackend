@@ -21,10 +21,15 @@ public class WorkOrderStateDetailResponse {
     @Schema(description = "고유아이디")
     Long id;
 
-    @Schema(description = "지시상태")
-    OrderState orderState;
-
-    @Schema(description = "작업일시")
+    @Schema(description = "완료")
     @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
-    LocalDateTime workOrderDateTime;
+    LocalDateTime completionDateTime;
+
+    @Schema(description = "진행중")
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
+    LocalDateTime ongoingDateTime;
+
+    @Schema(description = "예정")
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
+    LocalDateTime scheduleTime;
 }
