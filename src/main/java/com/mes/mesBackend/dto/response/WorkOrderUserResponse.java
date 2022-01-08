@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Objects;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -40,9 +42,6 @@ public class WorkOrderUserResponse {
     @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime endDateTime;
 
-    @JsonIgnore
-    LocalDateTime scheduleDateTime;
-
     @Schema(description = "소요시간")
     Long costTime;
 
@@ -58,40 +57,48 @@ public class WorkOrderUserResponse {
     @Schema(description = "제조오더번호")
     String produceOrderNo;
 
-    // scheduleDateTime, startDateTime, endDateTime check
-    public WorkOrderUserResponse dateTimeCheckingConverter() {
-        if (scheduleDateTime != null && startDateTime == null && endDateTime == null) {
-            return null;
-        } else if (scheduleDateTime != null && startDateTime != null && endDateTime != null) {
-            if (scheduleDateTime.isAfter(startDateTime) || scheduleDateTime.isAfter(endDateTime)) {
-                return null;
-            } else if (startDateTime.isAfter(endDateTime)) {
-                this.setEndDateTime(null);
-            }
-            return this;
+    // costTime(소요시간)
+    public void putCostTime() {
+        if (this.startDateTime != null && this.endDateTime != null) {
+            long costTime = ChronoUnit.MINUTES.between(this.startDateTime, this.endDateTime);
+            setCostTime(costTime);
         }
-        return this;
     }
 
-    // 지시상태 조회
-    public WorkOrderUserResponse orderStateCondition(OrderState orderState) {
-        if (orderState != null) {
-            if (orderState == OrderState.ONGOING) {
-                if (startDateTime != null && endDateTime == null) {
-                    return this;
-                } else {
-                    return null;
-                }
-            } else if (orderState == OrderState.COMPLETION) {
-                if (startDateTime != null && endDateTime != null) {
-                    return this;
-                } else {
-                    return null;
-                }
-            } else if (orderState == OrderState.SCHEDULE) {
-                return null;
-            }
-        }
-        return this;
-    }
+//    // scheduleDateTime, startDateTime, endDateTime check
+//    public WorkOrderUserResponse dateTimeCheckingConverter() {
+//        if (scheduleDateTime != null && startDateTime == null && endDateTime == null) {
+//            return null;
+//        } else if (scheduleDateTime != null && startDateTime != null && endDateTime != null) {
+//            if (scheduleDateTime.isAfter(startDateTime) || scheduleDateTime.isAfter(endDateTime)) {
+//                return null;
+//            } else if (startDateTime.isAfter(endDateTime)) {
+//                this.setEndDateTime(null);
+//            }
+//            return this;
+//        }
+//        return this;
+//    }
+//
+//    // 지시상태 조회
+//    public WorkOrderUserResponse orderStateCondition(OrderState orderState) {
+//        if (orderState != null) {
+//            if (orderState == OrderState.ONGOING) {
+//                if (startDateTime != null && endDateTime == null) {
+//                    return this;
+//                } else {
+//                    return null;
+//                }
+//            } else if (orderState == OrderState.COMPLETION) {
+//                if (startDateTime != null && endDateTime != null) {
+//                    return this;
+//                } else {
+//                    return null;
+//                }
+//            } else if (orderState == OrderState.SCHEDULE) {
+//                return null;
+//            }
+//        }
+//        return this;
+//    }
 }

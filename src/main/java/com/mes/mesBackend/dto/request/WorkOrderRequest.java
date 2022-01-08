@@ -27,7 +27,7 @@ public class WorkOrderRequest {
     @NotNull(message = NOT_NULL)
     Long workLine;
 
-    @Schema(description = "작업공정 id")
+    @Schema(description = "지시수량 id")
     @NotNull(message = NOT_NULL)
     int orderAmount;
 
@@ -48,10 +48,6 @@ public class WorkOrderRequest {
     @NotNull(message = NOT_NULL)
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     int uph = 1;
-
-    @Schema(description = "소요시간")
-    @NotNull(message = NOT_NULL)
-    int costTime;
 
     @Schema(description = "작업예정일")
     @NotNull(message = NOT_NULL)
