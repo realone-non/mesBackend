@@ -1,12 +1,11 @@
 package com.mes.mesBackend.controller;
 
-import com.mes.mesBackend.dto.request.ItemFormRequest;
-import com.mes.mesBackend.dto.response.ItemFormResponse;
+import com.mes.mesBackend.dto.response.DeadlineResponse;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
-import com.mes.mesBackend.service.ItemFormService;
+import com.mes.mesBackend.service.DeadlineService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,30 +15,32 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 
-// 품목형태
-@Tag(name = "item-form", description = "품목형태 API")
-@RequestMapping(value = "/item-forms")
+// 18-5. 마감일자
+@Tag(name = "deadline", description = "18-5.마감일자 API")
+@RequestMapping(value = "/deadlines")
 @RestController
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Authorization")
-public class ItemFormController {
-    private final ItemFormService itemFormService;
+public class DeadlineController {
+
+    private final DeadlineService deadlineService;
     private final LogService logService;
 
-    private Logger logger = LoggerFactory.getLogger(ItemFormController.class);
+    private Logger logger = LoggerFactory.getLogger(DeadlineController.class);
     private CustomLogger cLogger;
 
-    // 품목형태 생성
+    // 마감일자 생성
     @PostMapping
     @ResponseBody
-    @Operation(summary = "품목형태 생성")
+    @Operation(summary = "마감일자 생성")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -47,53 +48,53 @@ public class ItemFormController {
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity<ItemFormResponse> createItemForm(
-            @RequestBody @Valid ItemFormRequest itemFormRequest,
+    public ResponseEntity<DeadlineResponse> createDeadline(
+            @RequestParam @Parameter(description = "마감일자 yyyy-MM-dd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate deadlineDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        ItemFormResponse itemForm = itemFormService.createItemForm(itemFormRequest);
+        DeadlineResponse deadline = deadlineService.createDeadline(deadlineDate);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + itemForm.getId() + " from createItemForm.");
-        return new ResponseEntity<>(itemForm, HttpStatus.OK);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + deadline.getId() + " from createDeadline.");
+        return new ResponseEntity<>(deadline, HttpStatus.OK);
     }
 
-    // 품목형태 단일 조회
+    // 마감일자 단일 조회
     @GetMapping("/{id}")
     @ResponseBody
-    @Operation(summary = "품목형태 단일 조회")
+    @Operation(summary = "마감일자 단일 조회")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
                     @ApiResponse(responseCode = "404", description = "not found resource"),
             }
     )
-    public ResponseEntity<ItemFormResponse> getItemForm(
+    public ResponseEntity<DeadlineResponse> getDeadline(
             @PathVariable Long id,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        ItemFormResponse itemForm = itemFormService.getItemForm(id);
+        DeadlineResponse deadline = deadlineService.getDeadline(id);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + itemForm.getId() + " from getItemForm.");
-        return new ResponseEntity<>(itemForm, HttpStatus.OK);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + deadline.getId() + " from getDeadline.");
+        return new ResponseEntity<>(deadline, HttpStatus.OK);
     }
 
-    // 품목형태 리스트 조회
+    // 마감일자 리스트 조회
     @GetMapping
     @ResponseBody
-    @Operation(summary = "품목형태 리스트 조회")
-    public ResponseEntity<List<ItemFormResponse>> getItemForms(
+    @Operation(summary = "마감일자 리스트 조회")
+    public ResponseEntity<List<DeadlineResponse>> getDeadlines(
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<ItemFormResponse> itemForms = itemFormService.getItemForms();
+        List<DeadlineResponse> deadlines = deadlineService.getDeadlines();
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getItemForms.");
-        return new ResponseEntity<>(itemForms, HttpStatus.OK);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getDeadlines.");
+        return new ResponseEntity<>(deadlines, HttpStatus.OK);
     }
 
-    // 품목형태 수정
+    // 마감일자 수정
     @PatchMapping("/{id}")
     @ResponseBody
-    @Operation(summary = "품목형태 수정")
+    @Operation(summary = "마감일자 수정")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -101,34 +102,34 @@ public class ItemFormController {
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity<ItemFormResponse> updateItemForm(
+    public ResponseEntity<DeadlineResponse> updateDeadline(
             @PathVariable Long id,
-            @RequestBody @Valid ItemFormRequest itemFormRequest,
+            @RequestParam @Parameter(description = "마감일자 yyyy-MM-dd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate deadlineDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        ItemFormResponse itemForm = itemFormService.updateItemForm(id, itemFormRequest);
+        DeadlineResponse deadline = deadlineService.updateDeadline(id, deadlineDate);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + itemForm.getId() + " from updateItemForm.");
-        return new ResponseEntity<>(itemForm, HttpStatus.OK);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + deadline.getId() + " from updateDeadline.");
+        return new ResponseEntity<>(deadline, HttpStatus.OK);
     }
 
-    // 품목형태 삭제
+    // 마감일자 삭제
     @DeleteMapping("/{id}")
     @ResponseBody
-    @Operation(summary = "품목형태 삭제")
+    @Operation(summary = "마감일자 삭제")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "204", description = "no content"),
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity deleteItemForm(
+    public ResponseEntity deleteDeadline(
             @PathVariable Long id,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        itemFormService.deleteItemForm(id);
+        deadlineService.deleteDeadline(id);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteItemForm.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteDeadline.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
