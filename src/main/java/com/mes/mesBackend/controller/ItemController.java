@@ -39,11 +39,8 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 @SecurityRequirement(name = "Authorization")
 public class ItemController {
 
-    @Autowired
-    ItemService itemService;
-    @Autowired
-    LogService logService;
-
+    private final ItemService itemService;
+    private final LogService logService;
     private Logger logger = LoggerFactory.getLogger(ItemController.class);
     private CustomLogger cLogger;
 
