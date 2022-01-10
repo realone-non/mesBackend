@@ -1,17 +1,14 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.EquipmentCheckDetailRequest;
-import com.mes.mesBackend.dto.request.PurchaseRequestRequest;
 import com.mes.mesBackend.dto.response.EquipmentCheckDetailResponse;
 import com.mes.mesBackend.dto.response.EquipmentCheckResponse;
-import com.mes.mesBackend.dto.response.PurchaseRequestResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.EquipmentCheckService;
-import com.mes.mesBackend.service.PurchaseRequestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,6 +27,7 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 
+// 17-1. 설비점검 실적 등록
 @Tag(name = "equipment-check", description = "17-1. 설비점검 실적 등록 API")
 @RequestMapping("/equipment-checks")
 @RestController
@@ -38,11 +36,12 @@ import java.util.List;
 public class EquipmentCheckController {
     private final EquipmentCheckService equipmentCheckService;
     private final LogService logService;
-    private Logger logger = LoggerFactory.getLogger(PurchaseRequestController.class);
+    private Logger logger = LoggerFactory.getLogger(EquipmentCheckController.class);
     private CustomLogger cLogger;
 
     // 설비 리스트 조회
     // 검색조건: 설비유형, 점검유형(보류), 작업기간(디테일 정보 생성날짜 기준) fromDate~toDate
+    // TODO(점검유형 보류)
     @GetMapping
     @ResponseBody
     @Operation(
@@ -63,7 +62,7 @@ public class EquipmentCheckController {
     
     // 설비 단일 조회
     @GetMapping("/{equipment-id}")
-    @ResponseBody()
+    @ResponseBody
     @Operation(summary = "설비정보 단일 조회", description = "")
     @ApiResponses(
             value = {
@@ -72,7 +71,7 @@ public class EquipmentCheckController {
             }
     )
     public ResponseEntity<EquipmentCheckResponse> getEquipmentCheck(
-            @PathVariable(value = "equipment-id") @Parameter(name = "설비 id") Long equipmentId,
+            @PathVariable(value = "equipment-id") @Parameter(description = "설비 id") Long equipmentId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         EquipmentCheckResponse equipmentCheck = equipmentCheckService.getEquipmentCheckResponse(equipmentId);
@@ -96,7 +95,7 @@ public class EquipmentCheckController {
             @RequestBody @Valid EquipmentCheckDetailRequest equipmentCheckDetailRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws BadRequestException, NotFoundException {
-        EquipmentCheckDetailResponse equipmentCheckDetail = equipmentCheckService.createEquipmentCheckDetail(equipmentCheckDetailRequest);
+        EquipmentCheckDetailResponse equipmentCheckDetail = equipmentCheckService.createEquipmentCheckDetail(equipmentId, equipmentCheckDetailRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + equipmentCheckDetail.getId() + " from createEquipmentCheckDetail.");
         return new ResponseEntity<>(equipmentCheckDetail, HttpStatus.OK);

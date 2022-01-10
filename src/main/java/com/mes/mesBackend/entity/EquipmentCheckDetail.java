@@ -31,9 +31,6 @@ public class EquipmentCheckDetail extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '설비점검 세부항목 고유아이디'")
     private Long id;
 
-    @Column(name = "CHECK_CATEGORY", columnDefinition = "varchar(255) COMMENT '점검항목'", nullable = false)
-    private String checkCategory;       // 점검항목
-
     @Column(name = "CHECK_CONTENT", columnDefinition = "varchar(255) COMMENT '점검내용'", nullable = false)
     private String checkContent;        // 점검내용
 
@@ -65,4 +62,24 @@ public class EquipmentCheckDetail extends BaseTimeEntity {
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
+
+    public void add(Equipment equipment, EquipmentMaintenance equipmentMaintenance) {
+        setEquipment(equipment);
+        setEquipmentMaintenance(equipmentMaintenance);
+    }
+
+    public void update(EquipmentCheckDetail newEquipmentCheckDetail, EquipmentMaintenance newEquipmentMaintenance) {
+        setEquipmentMaintenance(newEquipmentMaintenance);
+        setCheckContent(newEquipmentCheckDetail.checkContent);
+        setCriteriaStandard(newEquipmentCheckDetail.criteriaStandard);
+        setCriteriaMethod(newEquipmentCheckDetail.criteriaMethod);
+        setUsl(newEquipmentCheckDetail.usl);
+        setLsl(newEquipmentCheckDetail.lsl);
+        setResult(newEquipmentCheckDetail.result);
+        setRegisterType(newEquipmentCheckDetail.registerType);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

@@ -77,7 +77,8 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     // 설비 단일 조회 및 예외
-    private Equipment getEquipmentOrThrow(Long id) throws NotFoundException {
+    @Override
+    public Equipment getEquipmentOrThrow(Long id) throws NotFoundException {
         return equipmentRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("equipment does not exist. input id: " + id));
     }
