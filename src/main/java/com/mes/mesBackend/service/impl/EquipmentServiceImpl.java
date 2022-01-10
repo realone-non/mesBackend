@@ -11,24 +11,19 @@ import com.mes.mesBackend.repository.EquipmentRepository;
 import com.mes.mesBackend.service.ClientService;
 import com.mes.mesBackend.service.EquipmentService;
 import com.mes.mesBackend.service.WorkLineService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 // 3-5-1. 설비등록
 @Service
+@RequiredArgsConstructor
 public class EquipmentServiceImpl implements EquipmentService {
-    @Autowired
-    EquipmentRepository equipmentRepository;
-    @Autowired
-    WorkLineService workLineService;
-    @Autowired
-    ModelMapper mapper;
-    @Autowired
-    ClientService clientService;
+    private final EquipmentRepository equipmentRepository;
+    private final WorkLineService workLineService;
+    private final ModelMapper mapper;
+    private final ClientService clientService;
 
     // 설비 생성
     @Override
