@@ -111,6 +111,7 @@ public class EquipmentCheckDetailRepositoryImpl implements EquipmentCheckDetailR
                         )
                 )
                 .from(equipmentCheckDetail)
+                .leftJoin(equipment).on(equipment.id.eq(equipmentCheckDetail.equipment.id))
                 .leftJoin(equipmentMaintenance).on(equipmentMaintenance.id.eq(equipmentCheckDetail.equipmentMaintenance.id))
                 .where(
                         isEquipmentIdEq(equipmentId),
@@ -140,6 +141,7 @@ public class EquipmentCheckDetailRepositoryImpl implements EquipmentCheckDetailR
                                 )
                         )
                         .from(equipmentCheckDetail)
+                        .leftJoin(equipment).on(equipment.id.eq(equipmentCheckDetail.equipment.id))
                         .leftJoin(equipmentMaintenance).on(equipmentMaintenance.id.eq(equipmentCheckDetail.equipmentMaintenance.id))
                         .where(
                                 isEquipmentIdEq(equipmentId),
