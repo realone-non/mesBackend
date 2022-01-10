@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +29,10 @@ import java.util.List;
 @RequestMapping("/equipments")
 @RestController
 @SecurityRequirement(name = "Authorization")
+@RequiredArgsConstructor
 public class EquipmentController {
-    @Autowired
-    EquipmentService equipmentService;
-    @Autowired
-    LogService logService;
+    private final EquipmentService equipmentService;
+    private final LogService logService;
 
     private Logger logger = LoggerFactory.getLogger(EquipmentController.class);
     private CustomLogger cLogger;
