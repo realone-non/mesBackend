@@ -1,11 +1,8 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.EquipmentBreakdownRequest;
-import com.mes.mesBackend.dto.request.RepairItemRequest;
 import com.mes.mesBackend.dto.request.RepairPartRequest;
-import com.mes.mesBackend.dto.response.EquipmentBreakdownResponse;
-import com.mes.mesBackend.dto.response.RepairItemResponse;
-import com.mes.mesBackend.dto.response.RepairPartResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +16,7 @@ public interface EquipmentBreakdownService {
     // 설비고장 생성
     EquipmentBreakdownResponse createEquipmentBreakdown(EquipmentBreakdownRequest equipmentBreakdownRequest) throws NotFoundException;
     // 설비고장 리스트 검색 조회, 검색조건: 작업장 id, 설비유형, 작업기간 fromDate~toDate
-    List<EquipmentBreakdownResponse> getEquipmentBreakdowns(Long workCenterId, String equipmentType, LocalDate fromDate, LocalDate toDate);
+    List<EquipmentBreakdownResponse> getEquipmentBreakdowns(Long workCenterId, Long workLineId, LocalDate fromDate, LocalDate toDate);
     // 설비고장 단일조회
     EquipmentBreakdownResponse getEquipmentBreakdown(Long equipmentBreakdownId) throws NotFoundException;
     // 설비고장 수정
@@ -32,13 +29,13 @@ public interface EquipmentBreakdownService {
     void deleteFileToEquipmentBreakdown(Long equipmentBreakdownId, Long fileId) throws NotFoundException;
     // ============================================== 수리항목 ==============================================
     // 수리항목 생성
-    RepairItemResponse createRepairItem(Long equipmentBreakdownId, RepairItemRequest repairItemRequest) throws NotFoundException;
+    RepairItemResponse createRepairItem(Long equipmentBreakdownId, Long repairCodeId) throws NotFoundException;
     // 수리항목 전체 조회
     List<RepairItemResponse> getRepairItemResponses(Long equipmentBreakdownId) throws NotFoundException;
     // 수리항목 단일 조회
     RepairItemResponse getRepairItemResponse(Long equipmentBreakdownId, Long repairItemId) throws NotFoundException;
     // 수리항목 수정
-    RepairItemResponse updateRepairItem(Long equipmentBreakdownId, Long repairItemId, RepairItemRequest repairItemRequest) throws NotFoundException;
+    RepairItemResponse updateRepairItem(Long equipmentBreakdownId, Long repairItemId, Long repairCodeId) throws NotFoundException;
     // 수리항목 삭제
     void deleteRepairItem(Long equipmentBreakdownId, Long repairItemId) throws NotFoundException;
     // ============================================== 수리부품정보 ==============================================
@@ -52,4 +49,18 @@ public interface EquipmentBreakdownService {
     RepairPartResponse updateRepairPart(Long equipmentBreakdownId, Long repairItemId, Long repairPartId, RepairPartRequest repairPartRequest) throws NotFoundException;
     // 수리부품 삭제
     void deleteRepairPart(Long equipmentBreakdownId, Long repairItemId, Long repairPartId) throws NotFoundException;
+
+    List<EquipmentRepairHistoryResponse> getEquipmentRepairHistories(Long workCenterId, String equipmentType, String repairItem, LocalDate fromDate, LocalDate toDate);
+
+    // ============================================== 수리작업자 정보 ==============================================
+    // 수리작업자 생성
+    RepairWorkerResponse createRepairWorker(Long equipmentBreakdownId, Long userId) throws NotFoundException;
+    // 수리작업자 전체 조회
+    List<RepairWorkerResponse> getRepairWorkerResponses(Long equipmentBreakdownId) throws NotFoundException;
+    // 수리작업자 단일 조회
+    RepairWorkerResponse getRepairWorkerResponse(Long equipmentBreakdownId, Long repairWorkerId) throws NotFoundException;
+    // 수리작업자 수정
+    RepairWorkerResponse updateRepairWorker(Long equipmentBreakdownId, Long repairWorkerId, Long userId) throws NotFoundException;
+    // 수리작업자 삭제
+    void deleteRepairWorker(Long equipmentBreakdownId, Long repairWorkerId) throws NotFoundException;
 }

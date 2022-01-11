@@ -49,12 +49,12 @@ public class EquipmentCheckController {
             description = "검색조건: 설비유형, 점검유형(보류), 작업기간 fromDate~toDate"
     )
     public ResponseEntity<List<EquipmentCheckResponse>> getEquipmentChecks(
-            @RequestParam(required = false) @Parameter(description = "설비유형") String equipmentType,
+            @RequestParam(required = false) @Parameter(description = "설비유형(작업라인 id)") Long workLineId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 toDate") LocalDate toDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<EquipmentCheckResponse> equipmentChecks = equipmentCheckService.getEquipmentChecks(equipmentType, fromDate, toDate);
+        List<EquipmentCheckResponse> equipmentChecks = equipmentCheckService.getEquipmentChecks(workLineId, fromDate, toDate);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getEquipmentChecks.");
         return new ResponseEntity<>(equipmentChecks, HttpStatus.OK);

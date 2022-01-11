@@ -46,9 +46,6 @@ public class Equipment extends BaseTimeEntity {
     @Column(name = "EQUIPMENT_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '설비명'")
     private String equipmentName;        // 설비명
 
-    @Column(name = "EQUIPMENT_TYPE", columnDefinition = "varchar(255) COMMENT '설비유형'")
-    private String equipmentType;        // 설비유형
-
     @Column(name = "MODEL", columnDefinition = "varchar(255) COMMENT '규격모델'", nullable = false)
     private String model;               // 규격&모델
 
@@ -73,8 +70,8 @@ public class Equipment extends BaseTimeEntity {
 
     // 다대일 단방향
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "WORK_LINE", columnDefinition = "bigint COMMENT '작업라인'", nullable = false)
-    private WorkLine workLine;              // 작업라인
+    @JoinColumn(name = "WORK_LINE", columnDefinition = "bigint COMMENT '작업라인,설비유형'", nullable = false)
+    private WorkLine workLine;              // 작업라인,설비유형
 
     @Column(name = "CHECK_CYCLE", columnDefinition = "int COMMENT '점검주기'", nullable = false)
     private int checkCycle;             // 점검주기
@@ -93,7 +90,6 @@ public class Equipment extends BaseTimeEntity {
     public void update(Equipment newEquipment, Client newClient, WorkLine newWorkLine) {
         setEquipmentCode(newEquipment.equipmentCode);
         setEquipmentName(newEquipment.equipmentName);
-        setEquipmentType(newEquipment.equipmentType);
         setModel(newEquipment.model);
         setClient(newClient);
         setPurchaseDate(newEquipment.purchaseDate);

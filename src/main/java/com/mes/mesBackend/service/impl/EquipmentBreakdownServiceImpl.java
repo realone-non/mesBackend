@@ -1,24 +1,15 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.EquipmentBreakdownRequest;
-import com.mes.mesBackend.dto.request.RepairItemRequest;
 import com.mes.mesBackend.dto.request.RepairPartRequest;
-import com.mes.mesBackend.dto.response.EquipmentBreakdownFileResponse;
-import com.mes.mesBackend.dto.response.EquipmentBreakdownResponse;
-import com.mes.mesBackend.dto.response.RepairItemResponse;
-import com.mes.mesBackend.dto.response.RepairPartResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.S3Uploader;
 import com.mes.mesBackend.mapper.ModelMapper;
-import com.mes.mesBackend.repository.EquipmentBreakdownFileRepository;
-import com.mes.mesBackend.repository.EquipmentBreakdownRepository;
-import com.mes.mesBackend.repository.RepairItemRepository;
-import com.mes.mesBackend.repository.RepairPartRepository;
-import com.mes.mesBackend.service.EquipmentBreakdownService;
-import com.mes.mesBackend.service.EquipmentService;
-import com.mes.mesBackend.service.WorkCenterService;
+import com.mes.mesBackend.repository.*;
+import com.mes.mesBackend.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,8 +27,11 @@ public class EquipmentBreakdownServiceImpl implements EquipmentBreakdownService 
     private final EquipmentBreakdownFileRepository equipmentBreakdownFileRepo;
     private final RepairItemRepository repairItemRepo;
     private final RepairPartRepository repairPartRepo;
+    private final RepairWorkerRepository repairWorkerRepo;
     private final EquipmentService equipmentService;
     private final WorkCenterService workCenterService;
+    private final RepairCodeService repairCodeService;
+    private final UserService userService;
     private final ModelMapper mapper;
     private final S3Uploader s3Uploader;
 
@@ -57,8 +51,8 @@ public class EquipmentBreakdownServiceImpl implements EquipmentBreakdownService 
 
     // 설비고장 리스트 검색 조회, 검색조건: 작업장 id, 설비유형, 작업기간 fromDate~toDate
     @Override
-    public List<EquipmentBreakdownResponse> getEquipmentBreakdowns(Long workCenterId, String equipmentType, LocalDate fromDate, LocalDate toDate) {
-        List<EquipmentBreakdownResponse> equipmentBreakdownResponses = equipmentBreakdownRepo.findEquipmentBreakdownResponsesByCondition(workCenterId, equipmentType, fromDate, toDate);
+    public List<EquipmentBreakdownResponse> getEquipmentBreakdowns(Long workCenterId, Long workLineId, LocalDate fromDate, LocalDate toDate) {
+        List<EquipmentBreakdownResponse> equipmentBreakdownResponses = equipmentBreakdownRepo.findEquipmentBreakdownResponsesByCondition(workCenterId, workLineId, fromDate, toDate);
         for (EquipmentBreakdownResponse response : equipmentBreakdownResponses) {
             List<EquipmentBreakdownFileResponse> beforeFiles = equipmentBreakdownRepo.findBeforeFileResponsesByEquipmentBreakdownId(response.getId());
             List<EquipmentBreakdownFileResponse> afterFiles = equipmentBreakdownRepo.findAfterFileResponsesByEquipmentBreakdownId(response.getId());
@@ -152,10 +146,11 @@ public class EquipmentBreakdownServiceImpl implements EquipmentBreakdownService 
     // ============================================== 수리항목 ==============================================
     // 수리항목 생성
     @Override
-    public RepairItemResponse createRepairItem(Long equipmentBreakdownId, RepairItemRequest repairItemRequest) throws NotFoundException {
-        RepairItem repairItem = mapper.toEntity(repairItemRequest, RepairItem.class);
+    public RepairItemResponse createRepairItem(Long equipmentBreakdownId, Long repairCodeId) throws NotFoundException {
+        RepairItem repairItem = new RepairItem();
         EquipmentBreakdown equipmentBreakdown = getEquipmentBreakdownOrThrow(equipmentBreakdownId);
-        repairItem.add(equipmentBreakdown);
+        RepairCode repairCode = repairCodeService.getRepairCodeOrThrow(repairCodeId);
+        repairItem.add(equipmentBreakdown, repairCode);
         repairItemRepo.save(repairItem);
         return mapper.toResponse(repairItem, RepairItemResponse.class);
     }
@@ -177,10 +172,10 @@ public class EquipmentBreakdownServiceImpl implements EquipmentBreakdownService 
 
     // 수리항목 수정
     @Override
-    public RepairItemResponse updateRepairItem(Long equipmentBreakdownId, Long repairItemId, RepairItemRequest repairItemRequest) throws NotFoundException {
+    public RepairItemResponse updateRepairItem(Long equipmentBreakdownId, Long repairItemId, Long repairCodeId) throws NotFoundException {
         RepairItem findRepairItem = getRepairItemOrThrow(equipmentBreakdownId, repairItemId);
-        RepairItem newRepairItem = mapper.toEntity(repairItemRequest, RepairItem.class);
-        findRepairItem.update(newRepairItem);
+        RepairCode repairCode = repairCodeService.getRepairCodeOrThrow(repairCodeId);
+        findRepairItem.update(repairCode);
         repairItemRepo.save(findRepairItem);
         return mapper.toResponse(findRepairItem, RepairItemResponse.class);
     }
@@ -257,4 +252,67 @@ public class EquipmentBreakdownServiceImpl implements EquipmentBreakdownService 
                         "input repairPartId: " + repairPartId)
                 );
     }
+
+    // ============================================== 수리작업자 정보 ==============================================
+    // 수리작업자 생성
+    @Override
+    public RepairWorkerResponse createRepairWorker(Long equipmentBreakdownId, Long userId) throws NotFoundException {
+        RepairWorker repairWorker = new RepairWorker();
+        EquipmentBreakdown equipmentBreakdown = getEquipmentBreakdownOrThrow(equipmentBreakdownId);
+        User user = userService.getUserOrThrow(userId);
+        repairWorker.add(equipmentBreakdown, user);
+        repairWorkerRepo.save(repairWorker);
+        return mapper.toResponse(repairWorker, RepairWorkerResponse.class);
+    }
+
+    // 수리작업자 전체 조회
+    @Override
+    public List<RepairWorkerResponse> getRepairWorkerResponses(Long equipmentBreakdownId) throws NotFoundException {
+        EquipmentBreakdown equipmentBreakdown = getEquipmentBreakdownOrThrow(equipmentBreakdownId);
+        List<RepairWorker> repairWorkers = repairWorkerRepo.findAllByEquipmentBreakdownAndDeleteYnFalse(equipmentBreakdown);
+        return mapper.toListResponses(repairWorkers, RepairWorkerResponse.class);
+    }
+
+    // 수리작업자 단일 조회
+    @Override
+    public RepairWorkerResponse getRepairWorkerResponse(Long equipmentBreakdownId, Long repairWorkerId) throws NotFoundException {
+        RepairWorker repairWorker = getRepairWorkerOrThrow(equipmentBreakdownId, repairWorkerId);
+        return mapper.toResponse(repairWorker, RepairWorkerResponse.class);
+    }
+
+    // 수리작업자 수정
+    @Override
+    public RepairWorkerResponse updateRepairWorker(Long equipmentBreakdownId, Long repairWorkerId, Long userId) throws NotFoundException {
+        RepairWorker findRepairWorker = getRepairWorkerOrThrow(equipmentBreakdownId, repairWorkerId);
+        User newUser = userService.getUserOrThrow(userId);
+        findRepairWorker.update(newUser);
+        repairWorkerRepo.save(findRepairWorker);
+        return mapper.toResponse(findRepairWorker, RepairWorkerResponse.class);
+    }
+
+    // 수리작업자 삭제
+    @Override
+    public void deleteRepairWorker(Long equipmentBreakdownId, Long repairWorkerId) throws NotFoundException {
+        RepairWorker findRepairWorker = getRepairWorkerOrThrow(equipmentBreakdownId, repairWorkerId);
+        findRepairWorker.delete();
+        repairWorkerRepo.save(findRepairWorker);
+    }
+
+    // 수리작업자 단일 조회 및 예외
+    private RepairWorker getRepairWorkerOrThrow(Long equipmentBreakdownId, Long repairWorkerId) throws NotFoundException {
+        EquipmentBreakdown equipmentBreakdown = getEquipmentBreakdownOrThrow(equipmentBreakdownId);
+        return repairWorkerRepo.findByIdAndEquipmentBreakdownAndDeleteYnFalse(repairWorkerId, equipmentBreakdown)
+                .orElseThrow(() -> new NotFoundException("repairWorker does not exist. " +
+                        "input equipmentBreakdownId: " + equipmentBreakdownId + ", " +
+                        "input repairWorkerId: " + repairWorkerId)
+                );
+    }
+
+    // ============================================== 17-3. ==============================================
+    @Override
+    public List<EquipmentRepairHistoryResponse> getEquipmentRepairHistories(Long workCenterId, String equipmentType, String repairItem, LocalDate fromDate, LocalDate toDate) {
+        return null;
+    }
+
+
 }
