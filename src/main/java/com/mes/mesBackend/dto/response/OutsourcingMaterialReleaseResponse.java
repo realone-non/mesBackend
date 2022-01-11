@@ -12,6 +12,9 @@ public class OutsourcingMaterialReleaseResponse {
     @Schema(description = "고유아이디")
     Long id;
 
+    @Schema(description = "품명 ID")
+    Long itemId;
+
     @Schema(description = "품번")
     String itemNo;
 
