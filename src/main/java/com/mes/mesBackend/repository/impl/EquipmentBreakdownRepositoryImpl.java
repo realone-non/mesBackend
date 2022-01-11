@@ -2,6 +2,7 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.EquipmentBreakdownFileResponse;
 import com.mes.mesBackend.dto.response.EquipmentBreakdownResponse;
+import com.mes.mesBackend.dto.response.EquipmentRepairHistoryResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.EquipmentBreakdownRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -24,6 +25,9 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
     final QWorkCenter workCenter = QWorkCenter.workCenter;
     final QEquipmentBreakdownFile equipmentBreakdownFile = QEquipmentBreakdownFile.equipmentBreakdownFile;
     final QWorkLine workLine = QWorkLine.workLine;
+    final QRepairItem repairItem = QRepairItem.repairItem;
+    final QRepairPart repairPart = QRepairPart.repairPart1;
+    final QRepairCode repairCode = QRepairCode.repairCode1;
 
     // 설비고장 리스트 검색 조회, 검색조건: 작업장 id, 설비유형, 작업기간 fromDate~toDate
     @Override
@@ -143,6 +147,53 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                 )
                 .fetch();
     }
+    // ============================================== 17-3. 설비 수리내역 조회 ==============================================
+    // 설비 수리내역 리스트 조회, 검색조건: 작업장 id, 설비유형, 수리항목, 작업기간 fromDate~toDate
+    @Override
+    public List<EquipmentRepairHistoryResponse> findEquipmentRepairHistoryResponseByCondition(
+            Long workCenterId,
+            Long workLineId,
+            Long repairCodeId,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                EquipmentRepairHistoryResponse.class,
+                                equipmentBreakdown.id.as("equipmentBreakdownId"),
+                                equipmentBreakdown.breakDownDate.as("breakdownDate"),
+                                equipment.equipmentCode.as("equipmentCode"),
+                                equipment.equipmentName.as("equipmentName"),
+                                workLine.workLineName.as("equipmentType"),
+                                workCenter.workCenterName.as("workCenterName"),
+                                equipmentBreakdown.repairStartDate.as("repairStartDate"),
+                                equipmentBreakdown.repairEndDate.as("repairEndDate"),
+                                repairItem.repairCode.repairCode.as("repairCode"),
+                                repairItem.repairCode.repairContent.as("repairContent")
+                        )
+                )
+                .from(repairItem)
+                .innerJoin(equipmentBreakdown).on(equipmentBreakdown.id.eq(repairItem.equipmentBreakdown.id))
+                .leftJoin(workCenter).on(workCenter.id.eq(equipmentBreakdown.workCenter.id))
+                .leftJoin(equipment).on(equipment.id.eq(equipmentBreakdown.equipment.id))
+                .leftJoin(workLine).on(workLine.id.eq(equipmentBreakdown.equipment.workLine.id))
+                .leftJoin(repairCode).on(repairCode.id.eq(repairItem.repairCode.id))
+                .where(
+                        isWorkCenterEq(workCenterId),
+                        isEquipmentTypeContain(workLineId),
+                        isRepairItemEq(repairCodeId),
+                        isWorkDateBetween(fromDate, toDate),
+                        isEquipmentBreakdownDeleteYnFalse(),
+                        isRepairItemDeleteYnFalse()
+                )
+                .fetch();
+    }
+
+    // 수리코드 조회
+    private BooleanExpression isRepairItemEq(Long repairItemId) {
+        return repairItemId != null ? repairItem.repairCode.id.eq(repairItemId) : null;
+    }
 
     // 작업장 id
     private BooleanExpression isWorkCenterEq(Long workCenterId) {
@@ -164,5 +215,8 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
     }
     private BooleanExpression isEquipmentBreakdownIdEq(Long equipmentBreakdownId) {
         return equipmentBreakdown.id.eq(equipmentBreakdownId);
+    }
+    private BooleanExpression isRepairItemDeleteYnFalse() {
+        return repairItem.deleteYn.isFalse();
     }
 }

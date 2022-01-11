@@ -2,6 +2,7 @@ package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.EquipmentBreakdownFileResponse;
 import com.mes.mesBackend.dto.response.EquipmentBreakdownResponse;
+import com.mes.mesBackend.dto.response.EquipmentRepairHistoryResponse;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,4 +18,13 @@ public interface EquipmentBreakdownRepositoryCustom {
     List<EquipmentBreakdownFileResponse> findBeforeFileResponsesByEquipmentBreakdownId(Long equipmentBreakdownId);
     // 설비고장 id 로 수리후 파일들 조회
     List<EquipmentBreakdownFileResponse> findAfterFileResponsesByEquipmentBreakdownId(Long equipmentBreakdownId);
+    // ============================================== 17-3. 설비 수리내역 조회 ==============================================
+    // 설비 수리내역 리스트 조회, 검색조건: 작업장 id, 설비유형, 수리항목, 작업기간 fromDate~toDate
+    List<EquipmentRepairHistoryResponse> findEquipmentRepairHistoryResponseByCondition(
+            Long workCenterId,
+            Long workLineId,
+            Long repairCodeId,
+            LocalDate fromDate,
+            LocalDate toDate
+    );
 }
