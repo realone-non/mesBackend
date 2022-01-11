@@ -61,8 +61,8 @@ public class Measure extends BaseTimeEntity {
     @Column(name = "MAKER", columnDefinition = "varchar(255) COMMENT '생산업체명'", nullable = false)
     private String maker;               // 생산업체명
 
-    @Column(name = "CALIBRATION_CYCLE", columnDefinition = "bigint COMMENT '검교정주기'", nullable = false)
-    private Long calibrationCycle;      // 검교정주기
+    @Column(name = "CALIBRATION_CYCLE", columnDefinition = "int COMMENT '검교정주기'", nullable = false)
+    private int calibrationCycle;      // 검교정주기
 
     @Column(name = "CALIBRATION_LAST_DATE", columnDefinition = "datetime COMMENT '최종 검교정일자'", nullable = false)
     private LocalDateTime calibrationLastDate;      // 최종 검교정일자
@@ -76,7 +76,7 @@ public class Measure extends BaseTimeEntity {
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    public void addMapping(GaugeType gaugeType, Department department, LocalDateTime calibrationLastDate, Long calibrationCycle) {
+    public void addMapping(GaugeType gaugeType, Department department, LocalDateTime calibrationLastDate, int calibrationCycle) {
         setGaugeType(gaugeType);
         setDepartment(department);
         setCalibrationNextDate(calibrationLastDate.plusMonths(calibrationCycle));
