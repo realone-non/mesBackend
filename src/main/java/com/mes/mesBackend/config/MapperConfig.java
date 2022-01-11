@@ -38,6 +38,7 @@ public class MapperConfig {
         modelMapper.addConverter(toContractItemResponse);
         modelMapper.addConverter(contractToProduceOrderConverter);
         modelMapper.addConverter(contractItemToProduceOrderConverter);
+        modelMapper.addConverter(equipmentToResponse);
 
         return modelMapper;
     }
@@ -257,6 +258,17 @@ public class MapperConfig {
             produceOrder.setItemName(contractItem.getItem().getItemName());
             produceOrder.setAmount(contractItem.getAmount());
             return produceOrder;
+        }
+    };
+
+    Converter<Equipment, EquipmentResponse> equipmentToResponse = new Converter<Equipment, EquipmentResponse>() {
+        @Override
+        public EquipmentResponse convert(MappingContext<Equipment, EquipmentResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            Equipment equipment = context.getSource();
+            EquipmentResponse response = modelMapper.map(equipment, EquipmentResponse.class);
+            response.setEquipmentType(equipment.getWorkLine().getWorkLineName());
+            return response;
         }
     };
 }

@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface EquipmentCheckDetailRepositoryCustom {
     // 설비 리스트 조회
     // 검색조건: 설비유형, 점검유형(보류), 작업기간(디테일 정보 생성날짜 기준) fromDate~toDate
-    List<EquipmentCheckResponse> findEquipmentChecksResponseByCondition(String equipmentType, LocalDate fromDate, LocalDate toDate);
+    List<EquipmentCheckResponse> findEquipmentChecksResponseByCondition(Long workLineId, LocalDate fromDate, LocalDate toDate);
     // 설비 단일 조회
     Optional<EquipmentCheckResponse> findEquipmentChecksResponseByEquipmentId(Long equipmentId);
     // ================================================ 설비점검 실적 상세 정보 ================================================

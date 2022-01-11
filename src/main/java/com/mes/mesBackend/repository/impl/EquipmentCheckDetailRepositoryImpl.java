@@ -31,7 +31,7 @@ public class EquipmentCheckDetailRepositoryImpl implements EquipmentCheckDetailR
     // 검색조건: 설비유형, 점검유형(보류), 작업기간(디테일 정보 생성날짜 기준) fromDate~toDate
     @Override
     public List<EquipmentCheckResponse> findEquipmentChecksResponseByCondition(
-            String equipmentType,
+            Long workLineId,
             LocalDate fromDate,
             LocalDate toDate
     ) {
@@ -54,7 +54,7 @@ public class EquipmentCheckDetailRepositoryImpl implements EquipmentCheckDetailR
                 .leftJoin(workCenter).on(workCenter.id.eq(workLine.workCenter.id))
                 .leftJoin(equipmentCheckDetail).on(equipmentCheckDetail.equipment.id.eq(equipment.id))
                 .where(
-                        isEquipmentTypeContain(equipmentType),
+                        isEquipmentTypeContain(workLineId),
                         isWorkDateBetween(fromDate, toDate),
                         isEquipmentDeleteYnFalse()
                 )
@@ -153,9 +153,9 @@ public class EquipmentCheckDetailRepositoryImpl implements EquipmentCheckDetailR
     }
 
     // 검색조건:
-    // 설비유형
-    private BooleanExpression isEquipmentTypeContain(String equipmentType) {
-        return equipmentType != null ? equipment.equipmentType.contains(equipmentType) : null;
+    // 설비유형(작업라인 id)
+    private BooleanExpression isEquipmentTypeContain(Long workLineId) {
+        return workLineId != null ? equipment.workLine.id.eq(workLineId) : null;
     }
     // 작업기간(디테일 정보 생성날짜 기준) fromDate~toDate
     private BooleanExpression isWorkDateBetween(LocalDate fromDate, LocalDate toDate) {

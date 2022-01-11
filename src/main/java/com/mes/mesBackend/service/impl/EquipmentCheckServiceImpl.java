@@ -30,9 +30,9 @@ public class EquipmentCheckServiceImpl implements EquipmentCheckService {
     // 설비 리스트 조회
     // 검색조건: 설비유형, 점검유형(보류), 작업기간(디테일 정보 생성날짜 기준) fromDate~toDate
     @Override
-    public List<EquipmentCheckResponse> getEquipmentChecks(String equipmentType, LocalDate fromDate, LocalDate toDate) {
+    public List<EquipmentCheckResponse> getEquipmentChecks(Long workLineId, LocalDate fromDate, LocalDate toDate) {
         // TODO(점검유형 보류)
-        return equipmentCheckDetailRepo.findEquipmentChecksResponseByCondition(equipmentType, fromDate, toDate);
+        return equipmentCheckDetailRepo.findEquipmentChecksResponseByCondition(workLineId, fromDate, toDate);
     }
 
     // 설비 단일 조회
