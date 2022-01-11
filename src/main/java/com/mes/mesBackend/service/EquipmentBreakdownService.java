@@ -49,9 +49,6 @@ public interface EquipmentBreakdownService {
     RepairPartResponse updateRepairPart(Long equipmentBreakdownId, Long repairItemId, Long repairPartId, RepairPartRequest repairPartRequest) throws NotFoundException;
     // 수리부품 삭제
     void deleteRepairPart(Long equipmentBreakdownId, Long repairItemId, Long repairPartId) throws NotFoundException;
-
-    List<EquipmentRepairHistoryResponse> getEquipmentRepairHistories(Long workCenterId, String equipmentType, String repairItem, LocalDate fromDate, LocalDate toDate);
-
     // ============================================== 수리작업자 정보 ==============================================
     // 수리작업자 생성
     RepairWorkerResponse createRepairWorker(Long equipmentBreakdownId, Long userId) throws NotFoundException;
@@ -63,4 +60,7 @@ public interface EquipmentBreakdownService {
     RepairWorkerResponse updateRepairWorker(Long equipmentBreakdownId, Long repairWorkerId, Long userId) throws NotFoundException;
     // 수리작업자 삭제
     void deleteRepairWorker(Long equipmentBreakdownId, Long repairWorkerId) throws NotFoundException;
+    // ============================================== 17-3. 설비 수리내역 조회 ==============================================
+    // 설비 수리내역 리스트 조회, 검색조건: 작업장 id, 설비유형, 수리항목, 작업기간 fromDate~toDate
+    List<EquipmentRepairHistoryResponse> getEquipmentRepairHistories(Long workCenterId, Long workLineId, Long repairCodeId, LocalDate fromDate, LocalDate toDate);
 }

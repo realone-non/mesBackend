@@ -308,11 +308,16 @@ public class EquipmentBreakdownServiceImpl implements EquipmentBreakdownService 
                 );
     }
 
-    // ============================================== 17-3. ==============================================
+    // ============================================== 17-3. 설비 수리내역 조회 ==============================================
+    // 설비 수리내역 리스트 조회, 검색조건: 작업장 id, 설비유형, 수리항목, 작업기간 fromDate~toDate
     @Override
-    public List<EquipmentRepairHistoryResponse> getEquipmentRepairHistories(Long workCenterId, String equipmentType, String repairItem, LocalDate fromDate, LocalDate toDate) {
-        return null;
+    public List<EquipmentRepairHistoryResponse> getEquipmentRepairHistories(
+            Long workCenterId,
+            Long workLineId,
+            Long repairCodeId,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) {
+        return equipmentBreakdownRepo.findEquipmentRepairHistoryResponseByCondition(workCenterId, workLineId, repairCodeId, fromDate, toDate);
     }
-
-
 }

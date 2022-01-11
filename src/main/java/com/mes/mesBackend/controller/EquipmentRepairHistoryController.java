@@ -33,18 +33,18 @@ public class EquipmentRepairHistoryController {
     private CustomLogger cLogger;
 
     // 설비 수리내역 리스트 조회, 검색조건: 작업장 id, 설비유형, 수리항목, 작업기간 fromDate~toDate
-    @Operation(summary = "설비 수리내역 리스트 조회", description = "검색조건: 작업장 id, 설비유형, 수리항목, 작업기간 fromDate~toDate")
+    @Operation(summary = "설비 수리내역 리스트 조회", description = "검색조건: 작업장 id, 설비유형(작업라인 id), 수리항목(수리코드 id), 작업기간 fromDate~toDate")
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<EquipmentRepairHistoryResponse>> getEquipmentRepairHistories(
             @RequestParam(required = false) @Parameter(description = "작업장 id") Long workCenterId,
-            @RequestParam(required = false) @Parameter(description = "설비유형") String equipmentType,
-            @RequestParam(required = false) @Parameter(description = "수리항목") String repairItem,
+            @RequestParam(required = false) @Parameter(description = "설비유형(작업라인 id)") Long workLineId,
+            @RequestParam(required = false) @Parameter(description = "수리항목(수리코드 id)") Long repairCodeId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 toDate") LocalDate toDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<EquipmentRepairHistoryResponse> repairHistoryResponses = equipmentBreakdownService.getEquipmentRepairHistories(workCenterId, equipmentType, repairItem, fromDate, toDate);
+        List<EquipmentRepairHistoryResponse> repairHistoryResponses = equipmentBreakdownService.getEquipmentRepairHistories(workCenterId, workLineId, repairCodeId, fromDate, toDate);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getEquipmentRepairHistories.");
         return new ResponseEntity<>(repairHistoryResponses, HttpStatus.OK);
