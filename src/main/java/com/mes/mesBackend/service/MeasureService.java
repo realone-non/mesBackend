@@ -2,6 +2,7 @@ package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.MeasureRequest;
 import com.mes.mesBackend.dto.response.MeasureResponse;
+import com.mes.mesBackend.entity.Measure;
 import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,4 +22,6 @@ public interface MeasureService {
     MeasureResponse updateMeasure(Long id, MeasureRequest measureRequest) throws NotFoundException;
     // 계측기 삭제
     void deleteMeasure(Long id) throws NotFoundException;
+    // 계측기 단일 조회 및 예외
+    Measure getMeasureOrThrow(Long id) throws NotFoundException;
 }

@@ -107,6 +107,7 @@ public class EquipmentBreakdownServiceImpl implements EquipmentBreakdownService 
         String afterFileName = "equipment-breakdown/" + equipmentBreakdownId + "/after/";
         List<EquipmentBreakdownFile> fileList = new ArrayList<>();
 
+
         // fileDivision false 면 수리전, true 면 수리 후
         if (fileDivision) {
             for (MultipartFile afterFile : files) {
@@ -141,6 +142,14 @@ public class EquipmentBreakdownServiceImpl implements EquipmentBreakdownService 
     private EquipmentBreakdown getEquipmentBreakdownOrThrow(Long id) throws NotFoundException {
         return equipmentBreakdownRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("equipmentBreakdown does not exist. input id: " + id));
+    }
+
+    // 설비고장 파일 리스트 조회
+    @Override
+    public List<EquipmentBreakdownFileResponse> getFilesToEquipmentBreakdown(Long equipmentBreakdownId, boolean fileDivision) throws NotFoundException {
+        EquipmentBreakdown equipmentBreakdown = getEquipmentBreakdownOrThrow(equipmentBreakdownId);
+        if (fileDivision) return equipmentBreakdownRepo.findAfterFileResponsesByEquipmentBreakdownId(equipmentBreakdown.getId());   // 수리 후 파일
+        else return equipmentBreakdownRepo.findBeforeFileResponsesByEquipmentBreakdownId(equipmentBreakdown.getId());   // 수리 전 파일
     }
 
     // ============================================== 수리항목 ==============================================

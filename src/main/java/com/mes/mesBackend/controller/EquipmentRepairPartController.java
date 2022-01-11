@@ -1,6 +1,5 @@
 package com.mes.mesBackend.controller;
 
-import com.mes.mesBackend.dto.response.EquipmentRepairHistoryResponse;
 import com.mes.mesBackend.dto.response.EquipmentRepairPartResponse;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;

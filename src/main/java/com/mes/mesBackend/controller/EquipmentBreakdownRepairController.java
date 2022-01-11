@@ -2,10 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.EquipmentBreakdownRequest;
 import com.mes.mesBackend.dto.request.RepairPartRequest;
-import com.mes.mesBackend.dto.response.EquipmentBreakdownResponse;
-import com.mes.mesBackend.dto.response.RepairItemResponse;
-import com.mes.mesBackend.dto.response.RepairPartResponse;
-import com.mes.mesBackend.dto.response.RepairWorkerResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
@@ -166,7 +163,6 @@ public class EquipmentBreakdownRepairController {
     ) throws NotFoundException, IOException, BadRequestException {
         EquipmentBreakdownResponse equipmentBreakdownResponse = equipmentBreakdownService.createFilesToEquipmentBreakdown(equipmentBreakdownId, fileDivision, files);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        // TODO(파일 아이디 가져오기)
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + equipmentBreakdownResponse.getId() + " from createFilesToEquipmentBreakdown.");
         return new ResponseEntity<>(equipmentBreakdownResponse, HttpStatus.OK);
     }
@@ -190,6 +186,28 @@ public class EquipmentBreakdownRepairController {
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + fileId + " from deleteFileToEquipmentBreakdown.");
         return new ResponseEntity(NO_CONTENT);
+    }
+
+    // 설비 고장 파일 조회
+    @GetMapping(value = "/{equipment-breakdown-id}/files")
+    @ResponseBody
+    @Operation(summary = "설비고장 파일 조회")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    public ResponseEntity<List<EquipmentBreakdownFileResponse>> getFilesToEquipmentBreakdown(
+            @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
+            @RequestParam @Parameter(description = "수리전 false, 수리후 true") boolean fileDivision,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        List<EquipmentBreakdownFileResponse> fileResponse = equipmentBreakdownService.getFilesToEquipmentBreakdown(equipmentBreakdownId, fileDivision);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed from getFilesToEquipmentBreakdown.");
+        return new ResponseEntity<>(fileResponse, HttpStatus.OK);
     }
 
     // ============================================== 수리항목 ==============================================
