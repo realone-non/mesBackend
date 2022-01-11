@@ -320,4 +320,16 @@ public class EquipmentBreakdownServiceImpl implements EquipmentBreakdownService 
     ) {
         return equipmentBreakdownRepo.findEquipmentRepairHistoryResponseByCondition(workCenterId, workLineId, repairCodeId, fromDate, toDate);
     }
+    // ============================================== 17-4. 설비 수리부품 내역 조회 ==============================================
+    // 설비 수리부품 내역 조회, 검색조건: 작업장 id, 설비유형(작업라인 id), 수리항목(수리코드 id), 작업기간 fromDate~toDate
+    @Override
+    public List<EquipmentRepairPartResponse> getEquipmentRepairParts(
+            Long workCenterId,
+            Long workLineId,
+            Long repairCodeId,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) {
+        return equipmentBreakdownRepo.findEquipmentRepairPartResopnsesByCondition(workCenterId, workLineId, repairCodeId, fromDate, toDate);
+    }
 }
