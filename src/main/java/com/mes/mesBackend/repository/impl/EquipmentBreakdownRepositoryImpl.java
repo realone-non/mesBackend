@@ -3,6 +3,7 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.EquipmentBreakdownFileResponse;
 import com.mes.mesBackend.dto.response.EquipmentBreakdownResponse;
 import com.mes.mesBackend.dto.response.EquipmentRepairHistoryResponse;
+import com.mes.mesBackend.dto.response.EquipmentRepairPartResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.EquipmentBreakdownRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -188,6 +189,53 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                         isRepairItemDeleteYnFalse()
                 )
                 .fetch();
+    }
+
+    // ============================================== 17-4. 설비 수리부품 내역 조회 ==============================================
+    // 설비 수리부품 내역 조회, 검색조건: 작업장 id, 설비유형(작업라인 id), 수리항목(수리코드 id), 작업기간 fromDate~toDate
+    @Override
+    public List<EquipmentRepairPartResponse> findEquipmentRepairPartResopnsesByCondition(
+            Long workCenterId,
+            Long workLineId,
+            Long repairCodeId,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                EquipmentRepairPartResponse.class,
+                                equipmentBreakdown.id.as("equipmentBreakdownId"),
+                                equipmentBreakdown.breakDownDate.as("breakdownDate"),
+                                equipment.equipmentCode.as("equipmentCode"),
+                                equipment.equipmentName.as("equipmentName"),
+                                workLine.workLineName.as("equipmentType"),
+                                workCenter.workCenterName.as("workCenterName"),
+                                equipmentBreakdown.repairStartDate.as("repairStartDate"),
+                                equipmentBreakdown.repairEndDate.as("repairEndDate"),
+                                repairPart.repairPart.as("repairPart"),
+                                repairPart.repairPartName.as("repairPartName"),
+                                repairPart.amount.as("amount"),
+                                repairPart.note.as("note")
+                        )
+                )
+                .from(repairPart)
+                .innerJoin(equipmentBreakdown).on(equipmentBreakdown.id.eq(repairPart.repairItem.equipmentBreakdown.id))
+                .leftJoin(equipment).on(equipment.id.eq(equipmentBreakdown.equipment.id))
+                .leftJoin(workLine).on(workLine.id.eq(equipmentBreakdown.equipment.workLine.id))
+                .leftJoin(workCenter).on(workCenter.id.eq(equipmentBreakdown.workCenter.id))
+                .where(
+                        isWorkCenterEq(workCenterId),
+                        isEquipmentTypeContain(workLineId),
+                        isRepairItemEq(repairCodeId),
+                        isWorkDateBetween(fromDate, toDate),
+                        isEquipmentBreakdownDeleteYnFalse(),
+                        isRepairPartDeleteYn()
+                )
+                .fetch();
+    }
+    private BooleanExpression isRepairPartDeleteYn() {
+        return repairPart.deleteYn.isFalse();
     }
 
     // 수리코드 조회
