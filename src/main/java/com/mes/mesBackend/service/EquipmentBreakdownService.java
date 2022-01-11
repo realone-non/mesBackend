@@ -27,6 +27,8 @@ public interface EquipmentBreakdownService {
     EquipmentBreakdownResponse createFilesToEquipmentBreakdown(Long equipmentBreakdownId, boolean fileDivision, List<MultipartFile> files) throws NotFoundException, BadRequestException, IOException;
     // 설비고장 파일 삭제
     void deleteFileToEquipmentBreakdown(Long equipmentBreakdownId, Long fileId) throws NotFoundException;
+    // 설비고장 파일 list 조회
+    List<EquipmentBreakdownFileResponse> getFilesToEquipmentBreakdown(Long equipmentBreakdownId, boolean fileDivision) throws NotFoundException;
     // ============================================== 수리항목 ==============================================
     // 수리항목 생성
     RepairItemResponse createRepairItem(Long equipmentBreakdownId, Long repairCodeId) throws NotFoundException;

@@ -84,7 +84,8 @@ public class MeasureServiceImpl implements MeasureService {
     }
 
     // 계측기 단일 조회 및 예외
-    private Measure getMeasureOrThrow(Long id) throws NotFoundException {
+    @Override
+    public Measure getMeasureOrThrow(Long id) throws NotFoundException {
         return measureRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("measure does not exist. input id: " + id));
     }
