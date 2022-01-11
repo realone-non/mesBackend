@@ -63,4 +63,7 @@ public interface EquipmentBreakdownService {
     // ============================================== 17-3. 설비 수리내역 조회 ==============================================
     // 설비 수리내역 리스트 조회, 검색조건: 작업장 id, 설비유형, 수리항목, 작업기간 fromDate~toDate
     List<EquipmentRepairHistoryResponse> getEquipmentRepairHistories(Long workCenterId, Long workLineId, Long repairCodeId, LocalDate fromDate, LocalDate toDate);
+    // ============================================== 17-4. 설비 수리부품 내역 조회 ==============================================
+    // 설비 수리부품 내역 조회, 검색조건: 작업장 id, 설비유형(작업라인 id), 수리항목(수리코드 id), 작업기간 fromDate~toDate
+    List<EquipmentRepairPartResponse> getEquipmentRepairParts(Long workCenterId, Long workLineId, Long repairCodeId, LocalDate fromDate, LocalDate toDate);
 }
