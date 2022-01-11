@@ -270,6 +270,7 @@ public class MapperConfig {
             Equipment equipment = context.getSource();
             EquipmentResponse response = modelMapper.map(equipment, EquipmentResponse.class);
             response.setEquipmentType(equipment.getWorkLine().getWorkLineName());
+            return response;
         }
     };
 
