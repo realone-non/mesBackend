@@ -38,4 +38,19 @@ public class RepairPart extends BaseTimeEntity {
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;
+
+    public void add(RepairItem repairItem) {
+        setRepairItem(repairItem);
+    }
+
+    public void update(RepairPart newRepairPart) {
+        setRepairPart(newRepairPart.repairPart);
+        setRepairPartName(newRepairPart.repairPartName);
+        setAmount(newRepairPart.amount);
+        setNote(newRepairPart.note);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

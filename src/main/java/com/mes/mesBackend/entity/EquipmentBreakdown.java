@@ -87,4 +87,28 @@ public class EquipmentBreakdown extends BaseTimeEntity {
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;
+
+    public void add(Equipment equipment, WorkCenter workCenter) {
+        setEquipment(equipment);
+        setWorkCenter(workCenter);
+    }
+
+    public void update(EquipmentBreakdown newEquipmentBreakdown, Equipment newEquipment, WorkCenter newWorkCenter) {
+        setBreakDownDate(newEquipmentBreakdown.breakDownDate);
+        setEquipment(newEquipment);
+        setReportDate(newEquipmentBreakdown.reportDate);
+        setRequestBreakType(newEquipmentBreakdown.requestBreakType);
+        setBreakNote(newEquipmentBreakdown.breakNote);
+        setBreakReason(newEquipmentBreakdown.breakReason);
+        setCauseOfFailure(newEquipmentBreakdown.causeOfFailure);
+        setArrivalDate(newEquipmentBreakdown.arrivalDate);
+        setRepairStartDate(newEquipmentBreakdown.repairStartDate);
+        setRepairEndDate(newEquipmentBreakdown.repairEndDate);
+        setNote(newEquipmentBreakdown.note);
+        setWorkCenter(newWorkCenter);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }

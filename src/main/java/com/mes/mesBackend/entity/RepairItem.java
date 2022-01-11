@@ -32,4 +32,17 @@ public class RepairItem extends BaseTimeEntity {
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;
+
+    public void add(EquipmentBreakdown equipmentBreakdown) {
+        setEquipmentBreakdown(equipmentBreakdown);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
+
+    public void update(RepairItem newRepairItem) {
+        setRepairCode(newRepairItem.repairCode);
+        setRepairContent(newRepairItem.getRepairContent());
+    }
 }

@@ -35,4 +35,22 @@ public class EquipmentBreakdownFile extends BaseTimeEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "EQUIPMENT_BREAKDOWN", columnDefinition = "bigint COMMENT '설비고장수리내역'", nullable = false)
     private EquipmentBreakdown equipmentBreakdown;
+
+    public void putAfterFile(EquipmentBreakdown equipmentBreakdown, String afterFileUrl) {
+        setEquipmentBreakdown(equipmentBreakdown);
+        setAfterFileYn(true);
+        setBeforeFileYn(false);
+        setFileUrl(afterFileUrl);
+    }
+
+    public void putBeforeFile(EquipmentBreakdown equipmentBreakdown, String beforeFileUrl) {
+        setEquipmentBreakdown(equipmentBreakdown);
+        setAfterFileYn(false);
+        setBeforeFileYn(true);
+        setFileUrl(beforeFileUrl);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }
