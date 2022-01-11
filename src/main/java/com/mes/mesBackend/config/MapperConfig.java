@@ -38,6 +38,7 @@ public class MapperConfig {
         modelMapper.addConverter(toContractItemResponse);
         modelMapper.addConverter(contractToProduceOrderConverter);
         modelMapper.addConverter(contractItemToProduceOrderConverter);
+        modelMapper.addConverter(equipmentToResponse);
         modelMapper.addConverter(toOutsourcingInputConverter);
 
         return modelMapper;
@@ -260,6 +261,18 @@ public class MapperConfig {
             return produceOrder;
         }
     };
+
+
+    Converter<Equipment, EquipmentResponse> equipmentToResponse = new Converter<Equipment, EquipmentResponse>() {
+        @Override
+        public EquipmentResponse convert(MappingContext<Equipment, EquipmentResponse> context) {
+            ModelMapper modelMapper = new ModelMapper();
+            Equipment equipment = context.getSource();
+            EquipmentResponse response = modelMapper.map(equipment, EquipmentResponse.class);
+            response.setEquipmentType(equipment.getWorkLine().getWorkLineName());
+        }
+    };
+
 
     //LOT마스터 외주입고 LOT정보 변환
     Converter<LotMaster, OutsourcingInputLOTResponse> toOutsourcingInputConverter = new Converter<LotMaster, OutsourcingInputLOTResponse>() {

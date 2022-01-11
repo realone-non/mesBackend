@@ -1,11 +1,11 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.EquipmentBreakdownRequest;
-import com.mes.mesBackend.dto.request.RepairItemRequest;
 import com.mes.mesBackend.dto.request.RepairPartRequest;
 import com.mes.mesBackend.dto.response.EquipmentBreakdownResponse;
 import com.mes.mesBackend.dto.response.RepairItemResponse;
 import com.mes.mesBackend.dto.response.RepairPartResponse;
+import com.mes.mesBackend.dto.response.RepairWorkerResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
@@ -69,17 +69,17 @@ public class EquipmentBreakdownRepairController {
     }
 
     // 설비고장 리스트 검색 조회, 검색조건: 작업장 id, 설비유형, 작업기간 fromDate~toDate
-    @Operation(summary = "설비고장 리스트 조회", description = "검색조건: 작업장 id, 설비유형, 작업기간 fromDate~toDate")
+    @Operation(summary = "설비고장 리스트 조회", description = "검색조건: 작업장 id, 설비유형(작업라인 id), 작업기간 fromDate~toDate")
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<EquipmentBreakdownResponse>> getEquipmentBreakdowns(
             @RequestParam(required = false) @Parameter(description = "작업장 id") Long workCenterId,
-            @RequestParam(required = false) @Parameter(description = "설비유형") String equipmentType,
+            @RequestParam(required = false) @Parameter(description = "설비유형(작업라인 id)") Long workLineId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 toDate") LocalDate toDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<EquipmentBreakdownResponse> equipmentBreakdownResponses = equipmentBreakdownService.getEquipmentBreakdowns(workCenterId, equipmentType, fromDate, toDate);
+        List<EquipmentBreakdownResponse> equipmentBreakdownResponses = equipmentBreakdownService.getEquipmentBreakdowns(workCenterId, workLineId, fromDate, toDate);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getEquipmentBreakdowns.");
         return new ResponseEntity<>(equipmentBreakdownResponses, HttpStatus.OK);
@@ -206,10 +206,10 @@ public class EquipmentBreakdownRepairController {
     )
     public ResponseEntity<RepairItemResponse> createRepairItem(
             @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
-            @Valid @RequestBody RepairItemRequest repairItemRequest,
+            @RequestParam @Parameter(description = "수리코드 id") Long repairCodeId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        RepairItemResponse repairItemResponse = equipmentBreakdownService.createRepairItem(equipmentBreakdownId, repairItemRequest);
+        RepairItemResponse repairItemResponse = equipmentBreakdownService.createRepairItem(equipmentBreakdownId, repairCodeId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + repairItemResponse.getId() + " from createRepairItem.");
         return new ResponseEntity<>(repairItemResponse, HttpStatus.OK);
@@ -230,7 +230,7 @@ public class EquipmentBreakdownRepairController {
     }
 
     // 수리항목 단일 조회
-    @GetMapping("/{equipment-breakdown-id}/repair-items/{repair-item-id}")
+    @GetMapping("/{equipment-breakdown-id}/repair-items/{repair-worker-id}")
     @ResponseBody
     @Operation(summary = "수리항목 단일 조회")
     @ApiResponses(
@@ -241,7 +241,7 @@ public class EquipmentBreakdownRepairController {
     )
     public ResponseEntity<RepairItemResponse> getRepairItem(
             @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
-            @PathVariable(value = "repair-item-id") @Parameter(description = "수리항목 id") Long repairItemId,
+            @PathVariable(value = "repair-worker-id") @Parameter(description = "수리항목 id") Long repairItemId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         RepairItemResponse repairItemResponse = equipmentBreakdownService.getRepairItemResponse(equipmentBreakdownId, repairItemId);
@@ -251,7 +251,7 @@ public class EquipmentBreakdownRepairController {
     }
 
     // 수리항목 수정
-    @PatchMapping("/{equipment-breakdown-id}/repair-items/{repair-item-id}")
+    @PatchMapping("/{equipment-breakdown-id}/repair-items/{repair-worker-id}")
     @ResponseBody
     @Operation(summary = "수리항목 수정")
     @ApiResponses(
@@ -263,18 +263,18 @@ public class EquipmentBreakdownRepairController {
     )
     public ResponseEntity<RepairItemResponse> updateRepairItem(
             @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
-            @PathVariable(value = "repair-item-id") @Parameter(description = "수리항목 id") Long repairItemId,
-            @RequestBody @Valid RepairItemRequest repairItemRequest,
+            @PathVariable(value = "repair-worker-id") @Parameter(description = "수리항목 id") Long repairItemId,
+            @RequestParam @Parameter(description = "수리코드 id") Long repairCodeId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        RepairItemResponse repairItemResponse = equipmentBreakdownService.updateRepairItem(equipmentBreakdownId, repairItemId, repairItemRequest);
+        RepairItemResponse repairItemResponse = equipmentBreakdownService.updateRepairItem(equipmentBreakdownId, repairItemId, repairCodeId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + repairItemResponse.getId() + " from updateRepairItem.");
         return new ResponseEntity<>(repairItemResponse, HttpStatus.OK);
     }
 
     // 수리항목 삭제
-    @DeleteMapping("/{equipment-breakdown-id}/repair-items/{repair-item-id}")
+    @DeleteMapping("/{equipment-breakdown-id}/repair-items/{repair-worker-id}")
     @ResponseBody()
     @Operation(summary = "수리항목 삭제")
     @ApiResponses(
@@ -285,7 +285,7 @@ public class EquipmentBreakdownRepairController {
     )
     public ResponseEntity<Void> deleteRepairItem(
             @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
-            @PathVariable(value = "repair-item-id") @Parameter(description = "수리항목 id") Long repairItemId,
+            @PathVariable(value = "repair-worker-id") @Parameter(description = "수리항목 id") Long repairItemId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         equipmentBreakdownService.deleteRepairItem(equipmentBreakdownId, repairItemId);
@@ -296,7 +296,7 @@ public class EquipmentBreakdownRepairController {
 
     // ============================================== 수리부품정보 ==============================================
     // 수리부품 생성
-    @PostMapping("/{equipment-breakdown-id}/repair-items/{repair-item-id}/repair-parts")
+    @PostMapping("/{equipment-breakdown-id}/repair-items/{repair-worker-id}/repair-parts")
     @ResponseBody
     @Operation(summary = "수리부품 생성")
     @ApiResponses(
@@ -308,7 +308,7 @@ public class EquipmentBreakdownRepairController {
     )
     public ResponseEntity<RepairPartResponse> createRepairPart(
             @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
-            @PathVariable(value = "repair-item-id") @Parameter(description = "수리항목 id") Long repairItemId,
+            @PathVariable(value = "repair-worker-id") @Parameter(description = "수리항목 id") Long repairItemId,
             @Valid @RequestBody RepairPartRequest repairPartRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
@@ -319,12 +319,12 @@ public class EquipmentBreakdownRepairController {
     }
 
     // 수리부품 리스트 조회
-    @GetMapping("/{equipment-breakdown-id}/repair-items/{repair-item-id}/repair-parts")
+    @GetMapping("/{equipment-breakdown-id}/repair-items/{repair-worker-id}/repair-parts")
     @ResponseBody
     @Operation(summary = "수리부품 전체 조회", description = "검색조건: 수리부품그룹, 수리부품계정, 품번, 품명, 검색어")
     public ResponseEntity<List<RepairPartResponse>> getRepairParts(
             @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
-            @PathVariable(value = "repair-item-id") @Parameter(description = "수리항목 id") Long repairItemId,
+            @PathVariable(value = "repair-worker-id") @Parameter(description = "수리항목 id") Long repairItemId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<RepairPartResponse> repairPartResponses = equipmentBreakdownService.getRepairPartResponses(equipmentBreakdownId, repairItemId);
@@ -334,7 +334,7 @@ public class EquipmentBreakdownRepairController {
     }
 
     // 수리부품 단일 조회
-    @GetMapping("/{equipment-breakdown-id}/repair-items/{repair-item-id}/repair-parts/{repair-part-id}")
+    @GetMapping("/{equipment-breakdown-id}/repair-items/{repair-worker-id}/repair-parts/{repair-part-id}")
     @ResponseBody()
     @Operation(summary = "수리부품 조회")
     @ApiResponses(
@@ -345,7 +345,7 @@ public class EquipmentBreakdownRepairController {
     )
     public ResponseEntity<RepairPartResponse> getRepairPart(
             @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
-            @PathVariable(value = "repair-item-id") @Parameter(description = "수리항목 id") Long repairItemId,
+            @PathVariable(value = "repair-worker-id") @Parameter(description = "수리항목 id") Long repairItemId,
             @PathVariable(value = "repair-part-id") @Parameter(description = "수리부품 id") Long repairPartId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
@@ -356,7 +356,7 @@ public class EquipmentBreakdownRepairController {
     }
 
     // 수리부품 수정
-    @PatchMapping("/{equipment-breakdown-id}/repair-items/{repair-item-id}/repair-parts/{repair-part-id}")
+    @PatchMapping("/{equipment-breakdown-id}/repair-items/{repair-worker-id}/repair-parts/{repair-part-id}")
     @ResponseBody()
     @Operation(summary = "수리부품 수정")
     @ApiResponses(
@@ -368,7 +368,7 @@ public class EquipmentBreakdownRepairController {
     )
     public ResponseEntity<RepairPartResponse> updateRepairPart(
             @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
-            @PathVariable(value = "repair-item-id") @Parameter(description = "수리항목 id") Long repairItemId,
+            @PathVariable(value = "repair-worker-id") @Parameter(description = "수리항목 id") Long repairItemId,
             @PathVariable(value = "repair-part-id") @Parameter(description = "수리부품 id") Long repairPartId,
             @RequestBody @Valid RepairPartRequest repairPartRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
@@ -380,7 +380,7 @@ public class EquipmentBreakdownRepairController {
     }
 
     // 수리부품 삭제
-    @DeleteMapping("/{equipment-breakdown-id}/repair-items/{repair-item-id}/repair-parts/{repair-part-id}")
+    @DeleteMapping("/{equipment-breakdown-id}/repair-items/{repair-worker-id}/repair-parts/{repair-part-id}")
     @ResponseBody()
     @Operation(summary = "수리부품 삭제")
     @ApiResponses(
@@ -391,7 +391,7 @@ public class EquipmentBreakdownRepairController {
     )
     public ResponseEntity<Void> deleteRepairPart(
             @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
-            @PathVariable(value = "repair-item-id") @Parameter(description = "수리항목 id") Long repairItemId,
+            @PathVariable(value = "repair-worker-id") @Parameter(description = "수리항목 id") Long repairItemId,
             @PathVariable(value = "repair-part-id") @Parameter(description = "수리부품 id") Long repairPartId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
@@ -402,5 +402,105 @@ public class EquipmentBreakdownRepairController {
     }
 
     // ============================================== 수리작업자 정보 ==============================================
-    // TODO(협의 후 진행 작업보류)
+    // 수리작업자 생성
+    @PostMapping("/{equipment-breakdown-id}/repair-workers")
+    @ResponseBody
+    @Operation(summary = "수리작업자 생성")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    public ResponseEntity<RepairWorkerResponse> createRepairWorker(
+            @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
+            @RequestParam @Parameter(description = "작업자 id") Long userId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        RepairWorkerResponse repairWorkerResponse = equipmentBreakdownService.createRepairWorker(equipmentBreakdownId, userId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + repairWorkerResponse.getId() + " from createRepairWorker.");
+        return new ResponseEntity<>(repairWorkerResponse, HttpStatus.OK);
+    }
+
+    // 수리작업자 전체 조회
+    @GetMapping("/{equipment-breakdown-id}/repair-workers")
+    @ResponseBody
+    @Operation(summary = "수리작업자 전체 조회", description = "")
+    public ResponseEntity<List<RepairWorkerResponse>> getRepairWorkers(
+            @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        List<RepairWorkerResponse> repairWorkerResponses = equipmentBreakdownService.getRepairWorkerResponses(equipmentBreakdownId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list from getRepairWorkers.");
+        return new ResponseEntity<>(repairWorkerResponses, HttpStatus.OK);
+    }
+
+    // 수리작업자 단일 조회
+    @GetMapping("/{equipment-breakdown-id}/repair-workers/{repair-worker-id}")
+    @ResponseBody
+    @Operation(summary = "수리작업자 단일 조회")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+            }
+    )
+    public ResponseEntity<RepairWorkerResponse> getRepairWorker(
+            @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
+            @PathVariable(value = "repair-worker-id") @Parameter(description = "수리작업자 id") Long repairWorkerId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        RepairWorkerResponse repairWorkerResponse = equipmentBreakdownService.getRepairWorkerResponse(equipmentBreakdownId, repairWorkerId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + repairWorkerResponse.getId() + " from getRepairWorker.");
+        return new ResponseEntity<>(repairWorkerResponse, HttpStatus.OK);
+    }
+
+    // 수리작업자 수정
+    @PatchMapping("/{equipment-breakdown-id}/repair-workers/{repair-worker-id}")
+    @ResponseBody
+    @Operation(summary = "수리작업자 수정")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    public ResponseEntity<RepairWorkerResponse> updateRepairWorker(
+            @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
+            @PathVariable(value = "repair-worker-id") @Parameter(description = "수리작업자 id") Long repairWorkerId,
+            @RequestParam @Parameter(description = "작업자  id") Long userId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException, BadRequestException {
+        RepairWorkerResponse repairWorkerResponse = equipmentBreakdownService.updateRepairWorker(equipmentBreakdownId, repairWorkerId, userId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + repairWorkerResponse.getId() + " from updateRepairWorker.");
+        return new ResponseEntity<>(repairWorkerResponse, HttpStatus.OK);
+    }
+
+    // 수리작업자 삭제
+    @DeleteMapping("/{equipment-breakdown-id}/repair-workers/{repair-worker-id}")
+    @ResponseBody()
+    @Operation(summary = "수리작업자 삭제")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "204", description = "no content"),
+                    @ApiResponse(responseCode = "404", description = "not found resource")
+            }
+    )
+    public ResponseEntity<Void> deleteRepairWorker(
+            @PathVariable(value = "equipment-breakdown-id") @Parameter(description = "설비고장 id") Long equipmentBreakdownId,
+            @PathVariable(value = "repair-worker-id") @Parameter(description = "수리작업자 id") Long repairWorkerId,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        equipmentBreakdownService.deleteRepairWorker(equipmentBreakdownId, repairWorkerId);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + repairWorkerId + " from deleteRepairWorker.");
+        return new ResponseEntity(NO_CONTENT);
+    }
+
 }

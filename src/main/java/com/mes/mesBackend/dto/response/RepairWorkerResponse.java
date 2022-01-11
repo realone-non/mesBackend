@@ -7,15 +7,15 @@ import lombok.Setter;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
-// 17-2. 설비고장 수리내역 등록 수리항목
+// 17-2. 설비고장 수리내역 등록 수리작업자 정보
 @Getter
 @Setter
 @JsonInclude(NON_NULL)
-@Schema(description = "수리항목")
-public class RepairItemResponse {
+@Schema(description = "수리작업자")
+public class RepairWorkerResponse {
     @Schema(description = "고유아이디")
     Long id;
 
-    @Schema(description = "수리코드")
-    RepairCodeResponse repairCode;
+    @Schema(description = "작업자")
+    UserResponse.idAndCodeAndName user;
 }

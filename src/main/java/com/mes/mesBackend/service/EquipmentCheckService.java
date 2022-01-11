@@ -12,7 +12,7 @@ import java.util.List;
 public interface EquipmentCheckService {
     // 설비 리스트 조회
     // 검색조건: 설비유형, 점검유형(보류), 작업기간(디테일 정보 생성날짜 기준) fromDate~toDate
-    List<EquipmentCheckResponse> getEquipmentChecks(String equipmentType, LocalDate fromDate, LocalDate toDate);
+    List<EquipmentCheckResponse> getEquipmentChecks(Long workLineId, LocalDate fromDate, LocalDate toDate);
     // 설비 단일 조회
     EquipmentCheckResponse getEquipmentCheckResponse(Long equipmentId) throws NotFoundException;
 

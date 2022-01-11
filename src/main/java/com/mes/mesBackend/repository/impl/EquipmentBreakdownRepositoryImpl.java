@@ -2,10 +2,7 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.EquipmentBreakdownFileResponse;
 import com.mes.mesBackend.dto.response.EquipmentBreakdownResponse;
-import com.mes.mesBackend.entity.QEquipment;
-import com.mes.mesBackend.entity.QEquipmentBreakdown;
-import com.mes.mesBackend.entity.QEquipmentBreakdownFile;
-import com.mes.mesBackend.entity.QWorkCenter;
+import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.EquipmentBreakdownRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -26,10 +23,11 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
     final QEquipmentBreakdown equipmentBreakdown = QEquipmentBreakdown.equipmentBreakdown;
     final QWorkCenter workCenter = QWorkCenter.workCenter;
     final QEquipmentBreakdownFile equipmentBreakdownFile = QEquipmentBreakdownFile.equipmentBreakdownFile;
+    final QWorkLine workLine = QWorkLine.workLine;
 
     // 설비고장 리스트 검색 조회, 검색조건: 작업장 id, 설비유형, 작업기간 fromDate~toDate
     @Override
-    public List<EquipmentBreakdownResponse> findEquipmentBreakdownResponsesByCondition(Long workCenterId, String equipmentType, LocalDate fromDate, LocalDate toDate) {
+    public List<EquipmentBreakdownResponse> findEquipmentBreakdownResponsesByCondition(Long workCenterId, Long workLineId, LocalDate fromDate, LocalDate toDate) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -39,7 +37,7 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                                 equipment.id.as("equipmentId"),
                                 equipment.equipmentCode.as("equipmentCode"),
                                 equipment.equipmentName.as("equipmentName"),
-                                equipment.equipmentType.as("equipmentType"),
+                                workLine.workLineName.as("equipmentType"),
                                 equipmentBreakdown.reportDate.as("reportDate"),
                                 equipmentBreakdown.requestBreakType.as("requestBreakType"),
                                 equipmentBreakdown.breakNote.as("breakNote"),
@@ -56,9 +54,10 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                 .from(equipmentBreakdown)
                 .leftJoin(equipment).on(equipment.id.eq(equipmentBreakdown.equipment.id))
                 .leftJoin(workCenter).on(workCenter.id.eq(equipmentBreakdown.workCenter.id))
+                .leftJoin(workLine).on(workLine.id.eq(equipment.workLine.id))
                 .where(
                         isWorkCenterEq(workCenterId),
-                        isEquipmentTypeContain(equipmentType),
+                        isEquipmentTypeContain(workLineId),
                         isWorkDateBetween(fromDate, toDate),
                         isEquipmentBreakdownDeleteYnFalse()
                 )
@@ -78,7 +77,7 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                                         equipment.id.as("equipmentId"),
                                         equipment.equipmentCode.as("equipmentCode"),
                                         equipment.equipmentName.as("equipmentName"),
-                                        equipment.equipmentType.as("equipmentType"),
+                                        workLine.workLineName.as("equipmentType"),
                                         equipmentBreakdown.reportDate.as("reportDate"),
                                         equipmentBreakdown.requestBreakType.as("requestBreakType"),
                                         equipmentBreakdown.breakNote.as("breakNote"),
@@ -95,6 +94,7 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                         .from(equipmentBreakdown)
                         .leftJoin(equipment).on(equipment.id.eq(equipmentBreakdown.equipment.id))
                         .leftJoin(workCenter).on(workCenter.id.eq(equipmentBreakdown.workCenter.id))
+                        .leftJoin(workLine).on(workLine.id.eq(equipment.workLine.id))
                         .where(
                                 isEquipmentBreakdownIdEq(equipmentBreakdownId),
                                 isEquipmentBreakdownDeleteYnFalse()
@@ -150,8 +150,8 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
     }
 
     // 설비유형
-    private BooleanExpression isEquipmentTypeContain(String equipmentType) {
-        return equipmentType != null ? equipment.equipmentType.contains(equipmentType) : null;
+    private BooleanExpression isEquipmentTypeContain(Long equipmentType) {
+        return equipmentType != null ? workLine.id.eq(equipmentType) : null;
     }
     // 작업기간 fromDate~toDate
     private BooleanExpression isWorkDateBetween(LocalDate fromDate, LocalDate toDate) {
