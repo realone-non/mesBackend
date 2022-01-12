@@ -2,7 +2,6 @@ package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.response.WorkOrderStateDetailResponse;
 import com.mes.mesBackend.dto.response.WorkOrderStateResponse;
-import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.NotFoundException;
 
@@ -25,7 +24,7 @@ public interface WorkOrderStateService {
     // 작업지시 단일 조회
     WorkOrderStateResponse getWorkOrderState(Long workOrderId) throws NotFoundException;
     // 작업지시 상태 이력 정보 리스트 조회
-    List<WorkOrderStateDetailResponse> getWorkOrderStateDetails(Long workOrderId) throws NotFoundException;
+    WorkOrderStateDetailResponse getWorkOrderStateDetail(Long workOrderId);
     // 작업지시 상태 이력 변경
-    void createWorkOrderStateDetail(WorkOrderDetail workOrderDetail);
+//    void createWorkOrderStateDetail(WorkOrderDetail workOrderDetail);
 }

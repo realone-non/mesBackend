@@ -55,7 +55,8 @@ public class WorkOrderStateController {
             @RequestParam(required = false) @Parameter(description = "수주번호") String contractNo,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<WorkOrderStateResponse> workOrderStates = workOrderStateService.getWorkOrderStates(workProcessId, workLineId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
+        List<WorkOrderStateResponse> workOrderStates =
+                workOrderStateService.getWorkOrderStates(workProcessId, workLineId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkOrderStates.");
         return new ResponseEntity<>(workOrderStates, HttpStatus.OK);
@@ -84,14 +85,14 @@ public class WorkOrderStateController {
     // 작업지시 상태 이력 정보 리스트 조회
     @GetMapping("/{work-order-id}/work-order-state-details")
     @ResponseBody
-    @Operation(summary = "작업지시 상태 이력 정보 리스트 조회")
-    public ResponseEntity<List<WorkOrderStateDetailResponse>> getWorkOrderStateDetails(
+    @Operation(summary = "작업지시 상태 이력 정보 조회")
+    public ResponseEntity<WorkOrderStateDetailResponse> getWorkOrderStateDetails(
             @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
-        List<WorkOrderStateDetailResponse> workOrderStateDetails = workOrderStateService.getWorkOrderStateDetails(workOrderId);
+    ) {
+        WorkOrderStateDetailResponse workOrderStateDetail = workOrderStateService.getWorkOrderStateDetail(workOrderId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkOrderStateDetails.");
-        return new ResponseEntity<>(workOrderStateDetails, HttpStatus.OK);
+        return new ResponseEntity<>(workOrderStateDetail, HttpStatus.OK);
     }
 }

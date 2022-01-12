@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Random;
 
 @Component
 public class S3Service implements S3Uploader {
@@ -58,7 +59,7 @@ public class S3Service implements S3Uploader {
     }
 
     private String datePath() {
-        String dateTimeFormat = "yyyyMMdd_HHmmss";
+        String dateTimeFormat = "yyyyMMdd_HHmmss_SSS";
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormat));
     }
 }

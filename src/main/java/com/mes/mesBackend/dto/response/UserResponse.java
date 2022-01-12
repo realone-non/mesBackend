@@ -59,4 +59,16 @@ public class UserResponse {
         @Schema(description = "이름")
         String korName;    // 이름
     }
+
+    @Getter
+    @Setter
+    @Schema(description = "직원")
+    public static class idAndCodeAndName {
+        @Schema(description = "고유아이디")
+        Long id;
+        @Schema(description = "사번")
+        String userCode;     // 사번
+        @Schema(description = "이름")
+        String korName;    // 이름
+    }
 }

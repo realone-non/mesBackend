@@ -4,7 +4,9 @@ import com.mes.mesBackend.auth.TokenResponse;
 import com.mes.mesBackend.auth.TokenRequest;
 import com.mes.mesBackend.dto.request.UserLogin;
 import com.mes.mesBackend.dto.request.UserCreateRequest;
+import com.mes.mesBackend.dto.request.UserRegistrationRequest;
 import com.mes.mesBackend.dto.request.UserUpdateRequest;
+import com.mes.mesBackend.dto.response.UserRegistrationResponse;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -40,4 +42,17 @@ public interface UserService {
     User getUserOrThrow(Long id) throws NotFoundException;
 
     TokenResponse reissue(TokenRequest tokenRequestDto) throws CustomJwtException;
+
+    // =============================== 18-3. 사용자 등록 ===============================
+    // 사용자 생성
+    UserRegistrationResponse createUserRegistration(UserRegistrationRequest userRegistrationRequest) throws BadRequestException, NotFoundException;
+    // 사용자 단일 조회
+    UserRegistrationResponse getUserRegistration(Long id) throws NotFoundException;
+    // 사용자 리스트 검색 조회
+    // 검색조건: 사용자 ID(사번), 이름, 공장(X)
+    List<UserRegistrationResponse> getUserRegistrations(String userCode, String korName);
+    // 사용자 수정
+    UserRegistrationResponse updateUserRegistration(Long id, UserRegistrationRequest userRegistrationRequest) throws NotFoundException;
+    // 사용자 삭제
+    void deleteUserRegistration(Long id) throws NotFoundException;
 }
