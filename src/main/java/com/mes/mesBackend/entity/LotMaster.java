@@ -99,8 +99,11 @@ public class LotMaster extends BaseTimeEntity {
     @Column(name = "SHIPMENT_AMOUNT", columnDefinition = "int COMMENT '출하수량'")
     private int shipmentAmount;     // 출하수량
 
-    @Column(name = "RETURN_AMOUNT", columnDefinition = "int COMMENT '반품수량'")
-    private int returnAmount;       // 반품수량
+    @Column(name = "BAD_ITEM_RETURN_AMOUNT", columnDefinition = "int COMMENT '불량품 반품수량'")
+    private int badItemReturnAmount;       // 반품수량
+
+    @Column(name = "STOCK_RETURN_AMOUNT", columnDefinition = "int COMMENT '정상품 반품수량'")
+    private int stockReturnAmount;       // 정상품 반품수량
 
     @Column(name = "CHECK_REQUEST_AMOUNT", columnDefinition = "int COMMENT '검사요청수량'")
     private int checkRequestAmount;     // 검사요청수량
