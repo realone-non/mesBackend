@@ -1,6 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.LotType;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -86,4 +88,13 @@ public class LotMasterResponse {
     @Schema(description = "생성일시")
     @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = "Asia/Seoul")
     LocalDateTime createdDate;
+
+    @JsonIgnore
+    int badItemReturnAmount;       // 반품수량
+    @JsonIgnore
+    int stockReturnAmount;       // 정상품 반품수량
+
+    public void setReturnAmounts() {
+        setReturnAmount(this.badItemReturnAmount + this.stockReturnAmount);
+    }
 }
