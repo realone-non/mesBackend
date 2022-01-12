@@ -166,7 +166,9 @@ public class LotMasterServiceImpl implements LotMasterService {
             Long lotTypeId,
             Boolean testingYn
     ) {
-        return lotMasterRepo.findLotMastersByCondition(itemGroupId, lotNo, itemNoAndItemName, wareHouseId, enrollmentType, stockYn, lotTypeId, testingYn);
+        List<LotMasterResponse> lotMasterResponses = lotMasterRepo.findLotMastersByCondition(itemGroupId, lotNo, itemNoAndItemName, wareHouseId, enrollmentType, stockYn, lotTypeId, testingYn);
+        lotMasterResponses.forEach(LotMasterResponse::setReturnAmounts);
+        return lotMasterResponses;
     }
 
     // lotMaster 단일 조회 및 예외

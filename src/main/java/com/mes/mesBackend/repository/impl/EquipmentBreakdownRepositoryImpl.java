@@ -224,6 +224,8 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                 .leftJoin(equipment).on(equipment.id.eq(equipmentBreakdown.equipment.id))
                 .leftJoin(workLine).on(workLine.id.eq(equipmentBreakdown.equipment.workLine.id))
                 .leftJoin(workCenter).on(workCenter.id.eq(equipmentBreakdown.workCenter.id))
+                .leftJoin(repairItem).on(repairItem.id.eq(repairPart.repairItem.id))
+                .leftJoin(repairCode).on(repairCode.id.eq(repairItem.repairCode.id))
                 .where(
                         isWorkCenterEq(workCenterId),
                         isEquipmentTypeContain(workLineId),
