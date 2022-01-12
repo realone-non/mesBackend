@@ -64,7 +64,8 @@ public class EquipmentMaintenanceServiceImpl implements EquipmentMaintenanceServ
     }
 
     // 설비 보전항목 단일 조회 및 예외
-    private EquipmentMaintenance getEquipmentMaintenanceOrThrow(Long id) throws NotFoundException {
+    @Override
+    public EquipmentMaintenance getEquipmentMaintenanceOrThrow(Long id) throws NotFoundException {
         return equipmentMaintenanceRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("equipment maintenance does not exist. input id: " + id));
     }

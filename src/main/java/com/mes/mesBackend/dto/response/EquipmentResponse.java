@@ -1,15 +1,19 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 @Getter
 @Setter
 @Schema(description = "설비")
+@JsonInclude(NON_NULL)
 public class EquipmentResponse {
     @Schema(description = "고유아이디")
     Long id;

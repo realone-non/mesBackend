@@ -7,18 +7,17 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.ItemFormRepository;
 import com.mes.mesBackend.service.ItemFormService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 // 품목형태
 @Service
+@RequiredArgsConstructor
 public class ItemFormServiceImpl implements ItemFormService {
-    @Autowired
-    ItemFormRepository itemFormRepository;
-    @Autowired
-    ModelMapper mapper;
+    private final ItemFormRepository itemFormRepository;
+    private final ModelMapper mapper;
 
     // 품목형태 생성
     @Override

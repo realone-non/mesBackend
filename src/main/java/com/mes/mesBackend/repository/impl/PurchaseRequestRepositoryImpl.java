@@ -141,6 +141,7 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                         isOrderCompletionEq(orderCompletion),
                         isDeleteYnFalse()
                 )
+                .orderBy(purchaseRequest.id.asc())
                 .fetch();
     }
 

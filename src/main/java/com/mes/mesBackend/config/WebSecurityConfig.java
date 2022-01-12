@@ -45,7 +45,7 @@ public class WebSecurityConfig extends
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration config = new CorsConfiguration();
 //                        config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-                        config.setAllowedOrigins(Arrays.asList("http://localhost:3000","http://dev-mes-grid.s3-website.ap-northeast-2.amazonaws.com"));
+                        config.setAllowedOrigins(Arrays.asList("http://localhost:3000","http://dev-mes-grid.s3-website.ap-northeast-2.amazonaws.com", "http://prod-mes-grid.s3-website.ap-northeast-2.amazonaws.com"));
                         config.setAllowedMethods(Collections.singletonList("*"));
                         config.setAllowCredentials(true);
                         config.setAllowedHeaders(Collections.singletonList("*"));
