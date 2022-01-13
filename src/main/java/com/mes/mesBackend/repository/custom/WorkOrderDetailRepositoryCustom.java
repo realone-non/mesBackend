@@ -75,4 +75,12 @@ public interface WorkOrderDetailRepositoryCustom {
 
     // 제조오더에 해당된 작업지시 정보의 지시수량 모두
     List<Integer> findOrderAmountsByProduceOrderId(Long produceOrderId);
+
+    // =============================================== pop ===============================================
+    // 작업지시 정보 리스트, 조건: 작업자, 작업공정
+    List<PopWorkOrderResponse> findPopWorkOrderResponsesByCondition(Long workProcessId, Long userId, LocalDate fromDate, LocalDate toDate);
+    // 작업지시 상세 정보
+    List<PopWorkOrderDetailResponse> findPopWorkOrderDetailResponsesByItemId(Long itemId);
+    // 수주수량
+    Integer findContractItemAmountByWorkOrderId(Long workOrderId);
 }
