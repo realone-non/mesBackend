@@ -13,9 +13,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +28,11 @@ import java.util.List;
 @RequestMapping("/measures")
 @RestController
 @SecurityRequirement(name = "Authorization")
+@RequiredArgsConstructor
 public class MeasureController {
-    @Autowired
-    MeasureService measureService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(MeasureController.class);
+    private final MeasureService measureService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(MeasureController.class);
     private CustomLogger cLogger;
 
     // 계측기 생성

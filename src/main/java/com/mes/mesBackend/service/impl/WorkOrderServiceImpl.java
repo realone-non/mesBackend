@@ -5,9 +5,11 @@ import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
 import com.mes.mesBackend.dto.response.WorkOrderResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.NumberAutomatic;
 import com.mes.mesBackend.mapper.ModelMapper;
+import com.mes.mesBackend.repository.ProduceOrderRepository;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
 import com.mes.mesBackend.service.*;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.OrderState.*;
+
+// 6-2. 작업지시 등록
 @Service
 @RequiredArgsConstructor
 public class WorkOrderServiceImpl implements WorkOrderService {
@@ -28,7 +33,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private final ModelMapper mapper;
     private final NumberAutomatic numberAutomatic;
     private final TestProcessService testProcessService;
-    private final WorkOrderStateService workOrderStateService;
+    private final ProduceOrderRepository produceOrderRepo;
 
 
     // 제조오더 정보 리스트 조회
@@ -48,7 +53,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
     // 작업지시 생성
     @Override
-    public WorkOrderResponse createWorkOrder(Long produceOrderId, WorkOrderRequest workOrderRequest) throws NotFoundException {
+    public WorkOrderResponse createWorkOrder(Long produceOrderId, WorkOrderRequest workOrderRequest) throws NotFoundException, BadRequestException {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
         WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(workOrderRequest.getWorkProcess());
         WorkLine workLine = workLineService.getWorkLineOrThrow(workOrderRequest.getWorkLine());
@@ -56,8 +61,16 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         Unit unit = unitService.getUnitOrThrow(workOrderRequest.getUnit());
         TestProcess testProcess = testProcessService.getTestProcessOrThrow(workOrderRequest.getTestProcess());
 
-        // orderAmount 가 0 이면 수주품목의 수량으로 저장.
+        // orderAmount 가 0 이면 제조오더 정보의(productOrder) 수주품목수량(contractItem.amount) 으로 저장
+        // orderAmount: 사용자가 입력한 지시수량
         int orderAmount = workOrderRequest.getOrderAmount() != 0 ? workOrderRequest.getOrderAmount() : produceOrder.getContractItem().getAmount();
+
+        // 사용자가 입력한 지시수량이 수주품목의 수량보다 크면 예외
+        throwIfOrderAmountGreaterThanProduceOrderAmount(orderAmount, produceOrder.getContractItem().getAmount());
+        // 수주품목의 수주품목수량(오더수량) 보다 여태 저장된 지시수량 + 입력받은 지시수량이 크면 예외
+        throwIfTotalOrderAmountGreaterThanAmountOfProduceOrder(produceOrderId, orderAmount, produceOrder.getContractItem().getAmount());
+        // 사용자가 입력한 생산수량이 지시수량보다 크면 예외
+        throwIfProductionAmountGreaterThanOrderAmount(workOrderRequest.getProductionAmount(), orderAmount);
 
         WorkOrderDetail workOrderDetail = mapper.toEntity(workOrderRequest, WorkOrderDetail.class);
         String workOrderNo = numberAutomatic.createDateTimeNo();
@@ -65,48 +78,70 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         workOrderDetail.add(workProcess, workLine, user, unit, testProcess, produceOrder);
         workOrderDetail.setOrderNo(workOrderNo);
         workOrderDetail.setOrderAmount(orderAmount);
-
+        workOrderDetail.changeOrderStateDate();    // 지시상태 값 별 따라서 날짜 저장
         workOrderDetailRepo.save(workOrderDetail);
-        // 지시상태 상태 이력 생성
-        workOrderStateService.createWorkOrderStateDetail(workOrderDetail);
-        return mapper.toResponse(workOrderDetail, WorkOrderResponse.class);
+
+        // produceOrder(제조오더): 제조오더에 해당하는 workOrderDetail(작업지시) 의 orderState 상태값 별로 제조오더의 상태값도 변경됨.
+        changeOrderStateOfProduceOrder(produceOrder);
+        produceOrderRepo.save(produceOrder);
+
+        return getWorkOrderResponseOrThrow(produceOrderId, workOrderDetail.getId());
     }
+
 
     // 작업지시 단일조회
     @Override
-    public WorkOrderResponse getWorkOrder(Long produceOrderId, Long workOrderId) throws NotFoundException {
-        WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderId, produceOrderId);
-        return mapper.toResponse(workOrderDetail, WorkOrderResponse.class);
+    public WorkOrderResponse getWorkOrderResponseOrThrow(Long produceOrderId, Long workOrderId) throws NotFoundException {
+        WorkOrderResponse workOrderResponse = workOrderDetailRepo.findWorkOrderResponseByProduceOrderIdAndWorkOrderId(produceOrderId, workOrderId)
+                .orElseThrow(() -> new NotFoundException("workOrderDetail does not exists. input id: " + workOrderId));
+        workOrderResponse.setCostTime();
+        return workOrderResponse;
     }
 
     // 작업지시 리스트 조회
     @Override
     public List<WorkOrderResponse> getWorkOrders(Long produceOrderId) throws NotFoundException {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
-        List<WorkOrderDetail> workOrderDetails = workOrderDetailRepo.findAllByProduceOrderAndDeleteYnFalse(produceOrder);
-        return mapper.toListResponses(workOrderDetails, WorkOrderResponse.class);
+        List<WorkOrderResponse> workOrderDetails = workOrderDetailRepo.findWorkOrderResponseByProduceOrderIdAndDeleteYnFalse(produceOrder.getId());
+        workOrderDetails.forEach(WorkOrderResponse::setCostTime);
+        return workOrderDetails;
     }
 
     // 작업지시 수정
     @Override
-    public WorkOrderResponse updateWorkOrder(Long produceOrderId, Long workOrderId, WorkOrderRequest newWorkOrderRequest) throws NotFoundException {
+    public WorkOrderResponse updateWorkOrder(Long produceOrderId, Long workOrderId, WorkOrderRequest newWorkOrderRequest) throws NotFoundException, BadRequestException {
         WorkOrderDetail findWorkOrderDetail = getWorkOrderDetailOrThrow(workOrderId, produceOrderId);
-        OrderState orderState = findWorkOrderDetail.getOrderState();
         WorkProcess newWorkProcess = workProcessService.getWorkProcessOrThrow(newWorkOrderRequest.getWorkProcess());
         WorkLine newWorkLine = workLineService.getWorkLineOrThrow(newWorkOrderRequest.getWorkLine());
         User newUser = newWorkOrderRequest.getUser() != null ? userService.getUserOrThrow(newWorkOrderRequest.getUser()) : null;
         Unit newUnit = unitService.getUnitOrThrow(newWorkOrderRequest.getUnit());
         TestProcess testProcess = testProcessService.getTestProcessOrThrow(newWorkOrderRequest.getTestProcess());
-        WorkOrderDetail newWorkOrderDetail = mapper.toEntity(newWorkOrderRequest, WorkOrderDetail.class);
-        findWorkOrderDetail.update(newWorkOrderDetail, newWorkProcess, newWorkLine, newUser, testProcess, newUnit);
-        workOrderDetailRepo.save(findWorkOrderDetail);
+        ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
 
-        // 지시상태 변경 상태 이력생성 (기존값 -> 바뀐값 변경 시에 이력 생성)
-        if (orderState != newWorkOrderRequest.getOrderState()) {
-            workOrderStateService.createWorkOrderStateDetail(findWorkOrderDetail);
+        // orderAmount 가 0 이면 제조오더 정보의(productOrder) 수주품목수량(contractItem.amount) 으로 저장
+        // orderAmount: 사용자가 입력한 지시수량
+        int orderAmount = newWorkOrderRequest.getOrderAmount() != 0 ? newWorkOrderRequest.getOrderAmount() : produceOrder.getContractItem().getAmount();
+
+        if (orderAmount !=  findWorkOrderDetail.getOrderAmount()) {
+            // 사용자가 입력한 지시수량이 수주품목의 수량보다 크면 예외
+            throwIfOrderAmountGreaterThanProduceOrderAmount(orderAmount, produceOrder.getContractItem().getAmount());
+            // 수주품목의 수주품목수량(오더수량) 보다 여태 저장된 지시수량 + 입력받은 지시수량이 크면 예외
+            throwIfTotalOrderAmountGreaterThanAmountOfProduceOrder(produceOrderId, orderAmount, produceOrder.getContractItem().getAmount());
+            // 사용자가 입력한 생산수량이 지시수량보다 크면 예외
+            throwIfProductionAmountGreaterThanOrderAmount(newWorkOrderRequest.getProductionAmount(), orderAmount);
         }
 
-        return mapper.toResponse(findWorkOrderDetail, WorkOrderResponse.class);
+        newWorkOrderRequest.setOrderAmount(orderAmount);
+        WorkOrderDetail newWorkOrderDetail = mapper.toEntity(newWorkOrderRequest, WorkOrderDetail.class);
+        findWorkOrderDetail.update(newWorkOrderDetail, newWorkProcess, newWorkLine, newUser, testProcess, newUnit);
+        findWorkOrderDetail.changeOrderStateDate();        // 지시상태 값 별 따라서 날짜 저장
+        workOrderDetailRepo.save(findWorkOrderDetail);
+
+        // produceOrder(제조오더): 제조오더에 해당하는 workOrderDetail(작업지시) 의 orderState 상태값 별로 제조오더의 상태값도 변경됨.
+        changeOrderStateOfProduceOrder(produceOrder);
+        produceOrderRepo.save(produceOrder);
+
+        return getWorkOrderResponseOrThrow(produceOrderId, workOrderId);
     }
 
     // 작업지시 삭제
@@ -123,5 +158,50 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
         return workOrderDetailRepo.findByIdAndProduceOrderAndDeleteYnFalse(id, produceOrder)
                 .orElseThrow(() -> new NotFoundException("workOrderDetail does not exist. input id: " + id));
+    }
+
+    // produceOrder(제조오더): 제조오더에 해당하는 workOrderDetail(작업지시) 의 orderState 상태값 별로 제조오더의 상태값도 변경됨.
+    @Override
+    public void changeOrderStateOfProduceOrder(ProduceOrder produceOrder) {
+        List<OrderState> orderStatesInWorkOrderDetail = workOrderDetailRepo.findOrderStatesByProduceOrderId(produceOrder.getId());
+        // 모든 orderState 가 schedule 이면 ? SCHEDULE
+        if (orderStatesInWorkOrderDetail.stream().allMatch(orderState -> orderState.equals(SCHEDULE))) produceOrder.setOrderState(SCHEDULE);
+        // 최소한 한개의 orderState 가 ongoing 이면 ? ONGOING
+        if (orderStatesInWorkOrderDetail.stream().anyMatch(orderState -> orderState.equals(ONGOING))) produceOrder.setOrderState(ONGOING);
+        // 모든 orderState 가 completion 이면 ? COMPLETION
+        if (orderStatesInWorkOrderDetail.stream().allMatch(orderState -> orderState.equals(COMPLETION))) produceOrder.setOrderState(COMPLETION);
+    }
+
+    // 수주품목의 수주품목수량(오더수량) 보다 여태 저장된 지시수량 + 입력받은 지시수량이 크면 예외
+    private void throwIfTotalOrderAmountGreaterThanAmountOfProduceOrder(Long produceOrderId, int orderAmount, int amountOfProduceOrder) throws BadRequestException {
+        List<Integer> orderAmounts = workOrderDetailRepo.findOrderAmountsByProduceOrderId(produceOrderId);
+        int orderAmountSum = orderAmounts.stream().mapToInt(Integer::intValue).sum();
+        if (orderAmountSum + orderAmount > amountOfProduceOrder) {
+            throw new BadRequestException("total orderAmount must not be greater than the amount of produceOrder. " +
+                    "input orderAmount: " + orderAmount + ", " +
+                    "total orderAmount: " + orderAmountSum + ", " +
+                    "amount of produceOrder: " + amountOfProduceOrder
+            );
+        }
+    }
+
+    // 사용자가 입력한 지시수량이 수주품목의 수량보다 크면 예외
+    private void throwIfOrderAmountGreaterThanProduceOrderAmount(int orderAmount, int orderAmountOfProduceOrder) throws BadRequestException {
+        if (orderAmount > orderAmountOfProduceOrder) {
+            throw new BadRequestException("input orderAmount must not be greater than amount of produceOrder." +
+                    " input orderAmount: " + orderAmount + ", " +
+                    "amount of produceOrder: " + orderAmountOfProduceOrder
+            );
+        }
+    }
+
+    // 사용자가 입력한 생산수량이 지시수량보다 크면 예외
+    private void throwIfProductionAmountGreaterThanOrderAmount(int productionAmount, int orderAmount) throws BadRequestException {
+        if (productionAmount > orderAmount) {
+            throw new BadRequestException("input productionAmount must not be greater than orderAmount. " +
+                    "input productionAmount: " + productionAmount + ", " +
+                    "orderAmount: " + orderAmount
+            );
+        }
     }
 }

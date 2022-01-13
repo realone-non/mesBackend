@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.request.WorkOrderRequest;
 import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
 import com.mes.mesBackend.dto.response.WorkOrderResponse;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -77,7 +78,7 @@ public class WorkOrderController {
             @PathVariable(value = "produce-order-id") @Parameter(description = "제조오더 id") Long produceOrderId,
             @RequestBody @Valid WorkOrderRequest workOrderRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         WorkOrderResponse workOrder = workOrderService.createWorkOrder(produceOrderId, workOrderRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workOrder.getId() + " from createWorkOrder.");
@@ -99,7 +100,7 @@ public class WorkOrderController {
             @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        WorkOrderResponse workOrder = workOrderService.getWorkOrder(produceOrderId, workOrderId);
+        WorkOrderResponse workOrder = workOrderService.getWorkOrderResponseOrThrow(produceOrderId, workOrderId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + workOrder.getId() + " from getWorkOrder.");
         return new ResponseEntity<>(workOrder, HttpStatus.OK);
@@ -135,7 +136,7 @@ public class WorkOrderController {
             @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
             @RequestBody @Valid WorkOrderRequest workOrderRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         WorkOrderResponse workOrder = workOrderService.updateWorkOrder(produceOrderId, workOrderId, workOrderRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + workOrder.getId() + " from updateWorkOrder.");
