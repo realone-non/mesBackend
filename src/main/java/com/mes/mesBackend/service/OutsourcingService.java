@@ -1,13 +1,9 @@
 package com.mes.mesBackend.service;
 
-import com.mes.mesBackend.dto.request.OutsourcingInputLOTRequest;
-import com.mes.mesBackend.dto.request.OutsourcingInputRequest;
-import com.mes.mesBackend.dto.request.OutsourcingMaterialReleaseRequest;
-import com.mes.mesBackend.dto.request.OutsourcingProductionRequestRequest;
-import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
-import com.mes.mesBackend.dto.response.OutsourcingInputResponse;
-import com.mes.mesBackend.dto.response.OutsourcingMaterialReleaseResponse;
-import com.mes.mesBackend.dto.response.OutsourcingProductionResponse;
+import com.mes.mesBackend.dto.request.*;
+import com.mes.mesBackend.dto.response.*;
+import com.mes.mesBackend.entity.LotMaster;
+import com.mes.mesBackend.entity.OutsourcingReturn;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 
@@ -76,4 +72,18 @@ public interface OutsourcingService {
     //외주 입고 LOT정보 삭제
     void deleteOutsourcingInputLOT(Long inputId, Long id) throws NotFoundException;
 
+    //외주 반품 등록
+    OutsourcingReturnResponse createOutsourcingReturn(OutsourcingReturnRequest request) throws NotFoundException, BadRequestException;
+
+    //외주 반품 리스트조회
+    List<OutsourcingReturnResponse> getOutsourcingReturnList(Long clientId, Long itemId, LocalDate startDate, LocalDate endDate);
+
+    //외주 반품 조회
+    OutsourcingReturnResponse getOutsourcingReturn(Long returnId) throws NotFoundException;
+
+    //외주 반품 수정
+    OutsourcingReturnResponse modifyOutsourcingReturn(Long returnId, OutsourcingReturnRequest request) throws NotFoundException, BadRequestException;
+
+    //외주 반품 삭제
+    void deleteOutsourcingReturn(Long id) throws NotFoundException;
 }
