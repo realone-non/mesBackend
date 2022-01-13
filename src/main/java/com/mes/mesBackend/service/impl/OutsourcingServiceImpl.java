@@ -1,10 +1,8 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.*;
-import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
-import com.mes.mesBackend.dto.response.OutsourcingInputResponse;
-import com.mes.mesBackend.dto.response.OutsourcingMaterialReleaseResponse;
-import com.mes.mesBackend.dto.response.OutsourcingProductionResponse;
+import com.mes.mesBackend.dto.response.*;
+
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -31,6 +29,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     @Autowired
     OutsourcingInputRepository outsourcingInputRepository;
     @Autowired
+    OutsourcingReturnRepository outsourcingReturnRepository;
+    @Autowired
     BomMasterRepository bomMasterRepository;
     @Autowired
     BomItemDetailRepository bomItemDetailRepository;
@@ -40,6 +40,7 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     LotMasterRepository lotMasterRepository;
     @Autowired
     WareHouseRepository wareHouseRepository;
+
 
     //외주생산의뢰 등록
     @Override
@@ -211,5 +212,57 @@ public class OutsourcingServiceImpl implements OutsourcingService {
         LotMaster lotInfo = lotMasterRepository.findByIdAndDeleteYnFalse(id).orElseThrow(()-> new NotFoundException("lotinfo not in db:" + id));
         lotInfo.delete();
         lotMasterRepository.save(lotInfo);
+    }
+
+    //외주 반품 등록
+    public OutsourcingReturnResponse createOutsourcingReturn(OutsourcingReturnRequest request) throws NotFoundException, BadRequestException {
+        OutsourcingReturn returning = modelMapper.toEntity(request, OutsourcingReturn.class);
+        LotMaster lotMaster = lotMasterRepository.findByIdAndDeleteYnFalse(request.getLotMasterId()).orElseThrow(()-> new NotFoundException("lotinfo not in db:" + request.getLotMasterId()));
+        if(request.isReturnDivision() == true && lotMaster.getStockAmount() >= request.getReturnAmount() == true){
+                 lotMaster.setStockAmount(lotMaster.getStockAmount() - request.getReturnAmount());
+        }
+        else if(request.isReturnDivision() == false && lotMaster.getBadItemAmount() >= request.getReturnAmount() == true){
+            lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() - request.getReturnAmount());
+        }
+        else{
+            throw new BadRequestException("returnAmount can not bigger than stockAmount or badItemAmount");
+        }
+        outsourcingReturnRepository.save(returning);
+        return outsourcingReturnRepository.findReturnByIdAndDeleteYnAndUseYn(returning.getId()).orElseThrow(()-> new NotFoundException("returnInfo not in db:" + returning.getId()));
+    }
+
+    //외주 반품 리스트조회
+    public List<OutsourcingReturnResponse> getOutsourcingReturnList(Long clientId, Long itemId, LocalDate startDate, LocalDate endDate){
+        return outsourcingReturnRepository.findAllByCondition(clientId, itemId, startDate, endDate);
+    }
+
+    //외주 반품 조회
+    public OutsourcingReturnResponse getOutsourcingReturn(Long returnId) throws NotFoundException {
+        return outsourcingReturnRepository.findReturnByIdAndDeleteYnAndUseYn(returnId).orElseThrow(()-> new NotFoundException("lotinfo not in db:" + returnId));
+    }
+
+    //외주 반품 수정
+    public OutsourcingReturnResponse modifyOutsourcingReturn(Long returnId, OutsourcingReturnRequest request) throws NotFoundException, BadRequestException {
+        OutsourcingReturn returning = outsourcingReturnRepository.findByIdAndDeleteYnFalse(returnId).orElseThrow(()-> new NotFoundException("returnInfo not in db:" + returnId));
+        LotMaster lotMaster = lotMasterRepository.findByIdAndDeleteYnFalse(request.getLotMasterId()).orElseThrow(()-> new NotFoundException("lotInfo not in db:" + request.getLotMasterId()));
+        if(returning.isReturnDivision() == true && (lotMaster.getStockAmount() + lotMaster.getReturnAmount()) == (request.getReturnAmount() + request.getStockAmount())){
+            lotMaster.setStockAmount(request.getReturnAmount());
+        }
+        else if(request.isReturnDivision() == false && lotMaster.getBadItemAmount() >= request.getReturnAmount() == true){
+            lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() - request.getReturnAmount());
+        }
+        else{
+            throw new BadRequestException("returnAmount can not bigger than stockAmount or badItemAmount");
+        }
+        returning.update(request, lotMaster);
+        outsourcingReturnRepository.save(returning);
+        return outsourcingReturnRepository.findReturnByIdAndDeleteYnAndUseYn(returnId).orElseThrow(()-> new NotFoundException("returninfo not in db:" + returnId));
+    }
+
+    //외주 입고정보 삭제
+    public void deleteOutsourcingReturn(Long id) throws NotFoundException {
+        OutsourcingReturn returning = outsourcingReturnRepository.findByIdAndDeleteYnFalse(id).orElseThrow(()-> new NotFoundException("outsourcingInfo not in db:" + id));
+        returning.delete(returning);
+        outsourcingReturnRepository.save(returning);
     }
 }
