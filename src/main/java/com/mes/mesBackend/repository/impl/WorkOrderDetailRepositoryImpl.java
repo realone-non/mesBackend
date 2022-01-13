@@ -32,6 +32,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     final QUser user = QUser.user;
     final QTestProcess testProcess = QTestProcess.testProcess1;
     final QUnit unit = QUnit.unit;
+    final QBomItemDetail qBomItemDetail = QBomItemDetail.bomItemDetail;
+    final QBomMaster bomMaster = QBomMaster.bomMaster;
 
 
     // 검색조건: 품목그룹 id, 품명|품번, 수주번호, 제조오더번호, 작업공정 id, 착수예정일 fromDate~endDate, 지시상태
@@ -484,6 +486,89 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isDeleteYnFalse()
                 )
                 .fetch();
+    }
+
+    // =============================================== pop ===============================================
+    // 작업지시 정보 리스트, 조건: 작업자, 작업공정
+    @Override
+    public List<PopWorkOrderResponse> findPopWorkOrderResponsesByCondition(
+            Long workProcessId,
+            Long userId,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                PopWorkOrderResponse.class,
+                                workOrderDetail.id.as("id"),
+                                workOrderDetail.user.id.as("userId"),
+                                workOrderDetail.user.korName.as("userName"),
+                                workOrderDetail.orderNo.as("orderNo"),
+                                workOrderDetail.orderAmount.as("orderAmount"),
+                                workOrderDetail.expectedWorkDate.as("expectedWorkDate")
+                        )
+                )
+                .from(workOrderDetail)
+                .where(
+                        isWorkProcessId(workProcessId),
+                        isUserId(userId),
+                        isWorkOrderDateBetween(fromDate, toDate)
+                )
+                .fetch();
+
+    }
+
+    // 작업지시 상세 정보
+    @Override
+    public List<PopWorkOrderDetailResponse> findPopWorkOrderDetailResponsesByItemId(Long itemId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                PopWorkOrderDetailResponse.class,
+                                bomMaster.id.as("bomDetailId"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                itemAccount.account.as("itemAccount"),
+                                qBomItemDetail.amount.as("bomAmount")
+                        )
+                )
+                .from(qBomItemDetail)
+                .leftJoin(bomMaster).on(bomMaster.id.eq(qBomItemDetail.bomMaster.id))
+                .leftJoin(item).on(item.id.eq(qBomItemDetail.item.id))
+                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                .where(
+                        bomMaster.item.id.eq(itemId),
+                        bomMaster.deleteYn.isFalse(),
+                        qBomItemDetail.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+
+    // 수주수량
+    @Override
+    public Integer findContractItemAmountByWorkOrderId(Long workOrderId) {
+        return jpaQueryFactory
+                .select(workOrderDetail.produceOrder.contractItem.amount)
+                .from(workOrderDetail)
+                .where(
+                        workOrderDetail.id.eq(workOrderId),
+                        isDeleteYnFalse()
+                )
+                .fetchOne();
+    }
+
+    // 작업공정
+    private BooleanExpression isWorkProcessId(Long workProcessId) {
+        return workOrderDetail.workProcess.id.eq(workProcessId);
+    }
+    // 작업자
+    private BooleanExpression isUserId(Long userId) {
+        return workOrderDetail.user.id.eq(userId);
+    }
+    // 작업예정일 기준
+    private BooleanExpression isWorkOrderDateBetween(LocalDate fromDate, LocalDate toDate) {
+        return fromDate != null ? workOrderDetail.expectedWorkDate.between(fromDate, toDate) : null;
     }
 
     // 작업장
