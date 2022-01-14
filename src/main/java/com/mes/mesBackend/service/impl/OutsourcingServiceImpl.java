@@ -218,15 +218,18 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     public OutsourcingReturnResponse createOutsourcingReturn(OutsourcingReturnRequest request) throws NotFoundException, BadRequestException {
         OutsourcingReturn returning = modelMapper.toEntity(request, OutsourcingReturn.class);
         LotMaster lotMaster = lotMasterRepository.findByIdAndDeleteYnFalse(request.getLotMasterId()).orElseThrow(()-> new NotFoundException("lotinfo not in db:" + request.getLotMasterId()));
-        if(request.isReturnDivision() == true && lotMaster.getStockAmount() >= request.getReturnAmount() == true){
-                 lotMaster.setStockAmount(lotMaster.getStockAmount() - request.getReturnAmount());
+        if(request.isReturnDivision() == true && lotMaster.getStockAmount() >= request.getStockReturnAmount() == true){
+                 lotMaster.setStockAmount(lotMaster.getStockAmount() - request.getStockReturnAmount());
+                 lotMaster.setStockReturnAmount(request.getStockReturnAmount());
         }
-        else if(request.isReturnDivision() == false && lotMaster.getBadItemAmount() >= request.getReturnAmount() == true){
-            lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() - request.getReturnAmount());
+        else if(request.isReturnDivision() == false && lotMaster.getBadItemAmount() >= request.getBadItemReturnAmount() == true){
+            lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() - request.getBadItemReturnAmount());
+            lotMaster.setBadItemReturnAmount(request.getBadItemReturnAmount());
         }
         else{
             throw new BadRequestException("returnAmount can not bigger than stockAmount or badItemAmount");
         }
+        returning.setLotMaster(lotMaster);
         outsourcingReturnRepository.save(returning);
         return outsourcingReturnRepository.findReturnByIdAndDeleteYnAndUseYn(returning.getId()).orElseThrow(()-> new NotFoundException("returnInfo not in db:" + returning.getId()));
     }
@@ -245,11 +248,13 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     public OutsourcingReturnResponse modifyOutsourcingReturn(Long returnId, OutsourcingReturnRequest request) throws NotFoundException, BadRequestException {
         OutsourcingReturn returning = outsourcingReturnRepository.findByIdAndDeleteYnFalse(returnId).orElseThrow(()-> new NotFoundException("returnInfo not in db:" + returnId));
         LotMaster lotMaster = lotMasterRepository.findByIdAndDeleteYnFalse(request.getLotMasterId()).orElseThrow(()-> new NotFoundException("lotInfo not in db:" + request.getLotMasterId()));
-        if(returning.isReturnDivision() == true && (lotMaster.getStockAmount() + lotMaster.getReturnAmount()) == (request.getReturnAmount() + request.getStockAmount())){
-            lotMaster.setStockAmount(request.getReturnAmount());
+        if(returning.isReturnDivision() == true && (lotMaster.getStockAmount() + lotMaster.getStockReturnAmount()) == (request.getStockAmount() + request.getStockReturnAmount())){
+            lotMaster.setStockAmount(request.getStockAmount());
+            lotMaster.setStockReturnAmount(request.getStockReturnAmount());
         }
-        else if(request.isReturnDivision() == false && lotMaster.getBadItemAmount() >= request.getReturnAmount() == true){
-            lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() - request.getReturnAmount());
+        else if(request.isReturnDivision() == false && (lotMaster.getBadItemAmount() + lotMaster.getBadItemReturnAmount()) == (request.getBadItemAmount()) + request.getBadItemReturnAmount()){
+            lotMaster.setBadItemAmount(request.getBadItemAmount());
+            lotMaster.setBadItemReturnAmount(request.getBadItemReturnAmount());
         }
         else{
             throw new BadRequestException("returnAmount can not bigger than stockAmount or badItemAmount");
