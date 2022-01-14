@@ -100,7 +100,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
 
     //외주재고현황 전체 조회 검색 조건:외주처, 품목, 의뢰기간
     @Transactional(readOnly = true)
-    public List<OutsourcingStatusResponse> findStatusByCondition(Long clientId, Long itemId, LocalDate startDate, LocalDate endDate){
+    public List<OutsourcingStatusResponse> findStatusByCondition(Long clientId, Long itemId){
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -121,7 +121,6 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                 .where(
                         clientNull(clientId),
                         itemNull(itemId),
-                        dateNull(startDate, endDate),
                         lotMaster.useYn.eq(true),
                         lotMaster.deleteYn.eq(false),
                         lotMaster.enrollmentType.eq(EnrollmentType.OUTSOURCING_INPUT)
