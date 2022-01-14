@@ -16,7 +16,7 @@ public interface OutsourcingInputRepositoryCustom {
     Optional<OutsourcingInputResponse> findInputByIdAndDeleteYnAndUseYn(Long id);
 
     //외주 현황 조회
-    List<OutsourcingStatusResponse> findStatusByCondition(Long clientId, Long itemId, LocalDate startDate, LocalDate endDate);
+    List<OutsourcingStatusResponse> findStatusByCondition(Long clientId, Long itemId);
 
     //아이템 ID조회
     Long findItemIdByInputId(Long inputId);

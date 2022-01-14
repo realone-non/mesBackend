@@ -1,5 +1,7 @@
 package com.mes.mesBackend.entity;
 
+import com.mes.mesBackend.dto.request.HolidayRequest;
+import com.mes.mesBackend.entity.enumeration.HolidayType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,14 +28,25 @@ public class Holiday extends BaseTimeEntity {
     private String day; // 요일
 
     @Column(name = "TYPE", nullable = false, columnDefinition = "varchar(255) COMMENT '휴일유형'")
-    private String type;    // 휴일유형
+    private HolidayType type;    // 휴일유형
 
-    @Column(name = "DESCRIPTION", nullable = false, columnDefinition = "varchar(255) COMMENT '비고'")
-    private String description;    // 비고
+    @Column(name = "DESCRIPTION", columnDefinition = "varchar(255) COMMENT '비고'")
+    private String note;    // 비고
 
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;  // 사용여부
 
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
+
+    public void update(HolidayRequest request){
+        setDate(request.getDate());
+        setDay(request.getDay());
+        setType(request.getType());
+        setUseYn(request.isUseYn());
+    }
+
+    public void delete(){
+        setDeleteYn(true);
+    }
 }

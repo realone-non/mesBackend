@@ -272,7 +272,7 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     }
 
     //외주 현황 조회
-    public List<OutsourcingStatusResponse> getOutsourcingStatusList(Long clientId, Long itemId, LocalDate startDate, LocalDate endDate){
-        return outsourcingInputRepository.findStatusByCondition(clientId, itemId, startDate, endDate);
+    public List<OutsourcingStatusResponse> getOutsourcingStatusList(Long clientId, Long itemId){
+        return outsourcingInputRepository.findStatusByCondition(clientId, itemId);
     }
 }
