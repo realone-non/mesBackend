@@ -1,7 +1,9 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.OutsourcingInputResponse;
+import com.mes.mesBackend.dto.response.OutsourcingStatusResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.repository.custom.OutsourcingInputRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -24,6 +26,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
     final QItem item = QItem.item;
     final QClient client = QClient.client;
     final QWareHouse wareHouse = QWareHouse.wareHouse;
+    final QLotMaster lotMaster = QLotMaster.lotMaster;
 
     //외주 입고 정보 검색 조건:외주처, 품목, 입고기간
     public List<OutsourcingInputResponse> findAllByCondition(Long clientId, Long itemId, LocalDate startDate, LocalDate endDate){
@@ -93,6 +96,38 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                 )
                 .fetchOne()
             );
+    }
+
+    //외주재고현황 전체 조회 검색 조건:외주처, 품목, 의뢰기간
+    @Transactional(readOnly = true)
+    public List<OutsourcingStatusResponse> findStatusByCondition(Long clientId, Long itemId, LocalDate startDate, LocalDate endDate){
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                OutsourcingStatusResponse.class,
+                                client.clientName.as("clientName"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                lotMaster.inputAmount.count().as("inputAmount"),
+                                lotMaster.stockReturnAmount.count().as("stockReturnAmount"),
+                                lotMaster.badItemAmount.count().as("badItemAmount"),
+                                lotMaster.badItemReturnAmount.count().as("badItemReturnAmount"),
+                                lotMaster.stockAmount.count().as("stockAmount")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(client).on(client.id.eq(item.manufacturer.id))
+                .where(
+                        clientNull(clientId),
+                        itemNull(itemId),
+                        dateNull(startDate, endDate),
+                        lotMaster.useYn.eq(true),
+                        lotMaster.deleteYn.eq(false),
+                        lotMaster.enrollmentType.eq(EnrollmentType.OUTSOURCING_INPUT)
+                )
+                .groupBy(client.clientName, item.itemNo, item.itemName)
+                .fetch();
     }
 
     // item조회

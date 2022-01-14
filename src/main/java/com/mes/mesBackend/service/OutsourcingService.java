@@ -86,4 +86,7 @@ public interface OutsourcingService {
 
     //외주 반품 삭제
     void deleteOutsourcingReturn(Long id) throws NotFoundException;
+
+    //외주 현황 조회
+    List<OutsourcingStatusResponse> getOutsourcingStatusList(Long clientId, Long itemId, LocalDate startDate, LocalDate endDate);
 }
