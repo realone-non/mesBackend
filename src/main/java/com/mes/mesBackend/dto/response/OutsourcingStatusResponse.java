@@ -20,7 +20,7 @@ public class OutsourcingStatusResponse {
     @Schema(description = "입고 수량")
     long inputAmount;
 
-    @Schema(description = "입고 반품수량")
+    @Schema(description = "재고 반품수량")
     long stockReturnAmount;
 
     @Schema(description = "불량 수량")
