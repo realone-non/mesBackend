@@ -20,11 +20,17 @@ public class OutsourcingReturnRequest {
     @Schema(description = "반품일시")
     LocalDate returnDate;
 
-    @Schema(description = "반품수량")
-    int returnAmount;
+    @Schema(description = "정상품반품수량")
+    int stockReturnAmount;
 
-    @Schema(description = "가능수량")
+    @Schema(description = "불량품반품수량")
+    int badItemReturnAmount;
+
+    @Schema(description = "정상품가능수량")
     int stockAmount;
+
+    @Schema(description = "불량품가능수량")
+    int badItemAmount;
 
     @Schema(description = "비고")
     String note;

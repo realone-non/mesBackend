@@ -3,7 +3,6 @@ package com.mes.mesBackend.repository.custom;
 import com.mes.mesBackend.dto.response.UserAuthorityResponse;
 import com.mes.mesBackend.dto.response.UserRegistrationResponse;
 import com.mes.mesBackend.entity.User;
-import org.graalvm.compiler.core.common.type.ArithmeticOpTable;
 
 import java.util.List;
 import java.util.Optional;

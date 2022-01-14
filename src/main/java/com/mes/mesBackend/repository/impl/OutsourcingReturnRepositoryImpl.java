@@ -23,6 +23,7 @@ public class OutsourcingReturnRepositoryImpl implements OutsourcingReturnReposit
     final QClient client = QClient.client;
     final QItem item = QItem.item;
     final QWareHouse wareHouse = QWareHouse.wareHouse;
+    final QLotType lotType = QLotType.lotType1;
 
     //외주반품 전체 조회 검색 조건:외주처, 품목, 반품기간
     @Transactional(readOnly = true)
@@ -37,19 +38,23 @@ public class OutsourcingReturnRepositoryImpl implements OutsourcingReturnReposit
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
                                 lotMaster.lotNo.as("lotNo"),
-                                lotMaster.lotType.as("lotType"),
+                                lotType.lotType.as("lotType"),
                                 outsourcingReturn.returnDate.as("returnDate"),
-                                lotMaster.returnAmount.as("returnAmount"),
+                                lotMaster.stockReturnAmount.as("stockReturnAmount"),
                                 lotMaster.stockAmount.as("stockAmount"),
+                                lotMaster.badItemReturnAmount.as("badItemReturnAmount"),
                                 lotMaster.badItemAmount.as("badAmount"),
                                 wareHouse.wareHouseName.as("wareHouse"),
-                                outsourcingReturn.note.as("note")
+                                outsourcingReturn.note.as("note"),
+                                outsourcingReturn.returnDivision.as("returnDivision")
                         )
                 )
                 .from(outsourcingReturn)
-                .leftJoin(lotMaster).on(lotMaster.id.eq(outsourcingReturn.id))
+                .leftJoin(lotMaster).on(lotMaster.id.eq(outsourcingReturn.lotMaster.id))
                 .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
+                .leftJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
                 .where(
                         clientNull(clientId),
                         itemNull(itemId),
@@ -73,19 +78,23 @@ public class OutsourcingReturnRepositoryImpl implements OutsourcingReturnReposit
                                         item.itemNo.as("itemNo"),
                                         item.itemName.as("itemName"),
                                         lotMaster.lotNo.as("lotNo"),
-                                        lotMaster.lotType.as("lotType"),
+                                        lotType.lotType.as("lotType"),
                                         outsourcingReturn.returnDate.as("returnDate"),
-                                        lotMaster.returnAmount.as("returnAmount"),
+                                        lotMaster.stockReturnAmount.as("stockReturnAmount"),
                                         lotMaster.stockAmount.as("stockAmount"),
+                                        lotMaster.badItemReturnAmount.as("badItemReturnAmount"),
                                         lotMaster.badItemAmount.as("badAmount"),
                                         wareHouse.wareHouseName.as("wareHouse"),
-                                        outsourcingReturn.note.as("note")
+                                        outsourcingReturn.note.as("note"),
+                                        outsourcingReturn.returnDivision.as("returnDivision")
                                 )
                         )
                         .from(outsourcingReturn)
-                        .leftJoin(lotMaster).on(lotMaster.id.eq(outsourcingReturn.id))
+                        .leftJoin(lotMaster).on(lotMaster.id.eq(outsourcingReturn.lotMaster.id))
                         .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                        .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                         .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
+                        .leftJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
                         .where(
                                 outsourcingReturn.id.eq(id),
                                 outsourcingReturn.useYn.eq(true),

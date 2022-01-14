@@ -16,7 +16,7 @@ import java.time.LocalDate;
 public class OutsourcingReturn extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", columnDefinition = "bigint COMMENT '외주반품 고유아이디")
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '외주반품 고유아이디'")
     private Long id;
     
     //LOT마스터
@@ -32,7 +32,7 @@ public class OutsourcingReturn extends BaseTimeEntity {
     @Column(name = "NOTE", columnDefinition = "text COMMENT '비고'")
     private String note;
 
-    @Column(name = "RETURN_DIVISION", columnDefinition = "bit(1) '정상품/불량품 반품 유무'")
+    @Column(name = "RETURN_DIVISION", columnDefinition = "bit(1) COMMENT '정상품/불량품 반품 유무'")
     private boolean returnDivision;
 
     //사용여부
@@ -44,6 +44,7 @@ public class OutsourcingReturn extends BaseTimeEntity {
     private boolean deleteYn = false;
 
     public void update(OutsourcingReturnRequest request, LotMaster lotMaster){
+
         setReturnDate(request.getReturnDate());
         setNote(request.getNote());
         setLotMaster(lotMaster);

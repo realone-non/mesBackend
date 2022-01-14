@@ -35,8 +35,11 @@ public class OutsourcingReturnResponse {
     @Schema(description = "반품일시")
     LocalDate returnDate;
 
-    @Schema(description = "반품수량")
-    int returnAmount;
+    @Schema(description = "정상품 반품수량")
+    int stockReturnAmount;
+
+    @Schema(description = "불량품 반품수량")
+    int badItemReturnAmount;
 
     @Schema(description = "정상품수량")
     int stockAmount;
