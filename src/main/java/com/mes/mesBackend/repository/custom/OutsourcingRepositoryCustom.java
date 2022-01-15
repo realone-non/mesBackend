@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.OutsourcingProductionResponse;
+import com.mes.mesBackend.dto.response.OutsourcingStatusResponse;
 
 import java.time.LocalDate;
 import java.util.List;
