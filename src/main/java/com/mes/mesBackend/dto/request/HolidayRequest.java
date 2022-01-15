@@ -21,12 +21,11 @@ public class HolidayRequest {
     String day;
 
     @Schema(description = "휴일 유형")
-    HolidayType type;
+    HolidayType type = HolidayType.EVERY_YEAR;
 
     @Schema(description = "비고")
     String note;
 
     @Schema(description = "사용여부")
     boolean useYn;
-
 }
