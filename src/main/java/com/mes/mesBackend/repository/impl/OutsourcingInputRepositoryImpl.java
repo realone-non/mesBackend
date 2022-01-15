@@ -108,11 +108,11 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                                 client.clientName.as("clientName"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
-                                lotMaster.inputAmount.count().as("inputAmount"),
-                                lotMaster.stockReturnAmount.count().as("stockReturnAmount"),
-                                lotMaster.badItemAmount.count().as("badItemAmount"),
-                                lotMaster.badItemReturnAmount.count().as("badItemReturnAmount"),
-                                lotMaster.stockAmount.count().as("stockAmount")
+                                lotMaster.inputAmount.sum().as("inputAmount"),
+                                lotMaster.stockReturnAmount.sum().as("stockReturnAmount"),
+                                lotMaster.badItemAmount.sum().as("badItemAmount"),
+                                lotMaster.badItemReturnAmount.sum().as("badItemReturnAmount"),
+                                lotMaster.stockAmount.sum().as("stockAmount")
                         )
                 )
                 .from(lotMaster)
@@ -126,7 +126,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                         lotMaster.deleteYn.eq(false),
                         lotMaster.enrollmentType.eq(EnrollmentType.OUTSOURCING_INPUT)
                 )
-                .groupBy(client.clientName, item.itemNo, item.itemName)
+                .groupBy(item.itemName)
                 .fetch();
     }
 
