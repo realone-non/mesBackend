@@ -18,17 +18,17 @@ public class OutsourcingStatusResponse {
     String itemName;
 
     @Schema(description = "입고 수량")
-    long inputAmount;
+    int inputAmount;
 
     @Schema(description = "재고 반품수량")
-    long stockReturnAmount;
+    int stockReturnAmount;
 
     @Schema(description = "불량 수량")
-    long badItemAmount;
+    int badItemAmount;
 
     @Schema(description = "불량 반품 수량")
-    long badItemReturnAmount;
+    int badItemReturnAmount;
 
     @Schema(description = "재고 수량")
-    long stockAmount;
+    int stockAmount;
 }
