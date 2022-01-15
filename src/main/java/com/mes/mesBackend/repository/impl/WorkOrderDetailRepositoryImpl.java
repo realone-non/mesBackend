@@ -6,6 +6,7 @@ import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.WorkOrderDetailRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+
+import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
 
 @RequiredArgsConstructor
 public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryCustom {
@@ -34,6 +37,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     final QUnit unit = QUnit.unit;
     final QBomItemDetail qBomItemDetail = QBomItemDetail.bomItemDetail;
     final QBomMaster bomMaster = QBomMaster.bomMaster;
+    final QWorkCenter workCenter = QWorkCenter.workCenter;
+    final QItemGroup itemGroup = QItemGroup.itemGroup;
 
 
     // 검색조건: 품목그룹 id, 품명|품번, 수주번호, 제조오더번호, 작업공정 id, 착수예정일 fromDate~endDate, 지시상태
@@ -558,14 +563,69 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .fetchOne();
     }
 
+    // =============================================== 8-5. 불량등록 ===============================================
+    // 작업지시 정보 리스트 조회,
+    // 검색조건: 작업장 id, 작업라인 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목
+    @Override
+    public List<BadItemWorkOrderResponse> findBadItemWorkOrderResponseByCondition(
+            Long workCenterId,
+            Long workLineId,
+            Long itemGroupId,
+            String produceOrderNo,
+            String workOrderNo,
+            LocalDate fromDate,
+            LocalDate toDate,
+            String itemNoAndItemName
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                BadItemWorkOrderResponse.class,
+                                workOrderDetail.id.as("workOrderId"),
+                                workOrderDetail.orderNo.as("workOrderNo"),
+                                workLine.workLineName.as("workProcessName"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                user.korName.as("userKorName"),
+                                contract.contractNo.as("contractNo")
+                        )
+                )
+                .from(workOrderDetail)
+                .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
+                .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
+                .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
+                .leftJoin(itemGroup).on(itemGroup.id.eq(item.itemGroup.id))
+                .where(
+                        isWorkLineIdEq(workLineId),
+                        isItemGroupEq(itemGroupId),
+                        isProduceOrderNoContain(produceOrderNo),
+                        isWorkOrderNoContain(workOrderNo),
+                        isItemNoAndItemNameContain(itemNoAndItemName),
+                        isDeleteYnFalse(),
+//                        workOrderDetail.deleteYn.isTrue(),
+                        workOrderDetail.orderState.notIn(SCHEDULE)
+                )
+                .fetch();
+    }
+
+    // JOB NO
+    private BooleanExpression isWorkOrderNoContain(String workOrderNo) {
+        return workOrderNo != null ? workOrderDetail.orderNo.contains(workOrderNo) : null;
+    }
+
     // 작업공정
     private BooleanExpression isWorkProcessId(Long workProcessId) {
         return workOrderDetail.workProcess.id.eq(workProcessId);
     }
+
     // 작업자
     private BooleanExpression isUserId(Long userId) {
         return workOrderDetail.user.id.eq(userId);
     }
+
     // 작업예정일 기준
     private BooleanExpression isWorkOrderDateBetween(LocalDate fromDate, LocalDate toDate) {
         return fromDate != null ? workOrderDetail.expectedWorkDate.between(fromDate, toDate) : null;
