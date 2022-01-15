@@ -33,7 +33,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     // 검사의뢰등록 response 단일 조회 및 예외
     @Override
     @Transactional(readOnly = true)
-    public Optional<InputTestRequestResponse> findResponseByIdAndDeleteYnFalse(Long id) {
+    public Optional<InputTestRequestResponse> findResponseByIdAndDeleteYnFalse(Long id,  boolean inputTestDivision) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .select(
@@ -72,7 +72,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
                         .where(
                                 inputTestRequest.id.eq(id),
-                                isInputTestRequestDeleteYnFalse()
+                                isInputTestRequestDeleteYnFalse(),
+                                isInputTestRequest(inputTestDivision)
                         )
                         .fetchOne()
         );
@@ -90,7 +91,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
             Long itemGroupId,
             TestType requestType,
             LocalDate fromDate,
-            LocalDate toDate
+            LocalDate toDate,
+            boolean inputTestDivision
     ) {
         return jpaQueryFactory
                 .select(
@@ -135,7 +137,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         isTestTypeEq(testType),
                         isRequestTestTypeEq(requestType),
                         isRequestDateBetween(fromDate, toDate),
-                        isInputTestRequestDeleteYnFalse()
+                        isInputTestRequestDeleteYnFalse(),
+                        isInputTestRequest(inputTestDivision)
                 )
                 .fetch();
     }
@@ -189,5 +192,10 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     // 삭제여부
     private BooleanExpression isInputTestRequestDeleteYnFalse() {
         return inputTestRequest.deleteYn.isFalse();
+    }
+
+    // 14-1. 부품수입검사 요청 조회
+    private BooleanExpression isInputTestRequest(boolean inputTestDivision) {
+        return inputTestRequest.inputTestDivision.eq(inputTestDivision);
     }
 }

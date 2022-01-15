@@ -40,7 +40,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
         throwIfRequestAmountGreaterThanInputAmount(inputTestRequestRequest.getLotId(), inputTestRequestRequest.getRequestAmount());       // 요청수량 재고수량 비교
         LotMaster lotMaster = lotMasterService.getLotMasterOrThrow(inputTestRequestRequest.getLotId());
         InputTestRequest inputTest = modelMapper.toEntity(inputTestRequestRequest, InputTestRequest.class);
-        inputTest.create(lotMaster);                // 상태값: SCHEDULE
+        inputTest.createItemInputRequest(lotMaster);                // 상태값: SCHEDULE
         inputTestRequestRepo.save(inputTest);       // lotMaster, 요청유형, 요청수량, 검사유형, 상태값 생성
         lotMaster.setCheckRequestAmount(lotMaster.getCheckRequestAmount() + inputTestRequestRequest.getRequestAmount());    // lotMaster 검사요청수량 변경 = 기존 검사요청수량 + 새로들어온 검사요청수량
         lotMasterRepo.save(lotMaster);
@@ -61,7 +61,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
             LocalDate fromDate,
             LocalDate toDate
     ) {
-        List<InputTestRequestResponse> inputTestRequestResponses = inputTestRequestRepo.findAllByCondition(warehouseId, lotTypeId, itemNoAndName, testType, itemGroupId, requestType, fromDate, toDate);
+        List<InputTestRequestResponse> inputTestRequestResponses = inputTestRequestRepo.findAllByCondition(warehouseId, lotTypeId, itemNoAndName, testType, itemGroupId, requestType, fromDate, toDate, true);
         for (InputTestRequestResponse inputTestRequestResponse : inputTestRequestResponses) {
             List<Integer> testAmount = inputTestDetailRepo.findTestAmountByInputTestRequestId(inputTestRequestResponse.getId());
             int testAmountSum = testAmount.stream().mapToInt(Integer::intValue).sum();
@@ -73,7 +73,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     // 검사의뢰 단일 조회
     @Override
     public InputTestRequestResponse getInputTestRequestResponse(Long id) throws NotFoundException {
-        InputTestRequestResponse inputTestRequestResponse = inputTestRequestRepo.findResponseByIdAndDeleteYnFalse(id)
+        InputTestRequestResponse inputTestRequestResponse = inputTestRequestRepo.findResponseByIdAndDeleteYnFalse(id, true)
                 .orElseThrow(() -> new NotFoundException("inputTestRequest does not exist. input id: " + id));
         List<Integer> testAmount = inputTestDetailRepo.findTestAmountByInputTestRequestId(inputTestRequestResponse.getId());
         int testAmountSum = testAmount.stream().mapToInt(Integer::intValue).sum();

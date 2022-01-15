@@ -17,6 +17,7 @@ import static lombok.AccessLevel.PROTECTED;
 
 /*
  * 14-1. 부품수입검사
+ * 15-1. 외주수입검사의뢰
  * */
 @AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
@@ -24,7 +25,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Data
 public class InputTestRequest extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "ID", columnDefinition = "bigint COMMENT '부품수입검사 고유아이디'")
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '수입검사 고유아이디'")
     private Long id;
 
     @ManyToOne(fetch = LAZY)
@@ -39,7 +40,7 @@ public class InputTestRequest extends BaseTimeEntity {
     private int requestAmount;                      // 요청수량
 
     @Enumerated(STRING)
-    @Column(name = "INPUT_TEST_STATE", columnDefinition = "varchar(255) COMMENT '부품수입검사 상태값'")
+    @Column(name = "INPUT_TEST_STATE", columnDefinition = "varchar(255) COMMENT '수입검사 상태값'")
     private InputTestState inputTestState = SCHEDULE;      // 수입검사의뢰 상태값
 
     @Enumerated(STRING)
@@ -49,9 +50,21 @@ public class InputTestRequest extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
-    public void create(LotMaster lotMaster) {
+    @Column(name = "INPUT_TEST_DIVISION", columnDefinition = "bit(1) COMMENT '외주수입검사, 부품수입검사 구분'", nullable = false)
+    private boolean inputTestDivision;      // 부품수입검사 true, 외주수입검사: false
+
+    // 14-1. 부품수입검사요청 등록
+    public void createItemInputRequest(LotMaster lotMaster) {
         setLotMaster(lotMaster);
         setInputTestState(SCHEDULE);
+        setInputTestDivision(true);
+    }
+
+    // 15-1. 외주수입검사요청 등록
+    public void createOutsourcingInputRequest(LotMaster lotMaster) {
+        setLotMaster(lotMaster);
+        setInputTestState(SCHEDULE);
+        setInputTestDivision(false);
     }
 
     public void update(LotMaster newLotMaster, InputTestRequest newInputTestRequest) {
@@ -63,14 +76,6 @@ public class InputTestRequest extends BaseTimeEntity {
 
     public void delete() {
         setDeleteYn(true);
-    }
-
-    public void changedOngoing() {
-        setInputTestState(ONGOING);
-    }
-
-    public void changedCompletion() {
-        setInputTestState(COMPLETION);
     }
 
     public void changedSchedule() {
