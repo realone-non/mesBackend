@@ -14,10 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,14 +28,11 @@ import java.util.List;
 @Tag(name = "bad-item", description = "불량항목 API")
 @RestController
 @SecurityRequirement(name = "Authorization")
-@Slf4j
+@RequiredArgsConstructor
 public class BadItemController {
-    @Autowired
-    BadItemService badItemService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(BadItemController.class);
+    private final BadItemService badItemService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(BadItemController.class);
     private CustomLogger cLogger;
 
 
@@ -51,7 +47,7 @@ public class BadItemController {
     public ResponseEntity<BadItemResponse> createBadItem(
             @RequestBody @Valid BadItemRequest badItemRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws BadRequestException {
+    ) throws BadRequestException, NotFoundException {
         BadItemResponse badItem = badItemService.createBadItem(badItemRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + badItem.getId() + " from createBadItem.");

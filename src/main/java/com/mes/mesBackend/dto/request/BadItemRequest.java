@@ -31,4 +31,13 @@ public class BadItemRequest {
     @Schema(description = "사용여부")
     @NotNull(message = NOT_NULL)
     boolean useYn = true;      //  사용여부
+
+    @Schema(description = "작업공정 id")
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
+    Long workProcessId;
+
+    @Schema(description = "소진 원부자재")
+    @NotBlank(message = NOT_NULL)
+    String exhaustItem;
 }

@@ -111,6 +111,9 @@ public class LotMaster extends BaseTimeEntity {
     @Column(name = "CHECK_AMOUNT", columnDefinition = "int COMMENT '검사수량'")
     private int checkAmount;            // 검사수량
 
+    @Column(name = "RECYCLE_AMOUNT", columnDefinition = "int COMMENT '재사용수량'")
+    private int recycleAmount;      // 재사용수량
+
     @Enumerated(STRING)
     @Column(name = "GOODS_TYPE", columnDefinition = "varchar(255) COMMENT '제품 타입'" )
     private GoodsType goodsType;
