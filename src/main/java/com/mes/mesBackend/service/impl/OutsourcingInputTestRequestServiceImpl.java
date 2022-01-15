@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service.impl;
 
-import com.mes.mesBackend.dto.request.InputTestRequestRequest;
+import com.mes.mesBackend.dto.request.InputTestRequestCreateRequest;
+import com.mes.mesBackend.dto.request.InputTestRequestUpdateRequest;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
 import com.mes.mesBackend.entity.InputTestRequest;
 import com.mes.mesBackend.entity.LotMaster;
@@ -36,11 +37,12 @@ public class OutsourcingInputTestRequestServiceImpl implements OutsourcingInputT
     * 예외: 입고된 갯수만큼만 요청수량을 등록 할 수 있음.
     * */
     @Override
-    public InputTestRequestResponse createOutsourcingInputTestRequest(InputTestRequestRequest inputTestRequestRequest) throws BadRequestException, NotFoundException {
+    public InputTestRequestResponse createOutsourcingInputTestRequest(InputTestRequestCreateRequest inputTestRequestRequest) throws BadRequestException, NotFoundException {
         // 입력받은 요청수량이 lot 의 입고수량보다 많은지 체크
         int requestAmount = inputTestRequestRequest.getRequestAmount();
-        throwIfRequestAmountGreaterThanInputAmount(inputTestRequestRequest.getLotId(), requestAmount);
         LotMaster lotMaster = lotMasterService.getLotMasterOrThrow(inputTestRequestRequest.getLotId());
+        throwIfRequestAmountGreaterThanInputAmount(inputTestRequestRequest.getLotId(), lotMaster.getCheckRequestAmount() + requestAmount);
+
         int beforeCheckRequestAmount = lotMaster.getCheckRequestAmount();
         InputTestRequest inputTest = modelMapper.toEntity(inputTestRequestRequest, InputTestRequest.class);
         inputTest.createOutsourcingInputRequest(lotMaster);
@@ -81,12 +83,21 @@ public class OutsourcingInputTestRequestServiceImpl implements OutsourcingInputT
 
     // 외주수입검사의뢰 수정
     @Override
-    public InputTestRequestResponse updateOutsourcingInputTestRequest(Long id, InputTestRequestRequest inputTestRequestRequest) throws BadRequestException, NotFoundException {
-        getInputTestRequestOrThrow(id);
-        int newRequestAmount = inputTestRequestRequest.getRequestAmount();
-        // 입력받은 요청수량이 lot 의 입고수량보다 많은지 체크
-        throwIfRequestAmountGreaterThanInputAmount(inputTestRequestRequest.getLotId(), newRequestAmount);
+    public InputTestRequestResponse updateOutsourcingInputTestRequest(Long id, InputTestRequestUpdateRequest inputTestRequestUpdateRequest) throws BadRequestException, NotFoundException {
+        InputTestRequest findInputTestRequest = getInputTestRequestOrThrow(id);
+        LotMaster findLotMaster = findInputTestRequest.getLotMaster();
+        int beforeRequestAmount = findInputTestRequest.getRequestAmount();
 
+        int newRequestAmount = inputTestRequestUpdateRequest.getRequestAmount();
+        // 입력받은 요청수량이 lot 의 입고수량보다 많은지 체크
+        throwIfRequestAmountGreaterThanInputAmount(findLotMaster.getId(), (findLotMaster.getCheckRequestAmount() - beforeRequestAmount) + newRequestAmount);
+
+        InputTestRequest newInputTestRequest = modelMapper.toEntity(inputTestRequestUpdateRequest, InputTestRequest.class);
+        findInputTestRequest.update(newInputTestRequest);
+        findLotMaster.setCheckRequestAmount((findLotMaster.getCheckRequestAmount() - beforeRequestAmount) + inputTestRequestUpdateRequest.getRequestAmount());
+        inputTestRequestRepo.save(findInputTestRequest);
+        lotMasterRepo.save(findLotMaster);
+        return getInputTestRequestResponse(id);
     }
 
     private InputTestRequest getInputTestRequestOrThrow(Long id) throws NotFoundException {
@@ -96,8 +107,12 @@ public class OutsourcingInputTestRequestServiceImpl implements OutsourcingInputT
 
     // 외주수입검사의뢰 삭제
     @Override
-    public void deleteOutsourcingInputTestRequest(Long id) {
-
+    public void deleteOutsourcingInputTestRequest(Long id) throws NotFoundException {
+        InputTestRequest findInputTestRequest = getInputTestRequestOrThrow(id);
+        LotMaster findLotMaster = findInputTestRequest.getLotMaster();
+        findInputTestRequest.delete();
+        findLotMaster.setCheckRequestAmount(findLotMaster.getCheckRequestAmount() - findInputTestRequest.getRequestAmount());
+        lotMasterRepo.save(findLotMaster);
     }
 
     // 입고된 갯수만큼만 요청수량을 등록 할 수 있음.

@@ -1,8 +1,8 @@
 package com.mes.mesBackend.controller;
 
-import com.mes.mesBackend.dto.request.InputTestRequestRequest;
+import com.mes.mesBackend.dto.request.InputTestRequestCreateRequest;
+import com.mes.mesBackend.dto.request.InputTestRequestUpdateRequest;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
-import com.mes.mesBackend.entity.InputTestRequest;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -31,7 +30,7 @@ import java.util.List;
 
 // 15-1. 외주수입검사의뢰 등록
 @RequestMapping(value = "/outsourcing-input-test-requests")
-@Tag(name = "outsourcing-input-test-request", description = "외주수입검사의뢰등록 API")
+@Tag(name = "outsourcing-input-test-request", description = "15-1. 외주수입검사의뢰등록 API")
 @RestController
 @SecurityRequirement(name = "Authorization")
 @RequiredArgsConstructor
@@ -52,7 +51,7 @@ public class OutsourcingInputTestRequestController {
             }
     )
     public ResponseEntity<InputTestRequestResponse> createOutsourcingInputTestRequest(
-            @RequestBody @Valid InputTestRequestRequest inputTestRequestRequest,
+            @RequestBody @Valid InputTestRequestCreateRequest inputTestRequestRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         InputTestRequestResponse outsourcingInputTestRequest =
@@ -121,10 +120,10 @@ public class OutsourcingInputTestRequestController {
     )
     public ResponseEntity<InputTestRequestResponse> updateOutsourcingInputTestRequest(
             @PathVariable(value = "id") @Parameter(description = "외주수입검사의뢰 id") Long id,
-            @RequestBody @Valid InputTestRequestRequest inputTestRequestRequest,
+            @RequestBody @Valid InputTestRequestUpdateRequest inputTestRequestUpdateRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        InputTestRequestResponse outsourcingInputTestRequest = outsourcingInputTestRequestService.updateOutsourcingInputTestRequest(id, inputTestRequest);
+        InputTestRequestResponse outsourcingInputTestRequest = outsourcingInputTestRequestService.updateOutsourcingInputTestRequest(id, inputTestRequestUpdateRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + outsourcingInputTestRequest.getId() + " from updateOutsourcingInputTestRequest.");
         return new ResponseEntity<>(outsourcingInputTestRequest, HttpStatus.OK);

@@ -29,6 +29,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     final QTestProcess testProcess = QTestProcess.testProcess1;
     final QTestCriteria testCriteria = QTestCriteria.testCriteria1;
     final QPurchaseInput purchaseInput = QPurchaseInput.purchaseInput;
+    final QOutSourcingInput outSourcingInput = QOutSourcingInput.outSourcingInput;
+
 
     // 검사의뢰등록 response 단일 조회 및 예외
     @Override
@@ -64,7 +66,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         .from(inputTestRequest)
                         .innerJoin(lotMaster).on(lotMaster.id.eq(inputTestRequest.lotMaster.id))
                         .innerJoin(item).on(item.id.eq(lotMaster.item.id))
-                        .innerJoin(purchaseInput).on(purchaseInput.id.eq(lotMaster.purchaseInput.id))
+                        .leftJoin(purchaseInput).on(purchaseInput.id.eq(lotMaster.purchaseInput.id))
+                        .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
                         .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                         .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
                         .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))
@@ -123,7 +126,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                 .from(inputTestRequest)
                 .innerJoin(lotMaster).on(lotMaster.id.eq(inputTestRequest.lotMaster.id))
                 .innerJoin(item).on(item.id.eq(lotMaster.item.id))
-                .innerJoin(purchaseInput).on(purchaseInput.id.eq(lotMaster.purchaseInput.id))
+                .leftJoin(purchaseInput).on(purchaseInput.id.eq(lotMaster.purchaseInput.id))
+                .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
                 .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))

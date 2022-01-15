@@ -1,6 +1,7 @@
 package com.mes.mesBackend.controller;
 
-import com.mes.mesBackend.dto.request.InputTestRequestRequest;
+import com.mes.mesBackend.dto.request.InputTestRequestCreateRequest;
+import com.mes.mesBackend.dto.request.InputTestRequestUpdateRequest;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -52,7 +53,7 @@ public class InputTestRequestController {
             }
     )
     public ResponseEntity<InputTestRequestResponse> createInputTestRequest(
-            @RequestBody @Valid InputTestRequestRequest inputTestRequestRequest,
+            @RequestBody @Valid InputTestRequestCreateRequest inputTestRequestRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         InputTestRequestResponse inputTestRequest = inputTestRequestService.createInputTestRequest(inputTestRequestRequest);
@@ -118,10 +119,10 @@ public class InputTestRequestController {
     )
     public ResponseEntity<InputTestRequestResponse> updateInputTestRequest(
             @PathVariable(value = "id") @Parameter(description = "검사의뢰 id") Long id,
-            @RequestBody @Valid InputTestRequestRequest inputTestRequestRequest,
+            @RequestBody @Valid InputTestRequestUpdateRequest inputTestRequestUpdateRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        InputTestRequestResponse inputTestRequest = inputTestRequestService.updateInputTestRequest(id, inputTestRequestRequest);
+        InputTestRequestResponse inputTestRequest = inputTestRequestService.updateInputTestRequest(id, inputTestRequestUpdateRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + inputTestRequest.getId() + " from updateInputTestRequest.");
         return new ResponseEntity<>(inputTestRequest, HttpStatus.OK);

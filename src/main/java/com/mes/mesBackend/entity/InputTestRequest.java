@@ -67,8 +67,7 @@ public class InputTestRequest extends BaseTimeEntity {
         setInputTestDivision(false);
     }
 
-    public void update(LotMaster newLotMaster, InputTestRequest newInputTestRequest) {
-        setLotMaster(newLotMaster);
+    public void update(InputTestRequest newInputTestRequest) {
         setRequestType(newInputTestRequest.requestType);
         setRequestAmount(newInputTestRequest.requestAmount);
         setTestType(newInputTestRequest.testType);
