@@ -12,10 +12,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Setter
 @Schema(description = "14-1.검사의뢰 등록")
 @JsonInclude(NON_NULL)
-public class InputTestRequestRequest {
-    @Schema(description = "lot id")
-    Long lotId;
-
+public class InputTestRequestUpdateRequest {
     @Schema(description = "요청유형")
     TestType requestType;
 

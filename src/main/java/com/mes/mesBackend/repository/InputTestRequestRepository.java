@@ -5,7 +5,11 @@ import com.mes.mesBackend.repository.custom.InputTestRequestRepositoryCustom;
 import com.mes.mesBackend.repository.custom.JpaCustomRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 // 14-1. 검사의뢰 등록
 @Repository
 public interface InputTestRequestRepository extends JpaCustomRepository<InputTestRequest, Long>, InputTestRequestRepositoryCustom {
+    Optional<InputTestRequest> findByIdAndInputTestDivisionFalseAndDeleteYnFalse(Long id);
+    Optional<InputTestRequest> findByIdAndInputTestDivisionTrueAndDeleteYnFalse(Long id);
 }
