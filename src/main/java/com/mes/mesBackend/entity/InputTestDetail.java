@@ -12,13 +12,14 @@ import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 // 14-2. 검사정보
+// 15-2. 외주수입검사 정보
 @AllArgsConstructor
 @NoArgsConstructor(access = PROTECTED)
 @Entity(name = "INPUT_TEST_DETAILS")
 @Data
 public class InputTestDetail extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "ID", columnDefinition = "bigint COMMENT '부품수입검사상세 고유아이디'")
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '수입검사상세 고유아이디'")
     private Long id;
 
     // 검사일시
