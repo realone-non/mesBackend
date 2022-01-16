@@ -36,6 +36,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     final QUser user = QUser.user;
     final QPurchaseOrder purchaseOrder = QPurchaseOrder.purchaseOrder;
     final QPurchaseRequest purchaseRequest = QPurchaseRequest.purchaseRequest;
+    final QOutSourcingInput outSourcingInput = QOutSourcingInput.outSourcingInput;
     // 검사요청정보 리스트 조회
     // 검색조건: 창고 id, 품명|품목, 완료여부, 입고번호, 품목그룹 id, LOT 유형 id, 요청기간 from~toDate, 제조사 id
     @Override
@@ -49,7 +50,8 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
             Long lotTypeId,
             LocalDate fromDate,
             LocalDate toDate,
-            Long manufactureId
+            Long manufactureId,
+            boolean inputTestDivision
     ) {
 
         return jpaQueryFactory
@@ -83,7 +85,8 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                 .from(inputTestRequest)
                 .innerJoin(lotMaster).on(lotMaster.id.eq(inputTestRequest.lotMaster.id))
                 .innerJoin(item).on(item.id.eq(lotMaster.item.id))
-                .innerJoin(purchaseInput).on(purchaseInput.id.eq(lotMaster.purchaseInput.id))
+                .leftJoin(purchaseInput).on(purchaseInput.id.eq(lotMaster.purchaseInput.id))
+                .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
                 .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))
@@ -100,7 +103,8 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                         isLotTypeEq(lotTypeId),
                         isRequestDateBetween(fromDate, toDate),
                         isManufactureEq(manufactureId),
-                        isInputTestRequestDeleteYnFalse()
+                        isInputTestRequestDeleteYnFalse(),
+                        isInputTestDivision(inputTestDivision)
                 )
                 .fetch();
     }
@@ -108,7 +112,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     // 검사상세정보 단일조회
     @Override
     @Transactional(readOnly = true)
-    public Optional<InputTestDetailResponse> findDetailByInputTestRequestIdAndInputTestDetailIdAndDeleteYnFalse(Long inputTestRequestId, Long inputTestDetailId) {
+    public Optional<InputTestDetailResponse> findDetailByInputTestRequestIdAndInputTestDetailIdAndDeleteYnFalse(Long inputTestRequestId, Long inputTestDetailId, boolean inputTestDivision) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .select(
@@ -138,7 +142,8 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                                 inputTestDetail.id.eq(inputTestDetailId),
                                 inputTestRequest.id.eq(inputTestRequestId),
                                 isInputTestRequestDeleteYnFalse(),
-                                isInputTestDetailDeleteYnFalse()
+                                isInputTestDetailDeleteYnFalse(),
+                                isInputTestDivision(inputTestDivision)
                         )
                         .fetchOne());
     }
@@ -177,7 +182,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                 ).fetch();
     }
 
-    // 검사요청정보에 해당하는 검사상세정보 모든 검사수량
+    // 검사요청정보에 해당하는 검사정보의 모든 검사수량
     @Override
     @Transactional(readOnly = true)
     public List<Integer> findTestAmountByInputTestRequestId(Long inputTestRequestId) {
@@ -192,33 +197,31 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                 .fetch();
     }
 
-    // 검사요청정보에 해당하는 검사상세정보 모든 불량수량
+    // 검사요청정보에 해당하는 검사정보의 총 부적합수량
     @Override
     @Transactional(readOnly = true)
     public List<Integer> findBadItemAmountByInputTestRequestId(Long inputTestRequestId) {
         return jpaQueryFactory
-                .select(lotMaster.badItemAmount)
-                .from(lotMaster)
-                .leftJoin(lotMaster).on(lotMaster.id.eq(inputTestRequest.lotMaster.id))
+                .select(inputTestDetail.incongruityAmount)
+                .from(inputTestDetail)
+                .innerJoin(inputTestRequest).on(inputTestRequest.id.eq(inputTestDetail.inputTestRequest.id))
                 .where(
-                        inputTestRequest.id.eq(inputTestRequestId),
-                        inputTestRequest.deleteYn.isFalse(),
-                        lotMaster.deleteYn.isFalse()
+                        inputTestDetail.inputTestRequest.id.eq(inputTestRequestId),
+                        isInputTestDetailDeleteYnFalse()
                 )
                 .fetch();
     }
-    // 검사요청정보에 해당하는 검사상세정보 모든 재고수량
+    // 검사요청정보에 해당하는 검사정보의 총 양품수량
     @Override
     @Transactional(readOnly = true)
     public List<Integer> findStockAmountByInputTestRequestId(Long inputTestRequestId) {
         return jpaQueryFactory
-                .select(lotMaster.stockAmount)
-                .from(lotMaster)
-                .leftJoin(lotMaster).on(lotMaster.id.eq(inputTestRequest.lotMaster.id))
+                .select(inputTestDetail.fairQualityAmount)
+                .from(inputTestDetail)
+                .innerJoin(inputTestRequest).on(inputTestRequest.id.eq(inputTestDetail.inputTestRequest.id))
                 .where(
-                        inputTestRequest.id.eq(inputTestRequestId),
-                        inputTestRequest.deleteYn.isFalse(),
-                        lotMaster.deleteYn.isFalse()
+                        inputTestDetail.inputTestRequest.id.eq(inputTestRequestId),
+                        isInputTestDetailDeleteYnFalse()
                 )
                 .fetch();
     }
@@ -328,5 +331,8 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     // 검사기간
     private BooleanExpression isTestDateBetween(LocalDate fromDate, LocalDate toDate) {
         return fromDate != null ? inputTestDetail.testDate.between(fromDate, toDate) : null;
+    }
+    private BooleanExpression isInputTestDivision(boolean testDivision) {
+        return inputTestRequest.inputTestDivision.eq(testDivision);
     }
 }

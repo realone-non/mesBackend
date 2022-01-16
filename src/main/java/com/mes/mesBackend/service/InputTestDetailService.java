@@ -24,22 +24,23 @@ public interface InputTestDetailService {
             Long lotTypeId,
             LocalDate fromDate,
             LocalDate toDate,
-            Long manufactureId
+            Long manufactureId,
+            boolean inputTestDivision
     );
     // 검사정보 생성
-    InputTestDetailResponse createInputTestDetail(Long inputTestRequestId, InputTestDetailRequest inputTestDetailRequest) throws NotFoundException, BadRequestException;
+    InputTestDetailResponse createInputTestDetail(Long inputTestRequestId, InputTestDetailRequest inputTestDetailRequest, boolean inputTestDivision) throws NotFoundException, BadRequestException;
     // 검사정보 단일조회
-    InputTestDetailResponse getInputTestDetail(Long inputTestRequestId, Long inputTestDetailId) throws NotFoundException;
+    InputTestDetailResponse getInputTestDetail(Long inputTestRequestId, Long inputTestDetailId, boolean inputTestDivision) throws NotFoundException;
     // 검사정보 전체조회
-    List<InputTestDetailResponse> getInputTestDetails(Long inputTestRequestId) throws NotFoundException;
+    List<InputTestDetailResponse> getInputTestDetails(Long inputTestRequestId, boolean inputTestDivision) throws NotFoundException;
     // 검사정보 수정
-    InputTestDetailResponse updateInputTestDetail(Long inputTestRequestId, Long inputTestDetailId, InputTestDetailRequest inputTestDetailRequest) throws NotFoundException, BadRequestException;
+    InputTestDetailResponse updateInputTestDetail(Long inputTestRequestId, Long inputTestDetailId, InputTestDetailRequest inputTestDetailRequest, boolean inputTestDivision) throws NotFoundException, BadRequestException;
     // 검사정보 삭제
-    void deleteInputTestDetail(Long inputTestRequestId, Long inputTestDetailId) throws NotFoundException;
+    void deleteInputTestDetail(Long inputTestRequestId, Long inputTestDetailId, boolean inputTestDivision) throws NotFoundException;
     // 검사성적서 파일
-    InputTestDetailResponse createTestReportFileToInputTestDetail(Long inputTestRequestId, Long inputTestDetailId, MultipartFile testReportFile) throws NotFoundException, BadRequestException, IOException;
+    InputTestDetailResponse createTestReportFileToInputTestDetail(Long inputTestRequestId, Long inputTestDetailId, MultipartFile testReportFile, boolean inputTestDivision) throws NotFoundException, BadRequestException, IOException;
     // COC 파일 추가
-    InputTestDetailResponse createCocFileToInputTestDetail(Long inputTestRequestId, Long inputTestDetailId, MultipartFile cocFile) throws NotFoundException, BadRequestException, IOException;
+    InputTestDetailResponse createCocFileToInputTestDetail(Long inputTestRequestId, Long inputTestDetailId, MultipartFile cocFile, boolean inputTestDivision) throws NotFoundException, BadRequestException, IOException;
     // 파일 삭제
-    void deleteTestReportFileAndCocFileToInputTestDetail(Long inputTestRequestId, Long inputTestDetailId, boolean testReportDeleteYn, boolean cocDeleteYn) throws NotFoundException;
+    void deleteTestReportFileAndCocFileToInputTestDetail(Long inputTestRequestId, Long inputTestDetailId, boolean testReportDeleteYn, boolean cocDeleteYn, boolean inputTestDivision) throws NotFoundException;
 }

@@ -101,7 +101,7 @@ public class OutsourcingInputTestRequestServiceImpl implements OutsourcingInputT
     }
 
     private InputTestRequest getInputTestRequestOrThrow(Long id) throws NotFoundException {
-        return inputTestRequestRepo.findByIdAndInputTestDivisionFalseAndDeleteYnFalse(id)
+        return inputTestRequestRepo.findByIdAndInputTestDivisionAndDeleteYnFalse(id, false)
                 .orElseThrow(() -> new NotFoundException("outsourcingInputTestRequest does not exist. input id: " + id));
     }
 

@@ -33,5 +33,5 @@ public interface InputTestRequestService {
     // 검사의뢰 삭제
     void deleteInputTestRequest(Long id) throws NotFoundException;
     // 검사의뢰 단일 조회 및 예외
-    InputTestRequest getInputTestRequestOrThrow(Long id) throws NotFoundException;
+    InputTestRequest getInputTestRequestOrThrow(Long id, boolean inputTestDivision) throws NotFoundException;
 }

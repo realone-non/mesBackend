@@ -85,7 +85,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     // 검사의뢰 수정
     @Override
     public InputTestRequestResponse updateInputTestRequest(Long id, InputTestRequestUpdateRequest inputTestRequestUpdateRequest) throws NotFoundException, BadRequestException {
-        InputTestRequest findInputTestRequest = getInputTestRequestOrThrow(id);
+        InputTestRequest findInputTestRequest = getInputTestRequestOrThrow(id, true);
         LotMaster findLotMaster = findInputTestRequest.getLotMaster();
         throwIfRequestAmountGreaterThanInputAmount(findInputTestRequest.getLotMaster().getId(), inputTestRequestUpdateRequest.getRequestAmount());     // 요청수량 재고수량 비교
         InputTestRequest newInputTestRequest = modelMapper.toEntity(inputTestRequestUpdateRequest, InputTestRequest.class);
@@ -101,7 +101,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     // 검사의뢰 삭제
     @Override
     public void deleteInputTestRequest(Long id) throws NotFoundException {
-        InputTestRequest inputTestRequest = getInputTestRequestOrThrow(id);
+        InputTestRequest inputTestRequest = getInputTestRequestOrThrow(id, true);
         inputTestRequest.delete();
         LotMaster lotMaster = inputTestRequest.getLotMaster();
         lotMaster.setCheckRequestAmount(lotMaster.getCheckRequestAmount() - inputTestRequest.getRequestAmount());
@@ -110,8 +110,8 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
 
     // 검사의뢰 단일 조회 및 예외
     @Override
-    public InputTestRequest getInputTestRequestOrThrow(Long id) throws NotFoundException {
-        return inputTestRequestRepo.findByIdAndInputTestDivisionTrueAndDeleteYnFalse(id)
+    public InputTestRequest getInputTestRequestOrThrow(Long id, boolean inputTestDivision) throws NotFoundException {
+        return inputTestRequestRepo.findByIdAndInputTestDivisionAndDeleteYnFalse(id, inputTestDivision)
                 .orElseThrow(() -> new NotFoundException("inputTestRequest does not exist. input id: " + id));
     }
 
