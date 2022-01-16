@@ -62,6 +62,9 @@ public class ItemLog extends  BaseTimeEntity{
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn;
 
+    @Column(name = "OUTSOURCING_YN", columnDefinition = "bit(1) COMMENT '외주 여부'")
+    private boolean outsourcingYn;
+
     public void update(int amount, ItemLogType logType){
         switch (logType){
             case STORE_AMOUNT:
@@ -86,6 +89,10 @@ public class ItemLog extends  BaseTimeEntity{
                 break;
             case RETURN_AMOUNT:
                 setReturnAmount(getReturnAmount() + amount);
+                setStockAmount(getStockAmount() - amount);
+                break;
+            case MOVE_AMOUNT:
+                setMoveAmount(getMoveAmount() + amount);
                 setStockAmount(getStockAmount() - amount);
                 break;
         }

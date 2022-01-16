@@ -1,6 +1,5 @@
 package com.mes.mesBackend.repository.impl;
 
-import com.mes.mesBackend.dto.response.ItemLogResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.ItemLogRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -20,11 +19,11 @@ public class ItemLogRepositoryImpl implements ItemLogRepositoryCustom {
     final QWareHouse wareHouse = QWareHouse.wareHouse;
 
     //일자별 품목 변동 사항 전체 조회 / 검색조건 : 창고, 생성기간
-    public List<ItemLogResponse> findAllCondition(Long warehouseId, LocalDate startDate, LocalDate endDate){
+    public List<ItemLog> findAllCondition(Long warehouseId, LocalDate startDate, LocalDate endDate, boolean isOut){
         return jpaQueryFactory
                 .select(
                         Projections.fields(
-                                ItemLogResponse.class,
+                                ItemLog.class,
                                 itemLog.wareHouse.wareHouseName.as("warehouse"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
@@ -43,17 +42,18 @@ public class ItemLogRepositoryImpl implements ItemLogRepositoryCustom {
                 .where(
                     isItemLogBetween(startDate, endDate),
                     isWareHouseNull(warehouseId),
-                    itemLog.deleteYn.eq(false)
+                    itemLog.deleteYn.eq(false),
+                        itemLog.outsourcingYn.eq(isOut)
                 )
                 .fetch();
     }
 
     //일자별 품목 변동 사항 단일 조회
-    public ItemLogResponse findByItemIdAndwareHouseId(Long itemId, Long warehouseId){
+    public ItemLog findByItemIdAndwareHouseId(Long itemId, Long warehouseId, boolean isOut){
         return jpaQueryFactory
         .select(
                 Projections.fields(
-                        ItemLogResponse.class,
+                        ItemLog.class,
                         itemLog.wareHouse.wareHouseName.as("warehouse"),
                         item.itemNo.as("itemNo"),
                         item.itemName.as("itemName"),
@@ -72,7 +72,8 @@ public class ItemLogRepositoryImpl implements ItemLogRepositoryCustom {
                 .where(
                         isWareHouseNull(warehouseId),
                         isItemNull(itemId),
-                        itemLog.deleteYn.eq(false)
+                        itemLog.deleteYn.eq(false),
+                        itemLog.outsourcingYn.eq(isOut)
                 )
                 .fetchOne();
     }
