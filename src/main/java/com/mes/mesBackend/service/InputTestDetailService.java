@@ -11,7 +11,8 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-// 14-2. 검사 등록
+// 14-2. 부품검사 등록 true
+// 15-2. 외주수입검사 등록 false
 public interface InputTestDetailService {
     // 검사요청정보 리스트 조회
     // 검색조건: 창고 id, 품명|품목, 완료여부, 입고번호, 품목그룹 id, LOT 유형 id, 요청기간 from~toDate, 제조사 id

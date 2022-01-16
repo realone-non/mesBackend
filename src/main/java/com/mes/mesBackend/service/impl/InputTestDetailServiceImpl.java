@@ -28,6 +28,7 @@ import java.util.List;
 import static com.mes.mesBackend.entity.enumeration.InputTestState.*;
 
 // 14-2. 검사 등록
+// 15-2. 검사 등록
 @Service
 @RequiredArgsConstructor
 public class InputTestDetailServiceImpl implements InputTestDetailService {
@@ -105,10 +106,9 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
         lotMasterRepo.save(lotMaster);
         inputTestDetailRepo.save(inputTestDetail);       // 검사상세정보 저장
         inputTestRequestRepo.save(inputTestRequest);     // 검사의뢰요청 저장
-
+        // 수량변동에 대한 기록저장
         return getInputTestDetail(inputTestRequestId, inputTestDetail.getId(), inputTestDivision);
     }
-
 
     // 검사정보 단일조회
     @Override
@@ -155,7 +155,6 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
                 .stream().mapToInt(Integer::intValue).sum();
 
         int findTestAmount = findInputTestDetail.getTestAmount();                   // 기존 검사수량
-        int findFairQualityAmount = findInputTestDetail.getFairQualityAmount();     // 기존 양품수량
         int findIncongruityAmount = findInputTestDetail.getIncongruityAmount();     // 기존 부적합수량
 
         // 기존 검사수량 + 입력 검사수량이 검사요청수량보다 크면 예외
@@ -188,6 +187,7 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
         );
 
         lotMasterRepo.save(lotMaster);
+        // 수량변동에 대한 기록저장
         return getInputTestDetail(inputTestRequestId, inputTestDetailId, inputTestDivision);
     }
 
@@ -201,7 +201,6 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
 
         int findTestAmount = findInputTestDetail.getTestAmount();
         int findIncongruityAmount = findInputTestDetail.getIncongruityAmount();
-        int findFairQualityAmount = findInputTestDetail.getFairQualityAmount();
 
         // lotMaster 재고수량, 불량수량, 검사수량 변경
         LotMaster lotMaster = inputTestRequest.getLotMaster();
@@ -229,8 +228,11 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
             boolean inputTestDivision
     ) throws NotFoundException, BadRequestException, IOException {
         InputTestDetail inputTestDetail = getInputTestDetailOrThrow(inputTestRequestId, inputTestDetailId, inputTestDivision);
+        String itemTestReportFileName = "item-input-test/" + inputTestDetail.getId() + "/test-report-files/";
+        String outsourcingTestReportFileName = "outsourcing-input-test/" + inputTestDetail.getId() + "/test-report-files/";
+        // inputTestDivison 따라서 파일명 다르게 리턴
+        String testReportFileName = inputTestDivision ? itemTestReportFileName : outsourcingTestReportFileName;
 
-        String testReportFileName = "input-test/" + inputTestDetail.getId() + "/test-report-files/";
         String testReportFileUrl = s3Uploader.upload(testReportFile, testReportFileName);
         inputTestDetail.setTestReportFileUrl(testReportFileUrl);
         inputTestDetailRepo.save(inputTestDetail);
@@ -248,7 +250,11 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
             boolean inputTestDivision
     ) throws NotFoundException, BadRequestException, IOException {
         InputTestDetail inputTestDetail = getInputTestDetailOrThrow(inputTestRequestId, inputTestDetailId, inputTestDivision);
-        String cocFileName = "input-test/" + inputTestDetail.getId() + "/coc-files/";
+        String itemCocFileName = "item-input-test/" + inputTestDetail.getId() + "/coc-files/";
+        String outsourcingCocFileName = "outsourcing-input-test/" + inputTestDetail.getId() + "/coc-files/";
+
+        String cocFileName = inputTestDivision ? itemCocFileName : outsourcingCocFileName;
+
         String cocFileUrl = s3Uploader.upload(cocFile, cocFileName);
         inputTestDetail.setCocFileUrl(cocFileUrl);
         inputTestDetailRepo.save(inputTestDetail);

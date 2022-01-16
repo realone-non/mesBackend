@@ -11,11 +11,13 @@ import com.mes.mesBackend.exception.NotFoundException;
 import java.time.LocalDate;
 import java.util.List;
 
-// 14-1. 검사의뢰 등록
+// 15-1. 외주수입검사의뢰 등록
+// 14-1. 부품수입검사의뢰 등록
 public interface InputTestRequestService {
     // 검사의뢰 생성
-    InputTestRequestResponse createInputTestRequest(InputTestRequestCreateRequest inputTestRequestRequest) throws NotFoundException, BadRequestException;
-    // 검사의뢰 리스트 검색 조회, 검색조건: 창고 id, LOT 유형 id, 품명|품목, 검사유형, 품목그룹, 요청유형, 의뢰기간
+    InputTestRequestResponse createInputTestRequest(InputTestRequestCreateRequest inputTestRequestRequest, boolean inputTestDivision) throws BadRequestException, NotFoundException;
+    // 검사의뢰 리스트 검색 조회
+    // 검색조건: 창고 id, LOT 유형 id, 품명|품목, 검사유형, 품목그룹, 요청유형, 의뢰기간
     List<InputTestRequestResponse> getInputTestRequests(
             Long warehouseId,
             Long lotTypeId,
@@ -24,14 +26,15 @@ public interface InputTestRequestService {
             Long itemGroupId,
             TestType requestType,
             LocalDate fromDate,
-            LocalDate toDate
+            LocalDate toDate,
+            boolean inputTestDivision
     );
-    // 검사의뢰 단일 조회
-    InputTestRequestResponse getInputTestRequestResponse(Long id) throws NotFoundException;
+    // 검사의뢰 단일 조회 및 예외
+    InputTestRequestResponse getInputTestRequestResponse(Long id, boolean inputTestDivision) throws NotFoundException;
     // 검사의뢰 수정
-    InputTestRequestResponse updateInputTestRequest(Long id, InputTestRequestUpdateRequest inputTestRequestUpdateRequest) throws NotFoundException, BadRequestException;
+    InputTestRequestResponse updateInputTestRequest(Long id, InputTestRequestUpdateRequest inputTestRequestUpdateRequest, boolean inputTestDivision) throws BadRequestException, NotFoundException;
     // 검사의뢰 삭제
-    void deleteInputTestRequest(Long id) throws NotFoundException;
+    void deleteInputTestRequest(Long id, boolean inputTestDivision) throws NotFoundException;
     // 검사의뢰 단일 조회 및 예외
     InputTestRequest getInputTestRequestOrThrow(Long id, boolean inputTestDivision) throws NotFoundException;
 }
