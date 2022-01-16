@@ -9,7 +9,7 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
-import com.mes.mesBackend.service.OutsourcingInputTestRequestService;
+import com.mes.mesBackend.service.InputTestRequestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,7 +35,7 @@ import java.util.List;
 @SecurityRequirement(name = "Authorization")
 @RequiredArgsConstructor
 public class OutsourcingInputTestRequestController {
-    private final OutsourcingInputTestRequestService outsourcingInputTestRequestService;
+    private final InputTestRequestService inputTestRequestService;
     private final LogService logService;
     private final Logger logger = LoggerFactory.getLogger(OutsourcingInputTestRequestController.class);
     private CustomLogger cLogger;
@@ -55,7 +55,7 @@ public class OutsourcingInputTestRequestController {
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         InputTestRequestResponse outsourcingInputTestRequest =
-                outsourcingInputTestRequestService.createOutsourcingInputTestRequest(inputTestRequestRequest);
+                inputTestRequestService.createInputTestRequest(inputTestRequestRequest, false);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " +
                 outsourcingInputTestRequest.getId() + " from createOutsourcingInputTestRequest.");
@@ -81,31 +81,31 @@ public class OutsourcingInputTestRequestController {
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<InputTestRequestResponse> outsourcingInputTestRequests =
-                outsourcingInputTestRequestService.getOutsourcingInputTestRequests(warehouseId, lotTypeId, itemNoAndName, testType, itemGroupId, requestType, fromDate, toDate);
+                inputTestRequestService.getInputTestRequests(warehouseId, lotTypeId, itemNoAndName, testType, itemGroupId, requestType, fromDate, toDate, false);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getOutsourcingInputTestRequests.");
         return new ResponseEntity<>(outsourcingInputTestRequests, HttpStatus.OK);
     }
 
-//    // 외주수입검사의뢰 단일 조회
-//    @GetMapping("/{id}")
-//    @ResponseBody()
-//    @Operation(summary = "외주수입검사의뢰 단일 조회", description = "")
-//    @ApiResponses(
-//            value = {
-//                    @ApiResponse(responseCode = "200", description = "success"),
-//                    @ApiResponse(responseCode = "404", description = "not found resource")
-//            }
-//    )
-//    public ResponseEntity<OutsourcingInputTestRequestResponse> getOutsourcingInputTestRequest(
-//            @PathVariable(value = "id") @Parameter(description = "외주수입검사의뢰 id") Long id,
-//            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-//    ) throws NotFoundException {
-//        OutsourcingInputTestRequestResponse outsourcingInputTestRequest = outsourcingInputTestRequestService.getOutsourcingInputTestRequestResponse(id);
-//        cLogger = new MongoLogger(logger, "mongoTemplate");
-//        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + outsourcingInputTestRequest.getId() + " from getOutsourcingInputTestRequest.");
-//        return new ResponseEntity<>(outsourcingInputTestRequest, HttpStatus.OK);
-//    }
+    // 외주수입검사의뢰 단일 조회
+    @GetMapping("/{id}")
+    @ResponseBody()
+    @Operation(summary = "외주수입검사의뢰 단일 조회", description = "")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource")
+            }
+    )
+    public ResponseEntity<InputTestRequestResponse> getOutsourcingInputTestRequest(
+            @PathVariable(value = "id") @Parameter(description = "외주수입검사의뢰 id") Long id,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        InputTestRequestResponse outsourcingInputTestRequest = inputTestRequestService.getInputTestRequestResponse(id, false);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + outsourcingInputTestRequest.getId() + " from getOutsourcingInputTestRequest.");
+        return new ResponseEntity<>(outsourcingInputTestRequest, HttpStatus.OK);
+    }
 
     // 외주수입검사의뢰 수정
     @PatchMapping("/{id}")
@@ -123,7 +123,7 @@ public class OutsourcingInputTestRequestController {
             @RequestBody @Valid InputTestRequestUpdateRequest inputTestRequestUpdateRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        InputTestRequestResponse outsourcingInputTestRequest = outsourcingInputTestRequestService.updateOutsourcingInputTestRequest(id, inputTestRequestUpdateRequest);
+        InputTestRequestResponse outsourcingInputTestRequest = inputTestRequestService.updateInputTestRequest(id, inputTestRequestUpdateRequest, false);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + outsourcingInputTestRequest.getId() + " from updateOutsourcingInputTestRequest.");
         return new ResponseEntity<>(outsourcingInputTestRequest, HttpStatus.OK);
@@ -142,8 +142,8 @@ public class OutsourcingInputTestRequestController {
     public ResponseEntity<Void> deleteOutsourcingInputTestRequest(
             @PathVariable(value = "id") @Parameter(description = "외주수입검사의뢰 id") Long id,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
-        outsourcingInputTestRequestService.deleteOutsourcingInputTestRequest(id);
+    ) throws NotFoundException, BadRequestException {
+        inputTestRequestService.deleteInputTestRequest(id, false);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteOutsourcingInputTestRequest.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);

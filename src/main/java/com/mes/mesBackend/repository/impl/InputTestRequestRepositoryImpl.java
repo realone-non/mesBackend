@@ -153,13 +153,28 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     @Transactional(readOnly = true)
     public Integer findLotMasterInputAmountByLotMasterId(Long lotMasterId) {
         return jpaQueryFactory
-                        .select(lotMaster.stockAmount)
+                        .select(lotMaster.inputAmount)
                         .from(lotMaster)
                         .where(
                                 lotMaster.id.eq(lotMasterId),
                                 lotMaster.deleteYn.isFalse()
                         )
                         .fetchOne();
+    }
+
+    // 검사요청상태값 별 검사요청 조회
+    @Override
+    public Optional<InputTestRequest> findByIdAndInputTestDivisionAndDeleteYnFalse(Long inputTestRequestId, boolean inputTestDivision) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(inputTestRequest)
+                        .where(
+                                isInputTestRequest(inputTestDivision),
+                                inputTestRequest.id.eq(inputTestRequestId),
+                                isInputTestRequestDeleteYnFalse()
+                        )
+                        .fetchOne()
+        );
     }
 
     // 창고 id
@@ -198,7 +213,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
         return inputTestRequest.deleteYn.isFalse();
     }
 
-    // 14-1. 부품수입검사 요청 조회
+    // 14-1. 부품수입검사 요청 조회 true
+    // 15-1. 외주수입검사 요청 조회 false
     private BooleanExpression isInputTestRequest(boolean inputTestDivision) {
         return inputTestRequest.inputTestDivision.eq(inputTestDivision);
     }
