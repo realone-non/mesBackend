@@ -153,7 +153,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     @Transactional(readOnly = true)
     public Integer findLotMasterInputAmountByLotMasterId(Long lotMasterId) {
         return jpaQueryFactory
-                        .select(lotMaster.stockAmount)
+                        .select(lotMaster.inputAmount)
                         .from(lotMaster)
                         .where(
                                 lotMaster.id.eq(lotMasterId),

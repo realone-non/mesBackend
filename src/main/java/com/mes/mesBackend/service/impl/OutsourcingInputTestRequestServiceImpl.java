@@ -38,9 +38,9 @@ public class OutsourcingInputTestRequestServiceImpl implements OutsourcingInputT
     * */
     @Override
     public InputTestRequestResponse createOutsourcingInputTestRequest(InputTestRequestCreateRequest inputTestRequestRequest) throws BadRequestException, NotFoundException {
-        // 입력받은 요청수량이 lot 의 입고수량보다 많은지 체크
         int requestAmount = inputTestRequestRequest.getRequestAmount();
         LotMaster lotMaster = lotMasterService.getLotMasterOrThrow(inputTestRequestRequest.getLotId());
+        // 입력받은 요청수량이 lot 의 입고수량보다 많은지 체크
         throwIfRequestAmountGreaterThanInputAmount(inputTestRequestRequest.getLotId(), lotMaster.getCheckRequestAmount() + requestAmount);
 
         int beforeCheckRequestAmount = lotMaster.getCheckRequestAmount();
