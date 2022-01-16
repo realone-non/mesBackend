@@ -114,8 +114,15 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
 
     // 외주수입검사의뢰 삭제
     @Override
-    public void deleteInputTestRequest(Long id, boolean inputTestDivision) throws NotFoundException {
+    public void deleteInputTestRequest(Long id, boolean inputTestDivision) throws NotFoundException, BadRequestException {
         InputTestRequest findInputTestRequest = getInputTestRequestOrThrow(id, inputTestDivision);
+
+        // 검사요청에 대한 검사등록 정보가 있을 시 삭제 불가
+        List<Integer> inputTest = inputTestDetailRepo.findTestAmountByInputTestRequestId(findInputTestRequest.getId());
+        if (!inputTest.isEmpty()) {
+            throw new BadRequestException("입력한 검사요청에 대한 검사등록이 존재하므로 삭제할 수 없음.");
+        }
+
         LotMaster findLotMaster = findInputTestRequest.getLotMaster();
         findInputTestRequest.delete();
         findLotMaster.setCheckRequestAmount(findLotMaster.getCheckRequestAmount() - findInputTestRequest.getRequestAmount());

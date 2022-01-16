@@ -142,7 +142,7 @@ public class OutsourcingInputTestRequestController {
     public ResponseEntity<Void> deleteOutsourcingInputTestRequest(
             @PathVariable(value = "id") @Parameter(description = "외주수입검사의뢰 id") Long id,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         inputTestRequestService.deleteInputTestRequest(id, false);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteOutsourcingInputTestRequest.");
