@@ -23,7 +23,6 @@ import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,9 +62,11 @@ public class OutsourcingStatusController {
     public ResponseEntity<List<OutsourcingStatusResponse>> getOutsourcingStatusList(
             @RequestParam(required = false) @Parameter(description = "외주사 ID") Long clientId,
             @RequestParam(required = false) @Parameter(description = "아이템 ID") Long itemId,
+            @RequestParam(required = false) @Parameter(description = "시작날짜") LocalDate startDate,
+            @RequestParam(required = false) @Parameter(description = "종료날짜") LocalDate endDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<OutsourcingStatusResponse> responseList = outsourcingService.getOutsourcingStatusList(clientId, itemId);
+        List<OutsourcingStatusResponse> responseList = outsourcingService.getOutsourcingStatusList(clientId, itemId, startDate, endDate);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
