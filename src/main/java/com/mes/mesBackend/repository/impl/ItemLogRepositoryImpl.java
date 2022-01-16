@@ -21,59 +21,27 @@ public class ItemLogRepositoryImpl implements ItemLogRepositoryCustom {
     //일자별 품목 변동 사항 전체 조회 / 검색조건 : 창고, 생성기간
     public List<ItemLog> findAllCondition(Long warehouseId, LocalDate startDate, LocalDate endDate, boolean isOut){
         return jpaQueryFactory
-                .select(
-                        Projections.fields(
-                                ItemLog.class,
-                                itemLog.wareHouse.wareHouseName.as("warehouse"),
-                                item.itemNo.as("itemNo"),
-                                item.itemName.as("itemName"),
-                                itemLog.stockAmount.as("storeAmount"),
-                                itemLog.createdAmount.as("createdAmount"),
-                                itemLog.badItemAmount.as("badItemAmount"),
-                                itemLog.inputAmount.as("inputAmount"),
-                                itemLog.shipmentAmount.as("shipmentAmount"),
-                                itemLog.stockRealAmount.as("stockRealAmount"),
-                                itemLog.moveAmount.as("moveAmount"),
-                                itemLog.returnAmount.as("returnAmount"),
-                                itemLog.stockAmount.as("stockAmount")
-                        )
-                )
-                .from(itemLog)
+                .selectFrom(itemLog)
                 .where(
                     isItemLogBetween(startDate, endDate),
                     isWareHouseNull(warehouseId),
                     itemLog.deleteYn.eq(false),
-                        itemLog.outsourcingYn.eq(isOut)
+                    itemLog.outsourcingYn.eq(isOut),
+                        itemLog.logDate.eq(LocalDate.now())
                 )
                 .fetch();
     }
 
     //일자별 품목 변동 사항 단일 조회
-    public ItemLog findByItemIdAndwareHouseId(Long itemId, Long warehouseId, boolean isOut){
+    public ItemLog findByItemIdAndwareHouseIdAndOutsourcingYn(Long itemId, Long warehouseId, boolean isOut){
         return jpaQueryFactory
-        .select(
-                Projections.fields(
-                        ItemLog.class,
-                        itemLog.wareHouse.wareHouseName.as("warehouse"),
-                        item.itemNo.as("itemNo"),
-                        item.itemName.as("itemName"),
-                        itemLog.stockAmount.as("storeAmount"),
-                        itemLog.createdAmount.as("createdAmount"),
-                        itemLog.badItemAmount.as("badItemAmount"),
-                        itemLog.inputAmount.as("inputAmount"),
-                        itemLog.shipmentAmount.as("shipmentAmount"),
-                        itemLog.stockRealAmount.as("stockRealAmount"),
-                        itemLog.moveAmount.as("moveAmount"),
-                        itemLog.returnAmount.as("returnAmount"),
-                        itemLog.stockAmount.as("stockAmount")
-                )
-        )
-                .from(itemLog)
+        .selectFrom(itemLog)
                 .where(
                         isWareHouseNull(warehouseId),
                         isItemNull(itemId),
                         itemLog.deleteYn.eq(false),
-                        itemLog.outsourcingYn.eq(isOut)
+                        itemLog.outsourcingYn.eq(isOut),
+                        itemLog.logDate.eq(LocalDate.now())
                 )
                 .fetchOne();
     }

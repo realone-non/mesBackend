@@ -180,7 +180,7 @@ public class OutsourcingServiceImpl implements OutsourcingService {
 
         LotMaster lotMaster = lotMasterRepository.findByLotNoAndUseYnTrue(lotNo);
 
-        amountHelper.amountUpdate(lotMaster.getItem().getId(), input.get().getInputWareHouse().getId(), null,  request.getInputAmount(), ItemLogType.INPUT_AMOUNT, true);
+        amountHelper.amountUpdate(lotMaster.getItem().getId(), input.get().getInputWareHouse().getId(), null,   ItemLogType.STORE_AMOUNT, request.getInputAmount(), true);
 
         OutsourcingInputLOTResponse lotResponse = new OutsourcingInputLOTResponse();
 

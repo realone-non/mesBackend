@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 //일자별 품목 변동 사항
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "ITEM_LOG_LIST")
 @Data
 public class ItemLog extends  BaseTimeEntity{
@@ -96,5 +96,10 @@ public class ItemLog extends  BaseTimeEntity{
                 setStockAmount(getStockAmount() - amount);
                 break;
         }
+    }
+    public void setProperty(Item item, WareHouse wareHouse, boolean isOut){
+        setItem(item);
+        setWareHouse(wareHouse);
+        setOutsourcingYn(isOut);
     }
 }
