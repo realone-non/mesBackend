@@ -10,6 +10,4 @@ import java.util.Optional;
 // 14-1. 검사의뢰 등록
 @Repository
 public interface InputTestRequestRepository extends JpaCustomRepository<InputTestRequest, Long>, InputTestRequestRepositoryCustom {
-    Optional<InputTestRequest> findByIdAndInputTestDivisionFalseAndDeleteYnFalse(Long id);
-    Optional<InputTestRequest> findByIdAndInputTestDivisionTrueAndDeleteYnFalse(Long id);
 }
