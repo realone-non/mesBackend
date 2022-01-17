@@ -36,13 +36,15 @@ public interface InputTestDetailRepositoryCustom {
     List<Integer> findStockAmountByInputTestRequestId(Long inputTestRequestId);
 
     // ================================================= 14-3. 검사실적조회 =================================================
-    // 검사실적조회
+    // 14-3. 검사실적조회
+    // 15-3. 검사실적 조회
     // 검색조건: 검사기간 fromDate~toDate, 품명|품목, 거래처 id, 입고번호(구매입고 id)
     List<InputTestPerformanceResponse> findInputTestPerformanceResponseByCondition(
             LocalDate fromDate,
             LocalDate toDate,
             String itemNoAndName,
             Long clientId,
-            Long purchaseInputNo
+            Long purchaseInputNo,
+            boolean inputTestDivision
     );
 }

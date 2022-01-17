@@ -7,8 +7,10 @@ import com.mes.mesBackend.entity.InputTestDetail;
 import com.mes.mesBackend.entity.InputTestRequest;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.User;
+import com.mes.mesBackend.entity.enumeration.ItemLogType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.AmountHelper;
 import com.mes.mesBackend.helper.S3Uploader;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.InputTestDetailRepository;
@@ -26,6 +28,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.InputTestState.*;
+import static com.mes.mesBackend.entity.enumeration.ItemLogType.BAD_AMOUNT;
 
 // 14-2. 검사 등록
 // 15-2. 검사 등록
@@ -39,6 +42,7 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
     private final UserService userService;
     private final LotMasterRepository lotMasterRepo;
     private final S3Uploader s3Uploader;
+    private final AmountHelper amountHelper;
 
     // 검사요청정보 리스트 조회
     // 검색조건: 창고 id, 품명|품목, 완료여부, 입고번호, 품목그룹 id, LOT 유형 id, 요청기간 from~toDate, 제조사 id
@@ -107,6 +111,7 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
         inputTestDetailRepo.save(inputTestDetail);       // 검사상세정보 저장
         inputTestRequestRepo.save(inputTestRequest);     // 검사의뢰요청 저장
         // 수량변동에 대한 기록저장
+        amountHelper.amountUpdate(lotMaster.getItem().getId(), lotMaster.getWareHouse().getId(), null, BAD_AMOUNT, inputTestDetail.getIncongruityAmount(), !inputTestDivision);
         return getInputTestDetail(inputTestRequestId, inputTestDetail.getId(), inputTestDivision);
     }
 
@@ -156,6 +161,7 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
 
         int findTestAmount = findInputTestDetail.getTestAmount();                   // 기존 검사수량
         int findIncongruityAmount = findInputTestDetail.getIncongruityAmount();     // 기존 부적합수량
+        int findFairQualityAmount = findInputTestDetail.getFairQualityAmount();
 
         // 기존 검사수량 + 입력 검사수량이 검사요청수량보다 크면 예외
         throwIfTestAmountGreaterThanCheckRequestAmount(
@@ -187,7 +193,10 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
         );
 
         lotMasterRepo.save(lotMaster);
+
         // 수량변동에 대한 기록저장
+        amountHelper.amountUpdate(lotMaster.getItem().getId(), lotMaster.getWareHouse().getId(), null, BAD_AMOUNT, (findIncongruityAmount - newIncongruityAmount) * -1, !inputTestDivision);
+        amountHelper.amountUpdate(lotMaster.getItem().getId(), lotMaster.getWareHouse().getId(), null, BAD_AMOUNT, (findFairQualityAmount - newFairQualityAmount) * -1, !inputTestDivision);
         return getInputTestDetail(inputTestRequestId, inputTestDetailId, inputTestDivision);
     }
 
@@ -201,6 +210,7 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
 
         int findTestAmount = findInputTestDetail.getTestAmount();
         int findIncongruityAmount = findInputTestDetail.getIncongruityAmount();
+        int findFairQualityAmount = findInputTestDetail.getFairQualityAmount();
 
         // lotMaster 재고수량, 불량수량, 검사수량 변경
         LotMaster lotMaster = inputTestRequest.getLotMaster();
@@ -215,6 +225,11 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
 
         inputTestDetailRepo.save(findInputTestDetail);      // 삭제
         inputTestRequestRepo.save(inputTestRequest);
+
+        // 수량변동에 대한 기록저장
+        amountHelper.amountUpdate(lotMaster.getItem().getId(), lotMaster.getWareHouse().getId(), null, BAD_AMOUNT, findIncongruityAmount * -1, !inputTestDivision);
+        amountHelper.amountUpdate(lotMaster.getItem().getId(), lotMaster.getWareHouse().getId(), null, BAD_AMOUNT, findFairQualityAmount * -1, !inputTestDivision);
+
         lotMasterRepo.save(lotMaster);
     }
 

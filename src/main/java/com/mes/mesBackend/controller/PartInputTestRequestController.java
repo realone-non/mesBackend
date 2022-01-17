@@ -30,16 +30,16 @@ import java.time.LocalDate;
 import java.util.List;
 
 // 14-1. 검사의뢰 등록
-@RequestMapping(value = "/item-input-test-requests")
-@Tag(name = "item-input-test-request", description = "14-1. 검사의뢰등록 API")
+@RequestMapping(value = "/part-input-test-requests")
+@Tag(name = "part-input-test-request", description = "14-1. 검사의뢰등록 API")
 @RestController
 @SecurityRequirement(name = "Authorization")
 @Slf4j
 @RequiredArgsConstructor
-public class ItemInputTestRequestController {
+public class PartInputTestRequestController {
     private final InputTestRequestService outsourcingInputTestRequestService;
     private final LogService logService;
-    private final Logger logger = LoggerFactory.getLogger(ItemInputTestRequestController.class);
+    private final Logger logger = LoggerFactory.getLogger(PartInputTestRequestController.class);
     private CustomLogger cLogger;
 
     // 검사의뢰 생성
@@ -141,7 +141,7 @@ public class ItemInputTestRequestController {
     public ResponseEntity<Void> deleteInputTestRequest(
             @PathVariable(value = "id") @Parameter(description = "검사의뢰 id") Long id,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         outsourcingInputTestRequestService.deleteInputTestRequest(id, true);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteItemInputTestRequest.");

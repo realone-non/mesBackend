@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 // 14-3. 검사실적 조회
+// 15-3. 검사실적 조회
 @Service
 @RequiredArgsConstructor
 public class InputTestPerformanceServiceImpl implements InputTestPerformanceService {
@@ -23,8 +24,9 @@ public class InputTestPerformanceServiceImpl implements InputTestPerformanceServ
             LocalDate toDate,
             String itemNoAndName,
             Long clientId,
-            Long purchaseInputNo
+            Long purchaseInputNo,
+            boolean inputTestDivision
     ) {
-        return inputTestDetailRepo.findInputTestPerformanceResponseByCondition(fromDate, toDate, itemNoAndName, clientId, purchaseInputNo);
+        return inputTestDetailRepo.findInputTestPerformanceResponseByCondition(fromDate, toDate, itemNoAndName, clientId, purchaseInputNo, inputTestDivision);
     }
 }
