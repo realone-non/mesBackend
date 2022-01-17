@@ -21,17 +21,17 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
-// 14-3. 검사실적 조회
-@RequestMapping(value = "/input-test-performances")
-@Tag(name = "input-test-performance", description = "검사실적조회 API")
+// 15-3. 검사실적 조회
+@RequestMapping(value = "/outsourcing-input-test-performances")
+@Tag(name = "outsourcing-input-test-performance", description = "15-3. 검사실적 조회 API")
 @RestController
 @SecurityRequirement(name = "Authorization")
 @Slf4j
 @RequiredArgsConstructor
-public class InputTestPerformanceController {
+public class OutsourcingInputTestPerformanceController {
     private final InputTestPerformanceService inputTestPerformanceService;
     private final LogService logService;
-    private final Logger logger = LoggerFactory.getLogger(InputTestPerformanceController.class);
+    private final Logger logger = LoggerFactory.getLogger(PartInputTestPerformanceController.class);
     private CustomLogger cLogger;
 
     // 검사실적조회
@@ -41,7 +41,7 @@ public class InputTestPerformanceController {
     @Operation(
             summary = "검사실적조회",
             description = "검색조건: 검사기간 fromDate~toDate, 품명|품번, 거래처 id, 입고번호(구매입고 id)")
-    public ResponseEntity<List<InputTestPerformanceResponse>> getInputTestPerformances(
+    public ResponseEntity<List<InputTestPerformanceResponse>> getOutsourcingInputTestPerformances(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "검사기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "검사기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
@@ -49,9 +49,9 @@ public class InputTestPerformanceController {
             @RequestParam(required = false) @Parameter(description = "입고번호 (purchaseInputId)") Long purchaseInputNo,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<InputTestPerformanceResponse> inputTestPerformanceResponses = inputTestPerformanceService.getInputTestPerformances(fromDate, toDate, itemNoAndName, clientId, purchaseInputNo);
+        List<InputTestPerformanceResponse> inputTestPerformanceResponses = inputTestPerformanceService.getInputTestPerformances(fromDate, toDate, itemNoAndName, clientId, purchaseInputNo, false);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getInputTestPerformances.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getOutsourcingInputTestPerformances.");
         return new ResponseEntity<>(inputTestPerformanceResponses, HttpStatus.OK);
     }
 }

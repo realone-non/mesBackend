@@ -34,16 +34,16 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 // 14-2. 검사 등록
-@RequestMapping(value = "/item-input-test-enrollments")
-@Tag(name = "item-input-test-enrollment", description = "14-2. 검사등록 API")
+@RequestMapping(value = "/part-input-test-enrollments")
+@Tag(name = "part-input-test-enrollment", description = "14-2. 검사등록 API")
 @RestController
 @SecurityRequirement(name = "Authorization")
 @Slf4j
 @RequiredArgsConstructor
-public class ItemInputTestEnrollmentController {
+public class PartInputTestEnrollmentController {
     private final InputTestDetailService inputTestDetailService;
     private final LogService logService;
-    private final Logger logger = LoggerFactory.getLogger(ItemInputTestEnrollmentController.class);
+    private final Logger logger = LoggerFactory.getLogger(PartInputTestEnrollmentController.class);
     private CustomLogger cLogger;
 
     // 검사요청정보 리스트 조회
