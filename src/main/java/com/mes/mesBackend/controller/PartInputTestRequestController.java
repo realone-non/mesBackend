@@ -30,16 +30,16 @@ import java.time.LocalDate;
 import java.util.List;
 
 // 14-1. 검사의뢰 등록
-@RequestMapping(value = "/item-input-test-requests")
-@Tag(name = "item-input-test-request", description = "14-1. 검사의뢰등록 API")
+@RequestMapping(value = "/part-input-test-requests")
+@Tag(name = "part-input-test-request", description = "14-1. 검사의뢰등록 API")
 @RestController
 @SecurityRequirement(name = "Authorization")
 @Slf4j
 @RequiredArgsConstructor
-public class ItemInputTestRequestController {
+public class PartInputTestRequestController {
     private final InputTestRequestService outsourcingInputTestRequestService;
     private final LogService logService;
-    private final Logger logger = LoggerFactory.getLogger(ItemInputTestRequestController.class);
+    private final Logger logger = LoggerFactory.getLogger(PartInputTestRequestController.class);
     private CustomLogger cLogger;
 
     // 검사의뢰 생성
