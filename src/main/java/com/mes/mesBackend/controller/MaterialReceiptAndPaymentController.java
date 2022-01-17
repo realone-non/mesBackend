@@ -61,7 +61,7 @@ public class MaterialReceiptAndPaymentController{
                     @ApiResponse(responseCode = "404", description = "not found resource"),
             }
     )
-    public ResponseEntity<List<ReceiptAndPaymentResponse>> getReceiptAndPaments(
+    public ResponseEntity<List<ReceiptAndPaymentResponse>> getReceiptAndPayments(
             @RequestParam(required = false) @Parameter(description = "창고 ID") Long warehouseId,
             @RequestParam(required = false) @Parameter(description = "품목 그룹 ID") Long itemAccountId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "시작날짜") LocalDate fromDate,
