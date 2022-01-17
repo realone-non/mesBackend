@@ -236,7 +236,8 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
             LocalDate toDate,
             String itemNoAndName,
             Long clientId,
-            Long purchaseInputNo
+            Long purchaseInputNo,
+            boolean inputTestDivision
     ) {
         return jpaQueryFactory
                 .select(
@@ -273,6 +274,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                 .leftJoin(item).on(item.id.eq(lotMaster.item.id))
                 .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))
                 .leftJoin(purchaseInput).on(purchaseInput.id.eq(lotMaster.purchaseInput.id))
+                .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
                 .leftJoin(purchaseRequest).on(purchaseRequest.id.eq(purchaseInput.purchaseRequest.id))
                 .leftJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
                 .leftJoin(testProcess).on(testProcess.id.eq(item.testProcess.id))
@@ -285,7 +287,8 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                         isManufactureEq(clientId),
                         isPurchaseInputNoEq(purchaseInputNo),
                         isInputTestDetailDeleteYnFalse(),
-                        isInputTestRequestDeleteYnFalse()
+                        isInputTestRequestDeleteYnFalse(),
+                        isInputTestDivision(inputTestDivision)
                 )
                 .fetch();
     }
