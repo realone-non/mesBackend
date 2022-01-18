@@ -1,7 +1,6 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.MaterialStockInspectRequestResponse;
-import com.mes.mesBackend.dto.response.OutsourcingProductionResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.MaterialStockInspectRequestRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -11,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class MaterialStockInspectRequestRepositoryImpl implements MaterialStockInspectRequestRepositoryCustom {
@@ -33,6 +33,7 @@ public class MaterialStockInspectRequestRepositoryImpl implements MaterialStockI
                                 wareHouse.id.as("warehouseId"),
                                 wareHouse.wareHouseName.as("warehouse"),
                                 wareHouseType.name.as("warehouseType"),
+                                itemAccount.id.as("itemAccountId"),
                                 itemAccount.account.as("itemAccount"),
                                 materialStockInspectRequest.inspectionType.as("stockInspectionType")
                         )
@@ -48,10 +49,11 @@ public class MaterialStockInspectRequestRepositoryImpl implements MaterialStockI
                 .fetch();
     }
 
-    public MaterialStockInspectRequestResponse findByIdAndDeleteYn(Long id){
-        return jpaQueryFactory
-                .select(
-                        Projections.fields(
+    public Optional<MaterialStockInspectRequestResponse> findByIdAndDeleteYn(Long id){
+        return Optional.ofNullable(
+                jpaQueryFactory
+                    .select(
+                            Projections.fields(
                                 MaterialStockInspectRequestResponse.class,
                                 materialStockInspectRequest.id.as("id"),
                                 materialStockInspectRequest.inspectDate.as("inspectDate"),
@@ -59,6 +61,7 @@ public class MaterialStockInspectRequestRepositoryImpl implements MaterialStockI
                                 wareHouse.id.as("warehouseId"),
                                 wareHouse.wareHouseName.as("warehouse"),
                                 wareHouseType.name.as("warehouseType"),
+                                itemAccount.id.as("itemAccountId"),
                                 itemAccount.account.as("itemAccount"),
                                 materialStockInspectRequest.inspectionType.as("stockInspectionType")
                         )
@@ -71,7 +74,8 @@ public class MaterialStockInspectRequestRepositoryImpl implements MaterialStockI
                         materialStockInspectRequest.id.eq(id),
                         materialStockInspectRequest.deleteYn.eq(false)
                 )
-                .fetchOne();
+                .fetchOne()
+        );
     }
 
     private BooleanExpression dateNull(LocalDate startDate, LocalDate endDate){

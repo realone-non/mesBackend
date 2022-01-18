@@ -30,7 +30,7 @@ public class MaterialStockInspectRequestResponse {
     String warehouse;
 
     @Schema(description = "품목그룹 ID")
-    String itemAccountId;
+    Long itemAccountId;
 
     @Schema(description = "품목그룹")
     String itemAccount;

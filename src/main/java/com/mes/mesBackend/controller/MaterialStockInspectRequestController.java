@@ -130,7 +130,7 @@ public class MaterialStockInspectRequestController {
     //재고실사의뢰 삭제
     @DeleteMapping("/{id}")
     @ResponseBody()
-    @Operation(summary = "상세정보 삭제", description = "")
+    @Operation(summary = "재고실사의뢰 삭제", description = "")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "204", description = "no content"),
@@ -138,7 +138,7 @@ public class MaterialStockInspectRequestController {
             }
     )
     public ResponseEntity<Void> deleteMaterialStockInspect(
-            @PathVariable(value = "equipment-id") @Parameter(description = "실사의뢰 id") Long id,
+            @PathVariable(value = "id") @Parameter(description = "재고실사의뢰 id") Long id,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         materialWarehouseService.deleteMaterialStockInspect(id);

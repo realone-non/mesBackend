@@ -50,7 +50,8 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
         dbStockInspect.setItemAccount(itemAccount);
         materialStockInspectRequestRepository.save(dbStockInspect);
         System.out.println(dbStockInspect.getId());
-        return materialStockInspectRequestRepository.findByIdAndDeleteYn(dbStockInspect.getId());
+        return materialStockInspectRequestRepository.findByIdAndDeleteYn(dbStockInspect.getId())
+                .orElseThrow(() -> new NotFoundException("stockInspectRequest does not exist. input id: " + dbStockInspect.getId()));
     }
     //재고실사의뢰 조회
     public List<MaterialStockInspectRequestResponse> getMaterialStockInspectList(LocalDate fromDate, LocalDate toDate){
@@ -58,7 +59,8 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
     }
     //재고실사의뢰 단건조회
     public MaterialStockInspectRequestResponse getMaterialStockInspect(Long id) throws NotFoundException{
-        return materialStockInspectRequestRepository.findByIdAndDeleteYn(id);
+        return materialStockInspectRequestRepository.findByIdAndDeleteYn(id)
+                .orElseThrow(() -> new NotFoundException("stockInspectRequest does not exist. input id: " + id));
     }
     //재고실사의뢰 수정
     public MaterialStockInspectRequestResponse modifyMaterialStockInspect(Long id, MaterialStockInspectRequestRequest request) throws NotFoundException{
@@ -70,12 +72,14 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
                 .orElseThrow(() -> new NotFoundException("itemAccount does not exist. input id: " + request.getItemAccountId()));
         dbStockRequest.update(request.getNote(), wareHouse, itemAccount);
         materialStockInspectRequestRepository.save(dbStockRequest);
-        return materialStockInspectRequestRepository.findByIdAndDeleteYn(id());
+        return materialStockInspectRequestRepository.findByIdAndDeleteYn(id)
+                .orElseThrow(() -> new NotFoundException("stockInspectRequest does not exist. input id: " + id));
     }
     //재고실사의뢰 삭제
     public void deleteMaterialStockInspect(Long id) throws NotFoundException{
         MaterialStockInspectRequest dbStockRequest = materialStockInspectRequestRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("stockInspect does not exist. input id: " + id));
         dbStockRequest.delete(id);
+        materialStockInspectRequestRepository.save(dbStockRequest);
     }
 }
