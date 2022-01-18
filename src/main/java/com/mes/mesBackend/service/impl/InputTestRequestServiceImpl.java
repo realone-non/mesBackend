@@ -5,6 +5,7 @@ import com.mes.mesBackend.dto.request.InputTestRequestUpdateRequest;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
 import com.mes.mesBackend.entity.InputTestRequest;
 import com.mes.mesBackend.entity.LotMaster;
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -20,6 +21,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
+import static com.mes.mesBackend.helper.Constants.PRODUCT_ITEM_ACCOUNT;
 
 // 15-1. 외주수입검사의뢰 등록
 @Service
@@ -40,26 +44,27 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     @Override
     public InputTestRequestResponse createInputTestRequest(
             InputTestRequestCreateRequest inputTestRequestRequest,
-            boolean inputTestDivision
+            InputTestDivision inputTestDivision
     ) throws BadRequestException, NotFoundException {
         int requestAmount = inputTestRequestRequest.getRequestAmount();
         LotMaster lotMaster = lotMasterService.getLotMasterOrThrow(inputTestRequestRequest.getLotId());
-        if (inputTestDivision) {
-            if (lotMaster.getPurchaseInput() == null) {
-                throw new BadRequestException("구매입고만 등록할 수 있음.");
-            }
-        } else {
-            if (lotMaster.getOutSourcingInput() == null) {
-                throw new BadRequestException("외주입고만 등록할 수 있음");
+
+        if (inputTestDivision.equals(PART)) {
+            if (lotMaster.getPurchaseInput() == null) throw new BadRequestException("구매입고만 등록할 수 있음.");
+        } else if (inputTestDivision.equals(OUT_SOURCING)) {
+            if (lotMaster.getOutSourcingInput() == null) throw new BadRequestException("외주입고만 등록할 수 있음");
+        } else if (inputTestDivision.equals(PRODUCT)) {
+            if (!lotMaster.getItem().getItemAccount().getAccount().equals(PRODUCT_ITEM_ACCOUNT)) {
+                throw new BadRequestException("완제품만 등록할 수 있음.");
             }
         }
 
-        // 입력받은 요청수량이 lot 의 입고수량보다 많은지 체크
+        // 입력받은 요청수량이 lot 의 재고수량보다 많은지 체크
         throwIfRequestAmountGreaterThanInputAmount(inputTestRequestRequest.getLotId(), lotMaster.getCheckRequestAmount() + requestAmount);
 
         int beforeCheckRequestAmount = lotMaster.getCheckRequestAmount();
         InputTestRequest inputTest = modelMapper.toEntity(inputTestRequestRequest, InputTestRequest.class);
-        inputTest.createOutsourcingInputRequest(lotMaster);
+        inputTest.createInputTestRequest(lotMaster, inputTestDivision, inputTestRequestRequest.getTestCompletionRequestDate());
         inputTestRequestRepo.save(inputTest);       // lotMaster, 요청유형, 요청수량, 검사유형, 상태값 생성
 
         lotMaster.setCheckRequestAmount(beforeCheckRequestAmount + requestAmount);
@@ -69,9 +74,15 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
 
     // 검사의뢰 단일 조회
     @Override
-    public InputTestRequestResponse getInputTestRequestResponse(Long inputTestId, boolean inputTestDivision) throws NotFoundException {
-        return inputTestRequestRepo.findResponseByIdAndDeleteYnFalse(inputTestId, inputTestDivision)
-                .orElseThrow(() -> new NotFoundException("inputTestRequest does not exist. input id: " + inputTestId)).division(inputTestDivision);
+    public InputTestRequestResponse getInputTestRequestResponse(Long inputTestId, InputTestDivision inputTestDivision) throws NotFoundException {
+        InputTestRequestResponse response = inputTestRequestRepo.findResponseByIdAndDeleteYnFalse(inputTestId, inputTestDivision)
+                .orElseThrow(() -> new NotFoundException("inputTestRequest does not exist. input id: " + inputTestId));
+        if (inputTestDivision.equals(PRODUCT)) {
+            String workOrderNo = inputTestRequestRepo.findWorkOrderNoByLotId(response.getLotId())
+                    .orElseThrow(() -> new NotFoundException("해당하는 lot 로 등록된 작업지시 정보가 없음."));
+            response.setWorkOrderNo(workOrderNo);
+        }
+        return response.division(inputTestDivision);
     }
 
     // 외주수입검사의뢰 리스트 검색 조회
@@ -86,25 +97,33 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
             TestType requestType,
             LocalDate fromDate,
             LocalDate toDate,
-            boolean inputTestDivision
-    ) {
-        List<InputTestRequestResponse> responses = inputTestRequestRepo.findAllByCondition(
-                warehouseId,
-                lotTypeId,
-                itemNoAndName,
-                testType,
-                itemGroupId,
-                requestType,
-                fromDate,
-                toDate,
-                inputTestDivision
-        );
-        for (InputTestRequestResponse response : responses) {
-            List<Integer> testAmountList = inputTestDetailRepo.findTestAmountByInputTestRequestId(response.getId());
-            int testAmountSum = testAmountList.stream().mapToInt(Integer::intValue).sum();
-            response.setTestAmount(testAmountSum);
-        }
-        return responses.stream().map(res -> res.division(inputTestDivision)).collect(Collectors.toList());
+            InputTestDivision inputTestDivision
+    ) throws NotFoundException {
+            List<InputTestRequestResponse> responses = inputTestRequestRepo.findAllByCondition(
+                    warehouseId,
+                    lotTypeId,
+                    itemNoAndName,
+                    testType,
+                    itemGroupId,
+                    requestType,
+                    fromDate,
+                    toDate,
+                    inputTestDivision
+            );
+            for (InputTestRequestResponse response : responses) {
+                List<Integer> testAmountList = inputTestDetailRepo.findTestAmountByInputTestRequestId(response.getId());
+                int testAmountSum = testAmountList.stream().mapToInt(Integer::intValue).sum();
+                response.setTestAmount(testAmountSum);
+
+                // 완제품에 대한 작업지시번호
+                if (inputTestDivision.equals(PRODUCT)) {
+                    Long lotId = response.getLotId();
+                    String workOrderNo = inputTestRequestRepo.findWorkOrderNoByLotId(lotId)
+                            .orElseThrow(() -> new NotFoundException("해당하는 lot 로 등록된 작업지시 정보가 없음."));
+                    response.setWorkOrderNo(workOrderNo);
+                }
+            }
+            return responses.stream().map(res -> res.division(inputTestDivision)).collect(Collectors.toList());
     }
 
     // 외주수입검사의뢰 수정
@@ -112,7 +131,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     public InputTestRequestResponse updateInputTestRequest(
             Long id,
             InputTestRequestUpdateRequest inputTestRequestUpdateRequest,
-            boolean inputTestDivision
+            InputTestDivision inputTestDivision
     ) throws BadRequestException, NotFoundException {
         InputTestRequest findInputTestRequest = getInputTestRequestOrThrow(id, inputTestDivision);
         LotMaster findLotMaster = findInputTestRequest.getLotMaster();
@@ -123,7 +142,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
         throwIfRequestAmountGreaterThanInputAmount(findLotMaster.getId(), (findLotMaster.getCheckRequestAmount() - beforeRequestAmount) + newRequestAmount);
 
         InputTestRequest newInputTestRequest = modelMapper.toEntity(inputTestRequestUpdateRequest, InputTestRequest.class);
-        findInputTestRequest.update(newInputTestRequest);
+        findInputTestRequest.update(newInputTestRequest, inputTestDivision);
         findLotMaster.setCheckRequestAmount((findLotMaster.getCheckRequestAmount() - beforeRequestAmount) + inputTestRequestUpdateRequest.getRequestAmount());
         inputTestRequestRepo.save(findInputTestRequest);
         lotMasterRepo.save(findLotMaster);
@@ -131,14 +150,14 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     }
 
     @Override
-    public InputTestRequest getInputTestRequestOrThrow(Long id, boolean inputTestDivision) throws NotFoundException {
+    public InputTestRequest getInputTestRequestOrThrow(Long id, InputTestDivision inputTestDivision) throws NotFoundException {
         return inputTestRequestRepo.findByIdAndInputTestDivisionAndDeleteYnFalse(id, inputTestDivision)
                 .orElseThrow(() -> new NotFoundException("inputTestRequest does not exist. input id: " + id));
     }
 
     // 외주수입검사의뢰 삭제
     @Override
-    public void deleteInputTestRequest(Long id, boolean inputTestDivision) throws NotFoundException, BadRequestException {
+    public void deleteInputTestRequest(Long id, InputTestDivision inputTestDivision) throws NotFoundException, BadRequestException {
         InputTestRequest findInputTestRequest = getInputTestRequestOrThrow(id, inputTestDivision);
 
         // 검사요청에 대한 검사등록 정보가 있을 시 삭제 불가
@@ -156,9 +175,9 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     // 입고된 갯수만큼만 요청수량을 등록 할 수 있음.
     // 요청수량 재고수량 비교
     private void throwIfRequestAmountGreaterThanInputAmount(Long lotId, int requestAmount) throws BadRequestException {
-        Integer stockAmountFromLotMaster = inputTestRequestRepo.findLotMasterInputAmountByLotMasterId(lotId);
+        Integer stockAmountFromLotMaster = inputTestRequestRepo.findLotMasterStockAmountByLotMasterId(lotId);
         if (requestAmount > stockAmountFromLotMaster)
-            throw new BadRequestException("input requestAmount must not be greater than inputAmount. " +
-                    "input requestAmount: " + requestAmount + ", inputAmount: " + stockAmountFromLotMaster);
+            throw new BadRequestException("input requestAmount must not be greater than stockAmount. " +
+                    "input requestAmount: " + requestAmount + ", stockAmount: " + stockAmountFromLotMaster);
     }
 }

@@ -7,4 +7,5 @@ public class Constants {
     public static final String ASIA_SEOUL = "Asia/Seoul";
     public static final String YYMMDD = "yyMMdd";
     public static final String LOT_DEFAULT_SEQ = String.format("%04d", 0);
+    public static final String PRODUCT_ITEM_ACCOUNT = "완제품";
 }

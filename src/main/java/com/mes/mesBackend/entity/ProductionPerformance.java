@@ -63,4 +63,8 @@ public class ProductionPerformance extends BaseTimeEntity {
     // 삭제여부
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "LOT_MASTER", columnDefinition = "bigint COMMENT 'lot master'")
+    private LotMaster lotMaster;
 }
