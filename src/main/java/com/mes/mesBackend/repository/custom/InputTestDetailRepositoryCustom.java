@@ -21,27 +21,30 @@ public interface InputTestDetailRepositoryCustom {
             Long lotTypeId,
             LocalDate fromDate,
             LocalDate toDate,
-            Long manufactureId
+            Long manufactureId,
+            boolean inputTestDivision
     );
     // 검사상세정보 단일조회
-    Optional<InputTestDetailResponse> findDetailByInputTestRequestIdAndInputTestDetailIdAndDeleteYnFalse(Long inputTestRequestId, Long inputTestDetailId);
+    Optional<InputTestDetailResponse> findDetailByInputTestRequestIdAndInputTestDetailIdAndDeleteYnFalse(Long inputTestRequestId, Long inputTestDetailId, boolean inputTestDivision);
     // 검사상세정보 전체 조회
     List<InputTestDetailResponse> findDetailsByInputTestRequestIdAndDeleteYnFalse(Long inputTestRequestId);
-    // 검사요청정보에 해당하는 검사상세정보 모든 검사수량
+    // 검사요청정보에 해당하는 검사정보의 모든 검사수량
     List<Integer> findTestAmountByInputTestRequestId(Long inputTestRequestId);
-    // 검사요청정보에 해당하는 검사상세정보 모든 불량수량
+    // 검사요청정보에 해당하는 검사정보의 총 부적합수량
     List<Integer> findBadItemAmountByInputTestRequestId(Long inputTestRequestId);
-    // 검사요청정보에 해당하는 검사상세정보 모든 재고수량
+    // 검사요청정보에 해당하는 검사정보의 총 양품수량
     List<Integer> findStockAmountByInputTestRequestId(Long inputTestRequestId);
 
     // ================================================= 14-3. 검사실적조회 =================================================
-    // 검사실적조회
+    // 14-3. 검사실적조회
+    // 15-3. 검사실적 조회
     // 검색조건: 검사기간 fromDate~toDate, 품명|품목, 거래처 id, 입고번호(구매입고 id)
     List<InputTestPerformanceResponse> findInputTestPerformanceResponseByCondition(
             LocalDate fromDate,
             LocalDate toDate,
             String itemNoAndName,
             Long clientId,
-            Long purchaseInputNo
+            Long purchaseInputNo,
+            boolean inputTestDivision
     );
 }

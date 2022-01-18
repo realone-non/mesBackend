@@ -11,6 +11,7 @@ import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.ItemFormService;
+import com.mes.mesBackend.service.MaterialWarehouseService;
 import com.mes.mesBackend.service.OutsourcingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,6 +24,7 @@ import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,15 +35,15 @@ import java.util.List;
 import java.util.Optional;
 
 // 품목형태
-@Tag(name = "outsourcing-status", description = "외주현황조회 API")
-@RequestMapping(value = "/outsourcing-status")
+@Tag(name = "material-receipt-and-payments", description = "부품 수불부 API")
+@RequestMapping(value = "/material-receipt-and-payments")
 @RestController
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Authorization")
-public class OutsourcingStatusController {
+public class MaterialReceiptAndPaymentController{
 
     @Autowired
-    OutsourcingService outsourcingService;
+    MaterialWarehouseService materialWarehouseService;
 
     @Autowired
     LogService logService;
@@ -49,22 +51,24 @@ public class OutsourcingStatusController {
     private Logger logger = LoggerFactory.getLogger(ItemFormController.class);
     private CustomLogger cLogger;
 
-    // 외주현황 리스트 조회
+    // 부품 수불부 조회
     @GetMapping
     @ResponseBody
-    @Operation(summary = "외주현황 리스트 조회")
+    @Operation(summary = "부품 수불부 조회")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
                     @ApiResponse(responseCode = "404", description = "not found resource"),
             }
     )
-    public ResponseEntity<List<OutsourcingStatusResponse>> getOutsourcingStatusList(
-            @RequestParam(required = false) @Parameter(description = "외주사 ID") Long clientId,
-            @RequestParam(required = false) @Parameter(description = "아이템 ID") Long itemId,
+    public ResponseEntity<List<ReceiptAndPaymentResponse>> getReceiptAndPayments(
+            @RequestParam(required = false) @Parameter(description = "창고 ID") Long warehouseId,
+            @RequestParam(required = false) @Parameter(description = "품목 그룹 ID") Long itemAccountId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "시작날짜") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "종료날짜") LocalDate toDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<OutsourcingStatusResponse> responseList = outsourcingService.getOutsourcingStatusList(clientId, itemId);
+        List<ReceiptAndPaymentResponse> responseList = materialWarehouseService.getReceiptAndPaymentList(warehouseId, itemAccountId, fromDate, toDate);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         return new ResponseEntity<>(responseList, HttpStatus.OK);
     }

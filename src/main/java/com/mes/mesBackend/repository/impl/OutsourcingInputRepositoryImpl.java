@@ -49,7 +49,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                 )
                 .from(input)
                 .leftJoin(wareHouse).on(wareHouse.id.eq(input.inputWareHouse.id))
-                .leftJoin(request).on(request.id.eq(input.outSourcingInput.id))
+                .leftJoin(request).on(request.id.eq(input.productionRequest.id))
                 .leftJoin(master).on(master.id.eq(request.bomMaster.id))
                 .leftJoin(item).on(item.id.eq(master.item.id))
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
@@ -85,7 +85,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                 )
                 .from(input)
                 .leftJoin(wareHouse).on(wareHouse.id.eq(input.inputWareHouse.id))
-                .leftJoin(request).on(request.id.eq(input.outSourcingInput.id))
+                .leftJoin(request).on(request.id.eq(input.productionRequest.id))
                 .leftJoin(master).on(master.id.eq(request.bomMaster.id))
                 .leftJoin(item).on(item.id.eq(master.item.id))
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
@@ -135,7 +135,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
         return jpaQueryFactory
                 .select(item.id)
                 .from(input)
-                .innerJoin(request).on(request.id.eq(input.outSourcingInput.id))
+                .innerJoin(request).on(request.id.eq(input.productionRequest.id))
                 .innerJoin(master).on(master.id.eq(request.bomMaster.id))
                 .innerJoin(item).on(item.id.eq(master.item.id))
                 .where(

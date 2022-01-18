@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
+import com.mes.mesBackend.entity.InputTestRequest;
 import com.mes.mesBackend.entity.enumeration.TestType;
 
 import java.time.LocalDate;
@@ -27,4 +28,6 @@ public interface InputTestRequestRepositoryCustom {
     // LOT Master 의 재고수량
     // inputTestService.createInputTest 에서 사용
     Integer findLotMasterInputAmountByLotMasterId(Long lotMasterId);
+    // 검사요청상태값 별 검사요청 조회
+    Optional<InputTestRequest> findByIdAndInputTestDivisionAndDeleteYnFalse(Long inputTestRequestId, boolean inputTestDivision);
 }

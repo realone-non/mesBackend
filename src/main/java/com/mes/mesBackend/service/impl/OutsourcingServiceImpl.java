@@ -4,8 +4,10 @@ import com.mes.mesBackend.dto.request.*;
 import com.mes.mesBackend.dto.response.*;
 
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.ItemLogType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.AmountHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.LotMasterService;
@@ -40,6 +42,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     LotMasterRepository lotMasterRepository;
     @Autowired
     WareHouseRepository wareHouseRepository;
+    @Autowired
+    AmountHelper amountHelper;
 
 
     //외주생산의뢰 등록
@@ -175,6 +179,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
         String lotNo = lotMasterService.createLotMaster(lotMasterRequest);
 
         LotMaster lotMaster = lotMasterRepository.findByLotNoAndUseYnTrue(lotNo);
+
+        amountHelper.amountUpdate(lotMaster.getItem().getId(), input.get().getInputWareHouse().getId(), null,   ItemLogType.STORE_AMOUNT, request.getInputAmount(), true);
 
         OutsourcingInputLOTResponse lotResponse = new OutsourcingInputLOTResponse();
 

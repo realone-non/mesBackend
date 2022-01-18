@@ -1,6 +1,6 @@
 package com.mes.mesBackend.repository.impl;
 
-import com.mes.mesBackend.dto.response.ItemLogResponse;
+import com.mes.mesBackend.dto.response.ReceiptAndPaymentResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.ItemLogRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -18,14 +18,29 @@ public class ItemLogRepositoryImpl implements ItemLogRepositoryCustom {
     final QItemLog itemLog = QItemLog.itemLog;
     final QItem item = QItem.item;
     final QWareHouse wareHouse = QWareHouse.wareHouse;
+    final QItemAccount itemAccount = QItemAccount.itemAccount;
 
     //일자별 품목 변동 사항 전체 조회 / 검색조건 : 창고, 생성기간
-    public List<ItemLogResponse> findAllCondition(Long warehouseId, LocalDate startDate, LocalDate endDate){
+    public List<ItemLog> findAllCondition(Long warehouseId, LocalDate startDate, LocalDate endDate, boolean isOut){
+        return jpaQueryFactory
+                .selectFrom(itemLog)
+                .where(
+                    isItemLogBetween(startDate, endDate),
+                    isWareHouseNull(warehouseId),
+                    itemLog.deleteYn.eq(false),
+                    itemLog.outsourcingYn.eq(isOut),
+                        itemLog.logDate.eq(LocalDate.now())
+                )
+                .fetch();
+    }
+
+    //일자별 품목 변동 사항 전체 조회(Response반환) / 검색조건 : 품목그룹, 창고, 생성기간
+    public List<ReceiptAndPaymentResponse> findAllConditionResponse(Long warehouseId, Long itemAccountId, LocalDate startDate, LocalDate endDate, boolean isOut){
         return jpaQueryFactory
                 .select(
                         Projections.fields(
-                                ItemLogResponse.class,
-                                itemLog.wareHouse.wareHouseName.as("warehouse"),
+                                ReceiptAndPaymentResponse.class,
+                                wareHouse.wareHouseName.as("warehouseName"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
                                 itemLog.stockAmount.as("storeAmount"),
@@ -40,45 +55,40 @@ public class ItemLogRepositoryImpl implements ItemLogRepositoryCustom {
                         )
                 )
                 .from(itemLog)
+                .innerJoin(item).on(item.id.eq(itemLog.item.id))
+                .innerJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                .innerJoin(wareHouse).on(wareHouse.id.eq(itemLog.wareHouse.id))
                 .where(
-                    isItemLogBetween(startDate, endDate),
-                    isWareHouseNull(warehouseId),
-                    itemLog.deleteYn.eq(false)
+                        isItemLogBetween(startDate, endDate),
+                        isWareHouseNull(warehouseId),
+                        isItemAccountNull(itemAccountId),
+                        itemLog.deleteYn.eq(false),
+                        itemLog.outsourcingYn.eq(isOut),
+                        itemLog.logDate.eq(LocalDate.now())
                 )
                 .fetch();
     }
 
     //일자별 품목 변동 사항 단일 조회
-    public ItemLogResponse findByItemIdAndwareHouseId(Long itemId, Long warehouseId){
+    public ItemLog findByItemIdAndwareHouseIdAndOutsourcingYn(Long itemId, Long warehouseId, boolean isOut){
         return jpaQueryFactory
-        .select(
-                Projections.fields(
-                        ItemLogResponse.class,
-                        itemLog.wareHouse.wareHouseName.as("warehouse"),
-                        item.itemNo.as("itemNo"),
-                        item.itemName.as("itemName"),
-                        itemLog.stockAmount.as("storeAmount"),
-                        itemLog.createdAmount.as("createdAmount"),
-                        itemLog.badItemAmount.as("badItemAmount"),
-                        itemLog.inputAmount.as("inputAmount"),
-                        itemLog.shipmentAmount.as("shipmentAmount"),
-                        itemLog.stockRealAmount.as("stockRealAmount"),
-                        itemLog.moveAmount.as("moveAmount"),
-                        itemLog.returnAmount.as("returnAmount"),
-                        itemLog.stockAmount.as("stockAmount")
-                )
-        )
-                .from(itemLog)
+        .selectFrom(itemLog)
                 .where(
                         isWareHouseNull(warehouseId),
                         isItemNull(itemId),
-                        itemLog.deleteYn.eq(false)
+                        itemLog.deleteYn.eq(false),
+                        itemLog.outsourcingYn.eq(isOut),
+                        itemLog.logDate.eq(LocalDate.now())
                 )
                 .fetchOne();
     }
 
     private BooleanExpression isItemLogBetween(LocalDate fromDate, LocalDate toDate) {
         return fromDate != null ? itemLog.logDate.between(fromDate, toDate) : null;
+    }
+
+    private BooleanExpression isItemAccountNull(Long itemAccountId){
+        return itemAccountId != null ? itemAccount.id.eq(itemAccountId) : null;
     }
 
     private BooleanExpression isItemNull(Long itemId){

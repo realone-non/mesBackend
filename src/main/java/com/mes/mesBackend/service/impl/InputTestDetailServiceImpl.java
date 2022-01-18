@@ -7,8 +7,10 @@ import com.mes.mesBackend.entity.InputTestDetail;
 import com.mes.mesBackend.entity.InputTestRequest;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.User;
+import com.mes.mesBackend.entity.enumeration.ItemLogType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.AmountHelper;
 import com.mes.mesBackend.helper.S3Uploader;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.InputTestDetailRepository;
@@ -25,10 +27,11 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.mes.mesBackend.entity.enumeration.InputTestState.COMPLETION;
-import static com.mes.mesBackend.entity.enumeration.InputTestState.ONGOING;
+import static com.mes.mesBackend.entity.enumeration.InputTestState.*;
+import static com.mes.mesBackend.entity.enumeration.ItemLogType.BAD_AMOUNT;
 
 // 14-2. 검사 등록
+// 15-2. 검사 등록
 @Service
 @RequiredArgsConstructor
 public class InputTestDetailServiceImpl implements InputTestDetailService {
@@ -39,6 +42,7 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
     private final UserService userService;
     private final LotMasterRepository lotMasterRepo;
     private final S3Uploader s3Uploader;
+    private final AmountHelper amountHelper;
 
     // 검사요청정보 리스트 조회
     // 검색조건: 창고 id, 품명|품목, 완료여부, 입고번호, 품목그룹 id, LOT 유형 id, 요청기간 from~toDate, 제조사 id
@@ -52,9 +56,10 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
             Long lotTypeId,
             LocalDate fromDate,
             LocalDate toDate,
-            Long manufactureId
+            Long manufactureId,
+            boolean inputTestDivision
     ) {
-        return inputTestDetailRepo.findInputTestRequestInfoResponseByCondition(warehouseId, itemNoAndName, completionYn, purchaseInputNo, itemGroupId, lotTypeId, fromDate, toDate, manufactureId);
+        return inputTestDetailRepo.findInputTestRequestInfoResponseByCondition(warehouseId, itemNoAndName, completionYn, purchaseInputNo, itemGroupId, lotTypeId, fromDate, toDate, manufactureId, inputTestDivision);
     }
 
     /*
@@ -64,41 +69,56 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
     * 4. lotMaster 재고수량(양품수량), 불량수량(부적합수량), 검사수량(총검사수량) 변경
     * */
     @Override
-    public InputTestDetailResponse createInputTestDetail(Long inputTestRequestId, InputTestDetailRequest inputTestDetailRequest) throws NotFoundException, BadRequestException {
-        throwIfFairQualityAmountAndIncongruityAmountGreaterThanTestAmount(
-                inputTestDetailRequest.getFairQualityAmount(),
-                inputTestDetailRequest.getIncongruityAmount(),
-                inputTestDetailRequest.getTestAmount()
-        );      // 양품수량, 부적합수량이 검사수량보다 크면 예외
+    public InputTestDetailResponse createInputTestDetail(
+            Long inputTestRequestId,
+            InputTestDetailRequest inputTestDetailRequest,
+            boolean inputTestDivision
+    ) throws NotFoundException, BadRequestException {
+        int inputFairQualityAmount = inputTestDetailRequest.getFairQualityAmount();
+        int inputIncongruityAmount = inputTestDetailRequest.getIncongruityAmount();
+        int inputTestAmount = inputTestDetailRequest.getTestAmount();
 
-        InputTestRequest inputTestRequest = inputTestRequestService.getInputTestRequestOrThrow(inputTestRequestId);
+        // 양품수량, 부적합수량이 검사수량보다 크면 예외
+        throwIfFairQualityAmountAndIncongruityAmountGreaterThanTestAmount(inputFairQualityAmount, inputIncongruityAmount, inputTestAmount);
+
+        InputTestRequest inputTestRequest = inputTestRequestService.getInputTestRequestOrThrow(inputTestRequestId, inputTestDivision);
+        LotMaster lotMaster = inputTestRequest.getLotMaster();
+        int checkRequestAmount = inputTestRequest.getRequestAmount();
+
+        int allTestAmount = inputTestDetailRepo.findTestAmountByInputTestRequestId(inputTestRequestId)
+                .stream().mapToInt(Integer::intValue).sum();
+
+        // 기존 검사수량 + 입력 검사수량 이 검사요청수량보다 크면 예외
+        throwIfTestAmountGreaterThanCheckRequestAmount(allTestAmount, checkRequestAmount, inputTestAmount);
+
         User user = userService.getUserOrThrow(inputTestDetailRequest.getUserId());
         InputTestDetail inputTestDetail = mapper.toEntity(inputTestDetailRequest, InputTestDetail.class);
         inputTestDetail.create(inputTestRequest, user);
 
-        if (inputTestRequest.getRequestAmount() == inputTestDetail.getTestAmount()) inputTestRequest.setInputTestState(COMPLETION);
+        // 검사요청에 해당하는 총 검사수량이 lotMaster 의 checkRequestAmount 와 같으면 COMPLETION
+        if ((allTestAmount + inputTestAmount) == checkRequestAmount) inputTestRequest.setInputTestState(COMPLETION);
         else inputTestRequest.setInputTestState(ONGOING);
 
-        inputTestDetailRepo.save(inputTestDetail);       // 검사상세정보 저장
-        inputTestRequestRepo.save(inputTestRequest);     // 검사의뢰요청 저장
-
-        LotMaster lotMaster = inputTestRequest.getLotMaster();      // 4. lotMaster 의 검사수량 변경
-
-        // 기존 재고수량, 기존불량수량
+        // lotMaster 의 검사수량 변경
         // 재고수량(양품수량), 불량수량(부적합수량), 검사수량(총검사수량) 변경
         lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
-                inputTestDetail.getFairQualityAmount(),
-                inputTestDetail.getIncongruityAmount(),
-                inputTestDetailRequest.getTestAmount()
+                lotMaster.getStockAmount() - inputIncongruityAmount,
+                lotMaster.getBadItemAmount() + inputTestDetail.getIncongruityAmount(),
+                lotMaster.getCheckAmount() + inputTestDetail.getTestAmount()
         );
+
         lotMasterRepo.save(lotMaster);
-        return getInputTestDetail(inputTestRequestId, inputTestDetail.getId());
+        inputTestDetailRepo.save(inputTestDetail);       // 검사상세정보 저장
+        inputTestRequestRepo.save(inputTestRequest);     // 검사의뢰요청 저장
+        // 수량변동에 대한 기록저장
+        amountHelper.amountUpdate(lotMaster.getItem().getId(), lotMaster.getWareHouse().getId(), null, BAD_AMOUNT, inputTestDetail.getIncongruityAmount(), !inputTestDivision);
+        return getInputTestDetail(inputTestRequestId, inputTestDetail.getId(), inputTestDivision);
     }
 
     // 검사정보 단일조회
     @Override
-    public InputTestDetailResponse getInputTestDetail(Long inputTestRequestId, Long inputTestDetailId) throws NotFoundException {
-        return inputTestDetailRepo.findDetailByInputTestRequestIdAndInputTestDetailIdAndDeleteYnFalse(inputTestRequestId, inputTestDetailId)
+    public InputTestDetailResponse getInputTestDetail(Long inputTestRequestId, Long inputTestDetailId, boolean inputTestDivision) throws NotFoundException {
+        return inputTestDetailRepo.findDetailByInputTestRequestIdAndInputTestDetailIdAndDeleteYnFalse(inputTestRequestId, inputTestDetailId, inputTestDivision)
                 .orElseThrow(() -> new NotFoundException("inputTestDetail does not exist. " +
                         "input inputTestRequestId: " + inputTestRequestId + ", " +
                         "input inputTestDetailId: " + inputTestDetailId));
@@ -106,8 +126,8 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
 
     // 검사정보 전체조회
     @Override
-    public List<InputTestDetailResponse> getInputTestDetails(Long inputTestRequestId) throws NotFoundException {
-        InputTestRequest inputTestRequest = inputTestRequestService.getInputTestRequestOrThrow(inputTestRequestId);
+    public List<InputTestDetailResponse> getInputTestDetails(Long inputTestRequestId, boolean inputTestDivision) throws NotFoundException {
+        InputTestRequest inputTestRequest = inputTestRequestService.getInputTestRequestOrThrow(inputTestRequestId, inputTestDivision);
         return inputTestDetailRepo.findDetailsByInputTestRequestIdAndDeleteYnFalse(inputTestRequest.getId());
     }
 
@@ -121,52 +141,95 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
     public InputTestDetailResponse updateInputTestDetail(
             Long inputTestRequestId,
             Long inputTestDetailId,
-            InputTestDetailRequest inputTestDetailRequest
+            InputTestDetailRequest inputTestDetailRequest,
+            boolean inputTestDivision
     ) throws NotFoundException, BadRequestException {
-        throwIfFairQualityAmountAndIncongruityAmountGreaterThanTestAmount(      // 양품수량, 부적합수량이 검사수량보다 크면 예외
-                inputTestDetailRequest.getFairQualityAmount(),
-                inputTestDetailRequest.getIncongruityAmount(),
-                inputTestDetailRequest.getTestAmount()
+        int newTestAmount = inputTestDetailRequest.getTestAmount();
+        int newFairQualityAmount = inputTestDetailRequest.getFairQualityAmount();
+        int newIncongruityAmount = inputTestDetailRequest.getIncongruityAmount();
+
+        // 양품수량, 부적합수량이 검사수량보다 크면 예외
+        throwIfFairQualityAmountAndIncongruityAmountGreaterThanTestAmount(newFairQualityAmount, newIncongruityAmount, newTestAmount);
+
+        InputTestRequest inputTestRequest = inputTestRequestService.getInputTestRequestOrThrow(inputTestRequestId, inputTestDivision);
+        InputTestDetail findInputTestDetail = getInputTestDetailOrThrow(inputTestRequestId, inputTestDetailId, inputTestDivision);
+
+        LotMaster lotMaster = inputTestRequest.getLotMaster();
+
+        int allTestAmount = inputTestDetailRepo.findTestAmountByInputTestRequestId(inputTestRequestId)
+                .stream().mapToInt(Integer::intValue).sum();
+
+        int findTestAmount = findInputTestDetail.getTestAmount();                   // 기존 검사수량
+        int findIncongruityAmount = findInputTestDetail.getIncongruityAmount();     // 기존 부적합수량
+        int findFairQualityAmount = findInputTestDetail.getFairQualityAmount();
+
+        // 기존 검사수량 + 입력 검사수량이 검사요청수량보다 크면 예외
+        throwIfTestAmountGreaterThanCheckRequestAmount(
+                allTestAmount - findTestAmount,
+                lotMaster.getCheckRequestAmount(),
+                newTestAmount
         );
 
-        InputTestRequest inputTestRequest = inputTestRequestService.getInputTestRequestOrThrow(inputTestRequestId);
-        InputTestDetail findInputTestDetail = getInputTestDetailOrThrow(inputTestRequestId, inputTestDetailId);
         InputTestDetail newInputTestDetail = mapper.toEntity(inputTestDetailRequest, InputTestDetail.class);
         User newUser = userService.getUserOrThrow(inputTestDetailRequest.getUserId());
         findInputTestDetail.update(newInputTestDetail, newUser);
 
-        if (inputTestRequest.getRequestAmount() == newInputTestDetail.getTestAmount()) inputTestRequest.setInputTestState(COMPLETION);
+        int allIncongruityAmount = lotMaster.getBadItemAmount();        // 총 부적합 수량
+        int allFairQualityAmount = lotMaster.getStockAmount();          // 총 양품수량
+
+        // 검사요청에 해당하는 총 검사수량이 lotMaster 의 checkRequestAmount 와 같으면 COMPLETION
+        if (((allTestAmount - findTestAmount) + newTestAmount) == lotMaster.getCheckRequestAmount()) inputTestRequest.setInputTestState(COMPLETION);
         else inputTestRequest.setInputTestState(ONGOING);
 
         inputTestDetailRepo.save(findInputTestDetail);
         inputTestRequestRepo.save(inputTestRequest);
 
-        LotMaster lotMaster = inputTestRequest.getLotMaster();      // 3. lotMaster 의 검사수량 변경
-
+        // 3. lotMaster 의 검사수량 변경
         // 재고수량(수정된 양품수량), 불량수량(수정된 부적합수량), 검사수량(수정된 검사수량) 변경
         lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
-                inputTestDetailRequest.getFairQualityAmount(),
-                inputTestDetailRequest.getIncongruityAmount(),
-                inputTestDetailRequest.getTestAmount()
+                (allFairQualityAmount + findIncongruityAmount) - newIncongruityAmount,
+                (allIncongruityAmount - findIncongruityAmount) + newIncongruityAmount,
+                (lotMaster.getCheckAmount() - findTestAmount) + newTestAmount
         );
 
         lotMasterRepo.save(lotMaster);
-        return getInputTestDetail(inputTestRequestId, inputTestDetailId);
+
+        // 수량변동에 대한 기록저장
+        amountHelper.amountUpdate(lotMaster.getItem().getId(), lotMaster.getWareHouse().getId(), null, BAD_AMOUNT, (findIncongruityAmount - newIncongruityAmount) * -1, !inputTestDivision);
+        amountHelper.amountUpdate(lotMaster.getItem().getId(), lotMaster.getWareHouse().getId(), null, BAD_AMOUNT, (findFairQualityAmount - newFairQualityAmount) * -1, !inputTestDivision);
+        return getInputTestDetail(inputTestRequestId, inputTestDetailId, inputTestDivision);
     }
 
     // 검사정보 삭제
     @Override
-    public void deleteInputTestDetail(Long inputTestRequestId, Long inputTestDetailId) throws NotFoundException {
-        InputTestRequest inputTestRequest = inputTestRequestService.getInputTestRequestOrThrow(inputTestRequestId);
-        InputTestDetail inputTestDetail = getInputTestDetailOrThrow(inputTestRequestId, inputTestDetailId);
-        inputTestDetail.delete();
-        inputTestDetailRepo.save(inputTestDetail);      // 삭제
+    public void deleteInputTestDetail(Long inputTestRequestId, Long inputTestDetailId, boolean inputTestDivision) throws NotFoundException {
+        InputTestRequest inputTestRequest = inputTestRequestService.getInputTestRequestOrThrow(inputTestRequestId, inputTestDivision);
+        InputTestDetail findInputTestDetail = getInputTestDetailOrThrow(inputTestRequestId, inputTestDetailId, inputTestDivision);
 
-        inputTestRequest.changedSchedule();           // 검사의뢰요청 상태값 Schedule 변경
+        findInputTestDetail.delete();
+
+        int findTestAmount = findInputTestDetail.getTestAmount();
+        int findIncongruityAmount = findInputTestDetail.getIncongruityAmount();
+        int findFairQualityAmount = findInputTestDetail.getFairQualityAmount();
+
+        // lotMaster 재고수량, 불량수량, 검사수량 변경
+        LotMaster lotMaster = inputTestRequest.getLotMaster();
+        lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
+                lotMaster.getStockAmount() + findIncongruityAmount,
+                lotMaster.getBadItemAmount() - findIncongruityAmount,
+                lotMaster.getCheckAmount() - findTestAmount
+        );
+
+        if (lotMaster.getCheckAmount() > 1) inputTestRequest.setInputTestState(ONGOING);
+        else inputTestRequest.setInputTestState(SCHEDULE);
+
+        inputTestDetailRepo.save(findInputTestDetail);      // 삭제
         inputTestRequestRepo.save(inputTestRequest);
 
-        LotMaster lotMaster = inputTestRequest.getLotMaster();      // lotMaster 검사수량 변경
-        lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(0, 0, lotMaster.getCreatedAmount());
+        // 수량변동에 대한 기록저장
+        amountHelper.amountUpdate(lotMaster.getItem().getId(), lotMaster.getWareHouse().getId(), null, BAD_AMOUNT, findIncongruityAmount * -1, !inputTestDivision);
+        amountHelper.amountUpdate(lotMaster.getItem().getId(), lotMaster.getWareHouse().getId(), null, BAD_AMOUNT, findFairQualityAmount * -1, !inputTestDivision);
+
         lotMasterRepo.save(lotMaster);
     }
 
@@ -176,15 +239,20 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
     public InputTestDetailResponse createTestReportFileToInputTestDetail(
             Long inputTestRequestId,
             Long inputTestDetailId,
-            MultipartFile testReportFile
+            MultipartFile testReportFile,
+            boolean inputTestDivision
     ) throws NotFoundException, BadRequestException, IOException {
-        InputTestDetail inputTestDetail = getInputTestDetailOrThrow(inputTestRequestId, inputTestDetailId);
-        String testReportFileName = "input-test/" + inputTestDetail.getId() + "/test-report-files/";
+        InputTestDetail inputTestDetail = getInputTestDetailOrThrow(inputTestRequestId, inputTestDetailId, inputTestDivision);
+        String itemTestReportFileName = "item-input-test/" + inputTestDetail.getId() + "/test-report-files/";
+        String outsourcingTestReportFileName = "outsourcing-input-test/" + inputTestDetail.getId() + "/test-report-files/";
+        // inputTestDivison 따라서 파일명 다르게 리턴
+        String testReportFileName = inputTestDivision ? itemTestReportFileName : outsourcingTestReportFileName;
+
         String testReportFileUrl = s3Uploader.upload(testReportFile, testReportFileName);
         inputTestDetail.setTestReportFileUrl(testReportFileUrl);
         inputTestDetailRepo.save(inputTestDetail);
 
-        return getInputTestDetail(inputTestRequestId, inputTestDetailId);
+        return getInputTestDetail(inputTestRequestId, inputTestDetailId, inputTestDivision);
     }
 
     // COC 파일 추가
@@ -193,15 +261,20 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
     public InputTestDetailResponse createCocFileToInputTestDetail(
             Long inputTestRequestId,
             Long inputTestDetailId,
-            MultipartFile cocFile
+            MultipartFile cocFile,
+            boolean inputTestDivision
     ) throws NotFoundException, BadRequestException, IOException {
-        InputTestDetail inputTestDetail = getInputTestDetailOrThrow(inputTestRequestId, inputTestDetailId);
-        String cocFileName = "input-test/" + inputTestDetail.getId() + "/coc-files/";
+        InputTestDetail inputTestDetail = getInputTestDetailOrThrow(inputTestRequestId, inputTestDetailId, inputTestDivision);
+        String itemCocFileName = "item-input-test/" + inputTestDetail.getId() + "/coc-files/";
+        String outsourcingCocFileName = "outsourcing-input-test/" + inputTestDetail.getId() + "/coc-files/";
+
+        String cocFileName = inputTestDivision ? itemCocFileName : outsourcingCocFileName;
+
         String cocFileUrl = s3Uploader.upload(cocFile, cocFileName);
         inputTestDetail.setCocFileUrl(cocFileUrl);
         inputTestDetailRepo.save(inputTestDetail);
 
-        return getInputTestDetail(inputTestRequestId, inputTestDetailId);
+        return getInputTestDetail(inputTestRequestId, inputTestDetailId, inputTestDivision);
     }
 
     // 파일 삭제
@@ -211,17 +284,18 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
             Long inputTestRequestId,
             Long inputTestDetailId,
             boolean testReportDeleteYn,
-            boolean cocDeleteYn
+            boolean cocDeleteYn,
+            boolean inputTestDivision
     ) throws NotFoundException {
-        InputTestDetail inputTestDetail = getInputTestDetailOrThrow(inputTestRequestId, inputTestDetailId);
+        InputTestDetail inputTestDetail = getInputTestDetailOrThrow(inputTestRequestId, inputTestDetailId, inputTestDivision);
         if (testReportDeleteYn) inputTestDetail.setTestReportFileUrl(null);
         if (cocDeleteYn) inputTestDetail.setCocFileUrl(null);
         inputTestDetailRepo.save(inputTestDetail);
     }
 
     // 검사정보 단일 조회 및 예외
-    private InputTestDetail getInputTestDetailOrThrow(Long inputTestRequestId, Long inputTestDetailId) throws NotFoundException {
-        InputTestRequest inputTestRequest = inputTestRequestService.getInputTestRequestOrThrow(inputTestRequestId);
+    private InputTestDetail getInputTestDetailOrThrow(Long inputTestRequestId, Long inputTestDetailId, boolean inputTestDivision) throws NotFoundException {
+        InputTestRequest inputTestRequest = inputTestRequestService.getInputTestRequestOrThrow(inputTestRequestId, inputTestDivision);
         return inputTestDetailRepo.findByInputTestRequestAndIdAndDeleteYnFalse(inputTestRequest, inputTestDetailId)
                 .orElseThrow(() -> new NotFoundException("inputTestDetail does not exist. " +
                         "input inputTestRequestId: " + inputTestRequestId + ", " +
@@ -245,11 +319,14 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
         }
     }
 
-    private void throwIfTestAmountGreaterThanRequestAmount(int testAmount, int requestAmount) throws BadRequestException {
-        if (testAmount > requestAmount) {   // 총 검사수량과 입력받은 검사수량이 검사요청수량보다 크면
-            throw new BadRequestException("testAmount is greater than requestAmount. " +
-                    "input testAmount: " + testAmount + ", " +
-                    "requestAmount: " + requestAmount);
+    // 기존 검사수량 + 입력 검사수량 이 검사요청수량보다 크면 예외
+    private void throwIfTestAmountGreaterThanCheckRequestAmount(int allTestAmount, int checkRequestAmount, int inputTestAmount) throws BadRequestException {
+        if ((inputTestAmount + allTestAmount) > checkRequestAmount) {
+            throw new BadRequestException("testAmount cannot be greater than checkRequestAmount. " +
+                    "input testAmount: " + inputTestAmount + ", " +
+                    "checkRequestAmount: " + checkRequestAmount + ", " +
+                    "allTestAmount: " + allTestAmount
+            );
         }
     }
 }

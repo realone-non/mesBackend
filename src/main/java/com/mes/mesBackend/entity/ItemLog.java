@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 //일자별 품목 변동 사항
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "ITEM_LOG_LIST")
 @Data
 public class ItemLog extends  BaseTimeEntity{
@@ -62,6 +62,9 @@ public class ItemLog extends  BaseTimeEntity{
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn;
 
+    @Column(name = "OUTSOURCING_YN", columnDefinition = "bit(1) COMMENT '외주 여부'")
+    private boolean outsourcingYn;
+
     public void update(int amount, ItemLogType logType){
         switch (logType){
             case STORE_AMOUNT:
@@ -88,6 +91,15 @@ public class ItemLog extends  BaseTimeEntity{
                 setReturnAmount(getReturnAmount() + amount);
                 setStockAmount(getStockAmount() - amount);
                 break;
+            case MOVE_AMOUNT:
+                setMoveAmount(getMoveAmount() + amount);
+                setStockAmount(getStockAmount() - amount);
+                break;
         }
+    }
+    public void setProperty(Item item, WareHouse wareHouse, boolean isOut){
+        setItem(item);
+        setWareHouse(wareHouse);
+        setOutsourcingYn(isOut);
     }
 }
