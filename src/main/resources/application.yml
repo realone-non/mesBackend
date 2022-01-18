@@ -18,6 +18,8 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+        jdbc:
+          batch_size: 1000
 
   # mongoDB
   data:
