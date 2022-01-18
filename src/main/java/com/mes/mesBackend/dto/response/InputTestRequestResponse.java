@@ -107,6 +107,9 @@ public class InputTestRequestResponse {
             setPurchaseInputNo(null);
             setTestCompletionRequestDate(null);
             setWorkOrderNo(null);
+            setCoc(null);
+            setTestReportYn(null);
+            setUrgentYn(null);
         } else if (inputTestDivision.equals(PRODUCT)) {
             setOutsourcingInputNo(null);
             setPurchaseInputNo(null);

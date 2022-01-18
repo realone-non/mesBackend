@@ -51,7 +51,7 @@ public class ProductInputTestPerformanceController {
             @RequestParam(required = false) @Parameter(description = "거래처 id") Long clientId,
             @RequestParam(required = false) @Parameter(description = "입고번호 (purchaseInputId)", hidden = true) Long purchaseInputNo,
             @RequestParam(required = false) @Parameter(description = "검사유형") TestType testType,
-            @RequestParam(required = false) @Parameter(description = "검사창고") Long wareHouseId,
+            @RequestParam(required = false) @Parameter(description = "입고창고") Long wareHouseId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<InputTestPerformanceResponse> inputTestPerformanceResponses = inputTestPerformanceService.getInputTestPerformances(fromDate, toDate, itemNoAndName, clientId, purchaseInputNo, PRODUCT, testType, wareHouseId);

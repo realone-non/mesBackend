@@ -157,72 +157,72 @@ public class OutsourcingInputTestEnrollmentController {
         return new ResponseEntity(NO_CONTENT);
     }
 
-    // 검사성적서 파일
-    @PutMapping(value = "/{input-test-request-id}/input-test-details/{input-test-detail-id}/test-report-files", consumes = MULTIPART_FORM_DATA_VALUE)
-    @ResponseBody
-    @Operation(summary = "검사성적서 파일 추가")
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "200", description = "success"),
-                    @ApiResponse(responseCode = "404", description = "not found resource"),
-                    @ApiResponse(responseCode = "400", description = "bad request")
-            }
-    )
-    public ResponseEntity<InputTestDetailResponse> createTestReportFileToOutsourcingInputTestEnrollment(
-            @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
-            @PathVariable(value = "input-test-detail-id") @Parameter(description = "검사정보 id") Long inputTestDetailId,
-            @RequestPart(required = false) @Parameter(description = "검사성적서 파일") MultipartFile testReportFile,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException, IOException, BadRequestException {
-        InputTestDetailResponse inputTestDetail = inputTestDetailService.createTestReportFileToInputTestDetail(inputTestRequestId, inputTestDetailId, testReportFile, OUT_SOURCING);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + inputTestDetail.getId() + " from createTestReportFileToOutsourcingInputTestEnrollment.");
-        return new ResponseEntity<>(inputTestDetail, HttpStatus.OK);
-    }
-
-    // COC 파일 추가
-    @PutMapping(value = "/{input-test-request-id}/input-test-details/{input-test-detail-id}/coc-files", consumes = MULTIPART_FORM_DATA_VALUE)
-    @ResponseBody
-    @Operation(summary = "COC 파일 추가")
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "200", description = "success"),
-                    @ApiResponse(responseCode = "404", description = "not found resource"),
-                    @ApiResponse(responseCode = "400", description = "bad request")
-            }
-    )
-    public ResponseEntity<InputTestDetailResponse> createCocFileToOutsourcingInputTestEnrollment(
-            @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
-            @PathVariable(value = "input-test-detail-id") @Parameter(description = "검사정보 id") Long inputTestDetailId,
-            @RequestPart(required = false) @Parameter(description = "COC 파일") MultipartFile cocFile,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException, IOException, BadRequestException {
-        InputTestDetailResponse inputTestDetail = inputTestDetailService.createCocFileToInputTestDetail(inputTestRequestId, inputTestDetailId, cocFile, OUT_SOURCING);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + inputTestDetail.getId() + " from createCocFileToOutsourcingInputTestEnrollment.");
-        return new ResponseEntity<>(inputTestDetail, HttpStatus.OK);
-    }
-
-    // 파일 삭제
-    @DeleteMapping("/{input-test-request-id}/input-test-details/{input-test-detail-id}/files")
-    @ResponseBody()
-    @Operation(summary = "검사정보 파일 삭제", description = "")
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "204", description = "no content"),
-                    @ApiResponse(responseCode = "404", description = "not found resource")
-            }
-    )
-    public ResponseEntity<Void> deleteTestReportFileToOutsourcingInputTestEnrollment(
-            @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
-            @PathVariable(value = "input-test-detail-id") @Parameter(description = "검사정보 id") Long inputTestDetailId,
-            @RequestParam(required = false) @Parameter(description = "검사성적서 파일") boolean testReportDeleteYn,
-            @RequestParam(required = false) @Parameter(description = "coc 파일") boolean cocDeleteYn,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
-        inputTestDetailService.deleteTestReportFileAndCocFileToInputTestDetail(inputTestRequestId, inputTestDetailId, testReportDeleteYn, cocDeleteYn, OUT_SOURCING);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + inputTestDetailId + " from deleteTestReportFileToOutsourcingInputTestEnrollment.");
-        return new ResponseEntity(NO_CONTENT);
-    }
+//    // 검사성적서 파일
+//    @PutMapping(value = "/{input-test-request-id}/input-test-details/{input-test-detail-id}/test-report-files", consumes = MULTIPART_FORM_DATA_VALUE)
+//    @ResponseBody
+//    @Operation(summary = "검사성적서 파일 추가")
+//    @ApiResponses(
+//            value = {
+//                    @ApiResponse(responseCode = "200", description = "success"),
+//                    @ApiResponse(responseCode = "404", description = "not found resource"),
+//                    @ApiResponse(responseCode = "400", description = "bad request")
+//            }
+//    )
+//    public ResponseEntity<InputTestDetailResponse> createTestReportFileToOutsourcingInputTestEnrollment(
+//            @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
+//            @PathVariable(value = "input-test-detail-id") @Parameter(description = "검사정보 id") Long inputTestDetailId,
+//            @RequestPart(required = false) @Parameter(description = "검사성적서 파일") MultipartFile testReportFile,
+//            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+//    ) throws NotFoundException, IOException, BadRequestException {
+//        InputTestDetailResponse inputTestDetail = inputTestDetailService.createTestReportFileToInputTestDetail(inputTestRequestId, inputTestDetailId, testReportFile, OUT_SOURCING);
+//        cLogger = new MongoLogger(logger, "mongoTemplate");
+//        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + inputTestDetail.getId() + " from createTestReportFileToOutsourcingInputTestEnrollment.");
+//        return new ResponseEntity<>(inputTestDetail, HttpStatus.OK);
+//    }
+//
+//    // COC 파일 추가
+//    @PutMapping(value = "/{input-test-request-id}/input-test-details/{input-test-detail-id}/coc-files", consumes = MULTIPART_FORM_DATA_VALUE)
+//    @ResponseBody
+//    @Operation(summary = "COC 파일 추가")
+//    @ApiResponses(
+//            value = {
+//                    @ApiResponse(responseCode = "200", description = "success"),
+//                    @ApiResponse(responseCode = "404", description = "not found resource"),
+//                    @ApiResponse(responseCode = "400", description = "bad request")
+//            }
+//    )
+//    public ResponseEntity<InputTestDetailResponse> createCocFileToOutsourcingInputTestEnrollment(
+//            @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
+//            @PathVariable(value = "input-test-detail-id") @Parameter(description = "검사정보 id") Long inputTestDetailId,
+//            @RequestPart(required = false) @Parameter(description = "COC 파일") MultipartFile cocFile,
+//            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+//    ) throws NotFoundException, IOException, BadRequestException {
+//        InputTestDetailResponse inputTestDetail = inputTestDetailService.createCocFileToInputTestDetail(inputTestRequestId, inputTestDetailId, cocFile, OUT_SOURCING);
+//        cLogger = new MongoLogger(logger, "mongoTemplate");
+//        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + inputTestDetail.getId() + " from createCocFileToOutsourcingInputTestEnrollment.");
+//        return new ResponseEntity<>(inputTestDetail, HttpStatus.OK);
+//    }
+//
+//    // 파일 삭제
+//    @DeleteMapping("/{input-test-request-id}/input-test-details/{input-test-detail-id}/files")
+//    @ResponseBody()
+//    @Operation(summary = "검사정보 파일 삭제", description = "")
+//    @ApiResponses(
+//            value = {
+//                    @ApiResponse(responseCode = "204", description = "no content"),
+//                    @ApiResponse(responseCode = "404", description = "not found resource")
+//            }
+//    )
+//    public ResponseEntity<Void> deleteTestReportFileToOutsourcingInputTestEnrollment(
+//            @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
+//            @PathVariable(value = "input-test-detail-id") @Parameter(description = "검사정보 id") Long inputTestDetailId,
+//            @RequestParam(required = false) @Parameter(description = "검사성적서 파일") boolean testReportDeleteYn,
+//            @RequestParam(required = false) @Parameter(description = "coc 파일") boolean cocDeleteYn,
+//            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+//    ) throws NotFoundException {
+//        inputTestDetailService.deleteTestReportFileAndCocFileToInputTestDetail(inputTestRequestId, inputTestDetailId, testReportDeleteYn, cocDeleteYn, OUT_SOURCING);
+//        cLogger = new MongoLogger(logger, "mongoTemplate");
+//        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + inputTestDetailId + " from deleteTestReportFileToOutsourcingInputTestEnrollment.");
+//        return new ResponseEntity(NO_CONTENT);
+//    }
 }
