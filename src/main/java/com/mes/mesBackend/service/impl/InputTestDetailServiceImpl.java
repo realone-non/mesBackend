@@ -7,7 +7,6 @@ import com.mes.mesBackend.entity.InputTestDetail;
 import com.mes.mesBackend.entity.InputTestRequest;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.User;
-import com.mes.mesBackend.entity.enumeration.ItemLogType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.AmountHelper;
@@ -26,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.mes.mesBackend.entity.enumeration.InputTestState.*;
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.BAD_AMOUNT;
@@ -59,7 +59,18 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
             Long manufactureId,
             boolean inputTestDivision
     ) {
-        return inputTestDetailRepo.findInputTestRequestInfoResponseByCondition(warehouseId, itemNoAndName, completionYn, purchaseInputNo, itemGroupId, lotTypeId, fromDate, toDate, manufactureId, inputTestDivision);
+        return inputTestDetailRepo.findInputTestRequestInfoResponseByCondition(
+                warehouseId,
+                itemNoAndName,
+                completionYn,
+                purchaseInputNo,
+                itemGroupId,
+                lotTypeId,
+                fromDate,
+                toDate,
+                manufactureId,
+                inputTestDivision
+        ).stream().map(res -> res.division(inputTestDivision)).collect(Collectors.toList());
     }
 
     /*

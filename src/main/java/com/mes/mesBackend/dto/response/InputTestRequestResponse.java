@@ -27,8 +27,11 @@ public class InputTestRequestResponse {
     @Schema(description = "LOT 번호")
     String lotNo;
 
-    @Schema(description = "입고번호")
+    @Schema(description = "구매입고 입고번호")
     Long purchaseInputNo;   // purchaseInputId
+
+    @Schema(description = "외주입고 입고번호")
+    Long outsourcingInputNo;   // purchaseInputId
 
     @Schema(description = "품번")
     String itemNo;
@@ -39,14 +42,14 @@ public class InputTestRequestResponse {
     @Schema(description = "제조사 품번")
     String itemManufacturerPartNo;
 
-    @Schema(description = "고객사 품번")
-    String itemClientPartNo;
+//    @Schema(description = "고객사 품번")
+//    String itemClientPartNo;      1월 17일 팀장님이 필드 삭제하라고 하심
 
     @Schema(description = "제조사")
     String manufacturerName;
 
-    @Schema(description = "고객사")
-    String clientName;
+//    @Schema(description = "고객사")
+//    String clientName;            1월 17일 팀장님이 필드 삭제하라고 하심
 
     @Schema(description = "창고")
     String warehouse;
@@ -81,4 +84,13 @@ public class InputTestRequestResponse {
 
     @Schema(description = "검사수량")
     int testAmount;
+
+    @Schema(description = "검사요청")
+    TestType testType;
+
+    public InputTestRequestResponse division(boolean inputTestDivision) {
+        if (inputTestDivision) setOutsourcingInputNo(null);
+        else setPurchaseInputNo(null);
+        return this;
+    }
 }

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // 15-1. 외주수입검사의뢰 등록
 @Service
@@ -37,9 +38,22 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     * 예외: 입고된 갯수만큼만 요청수량을 등록 할 수 있음.
     * */
     @Override
-    public InputTestRequestResponse createInputTestRequest(InputTestRequestCreateRequest inputTestRequestRequest, boolean inputTestDivision) throws BadRequestException, NotFoundException {
+    public InputTestRequestResponse createInputTestRequest(
+            InputTestRequestCreateRequest inputTestRequestRequest,
+            boolean inputTestDivision
+    ) throws BadRequestException, NotFoundException {
         int requestAmount = inputTestRequestRequest.getRequestAmount();
         LotMaster lotMaster = lotMasterService.getLotMasterOrThrow(inputTestRequestRequest.getLotId());
+        if (inputTestDivision) {
+            if (lotMaster.getPurchaseInput() == null) {
+                throw new BadRequestException("구매입고만 등록할 수 있음.");
+            }
+        } else {
+            if (lotMaster.getOutSourcingInput() == null) {
+                throw new BadRequestException("외주입고만 등록할 수 있음");
+            }
+        }
+
         // 입력받은 요청수량이 lot 의 입고수량보다 많은지 체크
         throwIfRequestAmountGreaterThanInputAmount(inputTestRequestRequest.getLotId(), lotMaster.getCheckRequestAmount() + requestAmount);
 
@@ -57,7 +71,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     @Override
     public InputTestRequestResponse getInputTestRequestResponse(Long inputTestId, boolean inputTestDivision) throws NotFoundException {
         return inputTestRequestRepo.findResponseByIdAndDeleteYnFalse(inputTestId, inputTestDivision)
-                .orElseThrow(() -> new NotFoundException("inputTestRequest does not exist. input id: " + inputTestId));
+                .orElseThrow(() -> new NotFoundException("inputTestRequest does not exist. input id: " + inputTestId)).division(inputTestDivision);
     }
 
     // 외주수입검사의뢰 리스트 검색 조회
@@ -74,13 +88,23 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
             LocalDate toDate,
             boolean inputTestDivision
     ) {
-        List<InputTestRequestResponse> responses = inputTestRequestRepo.findAllByCondition(warehouseId, lotTypeId, itemNoAndName, testType, itemGroupId, requestType, fromDate, toDate, inputTestDivision);
+        List<InputTestRequestResponse> responses = inputTestRequestRepo.findAllByCondition(
+                warehouseId,
+                lotTypeId,
+                itemNoAndName,
+                testType,
+                itemGroupId,
+                requestType,
+                fromDate,
+                toDate,
+                inputTestDivision
+        );
         for (InputTestRequestResponse response : responses) {
             List<Integer> testAmountList = inputTestDetailRepo.findTestAmountByInputTestRequestId(response.getId());
             int testAmountSum = testAmountList.stream().mapToInt(Integer::intValue).sum();
             response.setTestAmount(testAmountSum);
         }
-        return responses;
+        return responses.stream().map(res -> res.division(inputTestDivision)).collect(Collectors.toList());
     }
 
     // 외주수입검사의뢰 수정

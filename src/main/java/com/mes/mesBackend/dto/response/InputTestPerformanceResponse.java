@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,9 +14,11 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM;
 
+// 14-3. 검사실적조회
+// 15-3. 검사실적조회
 @Getter
 @Setter
-@Schema(description = "14-3. 검사실적조회")
+@Schema(description = "검사실적조회")
 @JsonInclude(NON_NULL)
 public class InputTestPerformanceResponse {
     @Schema(description = "검사등록 고유아이디")
@@ -38,14 +41,17 @@ public class InputTestPerformanceResponse {
     @Schema(description = "품목형태")
     String itemForm;
 
-    @Schema(description = "발주번호")
+    @Schema(description = "구매입고 발주번호")
     String purchaseOrderNo;
+
+    @Schema(description = "외주입고 발주번호")
+    Long outsourcingOrderNo;
 
     @Schema(description = "LOT 번호")
     String lotNo;
 
-    @Schema(description = "고객사 품번")
-    String itemClientPartNo;
+//    @Schema(description = "고객사 품번")
+//    String itemClientPartNo;
 
     @Schema(description = "제조사 품번")
     String itemManufacturerPartNo;
@@ -53,8 +59,8 @@ public class InputTestPerformanceResponse {
     @Schema(description = "제조사")
     String manufacturerName;
 
-    @Schema(description = "고객사")
-    String clientName;
+//    @Schema(description = "고객사")
+//    String clientName;
 
     @Schema(description = "검사방법")
     String testProcess;
@@ -88,4 +94,10 @@ public class InputTestPerformanceResponse {
 
     @Schema(description = "비고")
     String note;
+
+    public InputTestPerformanceResponse division(boolean inputTestDivision) {
+        if (inputTestDivision) setOutsourcingOrderNo(null);
+        else setPurchaseOrderNo(null);
+        return this;
+    }
 }
