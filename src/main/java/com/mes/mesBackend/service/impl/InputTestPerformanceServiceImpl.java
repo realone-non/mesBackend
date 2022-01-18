@@ -1,6 +1,8 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
+import com.mes.mesBackend.dto.response.InputTestScheduleResponse;
+import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.repository.InputTestDetailRepository;
 import com.mes.mesBackend.service.InputTestPerformanceService;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // 14-3. 검사실적 조회
 // 15-3. 검사실적 조회
@@ -27,6 +30,36 @@ public class InputTestPerformanceServiceImpl implements InputTestPerformanceServ
             Long purchaseInputNo,
             boolean inputTestDivision
     ) {
-        return inputTestDetailRepo.findInputTestPerformanceResponseByCondition(fromDate, toDate, itemNoAndName, clientId, purchaseInputNo, inputTestDivision);
+        return inputTestDetailRepo.findInputTestPerformanceResponseByCondition(
+                fromDate,
+                toDate,
+                itemNoAndName,
+                clientId,
+                purchaseInputNo,
+                inputTestDivision
+        ).stream().map(res -> res.division(inputTestDivision)).collect(Collectors.toList());
+    }
+
+    // 검사대기 현황 조회
+    // 검색조건: 검사창고 id, 검사유형, 품명|품번, 거래처, 검사기간 fromDate~toDate
+    @Override
+    public List<InputTestScheduleResponse> getInputTestSchedules(
+            Long wareHouseId,
+            TestType testType,
+            String itemNoAndName,
+            Long clientId,
+            LocalDate fromDate,
+            LocalDate toDate,
+            boolean inputTestDivision
+    ) {
+        return inputTestDetailRepo.findInputTestScheduleResponsesByCondition(
+                wareHouseId,
+                testType,
+                itemNoAndName,
+                clientId,
+                fromDate,
+                toDate,
+                inputTestDivision
+        ).stream().map(res -> res.division(inputTestDivision)).collect(Collectors.toList());
     }
 }

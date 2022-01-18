@@ -1,6 +1,8 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
+import com.mes.mesBackend.dto.response.InputTestScheduleResponse;
+import com.mes.mesBackend.entity.enumeration.TestType;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,6 +18,17 @@ public interface InputTestPerformanceService {
             String itemNoAndName,
             Long clientId,
             Long purchaseInputNo,
+            boolean inputTestDivision
+    );
+    // 검사대기 현황 조회
+    // 검색조건: 검사창고 id, 검사유형, 품명|품번, 거래처, 검사기간 fromDate~toDate
+    List<InputTestScheduleResponse> getInputTestSchedules(
+            Long wareHouseId,
+            TestType testType,
+            String itemNoAndName,
+            Long clientId,
+            LocalDate fromDate,
+            LocalDate toDate,
             boolean inputTestDivision
     );
 }
