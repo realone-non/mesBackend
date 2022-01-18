@@ -5,6 +5,7 @@ import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
 import com.mes.mesBackend.dto.response.InputTestRequestInfoResponse;
 import com.mes.mesBackend.dto.response.InputTestScheduleResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.repository.custom.InputTestDetailRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -19,6 +20,8 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.OUT_SOURCING;
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.PART;
 import static com.mes.mesBackend.entity.enumeration.InputTestState.*;
 
 // 14-2. 검사 등록
@@ -56,7 +59,8 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
             LocalDate fromDate,
             LocalDate toDate,
             Long manufactureId,
-            boolean inputTestDivision
+            InputTestDivision inputTestDivision,
+            TestType testType
     ) {
 
         return jpaQueryFactory
@@ -65,6 +69,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                                 InputTestRequestInfoResponse.class,
                                 inputTestRequest.id.as("id"),
                                 inputTestRequest.createdDate.as("requestDate"),
+                                lotMaster.id.as("lotMasterId"),
                                 lotMaster.lotNo.as("lotNo"),
                                 purchaseInput.id.as("purchaseInputNo"),             // 구매입고 입고번호
                                 outSourcingInput.id.as("outsourcingInputNo"),       // 외주입고 입고번호
@@ -80,13 +85,15 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                                 testProcess.testProcess.as("testProcess"),
                                 testCriteria.testCriteria.as("testCriteria"),
                                 wareHouse.wareHouseName.as("warehouse"),
-                                lotMaster.checkAmount.as("testAmount"),
-                                lotMaster.stockAmount.as("stockAmount"),
-                                lotMaster.checkRequestAmount.as("requestAmount"),
+//                                lotMaster.checkAmount.as("testAmount"),
+//                                lotMaster.stockAmount.as("stockAmount"),
+                                inputTestRequest.requestAmount.as("requestAmount"),
                                 inputTestRequest.testType.as("testType"),
                                 purchaseInput.urgentYn.as("urgentYn"),
                                 purchaseInput.testReportYn.as("testReportYn"),
-                                purchaseInput.coc.as("coc")
+                                purchaseInput.coc.as("coc"),
+                                lotMaster.enrollmentType.as("enrollmentType"),
+                                inputTestRequest.testCompletionRequestDate.as("testCompletionRequestDate")
                         )
                 )
                 .from(inputTestRequest)
@@ -112,7 +119,8 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                         isRequestDateBetween(fromDate, toDate),
                         isManufactureEq(manufactureId),
                         isInputTestRequestDeleteYnFalse(),
-                        isInputTestDivision(inputTestDivision)
+                        isInputTestDivision(inputTestDivision),
+                        isTestTypeEq(testType)
                 )
                 .fetch();
     }
@@ -120,7 +128,11 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     // 검사상세정보 단일조회
     @Override
     @Transactional(readOnly = true)
-    public Optional<InputTestDetailResponse> findDetailByInputTestRequestIdAndInputTestDetailIdAndDeleteYnFalse(Long inputTestRequestId, Long inputTestDetailId, boolean inputTestDivision) {
+    public Optional<InputTestDetailResponse> findDetailByInputTestRequestIdAndInputTestDetailIdAndDeleteYnFalse(
+            Long inputTestRequestId,
+            Long inputTestDetailId,
+            InputTestDivision inputTestDivision
+    ) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .select(
@@ -245,7 +257,9 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
             String itemNoAndName,
             Long clientId,
             Long purchaseInputNo,
-            boolean inputTestDivision
+            InputTestDivision inputTestDivision,
+            TestType testType,
+            Long wareHouseId
     ) {
         return jpaQueryFactory
                 .select(
@@ -274,7 +288,10 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                                 purchaseInput.coc.as("cocYn"),
                                 inputTestDetail.testReportFileUrl.as("testReportFileUrl"),
                                 inputTestDetail.cocFileUrl.as("cocFileUrl"),
-                                inputTestDetail.note.as("note")
+                                inputTestDetail.note.as("note"),
+                                lotMaster.lotType.lotType.as("lotType"),
+                                inputTestRequest.testType.as("testType"),
+                                wareHouse.wareHouseName.as("wareHouseName")
                         )
                 )
                 .from(inputTestDetail)
@@ -291,6 +308,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .leftJoin(user).on(user.id.eq(inputTestDetail.user.id))
                 .leftJoin(outSourcingProductionRequest).on(outSourcingProductionRequest.id.eq(outSourcingInput.productionRequest.id))
+                .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
                 .where(
                         isTestDateBetween(fromDate, toDate),
                         isItemNoAndItemNameContain(itemNoAndName),
@@ -298,16 +316,18 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                         isInputTestDetailDeleteYnFalse(),
                         isInputTestRequestDeleteYnFalse(),
                         isInputTestDivision(inputTestDivision),
-                        isInputIdEq(purchaseInputNo, inputTestDivision)
+                        isInputIdEq(purchaseInputNo, inputTestDivision),
+                        isTestTypeEq(testType),
+                        isWareHouseEq(wareHouseId)
                 )
                 .fetch();
     }
 
     // 입고번호
-    private BooleanExpression isInputIdEq(Long inputId, boolean inputTestDivision) {
+    private BooleanExpression isInputIdEq(Long inputId, InputTestDivision inputTestDivision) {
         if (inputId != null) {
-            if (inputTestDivision) return purchaseInput.id.eq(inputId);
-            else return outSourcingInput.id.eq(inputId);
+            if (inputTestDivision.equals(PART)) return purchaseInput.id.eq(inputId);
+            else if (inputTestDivision.equals(OUT_SOURCING))return outSourcingInput.id.eq(inputId);
         }
         return null;
     }
@@ -327,7 +347,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
             Long clientId,
             LocalDate fromDate,
             LocalDate toDate,
-            boolean inputTestDivision
+            InputTestDivision inputTestDivision
     ) {
         return jpaQueryFactory
                 .select(
@@ -358,10 +378,10 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                 .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
                 .leftJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
                 .leftJoin(item).on(item.id.eq(lotMaster.item.id))
-                .leftJoin(client).on(client.id.eq(purchaseOrder.client.id))
+                .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .where(
                         isWareHouseEq(wareHouseId),
-                        isTestType(testType),
+                        isTestTypeEq(testType),
                         isItemNoAndItemNameContain(itemNoAndName),
                         isClientIdEq(clientId),
                         isRequestDateBetween(fromDate, toDate),
@@ -373,7 +393,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     }
 
     // 검색조건: 검사창고 id, 검사유형, 품명|품번, 거래처, 검사기간 fromDate~toDate
-    private BooleanExpression isTestType(TestType testType) {
+    private BooleanExpression isTestTypeEq(TestType testType) {
         return testType != null ? inputTestRequest.testType.eq(testType) : null;
     }
     // 거래처
@@ -392,14 +412,16 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     private BooleanExpression isCompletionYn(Boolean completionYn) {
         return completionYn != null ? completionYn ? inputTestRequest.inputTestState.eq(COMPLETION) : inputTestRequest.inputTestState.eq(SCHEDULE).or(inputTestRequest.inputTestState.eq(ONGOING)) : null;
     }
+
     // 입고번호
-    private BooleanExpression isInputNoEq(Long inputNo, boolean inputTestDivision) {
+    private BooleanExpression isInputNoEq(Long inputNo, InputTestDivision inputTestDivision) {
         if (inputNo != null) {
-            if (inputTestDivision) return purchaseInput.id.eq(inputNo);
-            else return outSourcingInput.id.eq(inputNo);
-        } else
-            return null;
+            if (inputTestDivision.equals(PART)) return purchaseInput.id.eq(inputNo);
+            else if (inputTestDivision.equals(OUT_SOURCING))return outSourcingInput.id.eq(inputNo);
+        }
+        return null;
     }
+
     // 품목그룹 id
     private BooleanExpression isItemGroupEq(Long itemGroupId) {
         return itemGroupId != null ? item.itemGroup.id.eq(itemGroupId) : null;
@@ -423,7 +445,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     private BooleanExpression isTestDateBetween(LocalDate fromDate, LocalDate toDate) {
         return fromDate != null ? inputTestDetail.testDate.between(fromDate, toDate) : null;
     }
-    private BooleanExpression isInputTestDivision(boolean testDivision) {
+    private BooleanExpression isInputTestDivision(InputTestDivision testDivision) {
         return inputTestRequest.inputTestDivision.eq(testDivision);
     }
 }

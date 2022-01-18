@@ -2,6 +2,8 @@ package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM;
 
@@ -81,10 +84,10 @@ public class InputTestPerformanceResponse {
     String user;
 
     @Schema(description = "시험성적서")
-    boolean testReportYn;
+    Boolean testReportYn;
 
     @Schema(description = "COC")
-    boolean cocYn;
+    Boolean cocYn;
 
     @Schema(description = "검사성적서 파일 url")
     String testReportFileUrl;
@@ -95,9 +98,38 @@ public class InputTestPerformanceResponse {
     @Schema(description = "비고")
     String note;
 
-    public InputTestPerformanceResponse division(boolean inputTestDivision) {
-        if (inputTestDivision) setOutsourcingOrderNo(null);
-        else setPurchaseOrderNo(null);
+    @Schema(description = "LOT 유형")
+    String lotType;
+
+    @Schema(description = "검사유형")
+    TestType testType;
+
+    @Schema(description = "입고창고")
+    String wareHouseName;
+
+    public InputTestPerformanceResponse division(InputTestDivision inputTestDivision) {
+        if (inputTestDivision.equals(PART)) {
+            setOutsourcingOrderNo(null);
+            setLotType(null);
+            setTestType(null);
+            setWareHouseName(null);
+        }
+        else if (inputTestDivision.equals(OUT_SOURCING)) {
+            setPurchaseOrderNo(null);
+            setLotType(null);
+            setTestType(null);
+            setWareHouseName(null);
+        } else if (inputTestDivision.equals(PRODUCT)) {
+            setRequestDate(null);
+            setItemForm(null);
+            setOutsourcingOrderNo(null);
+            setPurchaseOrderNo(null);
+            setItemManufacturerPartNo(null);
+            setTestProcess(null);
+            setTestCriteria(null);
+            setTestReportFileUrl(null);
+            setCocFileUrl(null);
+        }
         return this;
     }
 }

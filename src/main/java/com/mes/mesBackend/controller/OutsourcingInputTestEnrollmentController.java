@@ -3,6 +3,8 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.InputTestDetailRequest;
 import com.mes.mesBackend.dto.response.InputTestDetailResponse;
 import com.mes.mesBackend.dto.response.InputTestRequestInfoResponse;
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
@@ -30,6 +32,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.OUT_SOURCING;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
@@ -63,9 +66,11 @@ public class OutsourcingInputTestEnrollmentController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "요청기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "요청기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "제조사 id(clientId)") Long manufactureId,
+            @RequestParam(required = false) @Parameter(description = "검사유형(삭제)", hidden = true) TestType testType,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        List<InputTestRequestInfoResponse> inputTestInfos = inputTestDetailService.getInputTestRequestInfo(warehouseId, itemNoAndName, completionYn, purchaseInputNo, itemGroupId, lotTypeId, fromDate, toDate, manufactureId, false);
+    ) throws NotFoundException {
+        List<InputTestRequestInfoResponse> inputTestInfos = inputTestDetailService.getInputTestRequestInfo(
+                warehouseId, itemNoAndName, completionYn, purchaseInputNo, itemGroupId, lotTypeId, fromDate, toDate, manufactureId, OUT_SOURCING, testType);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getOutsourcingInputTestRequestInfo.");
         return new ResponseEntity<>(inputTestInfos, HttpStatus.OK);
@@ -86,7 +91,7 @@ public class OutsourcingInputTestEnrollmentController {
             @RequestBody @Valid InputTestDetailRequest inputTestDetailRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        InputTestDetailResponse inputTestDetail = inputTestDetailService.createInputTestDetail(inputTestRequestId, inputTestDetailRequest, false);
+        InputTestDetailResponse inputTestDetail = inputTestDetailService.createInputTestDetail(inputTestRequestId, inputTestDetailRequest, OUT_SOURCING);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + inputTestDetail.getId() + " from createOutsourcingInputTestEnrollment.");
         return new ResponseEntity<>(inputTestDetail, HttpStatus.OK);
@@ -100,7 +105,7 @@ public class OutsourcingInputTestEnrollmentController {
             @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        List<InputTestDetailResponse> inputTestDetails = inputTestDetailService.getInputTestDetails(inputTestRequestId, false);
+        List<InputTestDetailResponse> inputTestDetails = inputTestDetailService.getInputTestDetails(inputTestRequestId, OUT_SOURCING);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getOutsourcingInputTestEnrollments.");
         return new ResponseEntity<>(inputTestDetails, HttpStatus.OK);
@@ -123,7 +128,9 @@ public class OutsourcingInputTestEnrollmentController {
             @RequestBody @Valid InputTestDetailRequest inputTestDetailRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        InputTestDetailResponse inputTestDetail = inputTestDetailService.updateInputTestDetail(inputTestRequestId, inputTestDetailId, inputTestDetailRequest, false);
+        InputTestDetailResponse inputTestDetail = inputTestDetailService.updateInputTestDetail(
+                inputTestRequestId, inputTestDetailId, inputTestDetailRequest, OUT_SOURCING
+        );
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + inputTestDetail.getId() + " from updateOutsourcingInputTestEnrollment.");
         return new ResponseEntity<>(inputTestDetail, HttpStatus.OK);
@@ -144,7 +151,7 @@ public class OutsourcingInputTestEnrollmentController {
             @PathVariable(value = "input-test-detail-id") @Parameter(description = "검사정보 id") Long inputTestDetailId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        inputTestDetailService.deleteInputTestDetail(inputTestRequestId, inputTestDetailId, false);
+        inputTestDetailService.deleteInputTestDetail(inputTestRequestId, inputTestDetailId, OUT_SOURCING);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + inputTestDetailId + " from deleteOutsourcingInputTestEnrollment.");
         return new ResponseEntity(NO_CONTENT);
@@ -167,7 +174,7 @@ public class OutsourcingInputTestEnrollmentController {
             @RequestPart(required = false) @Parameter(description = "검사성적서 파일") MultipartFile testReportFile,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, IOException, BadRequestException {
-        InputTestDetailResponse inputTestDetail = inputTestDetailService.createTestReportFileToInputTestDetail(inputTestRequestId, inputTestDetailId, testReportFile, false);
+        InputTestDetailResponse inputTestDetail = inputTestDetailService.createTestReportFileToInputTestDetail(inputTestRequestId, inputTestDetailId, testReportFile, OUT_SOURCING);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + inputTestDetail.getId() + " from createTestReportFileToOutsourcingInputTestEnrollment.");
         return new ResponseEntity<>(inputTestDetail, HttpStatus.OK);
@@ -190,7 +197,7 @@ public class OutsourcingInputTestEnrollmentController {
             @RequestPart(required = false) @Parameter(description = "COC 파일") MultipartFile cocFile,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, IOException, BadRequestException {
-        InputTestDetailResponse inputTestDetail = inputTestDetailService.createCocFileToInputTestDetail(inputTestRequestId, inputTestDetailId, cocFile, false);
+        InputTestDetailResponse inputTestDetail = inputTestDetailService.createCocFileToInputTestDetail(inputTestRequestId, inputTestDetailId, cocFile, OUT_SOURCING);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + inputTestDetail.getId() + " from createCocFileToOutsourcingInputTestEnrollment.");
         return new ResponseEntity<>(inputTestDetail, HttpStatus.OK);
@@ -213,7 +220,7 @@ public class OutsourcingInputTestEnrollmentController {
             @RequestParam(required = false) @Parameter(description = "coc 파일") boolean cocDeleteYn,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        inputTestDetailService.deleteTestReportFileAndCocFileToInputTestDetail(inputTestRequestId, inputTestDetailId, testReportDeleteYn, cocDeleteYn, false);
+        inputTestDetailService.deleteTestReportFileAndCocFileToInputTestDetail(inputTestRequestId, inputTestDetailId, testReportDeleteYn, cocDeleteYn, OUT_SOURCING);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + inputTestDetailId + " from deleteTestReportFileToOutsourcingInputTestEnrollment.");
         return new ResponseEntity(NO_CONTENT);
