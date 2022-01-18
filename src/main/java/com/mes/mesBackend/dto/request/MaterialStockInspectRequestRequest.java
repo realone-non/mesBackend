@@ -14,9 +14,6 @@ public class MaterialStockInspectRequestRequest {
     @Schema(description = "요청번호,ID")
     Long id;
 
-    @Schema(description = "실사일자")
-    LocalDate inspectDate;
-
     @Schema(description = "비고")
     String note;
 
