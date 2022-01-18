@@ -34,7 +34,7 @@ public class LotMasterController {
 
 
     // LOT 마스터 조회
-    // 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부
+    // 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 품목계정
     @GetMapping
     @ResponseBody
     @Operation(

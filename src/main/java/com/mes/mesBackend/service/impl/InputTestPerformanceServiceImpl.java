@@ -2,6 +2,7 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
 import com.mes.mesBackend.dto.response.InputTestScheduleResponse;
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.repository.InputTestDetailRepository;
 import com.mes.mesBackend.service.InputTestPerformanceService;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 // 14-3. 검사실적 조회
 // 15-3. 검사실적 조회
+// 16-4. 검사 현황 조회
 @Service
 @RequiredArgsConstructor
 public class InputTestPerformanceServiceImpl implements InputTestPerformanceService {
@@ -28,16 +30,13 @@ public class InputTestPerformanceServiceImpl implements InputTestPerformanceServ
             String itemNoAndName,
             Long clientId,
             Long purchaseInputNo,
-            boolean inputTestDivision
+            InputTestDivision inputTestDivision,
+            TestType testType,
+            Long wareHouseId
     ) {
         return inputTestDetailRepo.findInputTestPerformanceResponseByCondition(
-                fromDate,
-                toDate,
-                itemNoAndName,
-                clientId,
-                purchaseInputNo,
-                inputTestDivision
-        ).stream().map(res -> res.division(inputTestDivision)).collect(Collectors.toList());
+                fromDate, toDate, itemNoAndName, clientId, purchaseInputNo, inputTestDivision, testType, wareHouseId)
+                .stream().map(res -> res.division(inputTestDivision)).collect(Collectors.toList());
     }
 
     // 검사대기 현황 조회
@@ -50,7 +49,7 @@ public class InputTestPerformanceServiceImpl implements InputTestPerformanceServ
             Long clientId,
             LocalDate fromDate,
             LocalDate toDate,
-            boolean inputTestDivision
+            InputTestDivision inputTestDivision
     ) {
         return inputTestDetailRepo.findInputTestScheduleResponsesByCondition(
                 wareHouseId,

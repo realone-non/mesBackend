@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.response.InputTestDetailResponse;
 import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
 import com.mes.mesBackend.dto.response.InputTestRequestInfoResponse;
 import com.mes.mesBackend.dto.response.InputTestScheduleResponse;
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.TestType;
 
 import java.time.LocalDate;
@@ -24,10 +25,11 @@ public interface InputTestDetailRepositoryCustom {
             LocalDate fromDate,
             LocalDate toDate,
             Long manufactureId,
-            boolean inputTestDivision
+            InputTestDivision inputTestDivision,
+            TestType testType
     );
     // 검사상세정보 단일조회
-    Optional<InputTestDetailResponse> findDetailByInputTestRequestIdAndInputTestDetailIdAndDeleteYnFalse(Long inputTestRequestId, Long inputTestDetailId, boolean inputTestDivision);
+    Optional<InputTestDetailResponse> findDetailByInputTestRequestIdAndInputTestDetailIdAndDeleteYnFalse(Long inputTestRequestId, Long inputTestDetailId, InputTestDivision inputTestDivision);
     // 검사상세정보 전체 조회
     List<InputTestDetailResponse> findDetailsByInputTestRequestIdAndDeleteYnFalse(Long inputTestRequestId);
     // 검사요청정보에 해당하는 검사정보의 모든 검사수량
@@ -47,7 +49,9 @@ public interface InputTestDetailRepositoryCustom {
             String itemNoAndName,
             Long clientId,
             Long purchaseInputNo,
-            boolean inputTestDivision
+            InputTestDivision inputTestDivision,
+            TestType testType,
+            Long wareHouseId
     );
     // 14-4. 검사대기현황, 15-4. 검사대기현황
     // 검색조건: 검사창고 id, 검사유형, 품명|품번, 거래처, 검사기간 fromDate~toDate
@@ -58,6 +62,6 @@ public interface InputTestDetailRepositoryCustom {
             Long clientId,
             LocalDate fromDate,
             LocalDate toDate,
-            boolean inputTestDivision
+            InputTestDivision inputTestDivision
     );
 }

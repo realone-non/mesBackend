@@ -1,6 +1,8 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.OUT_SOURCING;
 
 // 15-3. 검사실적 조회
 @RequestMapping(value = "/outsourcing-input-test-performances")
@@ -46,10 +50,12 @@ public class OutsourcingInputTestPerformanceController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "검사기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
             @RequestParam(required = false) @Parameter(description = "거래처 id") Long clientId,
-            @RequestParam(required = false) @Parameter(description = "입고번호 (purchaseInputId)") Long purchaseInputNo,
+            @RequestParam(required = false) @Parameter(description = "입고번호 (outsourcingInputId)") Long inputId,
+            @RequestParam(required = false) @Parameter(description = "검사유형", hidden = true) TestType testType,
+            @RequestParam(required = false) @Parameter(description = "검사창고", hidden = true) Long wareHouseId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<InputTestPerformanceResponse> inputTestPerformanceResponses = inputTestPerformanceService.getInputTestPerformances(fromDate, toDate, itemNoAndName, clientId, purchaseInputNo, false);
+        List<InputTestPerformanceResponse> inputTestPerformanceResponses = inputTestPerformanceService.getInputTestPerformances(fromDate, toDate, itemNoAndName, clientId, inputId, OUT_SOURCING, testType, wareHouseId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getOutsourcingInputTestPerformances.");
         return new ResponseEntity<>(inputTestPerformanceResponses, HttpStatus.OK);

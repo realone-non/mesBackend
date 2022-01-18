@@ -1,8 +1,6 @@
 package com.mes.mesBackend.controller;
 
-import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
 import com.mes.mesBackend.dto.response.InputTestScheduleResponse;
-import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -24,20 +22,21 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.mes.mesBackend.entity.enumeration.InputTestDivision.PART;
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.PRODUCT;
 
-// 14-4. 검사대기 현황
-@RequestMapping(value = "/part-input-test-schedules")
-@Tag(name = "part-input-test-schedule", description = "14-4. 검사대기 현황 API")
+// 15-4. 검사대기 현황
+@RequestMapping(value = "/product-input-test-schedules")
+@Tag(name = "product-input-test-schedule", description = "16-5.. 검사대기 현황 API")
 @RestController
 @SecurityRequirement(name = "Authorization")
 @Slf4j
 @RequiredArgsConstructor
-public class PartInputTestScheduleController {
+public class ProductInputTestScheduleController {
     private final InputTestPerformanceService inputTestPerformanceService;
     private final LogService logService;
-    private final Logger logger = LoggerFactory.getLogger(PartInputTestScheduleController.class);
+    private final Logger logger = LoggerFactory.getLogger(ProductInputTestScheduleController.class);
     private CustomLogger cLogger;
+
 
     // 검사대기 현황 조회
     // 검색조건: 검사창고 id, 검사유형, 품명|품번, 거래처, 검사기간 fromDate~toDate
@@ -46,7 +45,7 @@ public class PartInputTestScheduleController {
     @Operation(
             summary = "검사대기 현황 조회",
             description = "검색조건: 검사창고 id, 검사유형, 품명|품번, 거래처, 검사요청기간 fromDate~toDate")
-    public ResponseEntity<List<InputTestScheduleResponse>> getPartInputTestSchedules(
+    public ResponseEntity<List<InputTestScheduleResponse>> getProductInputTestSchedules(
             @RequestParam(required = false) @Parameter(description = "검사창고 id") Long wareHouseId,
             @RequestParam(required = false) @Parameter(description = "검사유형") TestType testType,
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
@@ -56,10 +55,10 @@ public class PartInputTestScheduleController {
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<InputTestScheduleResponse> inputTestScheduleResponses = inputTestPerformanceService.getInputTestSchedules(
-                wareHouseId, testType, itemNoAndName, clientId, fromDate, toDate, PART
+                wareHouseId, testType, itemNoAndName, clientId, fromDate, toDate, PRODUCT
         );
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPartInputTestSchedules.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProductInputTestSchedules.");
         return new ResponseEntity<>(inputTestScheduleResponses, HttpStatus.OK);
     }
 }

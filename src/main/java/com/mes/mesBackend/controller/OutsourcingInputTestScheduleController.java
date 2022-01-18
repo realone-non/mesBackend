@@ -1,6 +1,7 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.InputTestScheduleResponse;
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.OUT_SOURCING;
 
 // 15-4. 검사대기 현황
 @RequestMapping(value = "/outsourcing-input-test-schedules")
@@ -51,7 +54,9 @@ public class OutsourcingInputTestScheduleController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "검사요청기간 toDate") LocalDate toDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<InputTestScheduleResponse> inputTestScheduleResponses = inputTestPerformanceService.getInputTestSchedules(wareHouseId, testType, itemNoAndName, clientId, fromDate, toDate, false);
+        List<InputTestScheduleResponse> inputTestScheduleResponses = inputTestPerformanceService.getInputTestSchedules(
+                wareHouseId, testType, itemNoAndName, clientId, fromDate, toDate, OUT_SOURCING
+        );
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getOutsourcingInputTestSchedules.");
         return new ResponseEntity<>(inputTestScheduleResponses, HttpStatus.OK);

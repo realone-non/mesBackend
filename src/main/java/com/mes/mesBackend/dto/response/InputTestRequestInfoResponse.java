@@ -1,16 +1,21 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
+import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM;
 
 // 14-2. 검사등록
@@ -26,6 +31,9 @@ public class InputTestRequestInfoResponse {
     @Schema(description = "요청일시")
     @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = "Asia/Seoul")
     LocalDateTime requestDate;
+
+    @JsonIgnore
+    Long lotMasterId;
 
     @Schema(description = "LOT 번호")
     String lotNo;
@@ -78,8 +86,8 @@ public class InputTestRequestInfoResponse {
     @Schema(description = "검사수량")
     int testAmount;
 
-    @Schema(description = "재고수량")
-    int stockAmount;
+//    @Schema(description = "재고수량")
+//    int stockAmount;      0118 없애라고 하심
 
     @Schema(description = "요청수량")
     int requestAmount;
@@ -88,22 +96,49 @@ public class InputTestRequestInfoResponse {
     TestType testType;      // 다시 검토
 
     @Schema(description = "긴급여부")
-    boolean urgentYn;
+    Boolean urgentYn;
 
     @Schema(description = "시험성적서")
-    boolean testReportYn;
+    Boolean testReportYn;
 
     @Schema(description = "COC")
-    boolean coc;
+    Boolean coc;
 
-    public InputTestRequestInfoResponse division(boolean inputTestDivision) {
-        if (inputTestDivision) {
+    @Schema(description = "검사완료요청일")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = "Asia/Seoul")
+    LocalDate testCompletionRequestDate;
+
+    @Schema(description = "지시번호")
+    String workOrderNo;
+
+    public InputTestRequestInfoResponse division(InputTestDivision inputTestDivision) {
+        if (inputTestDivision.equals(PART)) {
             setOutsourcingInputNo(null);
             setOutsourcingProductionRequestNo(null);
+            setTestCompletionRequestDate(null);
+            setWorkOrderNo(null);
         }
-        else {
+        else if (inputTestDivision.equals(OUT_SOURCING)){
             setPurchaseInputNo(null);
             setPurchaseOrderNo(null);
+            setTestCompletionRequestDate(null);
+            setWorkOrderNo(null);
+            setUrgentYn(null);
+            setTestReportYn(null);
+            setCoc(null);
+        } else if (inputTestDivision.equals(PRODUCT)) {
+            setOutsourcingProductionRequestNo(null);
+            setOutsourcingInputNo(null);
+            setPurchaseInputNo(null);
+            setPurchaseOrderNo(null);
+            setItemManufacturerPartNo(null);
+            setTestProcess(null);
+            setTestProcess(null);
+            setTestType(null);
+            setLotMasterId(null);
+            setUrgentYn(null);
+            setTestReportYn(null);
+            setCoc(null);
         }
         return this;
     }

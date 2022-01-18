@@ -1,5 +1,6 @@
 package com.mes.mesBackend.entity;
 
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.InputTestState;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import java.time.LocalDate;
+
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
 import static com.mes.mesBackend.entity.enumeration.InputTestState.*;
 import static com.mes.mesBackend.entity.enumeration.TestType.NO_TEST;
 import static javax.persistence.EnumType.STRING;
@@ -50,34 +54,33 @@ public class InputTestRequest extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
-    @Column(name = "INPUT_TEST_DIVISION", columnDefinition = "bit(1) COMMENT '외주수입검사, 부품수입검사 구분'", nullable = false)
-    private boolean inputTestDivision;      // 부품수입검사 true, 외주수입검사: false
+    @Enumerated(STRING)
+    @Column(name = "INPUT_TEST_DIVISION", columnDefinition = "varchar(255) COMMENT '외주수입검사, 부품수입검사, 제품검사 구분'", nullable = false)
+    private InputTestDivision inputTestDivision;
 
-    // 14-1. 부품수입검사요청 등록
-    public void createItemInputRequest(LotMaster lotMaster) {
+    @Column(name = "TEST_COMPLETION_REQUEST_DATE", columnDefinition = "datetime COMMENT '검사완료요청일'")
+    private LocalDate testCompletionRequestDate;
+
+    public void createInputTestRequest(LotMaster lotMaster, InputTestDivision inputTestDivision, LocalDate testCompletionRequestDate) {
         setLotMaster(lotMaster);
         setInputTestState(SCHEDULE);
-        setInputTestDivision(true);
+        setInputTestDivision(inputTestDivision);
+        if (inputTestDivision.equals(PRODUCT)) {
+            setTestCompletionRequestDate(testCompletionRequestDate);
+        } else
+            setTestCompletionRequestDate(null);
     }
 
-    // 15-1. 외주수입검사요청 등록
-    public void createOutsourcingInputRequest(LotMaster lotMaster) {
-        setLotMaster(lotMaster);
-        setInputTestState(SCHEDULE);
-        setInputTestDivision(false);
-    }
-
-    public void update(InputTestRequest newInputTestRequest) {
+    public void update(InputTestRequest newInputTestRequest, InputTestDivision inputTestDivision) {
         setRequestType(newInputTestRequest.requestType);
         setRequestAmount(newInputTestRequest.requestAmount);
         setTestType(newInputTestRequest.testType);
+        if (inputTestDivision.equals(PRODUCT)) {
+            setTestCompletionRequestDate(newInputTestRequest.testCompletionRequestDate);
+        }
     }
 
     public void delete() {
         setDeleteYn(true);
-    }
-
-    public void changedSchedule() {
-        setInputTestState(SCHEDULE);
     }
 }
