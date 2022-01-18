@@ -13,9 +13,11 @@ import java.time.LocalDateTime;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM;
 
+// 14-2. 검사등록
+// 15-2. 검사등록
 @Getter
 @Setter
-@Schema(description = "14-2.검사등록")
+@Schema(description = "검사등록")
 @JsonInclude(NON_NULL)
 public class InputTestRequestInfoResponse {
     @Schema(description = "고유아이디")
@@ -31,11 +33,17 @@ public class InputTestRequestInfoResponse {
     @Schema(description = "등록유형")
     EnrollmentType enrollmentType;
 
-    @Schema(description = "입고번호")
+    @Schema(description = "구매입고 입고번호")
     Long purchaseInputNo;   // purchaseInputId
 
-    @Schema(description = "발주번호")
+    @Schema(description = "외주입고 입고번호")
+    Long outsourcingInputNo;
+
+    @Schema(description = "구매입고 발주번호")
     String purchaseOrderNo;
+
+    @Schema(description = "외주입고 발주번호")
+    Long outsourcingProductionRequestNo;
 
     @Schema(description = "품번")
     String itemNo;
@@ -43,20 +51,20 @@ public class InputTestRequestInfoResponse {
     @Schema(description = "품명")
     String itemName;
 
-    @Schema(description = "고객사 품번")
-    String itemClientPartNo;
+//    @Schema(description = "고객사 품번")
+//    String itemClientPartNo;
 
     @Schema(description = "제조사 품번")
     String itemManufacturerPartNo;
 
-    @Schema(description = "고객사")
-    String clientName;
+//    @Schema(description = "고객사")
+//    String clientName;
 
     @Schema(description = "제조사")
     String manufacturerName;
 
     @Schema(description = "품목형태")
-    String itemForm;        // 품목형태
+    String itemForm;
 
     @Schema(description = "검사방법")
     String testProcess;
@@ -87,4 +95,16 @@ public class InputTestRequestInfoResponse {
 
     @Schema(description = "COC")
     boolean coc;
+
+    public InputTestRequestInfoResponse division(boolean inputTestDivision) {
+        if (inputTestDivision) {
+            setOutsourcingInputNo(null);
+            setOutsourcingProductionRequestNo(null);
+        }
+        else {
+            setPurchaseInputNo(null);
+            setPurchaseOrderNo(null);
+        }
+        return this;
+    }
 }

@@ -30,6 +30,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     final QTestCriteria testCriteria = QTestCriteria.testCriteria1;
     final QPurchaseInput purchaseInput = QPurchaseInput.purchaseInput;
     final QOutSourcingInput outSourcingInput = QOutSourcingInput.outSourcingInput;
+    final QOutSourcingProductionRequest outSourcingProductionRequest = QOutSourcingProductionRequest.outSourcingProductionRequest;
 
 
     // 검사의뢰등록 response 단일 조회 및 예외
@@ -45,12 +46,13 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                         lotMaster.id.as("lotId"),
                                         lotMaster.lotNo.as("lotNo"),
                                         purchaseInput.id.as("purchaseInputNo"),
+                                        outSourcingInput.id.as("outsourcingInputNo"),
                                         item.itemNo.as("itemNo"),
                                         item.itemName.as("itemName"),
                                         item.manufacturerPartNo.as("itemManufacturerPartNo"), // 제조사품번: 품목의 제조사품번
-                                        item.clientItemNo.as("itemClientPartNo"),   // 고객사품번: 품목의 거재처품번
+//                                        item.clientItemNo.as("itemClientPartNo"),   // 고객사품번: 품목의 거재처품번
                                         client.clientName.as("manufacturerName"), // 제조사: 품목의 제조사
-                                        client.clientName.as("clientName"), // 고객사: 제조사와 동일
+//                                        client.clientName.as("clientName"), // 고객사: 제조사와 동일
                                         wareHouse.wareHouseName.as("warehouse"),
                                         itemForm.form.as("itemForm"),
                                         testProcess.testProcess.as("testProcess"),
@@ -60,7 +62,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                         purchaseInput.coc.as("coc"),
                                         inputTestRequest.createdDate.as("requestDate"),
                                         inputTestRequest.requestType.as("requestType"),
-                                        inputTestRequest.requestAmount.as("requestAmount")
+                                        inputTestRequest.requestAmount.as("requestAmount"),
+                                        inputTestRequest.testType.as("testType")
                                 )
                         )
                         .from(inputTestRequest)
@@ -73,10 +76,12 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))
                         .leftJoin(testProcess).on(testProcess.id.eq(item.testProcess.id))
                         .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
+                        .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
+                        .leftJoin(outSourcingProductionRequest).on(outSourcingProductionRequest.id.eq(outSourcingInput.productionRequest.id))
                         .where(
                                 inputTestRequest.id.eq(id),
                                 isInputTestRequestDeleteYnFalse(),
-                                isInputTestRequest(inputTestDivision)
+                                isInputTestRequestDivision(inputTestDivision)
                         )
                         .fetchOne()
         );
@@ -105,12 +110,13 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                 lotMaster.id.as("lotId"),
                                 lotMaster.lotNo.as("lotNo"),
                                 purchaseInput.id.as("purchaseInputNo"),
+                                outSourcingInput.productionRequest.id.as("outsourcingInputNo"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
                                 item.manufacturerPartNo.as("itemManufacturerPartNo"), // 제조사품번: 품목의 제조사품번
-                                item.clientItemNo.as("itemClientPartNo"),   // 고객사품번: 품목의 거재처품번
+//                                item.clientItemNo.as("itemClientPartNo"),   // 고객사품번: 품목의 거재처품번
                                 client.clientName.as("manufacturerName"),   // 제조사: 품목의 제조사
-                                client.clientName.as("clientName"),         // 고객사: 제조사와 동일
+//                                client.clientName.as("clientName"),         // 고객사: 제조사와 동일
                                 wareHouse.wareHouseName.as("warehouse"),
                                 itemForm.form.as("itemForm"),
                                 testProcess.testProcess.as("testProcess"),
@@ -120,7 +126,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                 purchaseInput.coc.as("coc"),
                                 inputTestRequest.createdDate.as("requestDate"),
                                 inputTestRequest.requestType.as("requestType"),
-                                inputTestRequest.requestAmount.as("requestAmount")
+                                inputTestRequest.requestAmount.as("requestAmount"),
+                                inputTestRequest.testType.as("testType")
                         )
                 )
                 .from(inputTestRequest)
@@ -133,6 +140,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                 .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))
                 .leftJoin(testProcess).on(testProcess.id.eq(item.testProcess.id))
                 .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
+                .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
+                .leftJoin(outSourcingProductionRequest).on(outSourcingProductionRequest.id.eq(outSourcingInput.productionRequest.id))
                 .where(
                         isWareHouseEq(warehouseId),
                         isLotTypeEq(lotTypeId),
@@ -142,7 +151,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         isRequestTestTypeEq(requestType),
                         isRequestDateBetween(fromDate, toDate),
                         isInputTestRequestDeleteYnFalse(),
-                        isInputTestRequest(inputTestDivision)
+                        isInputTestRequestDivision(inputTestDivision)
                 )
                 .fetch();
     }
@@ -169,7 +178,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                 jpaQueryFactory
                         .selectFrom(inputTestRequest)
                         .where(
-                                isInputTestRequest(inputTestDivision),
+                                isInputTestRequestDivision(inputTestDivision),
                                 inputTestRequest.id.eq(inputTestRequestId),
                                 isInputTestRequestDeleteYnFalse()
                         )
@@ -215,7 +224,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
 
     // 14-1. 부품수입검사 요청 조회 true
     // 15-1. 외주수입검사 요청 조회 false
-    private BooleanExpression isInputTestRequest(boolean inputTestDivision) {
+    private BooleanExpression isInputTestRequestDivision(boolean inputTestDivision) {
         return inputTestRequest.inputTestDivision.eq(inputTestDivision);
     }
 }
