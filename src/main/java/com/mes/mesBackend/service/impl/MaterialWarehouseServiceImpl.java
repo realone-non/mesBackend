@@ -128,9 +128,7 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
         for (RequestMaterialStockInspect request:requestList) {
             for (MaterialStockInspect inspect: dbInspect) {
                 if(request.getId().equals(inspect.getId())){
-                    User user = userRepository.findByIdAndDeleteYnFalse(request.getUserId())
-                            .orElseThrow(() -> new NotFoundException("user does not exist. input id: " + request.getUserId()));
-                    inspect.update(request, user);
+                    inspect.update(request);
                     break;
                 }
             }
@@ -145,5 +143,20 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
                 .orElseThrow(() -> new NotFoundException("stockInspect does not exist. input id: " + id));
         dbInsepct.delete();
         materialStockInspectRepository.save(dbInsepct);
+    }
+
+    //재고실사 승인 등록
+    public List<MaterialStockInspectResponse> createStockInspectApproval(Long requestId, Long userId) throws NotFoundException {
+        MaterialStockInspectRequest dbRequest = materialStockInspectRequestRepository.findByIdAndDeleteYnFalse(requestId)
+                .orElseThrow(() -> new NotFoundException("inspectRequest does not exist. input id: " + requestId));
+        List<MaterialStockInspect> dbInspect = materialStockInspectRepository.findAllByDeleteYnFalseAndMaterialStockInspectRequest(dbRequest);
+        User user = userRepository.findByIdAndDeleteYnFalse(userId)
+                .orElseThrow(() -> new NotFoundException("user does not exist. input id: " + userId));
+        for (MaterialStockInspect inspect: dbInspect) {
+                inspect.approval(user);
+        }
+
+        materialStockInspectRepository.saveAll(dbInspect);
+        return materialStockInspectRepository.findAllByCondition(requestId, null, null, null);
     }
 }

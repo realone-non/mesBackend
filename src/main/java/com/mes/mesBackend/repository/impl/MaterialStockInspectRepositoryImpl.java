@@ -50,6 +50,7 @@ public class MaterialStockInspectRepositoryImpl implements MaterialStockInspectR
                                 materialStockInspect.itemAccount.as("itemAccount"),
                                 user.id.as("userId"),
                                 user.korName.as("userName"),
+                                materialStockInspect.approvalDate.as("approvalDate"),
                                 materialStockInspect.note.as("note")
                         )
                 )
