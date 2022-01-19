@@ -1,5 +1,6 @@
 package com.mes.mesBackend.controller;
 
+import com.mes.mesBackend.dto.response.MaterialStockInspectRequestResponse;
 import com.mes.mesBackend.dto.response.MaterialStockInspectResponse;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -19,10 +20,12 @@ import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 //재고실사 승인등록
@@ -59,6 +62,52 @@ public class MaterialStockInspectApprovalController {
         List<MaterialStockInspectResponse> responseList = materialWarehouseService.createStockInspectApproval(requestId, userId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the stockInspect requestId:" + requestId + " from createStockInspectData.");
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
+    }
+
+    //재고실사의뢰 조회
+    @GetMapping
+    @ResponseBody
+    @Operation(summary = "재고실사의뢰 조회")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    public ResponseEntity<List<MaterialStockInspectRequestResponse>> getMaterialStockInspects(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "시작날짜") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "종료날짜") LocalDate toDate,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException{
+        List<MaterialStockInspectRequestResponse> responseList = materialWarehouseService.getMaterialStockInspectRequestList(fromDate, toDate);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getMaterialStockInspects.");
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
+    }
+
+    //재고실사 조회
+    @GetMapping("/{request-id}")
+    @ResponseBody
+    @Operation(summary = "재고실사 조회")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    public ResponseEntity<List<MaterialStockInspectResponse>> getMaterialStockInspects(
+            @PathVariable(value = "request-id") @Parameter(description = "실사의뢰 ID") Long requestId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "시작날짜") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "종료날짜") LocalDate toDate,
+            @RequestParam(required = false) @Parameter(description = "아이템어카운트명") String itemAccount,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException{
+        List<MaterialStockInspectResponse> responseList = materialWarehouseService.getMaterialStockInspects(requestId, fromDate, toDate, itemAccount);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getMaterialStockInspects.");
         return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 }
