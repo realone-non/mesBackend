@@ -37,6 +37,8 @@ public interface MaterialWarehouseService {
     //재고조사 수정
     List<MaterialStockInspectResponse> modifyMaterialStockInspect(Long requestId, List<RequestMaterialStockInspect> requestList)
             throws NotFoundException;
-
+    //재고실사 삭제
     void deleteMaterialStockInspect(Long id) throws NotFoundException;
+    //재고실사 승인 등록
+    List<MaterialStockInspectResponse> createStockInspectApproval(Long requestId, Long userId) throws NotFoundException;
 }

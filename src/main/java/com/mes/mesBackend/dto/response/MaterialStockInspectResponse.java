@@ -44,6 +44,9 @@ public class MaterialStockInspectResponse {
     @Schema(description = "승인자 이름")
     String userName;
 
+    @Schema(description = "승인일시")
+    LocalDate approvalDate;
+
     @Schema(description = "품목 계정")
     String itemAccount;
 
