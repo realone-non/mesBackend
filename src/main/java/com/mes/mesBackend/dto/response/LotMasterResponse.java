@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.LotType;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
+import com.mes.mesBackend.entity.enumeration.ProcessType;
 import com.mes.mesBackend.entity.enumeration.QualityLevel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -45,6 +46,9 @@ public class LotMasterResponse {
 
     @Schema(description = "등록유형")
     EnrollmentType enrollmentType;
+
+    @Schema(description = "공정")
+    ProcessType process;
 
     @Schema(description = "공정용")
     boolean processYn;

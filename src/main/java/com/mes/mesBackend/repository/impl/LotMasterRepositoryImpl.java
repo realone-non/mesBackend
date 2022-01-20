@@ -13,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -105,6 +103,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotMaster.serialNo.as("serialNo"),
                                 lotType.lotType.as("lotType"),
                                 lotMaster.enrollmentType.as("enrollmentType"),
+                                lotMaster.process.as("process"),
                                 lotMaster.processYn.as("processYn"),
                                 lotMaster.stockAmount.as("stockAmount"),
                                 lotMaster.createdAmount.as("createdAmount"),

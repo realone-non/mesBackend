@@ -30,4 +30,8 @@ public class HeaderRequest {
     @NotNull(message = NOT_NULL)
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     int seq;
+
+    @Schema(description = "필수여부")
+    @NotNull(message = NOT_NULL)
+    boolean isRequire;
 }

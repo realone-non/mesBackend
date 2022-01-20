@@ -4,6 +4,7 @@ import com.mes.mesBackend.entity.Item;
 import com.mes.mesBackend.entity.ItemLog;
 import com.mes.mesBackend.entity.WareHouse;
 import com.mes.mesBackend.entity.enumeration.ItemLogType;
+import com.mes.mesBackend.entity.enumeration.ProcessType;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.repository.ItemLogRepository;
 import com.mes.mesBackend.repository.ItemRepository;
@@ -22,7 +23,13 @@ public class AmountHelper {
     @Autowired
     ItemRepository itemRepository;
 
-    public void amountUpdate(Long itemId, Long fromWarehouseId, Long toWareHouseId, ItemLogType type, int amount, boolean isOut) throws NotFoundException{
+    public void amountUpdate(
+            Long itemId,
+            Long fromWarehouseId,
+            Long toWareHouseId,
+            ItemLogType type,
+            int amount,
+            boolean isOut) throws NotFoundException{
         ItemLog fromItemLog = itemLogRepository.findByItemIdAndwareHouseIdAndOutsourcingYn(itemId, fromWarehouseId, isOut);
         ItemLog toItemLog = new ItemLog();
         LocalDate today = LocalDate.now();
