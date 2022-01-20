@@ -32,6 +32,9 @@ public class Header {
     @Column(name = "SEQ", columnDefinition = "int COMMENT '출력순서'")
     private int seq;        // 순서
 
+    @Column(name = "IS_REQUIRE", columnDefinition = "bit(1) COMMENT '필수여부'")
+    private boolean isRequire;
+
     public void put(Header newHeader) {
         setHeader(newHeader.header);
         setControllerName(newHeader.controllerName);

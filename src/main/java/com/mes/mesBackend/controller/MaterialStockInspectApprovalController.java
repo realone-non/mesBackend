@@ -29,7 +29,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 //재고실사 승인등록
-@Tag(name = "material-stockinspect-approval")
+@Tag(name = "material-stockinspect-approval", description = "재고실사승인 API")
 @RequestMapping(value = "/material-stockinspect-approval")
 @RestController
 @RequiredArgsConstructor

@@ -37,11 +37,6 @@ public class Development extends BaseTimeEntity {
 
     // 다대일 단방향
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CLIENT", nullable = false, columnDefinition = "bigint COMMENT '거래처'")
-    private Client client;      // 거래처
-
-    // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ITEM", nullable = false, columnDefinition = "bigint COMMENT '품목'")
     private Item item;          // 품목
 
