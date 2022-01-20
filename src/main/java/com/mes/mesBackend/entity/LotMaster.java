@@ -2,6 +2,7 @@ package com.mes.mesBackend.entity;
 
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
+import com.mes.mesBackend.entity.enumeration.ProcessType;
 import com.mes.mesBackend.entity.enumeration.QualityLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -113,6 +114,10 @@ public class LotMaster extends BaseTimeEntity {
 
     @Column(name = "RECYCLE_AMOUNT", columnDefinition = "int COMMENT '재사용수량'")
     private int recycleAmount;      // 재사용수량
+
+    @Enumerated(STRING)
+    @Column(name = "PROCESS", columnDefinition = "varchar(255) COMMENT '공정 유형'")
+    private ProcessType process;
 
     @Enumerated(STRING)
     @Column(name = "GOODS_TYPE", columnDefinition = "varchar(255) COMMENT '제품 타입'" )

@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.ReceiptAndPaymentResponse;
+import com.mes.mesBackend.dto.response.WarehouseInventoryResponse;
 import com.mes.mesBackend.entity.ItemLog;
 
 import java.time.LocalDate;

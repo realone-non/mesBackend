@@ -31,7 +31,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 //재고실사의뢰 등록
-@Tag(name = "material-stockinspect-requests")
+@Tag(name = "material-stockinspect-requests", description = "재고실사의뢰 API")
 @RequestMapping(value = "/material-stockinspect-requests")
 @RestController
 @RequiredArgsConstructor

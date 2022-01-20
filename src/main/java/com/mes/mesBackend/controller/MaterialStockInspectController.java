@@ -33,7 +33,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 //재고실사 등록
-@Tag(name = "material-stockinspect")
+@Tag(name = "material-stockinspect", description = "재고실사 등록 API")
 @RequestMapping(value = "/material-stockinspect")
 @RestController
 @RequiredArgsConstructor
@@ -46,6 +46,28 @@ public class MaterialStockInspectController {
 
     private Logger logger = LoggerFactory.getLogger(MaterialStockInspectRequestRepositoryCustom.class);
     private CustomLogger cLogger;
+
+    //재고실사의뢰 조회
+    @GetMapping()
+    @ResponseBody
+    @Operation(summary = "재고실사의뢰 조회")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    public ResponseEntity<List<MaterialStockInspectRequestResponse>> getMaterialStockInspects(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "시작날짜") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "종료날짜") LocalDate toDate,
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException{
+        List<MaterialStockInspectRequestResponse> responseList = materialWarehouseService.getMaterialStockInspectRequestList(fromDate, toDate);
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getMaterialStockInspects.");
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
+    }
 
     //DB재고실사 데이터 등록
     @PostMapping("/{request-id}/stock-inspect")

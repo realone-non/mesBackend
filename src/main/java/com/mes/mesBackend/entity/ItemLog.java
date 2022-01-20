@@ -1,6 +1,7 @@
 package com.mes.mesBackend.entity;
 
 import com.mes.mesBackend.entity.enumeration.ItemLogType;
+import com.mes.mesBackend.entity.enumeration.ProcessType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

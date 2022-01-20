@@ -23,6 +23,9 @@ public class HeaderResponse {
     @Schema(description = "순서")
     int seq;
 
+    @Schema(description = "필수여부")
+    boolean isRequire;
+
     @Schema(description = "그리드 옵션")
     GridOptionResponse gridOptionResponse;
 }
