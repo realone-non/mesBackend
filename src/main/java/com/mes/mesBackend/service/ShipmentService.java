@@ -34,7 +34,4 @@ public interface ShipmentService {
     ShipmentItemResponse updateShipmentItem(Long shipmentId, Long shipmentItemId, ShipmentItemRequest shipmentItemRequest);
     // 출하 품목정보 삭제
     void deleteShipmentItem(Long shipmentId, Long shipmentItemId);
-
-
-
 }

@@ -10,6 +10,8 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
+import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 @Getter
 @Setter
@@ -23,20 +25,26 @@ public class ShipmentResponse {
     String shipmentNo;
 
     @Schema(description = "거래처")
-    ClientResponse.CodeAndName client;
+    String clientNo;
+
+    @Schema(description = "거래처명")
+    String clientName;
 
     @Schema(description = "출하일자")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate shipmentDate;
 
     @Schema(description = "담당자")
-    UserResponse.idAndKorName user;
+    String userName;
 
     @Schema(description = "출하창고")
-    WareHouseResponse.idAndName wareHouse;
+    String wareHouseName;
 
     @Schema(description = "화폐")
-    CurrencyResponse.idAndUnit currency;
+    String currency;
+
+    @Schema(description = "현재 환율")
+    float exchangeRate;
 
     @Schema(description = "거래처 담당자")
     String clientManager;

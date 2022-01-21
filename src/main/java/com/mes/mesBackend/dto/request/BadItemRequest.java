@@ -17,20 +17,20 @@ public class BadItemRequest {
 
     @Schema(description = "불량항목코드")
     @NotBlank(message = NOT_NULL)
-    String badItemCode;     //  불량항목코드
+    String badItemCode;
 
     @Schema(description = "불량항목명")
     @NotBlank(message = NOT_NULL)
-    String badItemName;     // 불량항목명
+    String badItemName;
 
     @Schema(description = "순번")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
-    int orders;     // 순번
+    int orders;
 
     @Schema(description = "사용여부")
     @NotNull(message = NOT_NULL)
-    boolean useYn = true;      //  사용여부
+    boolean useYn = true;
 
     @Schema(description = "작업공정 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
