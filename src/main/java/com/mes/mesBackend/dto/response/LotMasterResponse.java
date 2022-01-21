@@ -15,6 +15,7 @@ import javax.persistence.Column;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM;
 
 // 7-1. LOT 마스터 조회
@@ -90,7 +91,7 @@ public class LotMasterResponse {
     QualityLevel qualityLevel;
 
     @Schema(description = "생성일시")
-    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime createdDate;
 
     @JsonIgnore
