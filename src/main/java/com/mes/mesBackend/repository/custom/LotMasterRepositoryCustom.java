@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.LotMasterResponse;
+import com.mes.mesBackend.dto.response.MaterialStockReponse;
 import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
 import com.mes.mesBackend.entity.ItemAccountCode;
 import com.mes.mesBackend.entity.LotMaster;
@@ -36,4 +37,7 @@ public interface LotMasterRepositoryCustom {
     List<OutsourcingInputLOTResponse> findLotMastersByOutsourcing(Long inputId);
     //LOT정보 조회
     OutsourcingInputLOTResponse findLotMasterByInputAndId(OutSourcingInput input, Long id);
+    //재고현황 조회
+    List<MaterialStockReponse> findStockByItemAccountAndItemAndItemAccountCode(
+            Long itemAccountId, Long itemId, Long itemGroupId, Long warehouseId);
 }

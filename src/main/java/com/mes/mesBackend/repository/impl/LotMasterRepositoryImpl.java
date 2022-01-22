@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.LotMasterResponse;
+import com.mes.mesBackend.dto.response.MaterialStockReponse;
 import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
@@ -25,6 +26,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     final QLotMaster lotMaster = QLotMaster.lotMaster;
     final QItemGroup itemGroup = QItemGroup.itemGroup;
     final QWareHouse wareHouse = QWareHouse.wareHouse;
+    final QClient client = QClient.client;
     final QLotType lotType = QLotType.lotType1;
     final QOutSourcingInput outSourcingInput = QOutSourcingInput.outSourcingInput;
 
@@ -217,6 +219,39 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .fetchOne();
     }
 
+    //재고현황 조회
+    @Transactional(readOnly = true)
+    public List<MaterialStockReponse> findStockByItemAccountAndItemAndItemAccountCode(
+            Long itemAccountId, Long itemId, Long itemGroupId, Long warehouseId){
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                MaterialStockReponse.class,
+                                lotMaster.item.itemNo.as("itemNo"),
+                                lotMaster.item.itemName.as("itemName"),
+                                item.manufacturer.clientCode.as("manufacturerCode"),
+                                lotMaster.wareHouse.id.as("warehouseId"),
+                                lotMaster.stockAmount.sum().as("amount")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                .leftJoin(itemAccountCode).on(itemAccountCode.id.eq(item.itemAccountCode.id))
+                .leftJoin(client).on(client.id.eq(item.manufacturer.id))
+                .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
+                .where(
+                        isWarehouseEq(warehouseId),
+                        isItemGroupEq(itemGroupId),
+                        isItemAccountEq(itemAccountId),
+                        isDeleteYnFalse()
+                )
+                .groupBy(item,wareHouse,lotMaster.enrollmentType)
+                .orderBy(item.id.asc())
+                .fetch();
+    }
+
+
     // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 유효여부
     // 품목그룹
     private BooleanExpression isItemGroupEq(Long itemGroupId) {
@@ -225,6 +260,16 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     // lot 번호
     private BooleanExpression isLotNoContain(String lotNo) {
         return lotNo != null ? lotMaster.lotNo.contains(lotNo) : null;
+    }
+
+    //품목계정
+    private BooleanExpression isItemAccountEq(Long itemAccountId) {
+        return itemAccountId != null ? itemAccount.id.eq(itemAccountId) : null;
+    }
+
+    //품목그룹
+    private BooleanExpression isItemAccountCodeEq(Long itemAccountCodeId) {
+        return itemAccountCodeId != null ? itemAccountCode.id.eq(itemAccountCodeId) : null;
     }
     // 품번|품명
     private BooleanExpression isItemNoAndItemNameContain(String itemNoAndName) {
