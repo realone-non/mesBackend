@@ -146,6 +146,10 @@ public class LotMaster extends BaseTimeEntity {
     @JoinColumn(name = "NEXT_LOT_NO", columnDefinition = "bigint(1) COMMENT '다음 로트번호'")
     private LotMaster nextLotNo;     // 다음 로트번호
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint(1) COMMENT '작업 공정'")
+    private WorkProcess workProcess;
+
 //    @Column(name = "END_YN", columnDefinition = "bit(1) COMMENT '로트 엔드'")
 //    private boolean endYn;      // 로트엔드
 

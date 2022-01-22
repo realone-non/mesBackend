@@ -3,6 +3,7 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.repository.custom.WorkOrderDetailRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -286,6 +287,23 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         )
                         .fetchOne()
         );
+    }
+
+    // 해당 공정이 존재하는지 여부
+    @Override
+    public boolean existByWorkProcess(Long produceOrderId, Long workProcessId) {
+        Integer fetchOne =  jpaQueryFactory
+                .selectOne()
+                .from(workOrderDetail)
+                .where(
+                        workOrderDetail.produceOrder.id.eq(produceOrderId),
+                        workOrderDetail.workProcess.id.eq(workProcessId),
+                        workOrderDetail.deleteYn.isFalse(),
+                        workOrderDetail.workProcess.deleteYn.isFalse()
+                )
+                .fetchFirst();
+
+        return fetchOne != null;
     }
 
     // =============================================== 8-1. 작지상태 확인 ===============================================

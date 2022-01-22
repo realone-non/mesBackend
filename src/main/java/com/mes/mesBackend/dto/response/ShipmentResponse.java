@@ -1,7 +1,9 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.Contract;
 import com.mes.mesBackend.entity.enumeration.PayType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -24,8 +26,11 @@ public class ShipmentResponse {
     @Schema(description = "출하번호")
     String shipmentNo;
 
-    @Schema(description = "거래처")
-    String clientNo;
+    @Schema(description = "거래처 id")
+    Long clientId;
+
+    @Schema(description = "거래처코드")
+    String clientCode;
 
     @Schema(description = "거래처명")
     String clientName;
@@ -35,7 +40,7 @@ public class ShipmentResponse {
     LocalDate shipmentDate;
 
     @Schema(description = "담당자")
-    String userName;
+    String userManager;
 
     @Schema(description = "출하창고")
     String wareHouseName;
@@ -63,4 +68,40 @@ public class ShipmentResponse {
 
     @Schema(description = "비고")
     String note;
+
+    @JsonIgnore
+    Long userId;
+
+    @JsonIgnore
+    Long currencyId;
+
+    public ShipmentResponse addContractInfo(Contract contract) {
+        if (contract != null) {
+            setUserId(contract.getUser().getId());
+            setUserManager(contract.getUser().getKorName());                        // 담당자
+            setWareHouseName(contract.getOutputWareHouse().getWareHouseName());    // 출하창고
+            setCurrencyId(contract.getCurrency().getId());                          // 화폐 id
+            setCurrency(contract.getCurrency().getCurrency());                     // 화폐
+            setExchangeRate(contract.getCurrency().getExchangeRate());              // 환율
+            setPayType(contract.getPayCondition());                                // 결제조건
+            setSurtax(contract.isSurtax());                                        // 부가세적용
+            setTransportCondition(contract.getTransportCondition());               // 운송조건
+            setForwader(contract.getForwader());                                   // Forwader
+        }
+        return this;
+    }
+
+    public ShipmentResponse currencyIdEq(Long currencyId) {
+        if (getCurrencyId().equals(currencyId)) {
+            return this;
+        }
+        return null;
+    }
+
+    public ShipmentResponse userIdEq(Long userId) {
+        if (getUserId().equals(userId)) {
+            return this;
+        }
+        return null;
+    }
 }

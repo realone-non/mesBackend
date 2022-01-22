@@ -9,10 +9,11 @@ import javax.persistence.*;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+import static lombok.AccessLevel.PUBLIC;
 
 // lotMaster 로그
 @AllArgsConstructor
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = PUBLIC)
 @Entity(name = "LOT_LOGS")
 @Data
 public class LotLog extends BaseTimeEntity {
