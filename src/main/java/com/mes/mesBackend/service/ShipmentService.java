@@ -27,15 +27,15 @@ public interface ShipmentService {
 
     // =================================================== 출하 수주 품목 ====================================================
     // 출하 품목정보 생성
-    ShipmentItemResponse createShipmentItem(Long shipmentId, Long contractItemId, String note) throws NotFoundException;
+    ShipmentItemResponse createShipmentItem(Long shipmentId, Long contractItemId, String note) throws NotFoundException, BadRequestException;
     // 출하 품목정보 단일 조회
     ShipmentItemResponse getShipmentItemResponse(Long shipmentId, Long shipmentItemId) throws NotFoundException;
     // 출하 품목 정보 전체조회
-    List<ShipmentItemResponse> getshipmentItem(Long shipmentId);
+    List<ShipmentItemResponse> getShipmentItem(Long shipmentId);
     // 출하 품목정보 수정
-    ShipmentItemResponse updateShipmentItem(Long shipmentId, Long shipmentItemId, Long contractItemId, String note) throws NotFoundException;
+    ShipmentItemResponse updateShipmentItem(Long shipmentId, Long shipmentItemId, Long contractItemId, String note) throws NotFoundException, BadRequestException;
     // 출하 품목정보 삭제
-    void deleteShipmentItem(Long shipmentId, Long shipmentItemId) throws NotFoundException;
+    void deleteShipmentItem(Long shipmentId, Long shipmentItemId) throws NotFoundException, BadRequestException;
 
     // ==================================================== 출하 LOT 정보 ====================================================
     // LOT 정보 생성
@@ -43,5 +43,5 @@ public interface ShipmentService {
     // LOT 정보 전체 조회
     List<ShipmentLotInfoResponse> getShipmentLots(Long shipmentId, Long shipmentItemId) throws NotFoundException;
     // 출하 LOT 정보 삭제
-    void deleteShipmentLot(Long shipmentId, Long shipmentItemId, Long shipmentLotId) throws NotFoundException;
+    void deleteShipmentLot(Long shipmentId, Long shipmentItemId, Long shipmentLotId) throws NotFoundException, BadRequestException;
 }

@@ -102,6 +102,21 @@ public class ShipmentItemRepositoryImpl implements ShipmentItemRepositoryCustom 
                 .fetch();
     }
 
+    // 출하에 수주품목이 있는지
+    @Override
+    public boolean existsByContractItemInShipment(Long shipmentId, Long contractItemId) {
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(shipmentItem)
+                .where(
+                        shipmentItem.shipment.id.eq(shipmentId),
+                        shipmentItem.contractItem.id.eq(contractItemId),
+                        shipmentItem.deleteYn.isFalse()
+                )
+                .fetchFirst();
+        return fetchOne != null;
+    }
+
     // shipment id eq
     private BooleanExpression isShipmentIdEq(Long shipmentId) {
         return shipment.id.eq(shipmentId);

@@ -43,13 +43,12 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 public class ShipmentController {
     private final ShipmentService shipmentService;
     private final LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(ShipmentController.class);
+    private final Logger logger = LoggerFactory.getLogger(ShipmentController.class);
     private CustomLogger cLogger;
 
     // ====================================================== 출하 ======================================================
     // 출하 생성
-    @Operation(summary = "출하 생성", description = "")
+    @Operation(summary = "출하 생성", description = "<br/>")
     @PostMapping
     @ApiResponses(
             value = {
@@ -119,7 +118,7 @@ public class ShipmentController {
             @PathVariable(value = "shipment-id") @Parameter(description = "출하 id") Long shipmentId,
             @RequestBody @Valid ShipmentUpdateRequest shipmentUpdateRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         ShipmentResponse shipment = shipmentService.updateShipment(shipmentId, shipmentUpdateRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + shipment.getId() + " from updateShipment.");
@@ -161,7 +160,7 @@ public class ShipmentController {
             @RequestParam @Valid @Parameter(description = "수주품목 id") Long contractItemId,
             @RequestParam(required = false) @Parameter(description = "비고") String note,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         ShipmentItemResponse shipmentItem = shipmentService.createShipmentItem(shipmentId, contractItemId, note);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + shipmentItem + " from createShipmentItem.");
@@ -198,13 +197,13 @@ public class ShipmentController {
                     @ApiResponse(responseCode = "404", description = "not found resource"),
             }
     )
-    public ResponseEntity<List<ShipmentItemResponse>> getshipmentItem(
+    public ResponseEntity<List<ShipmentItemResponse>> getShipmentItem(
             @PathVariable(value = "shipment-id") @Parameter(description = "출하 id") Long shipmentId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        List<ShipmentItemResponse> shipmentItem = shipmentService.getshipmentItem(shipmentId);
+        List<ShipmentItemResponse> shipmentItem = shipmentService.getShipmentItem(shipmentId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of shipmentId: " + shipmentId + " from getshipmentItem.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of shipmentId: " + shipmentId + " from getShipmentItem.");
         return new ResponseEntity<>(shipmentItem, HttpStatus.OK);
     }
 
@@ -225,7 +224,7 @@ public class ShipmentController {
             @RequestParam @Valid @Parameter(description = "수주품목 id") Long contractItemId,
             @RequestParam @Parameter(description = "비고") String note,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         ShipmentItemResponse shipmentItem = shipmentService.updateShipmentItem(shipmentId, shipmentItemId, contractItemId, note);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + shipmentItem + " from updateShipmentItem.");
@@ -246,7 +245,7 @@ public class ShipmentController {
             @PathVariable(value = "shipment-id") @Parameter(description = "출하 id") Long shipmentId,
             @PathVariable(value = "shipment-item-id") @Parameter(description = "출하 품목 id") Long shipmentItemId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         shipmentService.deleteShipmentItem(shipmentId, shipmentItemId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + shipmentId + " from deleteShipmentItem.");
@@ -313,7 +312,7 @@ public class ShipmentController {
             @PathVariable(value = "shipment-item-id") @Parameter(description = "출하 품목 id") Long shipmentItemId,
             @PathVariable(value = "shipment-lot-id") @Parameter(description = "출하 lot 정보 id") Long shipmentLotId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         shipmentService.deleteShipmentLot(shipmentId, shipmentItemId, shipmentLotId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + shipmentLotId + " from deleteShipmentLot.");
