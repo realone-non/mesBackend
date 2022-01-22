@@ -40,6 +40,8 @@ public interface WorkOrderDetailRepositoryCustom {
     List<WorkOrderResponse> findWorkOrderResponseByProduceOrderIdAndDeleteYnFalse(Long produceOrderId);
     // 작업지시 단일 조회
     Optional<WorkOrderResponse> findWorkOrderResponseByProduceOrderIdAndWorkOrderId(Long produceOrderId, Long workOrderId);
+    // 해당 공정이 존재하는지 여부
+    boolean existByWorkProcess(Long produceOrderId, Long workProcessId);
 
     // =============================================== 8-1. 작지상태 확인 ===============================================
     // 쟉업지시 정보 조회 , 검색조건: 작업장 id, 작업라인 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호

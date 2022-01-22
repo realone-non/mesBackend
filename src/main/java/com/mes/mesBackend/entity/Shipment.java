@@ -1,6 +1,7 @@
 package com.mes.mesBackend.entity;
 
 
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +10,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDate;
 
+import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
+import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -65,15 +68,19 @@ public class Shipment extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
-    public void add(Client client) {
+    @Enumerated(STRING)
+    @Column(name = "ORDER_STATE", columnDefinition = "varchar(255) COMMENT '지시상태'", nullable = false)
+    private OrderState orderState = SCHEDULE;
+
+    public void create(Client client, String shipmentNo) {
         setClient(client);
+        setOrderState(SCHEDULE);
+        setShipmentNo(shipmentNo);
     }
 
     public void update(
-            Shipment newShipment,
-            Client newClient
+            Shipment newShipment
     ) {
-        setClient(newClient);
         setShipmentDate(newShipment.shipmentDate);
         setClientManager(newShipment.clientManager);
         setNote(newShipment.note);

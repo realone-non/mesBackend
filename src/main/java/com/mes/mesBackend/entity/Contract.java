@@ -1,5 +1,6 @@
 package com.mes.mesBackend.entity;
 
+import com.mes.mesBackend.entity.enumeration.PayType;
 import com.mes.mesBackend.entity.enumeration.ProductionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -80,8 +81,8 @@ public class Contract extends BaseTimeEntity {
     @JoinColumn(name = "CURRENCY", columnDefinition = "bigint COMMENT '화폐'", nullable = false)
     private Currency currency;          // 화폐
 
-    @Column(name = "SURTAX", columnDefinition = "varchar(255) COMMENT '부가세 적용'", nullable = false)
-    private String surtax;              // 부가세적용
+    @Column(name = "SURTAX", columnDefinition = "bit(1) COMMENT '부가세 적용'", nullable = false)
+    private boolean surtax;              // 부가세적용
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "OUTPUT_WAREHOUSE", columnDefinition = "bigint COMMENT '출고창고'", nullable = false)
@@ -96,8 +97,9 @@ public class Contract extends BaseTimeEntity {
     @Column(name = "PAYMENT_YN", columnDefinition = "bit(1) COMMENT '결제완료'", nullable = false)
     private boolean paymentYn;          // 결제완료
 
+    @Enumerated(STRING)
     @Column(name = "PAY_CONDITION", columnDefinition = "varchar(255) COMMENT '지불조건'", nullable = false)
-    private String payCondition;        // 지불조건
+    private PayType payCondition;        // 지불조건
 
     @Column(name = "FORWADER", columnDefinition = "varchar(255) COMMENT 'Forwader'", nullable = false)
     private String forwader;                // Forwader

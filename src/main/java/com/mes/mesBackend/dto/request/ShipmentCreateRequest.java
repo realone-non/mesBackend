@@ -6,25 +6,24 @@ import lombok.Setter;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 import static com.mes.mesBackend.exception.Message.*;
 
 @Getter
 @Setter
-@Schema(description = "출하 품목 정보")
-public class ShipmentItemRequest {
-    @Schema(description = "수주 id")
+@Schema(description = "출하")
+public class ShipmentCreateRequest {
+    @Schema(description = "거래처 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
-    Long contract;
+    Long client;
 
-    @Schema(description = "수주 품목 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
-    Long contractItem;
+    @Schema(description = "출하일자")
+    LocalDate shipmentDate;
 
-    @Schema(description = "출하수량")
-    int shipmentAmount;
+    @Schema(description = "거래처담당자")
+    String clientManager;
 
     @Schema(description = "비고")
     String note;

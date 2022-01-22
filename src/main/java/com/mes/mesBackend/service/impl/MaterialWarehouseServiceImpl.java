@@ -1,9 +1,7 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.MaterialStockInspectRequestRequest;
-import com.mes.mesBackend.dto.response.MaterialStockInspectRequestResponse;
-import com.mes.mesBackend.dto.response.MaterialStockInspectResponse;
-import com.mes.mesBackend.dto.response.ReceiptAndPaymentResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.dto.request.RequestMaterialStockInspect;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
@@ -40,6 +38,8 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
     MaterialStockInspectRepository materialStockInspectRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    LotMasterRepository lotMasterRepository;
 
     //수불부 조회
     public List<ReceiptAndPaymentResponse> getReceiptAndPaymentList(Long warehouseId, Long itemAccountId, LocalDate fromDate, LocalDate toDate){
@@ -158,5 +158,17 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
 
         materialStockInspectRepository.saveAll(dbInspect);
         return materialStockInspectRepository.findAllByCondition(requestId, null, null, null);
+    }
+
+    //재고현황 조회
+    public List<MaterialStockReponse> getMaterialStock(Long itemAccountId, Long itemId, Long itemAccoutCodeId, Long warehouseId){
+        return lotMasterRepository.findStockByItemAccountAndItemAndItemAccountCode(
+                itemAccountId, itemId, itemAccoutCodeId, warehouseId);
+    }
+
+    //헤더용 창고 목록 조회
+    public List<HeaderWarehouseResponse> getHeaderWarehouse(){
+        List<WareHouse> wareHouseList = wareHouseRepository.findAllByDeleteYnFalse();
+        return modelMapper.toListResponses(wareHouseList, HeaderWarehouseResponse.class);
     }
 }

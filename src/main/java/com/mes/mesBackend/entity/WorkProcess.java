@@ -1,11 +1,14 @@
 package com.mes.mesBackend.entity;
 
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import static javax.persistence.EnumType.STRING;
 
 /*
  * 작업공정 등록
@@ -45,6 +48,10 @@ public class WorkProcess extends BaseTimeEntity {
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
+
+    @Enumerated(STRING)
+    @Column(name = "WORK_PROCESS_DIVISION", columnDefinition = "varchar(255) COMMENT '공정구분'")
+    private WorkProcessDivision workProcessDivision;
 
     // 연관 매핑 편리메서드
     public void addWorkProcessCode(WorkProcessCode workProcessCode) {

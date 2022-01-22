@@ -150,13 +150,11 @@ public class WorkOrderDetail extends BaseTimeEntity {
 
     public void update(
             WorkOrderDetail newWorkOrderDetail,
-            WorkProcess newWorkProcess,
             WorkLine newWorkLine,
             User newUser,
             TestProcess newTestProcess,
             Unit newUnit
     ) {
-        setWorkProcess(newWorkProcess);
         setWorkLine(newWorkLine);
         setOrderAmount(newWorkOrderDetail.orderAmount);
         setUser(newUser);
