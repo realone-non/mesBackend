@@ -13,4 +13,6 @@ public interface ShipmentLotRepositoryCustom {
     Optional<ShipmentLotInfoResponse> findShipmentLotResponseById(Long id);
     // 전체조회
     List<ShipmentLotInfoResponse> findShipmentLotResponsesByShipmentItemId(Long shipmentItemId);
+    // 출하 품목정보에 해당하는 LOT 정보가 있는지 여부
+    boolean existsByShipmentItemInShipmentLot(Long shipmentId);
 }
