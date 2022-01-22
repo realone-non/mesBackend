@@ -1,9 +1,11 @@
 package com.mes.mesBackend.service;
 
-import com.mes.mesBackend.dto.request.ShipmentItemRequest;
-import com.mes.mesBackend.dto.request.ShipmentRequest;
+import com.mes.mesBackend.dto.request.ShipmentCreateRequest;
+import com.mes.mesBackend.dto.request.ShipmentUpdateRequest;
 import com.mes.mesBackend.dto.response.ShipmentItemResponse;
+import com.mes.mesBackend.dto.response.ShipmentLotInfoResponse;
 import com.mes.mesBackend.dto.response.ShipmentResponse;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 
 import java.time.LocalDate;
@@ -13,28 +15,33 @@ import java.util.List;
 public interface ShipmentService {
     // ====================================================== 출하 ======================================================
     // 출하 생성
-    ShipmentResponse createShipment(ShipmentRequest shipmentRequest) throws NotFoundException;
+    ShipmentResponse createShipment(ShipmentCreateRequest shipmentRequest) throws NotFoundException;
     // 출하 단일 조회
-    ShipmentResponse getShipment(Long shipmentId) throws NotFoundException;
-    // 출하 리스트 조회 검색조건 : 거래처 명, 출하기간, 화폐 id, 담당자 명
-    List<ShipmentResponse> getShipments(String clientName, LocalDate fromDate, LocalDate toDate, Long currencyId, String userName);
+    ShipmentResponse getShipmentResponse(Long shipmentId) throws NotFoundException;
+    // 출하 리스트 조회 검색조건 : 거래처 id, 출하기간, 화폐 id, 담당자 id
+    List<ShipmentResponse> getShipments(Long clientId, LocalDate fromDate, LocalDate toDate, Long currencyId, Long userId);
     // 출하 수정
-    ShipmentResponse updateShipment(Long shipmentId, ShipmentRequest shipmentRequest) throws NotFoundException;
+    ShipmentResponse updateShipment(Long shipmentId, ShipmentUpdateRequest shipmentUpdateRequest) throws NotFoundException, BadRequestException;
     // 출하 삭제
-    void deleteShipment(Long shipmentId) throws NotFoundException;
+    void deleteShipment(Long shipmentId) throws NotFoundException, BadRequestException;
 
     // =================================================== 출하 수주 품목 ====================================================
     // 출하 품목정보 생성
-    ShipmentItemResponse createShipmentItem(Long shipmentId, ShipmentItemRequest shipmentItemRequest);
+    ShipmentItemResponse createShipmentItem(Long shipmentId, Long contractItemId, String note) throws NotFoundException;
     // 출하 품목정보 단일 조회
-    ShipmentItemResponse getShipmentItem(Long shipmentId, Long shipmentItemId);
+    ShipmentItemResponse getShipmentItemResponse(Long shipmentId, Long shipmentItemId) throws NotFoundException;
     // 출하 품목 정보 전체조회
-    List<ShipmentItemResponse> getShipmentItems(Long shipmentId);
+    List<ShipmentItemResponse> getshipmentItem(Long shipmentId);
     // 출하 품목정보 수정
-    ShipmentItemResponse updateShipmentItem(Long shipmentId, Long shipmentItemId, ShipmentItemRequest shipmentItemRequest);
+    ShipmentItemResponse updateShipmentItem(Long shipmentId, Long shipmentItemId, Long contractItemId, String note) throws NotFoundException;
     // 출하 품목정보 삭제
-    void deleteShipmentItem(Long shipmentId, Long shipmentItemId);
+    void deleteShipmentItem(Long shipmentId, Long shipmentItemId) throws NotFoundException;
 
-
-
+    // ==================================================== 출하 LOT 정보 ====================================================
+    // LOT 정보 생성
+    ShipmentLotInfoResponse createShipmentLot(Long shipmentId, Long shipmentItemId, Long lotMasterId) throws NotFoundException, BadRequestException;
+    // LOT 정보 전체 조회
+    List<ShipmentLotInfoResponse> getShipmentLots(Long shipmentId, Long shipmentItemId) throws NotFoundException;
+    // 출하 LOT 정보 삭제
+    void deleteShipmentLot(Long shipmentId, Long shipmentItemId, Long shipmentLotId) throws NotFoundException;
 }

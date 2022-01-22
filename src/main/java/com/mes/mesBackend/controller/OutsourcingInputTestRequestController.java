@@ -3,6 +3,7 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.InputTestRequestCreateRequest;
 import com.mes.mesBackend.dto.request.InputTestRequestUpdateRequest;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -27,6 +28,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
+
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.OUT_SOURCING;
 
 // 15-1. 외주수입검사의뢰 등록
 @RequestMapping(value = "/outsourcing-input-test-requests")
@@ -55,7 +58,7 @@ public class OutsourcingInputTestRequestController {
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         InputTestRequestResponse outsourcingInputTestRequest =
-                inputTestRequestService.createInputTestRequest(inputTestRequestRequest, false);
+                inputTestRequestService.createInputTestRequest(inputTestRequestRequest, OUT_SOURCING);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " +
                 outsourcingInputTestRequest.getId() + " from createOutsourcingInputTestRequest.");
@@ -79,9 +82,9 @@ public class OutsourcingInputTestRequestController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "의뢰기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "의뢰기간 toDate") LocalDate toDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
+    ) throws NotFoundException {
         List<InputTestRequestResponse> outsourcingInputTestRequests =
-                inputTestRequestService.getInputTestRequests(warehouseId, lotTypeId, itemNoAndName, testType, itemGroupId, requestType, fromDate, toDate, false);
+                inputTestRequestService.getInputTestRequests(warehouseId, lotTypeId, itemNoAndName, testType, itemGroupId, requestType, fromDate, toDate, OUT_SOURCING);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getOutsourcingInputTestRequests.");
         return new ResponseEntity<>(outsourcingInputTestRequests, HttpStatus.OK);
@@ -101,7 +104,7 @@ public class OutsourcingInputTestRequestController {
             @PathVariable(value = "id") @Parameter(description = "외주수입검사의뢰 id") Long id,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        InputTestRequestResponse outsourcingInputTestRequest = inputTestRequestService.getInputTestRequestResponse(id, false);
+        InputTestRequestResponse outsourcingInputTestRequest = inputTestRequestService.getInputTestRequestResponse(id, OUT_SOURCING);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + outsourcingInputTestRequest.getId() + " from getOutsourcingInputTestRequest.");
         return new ResponseEntity<>(outsourcingInputTestRequest, HttpStatus.OK);
@@ -123,7 +126,7 @@ public class OutsourcingInputTestRequestController {
             @RequestBody @Valid InputTestRequestUpdateRequest inputTestRequestUpdateRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        InputTestRequestResponse outsourcingInputTestRequest = inputTestRequestService.updateInputTestRequest(id, inputTestRequestUpdateRequest, false);
+        InputTestRequestResponse outsourcingInputTestRequest = inputTestRequestService.updateInputTestRequest(id, inputTestRequestUpdateRequest, OUT_SOURCING);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + outsourcingInputTestRequest.getId() + " from updateOutsourcingInputTestRequest.");
         return new ResponseEntity<>(outsourcingInputTestRequest, HttpStatus.OK);
@@ -142,8 +145,8 @@ public class OutsourcingInputTestRequestController {
     public ResponseEntity<Void> deleteOutsourcingInputTestRequest(
             @PathVariable(value = "id") @Parameter(description = "외주수입검사의뢰 id") Long id,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
-        inputTestRequestService.deleteInputTestRequest(id, false);
+    ) throws NotFoundException, BadRequestException {
+        inputTestRequestService.deleteInputTestRequest(id, OUT_SOURCING);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteOutsourcingInputTestRequest.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);

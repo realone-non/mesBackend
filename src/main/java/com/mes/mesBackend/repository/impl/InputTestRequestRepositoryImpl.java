@@ -2,6 +2,8 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InputTestState;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.repository.custom.InputTestRequestRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -15,6 +17,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+
+import static com.mes.mesBackend.entity.enumeration.InputTestState.COMPLETION;
 
 // 14-1. 검사의뢰 등록
 @RequiredArgsConstructor
@@ -30,12 +34,15 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     final QTestCriteria testCriteria = QTestCriteria.testCriteria1;
     final QPurchaseInput purchaseInput = QPurchaseInput.purchaseInput;
     final QOutSourcingInput outSourcingInput = QOutSourcingInput.outSourcingInput;
+    final QOutSourcingProductionRequest outSourcingProductionRequest = QOutSourcingProductionRequest.outSourcingProductionRequest;
+    final QProductionPerformance productionPerformance = QProductionPerformance.productionPerformance;
+    final QWorkOrderDetail workOrderDetail = QWorkOrderDetail.workOrderDetail;
 
 
     // 검사의뢰등록 response 단일 조회 및 예외
     @Override
     @Transactional(readOnly = true)
-    public Optional<InputTestRequestResponse> findResponseByIdAndDeleteYnFalse(Long id,  boolean inputTestDivision) {
+    public Optional<InputTestRequestResponse> findResponseByIdAndDeleteYnFalse(Long id,  InputTestDivision inputTestDivision) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .select(
@@ -45,12 +52,13 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                         lotMaster.id.as("lotId"),
                                         lotMaster.lotNo.as("lotNo"),
                                         purchaseInput.id.as("purchaseInputNo"),
+                                        outSourcingInput.id.as("outsourcingInputNo"),
                                         item.itemNo.as("itemNo"),
                                         item.itemName.as("itemName"),
                                         item.manufacturerPartNo.as("itemManufacturerPartNo"), // 제조사품번: 품목의 제조사품번
-                                        item.clientItemNo.as("itemClientPartNo"),   // 고객사품번: 품목의 거재처품번
-                                        client.clientName.as("manufacturerName"), // 제조사: 품목의 제조사
-                                        client.clientName.as("clientName"), // 고객사: 제조사와 동일
+//                                      item.clientItemNo.as("itemClientPartNo"),   // 고객사품번: 품목의 거재처품번
+                                        client.clientName.as("manufacturerName"),   // 제조사: 품목의 제조사
+//                                      client.clientName.as("clientName"),         // 고객사: 제조사와 동일
                                         wareHouse.wareHouseName.as("warehouse"),
                                         itemForm.form.as("itemForm"),
                                         testProcess.testProcess.as("testProcess"),
@@ -60,7 +68,9 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                         purchaseInput.coc.as("coc"),
                                         inputTestRequest.createdDate.as("requestDate"),
                                         inputTestRequest.requestType.as("requestType"),
-                                        inputTestRequest.requestAmount.as("requestAmount")
+                                        inputTestRequest.requestAmount.as("requestAmount"),
+                                        inputTestRequest.testType.as("testType"),
+                                        inputTestRequest.testCompletionRequestDate.as("testCompletionRequestDate")
                                 )
                         )
                         .from(inputTestRequest)
@@ -73,10 +83,12 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))
                         .leftJoin(testProcess).on(testProcess.id.eq(item.testProcess.id))
                         .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
+                        .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
+                        .leftJoin(outSourcingProductionRequest).on(outSourcingProductionRequest.id.eq(outSourcingInput.productionRequest.id))
                         .where(
                                 inputTestRequest.id.eq(id),
                                 isInputTestRequestDeleteYnFalse(),
-                                isInputTestRequest(inputTestDivision)
+                                isInputTestRequestDivision(inputTestDivision)
                         )
                         .fetchOne()
         );
@@ -95,7 +107,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
             TestType requestType,
             LocalDate fromDate,
             LocalDate toDate,
-            boolean inputTestDivision
+            InputTestDivision inputTestDivision
     ) {
         return jpaQueryFactory
                 .select(
@@ -105,12 +117,13 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                 lotMaster.id.as("lotId"),
                                 lotMaster.lotNo.as("lotNo"),
                                 purchaseInput.id.as("purchaseInputNo"),
+                                outSourcingInput.id.as("outsourcingInputNo"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
                                 item.manufacturerPartNo.as("itemManufacturerPartNo"), // 제조사품번: 품목의 제조사품번
-                                item.clientItemNo.as("itemClientPartNo"),   // 고객사품번: 품목의 거재처품번
+//                                item.clientItemNo.as("itemClientPartNo"),   // 고객사품번: 품목의 거재처품번
                                 client.clientName.as("manufacturerName"),   // 제조사: 품목의 제조사
-                                client.clientName.as("clientName"),         // 고객사: 제조사와 동일
+//                                client.clientName.as("clientName"),         // 고객사: 제조사와 동일
                                 wareHouse.wareHouseName.as("warehouse"),
                                 itemForm.form.as("itemForm"),
                                 testProcess.testProcess.as("testProcess"),
@@ -120,7 +133,9 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                 purchaseInput.coc.as("coc"),
                                 inputTestRequest.createdDate.as("requestDate"),
                                 inputTestRequest.requestType.as("requestType"),
-                                inputTestRequest.requestAmount.as("requestAmount")
+                                inputTestRequest.requestAmount.as("requestAmount"),
+                                inputTestRequest.testType.as("testType"),
+                                inputTestRequest.testCompletionRequestDate.as("testCompletionRequestDate")
                         )
                 )
                 .from(inputTestRequest)
@@ -133,6 +148,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                 .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))
                 .leftJoin(testProcess).on(testProcess.id.eq(item.testProcess.id))
                 .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
+                .leftJoin(outSourcingProductionRequest).on(outSourcingProductionRequest.id.eq(outSourcingInput.productionRequest.id))
                 .where(
                         isWareHouseEq(warehouseId),
                         isLotTypeEq(lotTypeId),
@@ -142,7 +158,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         isRequestTestTypeEq(requestType),
                         isRequestDateBetween(fromDate, toDate),
                         isInputTestRequestDeleteYnFalse(),
-                        isInputTestRequest(inputTestDivision)
+                        isInputTestRequestDivision(inputTestDivision)
                 )
                 .fetch();
     }
@@ -151,9 +167,9 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     // inputTestService.createInputTest
     @Override
     @Transactional(readOnly = true)
-    public Integer findLotMasterInputAmountByLotMasterId(Long lotMasterId) {
+    public Integer findLotMasterStockAmountByLotMasterId(Long lotMasterId) {
         return jpaQueryFactory
-                        .select(lotMaster.inputAmount)
+                        .select(lotMaster.stockAmount)
                         .from(lotMaster)
                         .where(
                                 lotMaster.id.eq(lotMasterId),
@@ -164,14 +180,52 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
 
     // 검사요청상태값 별 검사요청 조회
     @Override
-    public Optional<InputTestRequest> findByIdAndInputTestDivisionAndDeleteYnFalse(Long inputTestRequestId, boolean inputTestDivision) {
+    public Optional<InputTestRequest> findByIdAndInputTestDivisionAndDeleteYnFalse(
+            Long inputTestRequestId,
+            InputTestDivision inputTestDivision
+    ) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .selectFrom(inputTestRequest)
                         .where(
-                                isInputTestRequest(inputTestDivision),
+                                isInputTestRequestDivision(inputTestDivision),
                                 inputTestRequest.id.eq(inputTestRequestId),
                                 isInputTestRequestDeleteYnFalse()
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // lot id 로 생산실적의 workOrderDetailNo 조회
+    @Override
+    public Optional<String> findWorkOrderNoByLotId(Long lotMasterId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(workOrderDetail.orderNo)
+                        .from(productionPerformance)
+                        .innerJoin(lotMaster).on(lotMaster.id.eq(productionPerformance.lotMaster.id))
+                        .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(productionPerformance.workOrderDetail.id))
+                        .where(
+                                lotMaster.id.eq(lotMasterId),
+                                productionPerformance.deleteYn.isFalse(),
+                                workOrderDetail.deleteYn.isFalse(),
+                                lotMaster.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // 해당 lotMasterId 와 같은 검사 id 가져옴
+    @Override
+    public Optional<Long> findInputTestDetailIdByLotMasterId(Long lotMasterId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(inputTestRequest.id)
+                        .from(inputTestRequest)
+                        .where(
+                                inputTestRequest.lotMaster.id.eq(lotMasterId),
+                                inputTestRequest.inputTestState.eq(COMPLETION),
+                                inputTestRequest.deleteYn.isFalse()
                         )
                         .fetchOne()
         );
@@ -213,9 +267,10 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
         return inputTestRequest.deleteYn.isFalse();
     }
 
-    // 14-1. 부품수입검사 요청 조회 true
-    // 15-1. 외주수입검사 요청 조회 false
-    private BooleanExpression isInputTestRequest(boolean inputTestDivision) {
+    // 14-1. 부품수입검사 요청 조회 PART
+    // 15-1. 외주수입검사 요청 조회 OUT_SOURCING
+    // 16-1. 부품수입검사 요청 조회 PRODUCT
+    private BooleanExpression isInputTestRequestDivision(InputTestDivision inputTestDivision) {
         return inputTestRequest.inputTestDivision.eq(inputTestDivision);
     }
 }

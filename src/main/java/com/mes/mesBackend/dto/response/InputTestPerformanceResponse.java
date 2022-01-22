@@ -2,20 +2,26 @@ package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM;
 
+// 14-3. 검사실적조회
+// 15-3. 검사실적조회
 @Getter
 @Setter
-@Schema(description = "14-3. 검사실적조회")
+@Schema(description = "검사실적조회")
 @JsonInclude(NON_NULL)
 public class InputTestPerformanceResponse {
     @Schema(description = "검사등록 고유아이디")
@@ -38,14 +44,17 @@ public class InputTestPerformanceResponse {
     @Schema(description = "품목형태")
     String itemForm;
 
-    @Schema(description = "발주번호")
+    @Schema(description = "구매입고 발주번호")
     String purchaseOrderNo;
+
+    @Schema(description = "외주입고 발주번호")
+    Long outsourcingOrderNo;
 
     @Schema(description = "LOT 번호")
     String lotNo;
 
-    @Schema(description = "고객사 품번")
-    String itemClientPartNo;
+//    @Schema(description = "고객사 품번")
+//    String itemClientPartNo;
 
     @Schema(description = "제조사 품번")
     String itemManufacturerPartNo;
@@ -53,8 +62,8 @@ public class InputTestPerformanceResponse {
     @Schema(description = "제조사")
     String manufacturerName;
 
-    @Schema(description = "고객사")
-    String clientName;
+//    @Schema(description = "고객사")
+//    String clientName;
 
     @Schema(description = "검사방법")
     String testProcess;
@@ -75,10 +84,10 @@ public class InputTestPerformanceResponse {
     String user;
 
     @Schema(description = "시험성적서")
-    boolean testReportYn;
+    Boolean testReportYn;
 
     @Schema(description = "COC")
-    boolean cocYn;
+    Boolean cocYn;
 
     @Schema(description = "검사성적서 파일 url")
     String testReportFileUrl;
@@ -88,4 +97,39 @@ public class InputTestPerformanceResponse {
 
     @Schema(description = "비고")
     String note;
+
+    @Schema(description = "LOT 유형")
+    String lotType;
+
+    @Schema(description = "검사유형")
+    TestType testType;
+
+    @Schema(description = "입고창고")
+    String wareHouseName;
+
+    public InputTestPerformanceResponse division(InputTestDivision inputTestDivision) {
+        if (inputTestDivision.equals(PART)) {
+            setOutsourcingOrderNo(null);
+            setLotType(null);
+            setTestType(null);
+            setWareHouseName(null);
+        }
+        else if (inputTestDivision.equals(OUT_SOURCING)) {
+            setPurchaseOrderNo(null);
+            setLotType(null);
+            setTestType(null);
+            setWareHouseName(null);
+        } else if (inputTestDivision.equals(PRODUCT)) {
+            setRequestDate(null);
+            setItemForm(null);
+            setOutsourcingOrderNo(null);
+            setPurchaseOrderNo(null);
+            setItemManufacturerPartNo(null);
+            setTestProcess(null);
+            setTestCriteria(null);
+            setTestReportFileUrl(null);
+            setCocFileUrl(null);
+        }
+        return this;
+    }
 }

@@ -1,6 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +9,8 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.OUT_SOURCING;
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.PRODUCT;
 
 @Getter
 @Setter
@@ -52,4 +55,12 @@ public class InputTestDetailResponse {
 
     @Schema(description = "비고")
     String note;
+
+    public InputTestDetailResponse division(InputTestDivision inputTestDivision) {
+        if (inputTestDivision.equals(PRODUCT) || inputTestDivision.equals(OUT_SOURCING)) {
+            setCocFileUrl(null);
+            setTestReportFileUrl(null);
+        }
+        return this;
+    }
 }

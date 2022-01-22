@@ -12,16 +12,12 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 import static com.mes.mesBackend.exception.Message.*;
+import static com.mes.mesBackend.exception.Message.NOT_NULL;
 
 @Getter
 @Setter
 @Schema(description = "작업지시 정보")
-public class WorkOrderRequest {
-    @Schema(description = "작업공정 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
-    Long workProcess;
-
+public class WorkOrderUpdateRequest {
     @Schema(description = "작업라인 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)

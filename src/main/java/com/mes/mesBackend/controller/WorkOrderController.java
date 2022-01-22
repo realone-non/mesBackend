@@ -1,6 +1,7 @@
 package com.mes.mesBackend.controller;
 
-import com.mes.mesBackend.dto.request.WorkOrderRequest;
+import com.mes.mesBackend.dto.request.WorkOrderCreateRequest;
+import com.mes.mesBackend.dto.request.WorkOrderUpdateRequest;
 import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
 import com.mes.mesBackend.dto.response.WorkOrderResponse;
 import com.mes.mesBackend.entity.enumeration.OrderState;
@@ -38,7 +39,7 @@ public class WorkOrderController {
     private final WorkOrderService workOrderService;
     private final LogService logService;
 
-    private Logger logger = LoggerFactory.getLogger(WorkOrderController.class);
+    private final Logger logger = LoggerFactory.getLogger(WorkOrderController.class);
     private CustomLogger cLogger;
 
     // 검색조건: 품목그룹 id, 품명|품번, 수주번호, 제조오더번호, 착수예정일 fromDate~endDate, 지시상태
@@ -76,7 +77,7 @@ public class WorkOrderController {
     )
     public ResponseEntity<WorkOrderResponse> createWorkOrder(
             @PathVariable(value = "produce-order-id") @Parameter(description = "제조오더 id") Long produceOrderId,
-            @RequestBody @Valid WorkOrderRequest workOrderRequest,
+            @RequestBody @Valid WorkOrderCreateRequest workOrderRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         WorkOrderResponse workOrder = workOrderService.createWorkOrder(produceOrderId, workOrderRequest);
@@ -134,10 +135,10 @@ public class WorkOrderController {
     public ResponseEntity<WorkOrderResponse> updateWorkOrder(
             @PathVariable(value = "produce-order-id") @Parameter(description = "제조오더 id") Long produceOrderId,
             @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
-            @RequestBody @Valid WorkOrderRequest workOrderRequest,
+            @RequestBody @Valid WorkOrderUpdateRequest workOrderUpdateRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        WorkOrderResponse workOrder = workOrderService.updateWorkOrder(produceOrderId, workOrderId, workOrderRequest);
+        WorkOrderResponse workOrder = workOrderService.updateWorkOrder(produceOrderId, workOrderId, workOrderUpdateRequest);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + workOrder.getId() + " from updateWorkOrder.");
         return new ResponseEntity<>(workOrder, HttpStatus.OK);
@@ -157,7 +158,7 @@ public class WorkOrderController {
             @PathVariable(value = "produce-order-id") @Parameter(description = "제조오더 id") Long produceOrderId,
             @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         workOrderService.deleteWorkOrder(produceOrderId, workOrderId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + workOrderId + " from deleteWorkOrder.");

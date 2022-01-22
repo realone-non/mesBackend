@@ -1,12 +1,14 @@
 package com.mes.mesBackend.service.impl;
 
-import com.mes.mesBackend.dto.request.WorkOrderRequest;
+import com.mes.mesBackend.dto.request.WorkOrderCreateRequest;
+import com.mes.mesBackend.dto.request.WorkOrderUpdateRequest;
 import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
 import com.mes.mesBackend.dto.response.WorkOrderResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.LotLogHelper;
 import com.mes.mesBackend.helper.NumberAutomatic;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.ProduceOrderRepository;
@@ -34,6 +36,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private final NumberAutomatic numberAutomatic;
     private final TestProcessService testProcessService;
     private final ProduceOrderRepository produceOrderRepo;
+    private final LotLogHelper lotLogHelper;
 
 
     // 제조오더 정보 리스트 조회
@@ -53,7 +56,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
     // 작업지시 생성
     @Override
-    public WorkOrderResponse createWorkOrder(Long produceOrderId, WorkOrderRequest workOrderRequest) throws NotFoundException, BadRequestException {
+    public WorkOrderResponse createWorkOrder(Long produceOrderId, WorkOrderCreateRequest workOrderRequest) throws NotFoundException, BadRequestException {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
         WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(workOrderRequest.getWorkProcess());
         WorkLine workLine = workLineService.getWorkLineOrThrow(workOrderRequest.getWorkLine());
@@ -65,6 +68,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         // orderAmount: 사용자가 입력한 지시수량
         int orderAmount = workOrderRequest.getOrderAmount() != 0 ? workOrderRequest.getOrderAmount() : produceOrder.getContractItem().getAmount();
 
+        // 입력받은 공정이 기존에 제조오더에 등록되어 있는 공정이면 예외(하나의 제조오더에 하나의 작업공정만 등록 가능)
+        throwIfWorkProcessByProduceOrder(produceOrderId, workOrderRequest.getWorkProcess());
         // 사용자가 입력한 지시수량이 수주품목의 수량보다 크면 예외
         throwIfOrderAmountGreaterThanProduceOrderAmount(orderAmount, produceOrder.getContractItem().getAmount());
         // 수주품목의 수주품목수량(오더수량) 보다 여태 저장된 지시수량 + 입력받은 지시수량이 크면 예외
@@ -108,10 +113,12 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     }
 
     // 작업지시 수정
+    /*
+    * 작업공정 수정 불가
+    * */
     @Override
-    public WorkOrderResponse updateWorkOrder(Long produceOrderId, Long workOrderId, WorkOrderRequest newWorkOrderRequest) throws NotFoundException, BadRequestException {
+    public WorkOrderResponse updateWorkOrder(Long produceOrderId, Long workOrderId, WorkOrderUpdateRequest newWorkOrderRequest) throws NotFoundException, BadRequestException {
         WorkOrderDetail findWorkOrderDetail = getWorkOrderDetailOrThrow(workOrderId, produceOrderId);
-        WorkProcess newWorkProcess = workProcessService.getWorkProcessOrThrow(newWorkOrderRequest.getWorkProcess());
         WorkLine newWorkLine = workLineService.getWorkLineOrThrow(newWorkOrderRequest.getWorkLine());
         User newUser = newWorkOrderRequest.getUser() != null ? userService.getUserOrThrow(newWorkOrderRequest.getUser()) : null;
         Unit newUnit = unitService.getUnitOrThrow(newWorkOrderRequest.getUnit());
@@ -133,7 +140,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         newWorkOrderRequest.setOrderAmount(orderAmount);
         WorkOrderDetail newWorkOrderDetail = mapper.toEntity(newWorkOrderRequest, WorkOrderDetail.class);
-        findWorkOrderDetail.update(newWorkOrderDetail, newWorkProcess, newWorkLine, newUser, testProcess, newUnit);
+        findWorkOrderDetail.update(newWorkOrderDetail, newWorkLine, newUser, testProcess, newUnit);
         findWorkOrderDetail.changeOrderStateDate();        // 지시상태 값 별 따라서 날짜 저장
         workOrderDetailRepo.save(findWorkOrderDetail);
 
@@ -145,9 +152,17 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     }
 
     // 작업지시 삭제
+    /*
+    * 진행중, 완료는 삭제 불가
+    * */
     @Override
-    public void deleteWorkOrder(Long produceOrderId, Long workOrderId) throws NotFoundException {
+    public void deleteWorkOrder(Long produceOrderId, Long workOrderId) throws NotFoundException, BadRequestException {
         WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderId, produceOrderId);
+
+        if (!workOrderDetail.getOrderState().equals(SCHEDULE)) {
+            throw new BadRequestException("진행중이거나 완료가 된 작업지시는 삭제 할 수 없습니다.");
+        }
+
         workOrderDetail.delete();
         workOrderDetailRepo.save(workOrderDetail);
     }
@@ -164,11 +179,11 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     @Override
     public void changeOrderStateOfProduceOrder(ProduceOrder produceOrder) {
         List<OrderState> orderStatesInWorkOrderDetail = workOrderDetailRepo.findOrderStatesByProduceOrderId(produceOrder.getId());
-        // 모든 orderState 가 schedule 이면 ? SCHEDULE
+        // 모든 orderState 가 schedule ? SCHEDULE
         if (orderStatesInWorkOrderDetail.stream().allMatch(orderState -> orderState.equals(SCHEDULE))) produceOrder.setOrderState(SCHEDULE);
-        // 최소한 한개의 orderState 가 ongoing 이면 ? ONGOING
+        // 최소한 한개의 orderState 가 ongoing ? ONGOING
         if (orderStatesInWorkOrderDetail.stream().anyMatch(orderState -> orderState.equals(ONGOING))) produceOrder.setOrderState(ONGOING);
-        // 모든 orderState 가 completion 이면 ? COMPLETION
+        // 모든 orderState 가 completion ? COMPLETION
         if (orderStatesInWorkOrderDetail.stream().allMatch(orderState -> orderState.equals(COMPLETION))) produceOrder.setOrderState(COMPLETION);
     }
 
@@ -202,6 +217,14 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                     "input productionAmount: " + productionAmount + ", " +
                     "orderAmount: " + orderAmount
             );
+        }
+    }
+
+    // 입력받은 공정이 기존에 제조오더에 등록되어 있는 공정이면 예외(하나의 제조오더에 하나의 작업공정만 등록 가능)
+    private void throwIfWorkProcessByProduceOrder(Long produceOrderId, Long workProcessId) throws BadRequestException {
+        boolean existByWorkProcess = workOrderDetailRepo.existByWorkProcess(produceOrderId, workProcessId);
+        if (!existByWorkProcess) {
+            throw new BadRequestException("해당 공정에 대한 작업지시가 이미 등록되어 있으므로, 삭제 후 등록 바랍니다.");
         }
     }
 }

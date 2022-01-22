@@ -16,7 +16,7 @@ import static com.mes.mesBackend.exception.Message.*;
 @Setter
 @Schema(description = "수주")
 public class ContractRequest {
-    @Schema(description = "고유아이디")
+    @Schema(description = "고객사 id")
     Long client;
 
     @Schema(description = "수주일자")

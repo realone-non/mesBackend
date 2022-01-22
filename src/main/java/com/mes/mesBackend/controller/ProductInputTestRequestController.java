@@ -29,21 +29,23 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 
-// 14-1. 검사의뢰 등록
-@RequestMapping(value = "/item-input-test-requests")
-@Tag(name = "item-input-test-request", description = "14-1. 검사의뢰등록 API")
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.PRODUCT;
+
+// 16-1. 검사의뢰 등록
+@RequestMapping(value = "/product-input-test-requests")
+@Tag(name = "product-input-test-request", description = "16-1. 검사의뢰등록 API")
 @RestController
 @SecurityRequirement(name = "Authorization")
 @Slf4j
 @RequiredArgsConstructor
-public class ItemInputTestRequestController {
-    private final InputTestRequestService outsourcingInputTestRequestService;
+public class ProductInputTestRequestController {
+    private final InputTestRequestService inputTestRequestService;
     private final LogService logService;
-    private final Logger logger = LoggerFactory.getLogger(ItemInputTestRequestController.class);
+    private final Logger logger = LoggerFactory.getLogger(ProductInputTestRequestController.class);
     private CustomLogger cLogger;
 
     // 검사의뢰 생성
-    @Operation(summary = "검사의뢰 생성", description = "* testType 추후 변경 예정")
+    @Operation(summary = "검사의뢰 생성", description = "* testType 추후 변경 예정, 완제품인 lot id 만 등록가능")
     @PostMapping
     @ApiResponses(
             value = {
@@ -52,13 +54,13 @@ public class ItemInputTestRequestController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<InputTestRequestResponse> createInputTestRequest(
+    public ResponseEntity<InputTestRequestResponse> createProductInputTestRequest(
             @RequestBody @Valid InputTestRequestCreateRequest inputTestRequestRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        InputTestRequestResponse inputTestRequest = outsourcingInputTestRequestService.createInputTestRequest(inputTestRequestRequest, true);
+        InputTestRequestResponse inputTestRequest = inputTestRequestService.createInputTestRequest(inputTestRequestRequest, PRODUCT);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + inputTestRequest.getId() + " from createItemInputTestRequest.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + inputTestRequest.getId() + " from createProductInputTestRequest.");
         return new ResponseEntity<>(inputTestRequest, HttpStatus.OK);
     }
 
@@ -69,7 +71,7 @@ public class ItemInputTestRequestController {
     @Operation(
             summary = "검사의뢰 리스트 조회",
             description = "검색조건: 창고 id, LOT 유형 id, 품명|품목, 검사유형(추후 변경예정), 품목그룹 id, 요청유형, 의뢰기간")
-    public ResponseEntity<List<InputTestRequestResponse>> getInputTestRequests(
+    public ResponseEntity<List<InputTestRequestResponse>> getProductInputTestRequests(
             @RequestParam(required = false) @Parameter(description = "창고 id") Long warehouseId,
             @RequestParam(required = false) @Parameter(description = "LOT 유형 id") Long lotTypeId,
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
@@ -79,10 +81,11 @@ public class ItemInputTestRequestController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "의뢰기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "의뢰기간 toDate") LocalDate toDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        List<InputTestRequestResponse> inputTestRequests = outsourcingInputTestRequestService.getInputTestRequests(warehouseId, lotTypeId, itemNoAndName, testType, itemGroupId, requestType, fromDate, toDate, true);
+    ) throws NotFoundException {
+        List<InputTestRequestResponse> inputTestRequests = inputTestRequestService.getInputTestRequests(
+                warehouseId, lotTypeId, itemNoAndName, testType, itemGroupId, requestType, fromDate, toDate, PRODUCT);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getItemInputTestRequests.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProductInputTestRequests.");
         return new ResponseEntity<>(inputTestRequests, HttpStatus.OK);
     }
 
@@ -96,13 +99,13 @@ public class ItemInputTestRequestController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<InputTestRequestResponse> getInputTestRequest(
+    public ResponseEntity<InputTestRequestResponse> getProductInputTestRequest(
             @PathVariable(value = "id") @Parameter(description = "검사의뢰 id") Long id,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        InputTestRequestResponse inputTestRequest = outsourcingInputTestRequestService.getInputTestRequestResponse(id, true);
+        InputTestRequestResponse inputTestRequest = inputTestRequestService.getInputTestRequestResponse(id, PRODUCT);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + inputTestRequest.getId() + " from getItemInputTestRequest.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + inputTestRequest.getId() + " from getProductItemInputTestRequest.");
         return new ResponseEntity<>(inputTestRequest, HttpStatus.OK);
     }
 
@@ -117,14 +120,14 @@ public class ItemInputTestRequestController {
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity<InputTestRequestResponse> updateInputTestRequest(
+    public ResponseEntity<InputTestRequestResponse> updateProductInputTestRequest(
             @PathVariable(value = "id") @Parameter(description = "검사의뢰 id") Long id,
             @RequestBody @Valid InputTestRequestUpdateRequest inputTestRequestUpdateRequest,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        InputTestRequestResponse inputTestRequest = outsourcingInputTestRequestService.updateInputTestRequest(id, inputTestRequestUpdateRequest, true);
+        InputTestRequestResponse inputTestRequest = inputTestRequestService.updateInputTestRequest(id, inputTestRequestUpdateRequest, PRODUCT);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + inputTestRequest.getId() + " from updateItemInputTestRequest.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + inputTestRequest.getId() + " from updateProductInputTestRequest.");
         return new ResponseEntity<>(inputTestRequest, HttpStatus.OK);
     }
 
@@ -138,13 +141,13 @@ public class ItemInputTestRequestController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteInputTestRequest(
+    public ResponseEntity<Void> deleteProductInputTestRequest(
             @PathVariable(value = "id") @Parameter(description = "검사의뢰 id") Long id,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
-        outsourcingInputTestRequestService.deleteInputTestRequest(id, true);
+    ) throws NotFoundException, BadRequestException {
+        inputTestRequestService.deleteInputTestRequest(id, PRODUCT);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteItemInputTestRequest.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteProductInputTestRequest.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
