@@ -2,9 +2,7 @@ package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.MaterialStockInspectRequestRequest;
 import com.mes.mesBackend.dto.request.RequestMaterialStockInspect;
-import com.mes.mesBackend.dto.response.MaterialStockInspectRequestResponse;
-import com.mes.mesBackend.dto.response.MaterialStockInspectResponse;
-import com.mes.mesBackend.dto.response.ReceiptAndPaymentResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.MaterialStockInspect;
 import com.mes.mesBackend.entity.MaterialStockInspectRequest;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
@@ -41,4 +39,8 @@ public interface MaterialWarehouseService {
     void deleteMaterialStockInspect(Long id) throws NotFoundException;
     //재고실사 승인 등록
     List<MaterialStockInspectResponse> createStockInspectApproval(Long requestId, Long userId) throws NotFoundException;
+    //재고현황 조회
+    List<MaterialStockReponse> getMaterialStock(Long itemAccountId, Long itemId, Long itemAccoutCodeId, Long warehouseId);
+    //헤더용 창고 목록 조회
+    List<HeaderWarehouseResponse> getHeaderWarehouse();
 }
