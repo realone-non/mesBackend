@@ -29,7 +29,7 @@ public class ShipmentLotInfoResponse {
     int shipmentOutputAmount;
 
     @Schema(description = "출하금액")
-    int shipmentPrice;               // 출하금액 = 출하수량 * 수주 품목 단가
+    int shipmentPrice;
 
     @Schema(description = "출하금액(원화)")
     int shipmentPriceWon;
@@ -37,6 +37,6 @@ public class ShipmentLotInfoResponse {
     @Schema(description = "VAT")
     double vat;
 
-    @Schema(description = "검사번호")
-    Long inputTestId;
+    @Schema(description = "검사여부")
+    boolean inputTestYn;
 }

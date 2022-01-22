@@ -45,13 +45,13 @@ public class ShipmentLotRepositoryImpl implements ShipmentLotRepositoryCustom {
                                 Projections.fields(
                                         ShipmentLotInfoResponse.class,
                                         shipmentLot.id.as("shipmentLotId"),
-                                        shipmentLot.lotMaster.id.as("lotId"),
-                                        shipmentLot.lotMaster.lotNo.as("lotNo"),
-                                        shipmentLot.shipmentItem.contractItem.item.unit.unitCodeName.as("contractUnit"),
-                                        shipmentLot.lotMaster.stockAmount.as("shipmentOutputAmount"),
-                                        shipmentLot.lotMaster.stockAmount.multiply(shipmentLot.shipmentItem.contractItem.item.inputUnitPrice).as("shipmentPrice"),
-                                        shipmentLot.lotMaster.stockAmount.multiply(shipmentLot.shipmentItem.contractItem.item.inputUnitPrice).as("shipmentPriceWon"),
-                                        shipmentLot.lotMaster.stockAmount.multiply(shipmentLot.shipmentItem.contractItem.item.inputUnitPrice).doubleValue().multiply(0.1).as("vat")
+                                        lotMaster.id.as("lotId"),
+                                        lotMaster.lotNo.as("lotNo"),
+                                        unit.unitCodeName.as("contractUnit"),
+                                        lotMaster.shipmentAmount.as("shipmentOutputAmount"),
+                                        lotMaster.shipmentAmount.multiply(item.inputUnitPrice).as("shipmentPrice"),
+                                        lotMaster.shipmentAmount.multiply(item.inputUnitPrice).as("shipmentPriceWon"),
+                                        lotMaster.shipmentAmount.multiply(item.inputUnitPrice).doubleValue().multiply(0.1).as("vat")
                                 )
                         )
                         .from(shipmentLot)
@@ -76,13 +76,13 @@ public class ShipmentLotRepositoryImpl implements ShipmentLotRepositoryCustom {
                         Projections.fields(
                                 ShipmentLotInfoResponse.class,
                                 shipmentLot.id.as("shipmentLotId"),
-                                shipmentLot.lotMaster.id.as("lotId"),
-                                shipmentLot.lotMaster.lotNo.as("lotNo"),
-                                shipmentLot.shipmentItem.contractItem.item.unit.unitCodeName.as("contractUnit"),
-                                shipmentLot.lotMaster.stockAmount.as("shipmentOutputAmount"),
-                                shipmentLot.lotMaster.stockAmount.multiply(shipmentLot.shipmentItem.contractItem.item.inputUnitPrice).as("shipmentPrice"),
-                                shipmentLot.lotMaster.stockAmount.multiply(shipmentLot.shipmentItem.contractItem.item.inputUnitPrice).as("shipmentPriceWon"),
-                                shipmentLot.lotMaster.stockAmount.multiply(shipmentLot.shipmentItem.contractItem.item.inputUnitPrice).doubleValue().multiply(0.1).as("vat")
+                                lotMaster.id.as("lotId"),
+                                lotMaster.lotNo.as("lotNo"),
+                                unit.unitCodeName.as("contractUnit"),
+                                lotMaster.shipmentAmount.as("shipmentOutputAmount"),
+                                lotMaster.shipmentAmount.multiply(item.inputUnitPrice).as("shipmentPrice"),
+                                lotMaster.shipmentAmount.multiply(item.inputUnitPrice).as("shipmentPriceWon"),
+                                lotMaster.shipmentAmount.multiply(item.inputUnitPrice).doubleValue().multiply(0.1).as("vat")
                         )
                 )
                 .from(shipmentLot)
@@ -110,5 +110,19 @@ public class ShipmentLotRepositoryImpl implements ShipmentLotRepositoryCustom {
                 )
                 .fetchFirst();
         return fetchOne != null;
+    }
+
+    // 출하 품목에 등록 된 lotMaster 의 재고수량 모듀
+    @Override
+    public List<Integer> findShipmentLotShipmentAmountByShipmentItemId(Long shipmentItemId) {
+        return jpaQueryFactory
+                .select(lotMaster.shipmentAmount)
+                .from(shipmentLot)
+                .innerJoin(lotMaster).on(lotMaster.id.eq(shipmentLot.lotMaster.id))
+                .where(
+                        shipmentLot.shipmentItem.id.eq(shipmentItemId),
+                        shipmentLot.deleteYn.isFalse()
+                )
+                .fetch();
     }
 }

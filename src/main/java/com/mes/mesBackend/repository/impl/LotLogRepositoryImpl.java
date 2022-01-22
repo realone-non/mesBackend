@@ -121,6 +121,21 @@ public class LotLogRepositoryImpl implements LotLogRepositoryCustom {
         );
     }
 
+    // 작업공정 구분으로 작업공정 id 가져옴
+    @Override
+    public Optional<Long> findWorkProcessIdByWorkProcessDivision(WorkProcessDivision workProcessDivision) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(workProcess.id)
+                        .from(workProcess)
+                        .where(
+                                workProcess.workProcessDivision.eq(workProcessDivision),
+                                workProcess.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
+    }
+
     private BooleanExpression isWorkProcessIdEq(Long workProcessId) {
         return workProcessId != null ? workProcess.id.eq(workProcessId) : null;
     }

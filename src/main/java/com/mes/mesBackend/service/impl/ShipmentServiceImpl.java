@@ -12,7 +12,6 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.AmountHelper;
 import com.mes.mesBackend.helper.LotLogHelper;
 import com.mes.mesBackend.helper.NumberAutomatic;
-import com.mes.mesBackend.helper.ProductionPerformanceHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.ClientService;
@@ -88,7 +87,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             res.addContractInfo(contract);
             if (currencyId != null) response.add(res.currencyIdEq(currencyId));
             if (userId != null) response.add(res.userIdEq(userId));                   // 담당자 조회
-            response.add(res);
+//            response.add(res);
         }
         response.remove(null);
         return response;
@@ -157,14 +156,20 @@ public class ShipmentServiceImpl implements ShipmentService {
     // 출하 품목정보 단일 조회
     @Override
     public ShipmentItemResponse getShipmentItemResponse(Long shipmentId, Long shipmentItemId) throws NotFoundException {
+        int shipmentAmount = shipmentLotRepo.findShipmentLotShipmentAmountByShipmentItemId(shipmentItemId).stream().mapToInt(Integer::intValue).sum();
         return shipmentItemRepo.findShipmentItemResponseByShipmentItemId(shipmentId, shipmentItemId)
-                .orElseThrow(() -> new NotFoundException("shipmentItem does not exist. input id: " + shipmentItemId));
+                .orElseThrow(() -> new NotFoundException("shipmentItem does not exist. input id: " + shipmentItemId)).converter(shipmentAmount);
     }
 
     // 출하 품목 정보 전체조회
     @Override
     public List<ShipmentItemResponse> getShipmentItem(Long shipmentId) {
-        return shipmentItemRepo.findShipmentResponsesByShipmentId(shipmentId);
+        List<ShipmentItemResponse> responses = shipmentItemRepo.findShipmentResponsesByShipmentId(shipmentId);
+        for (ShipmentItemResponse res : responses) {
+            int shipmentAmount = shipmentLotRepo.findShipmentLotShipmentAmountByShipmentItemId(res.getId()).stream().mapToInt(Integer::intValue).sum();
+            res.converter(shipmentAmount);
+        }
+        return responses;
     }
 
     // 출하 품목정보 수정
@@ -205,7 +210,6 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipmentItem.delete();
         shipmentItemRepo.save(shipmentItem);
     }
-
 
 // =================================================== 출하 LOT 정보 ====================================================
     // LOT 정보 생성
@@ -250,11 +254,11 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     // LOT 정보 전체 조회
     @Override
-    public List<ShipmentLotInfoResponse> getShipmentLots(Long shipmentId, Long shipmentItemId) throws NotFoundException {
+    public List<ShipmentLotInfoResponse> getShipmentLots(Long shipmentId, Long shipmentItemId) {
         List<ShipmentLotInfoResponse> responses = shipmentLotRepo.findShipmentLotResponsesByShipmentItemId(shipmentItemId);
         for (ShipmentLotInfoResponse res : responses) {
-            Long inputTestDetailId = getInputTestIdInLotMasterId(res.getLotId(), res.getShipmentLotId());
-            res.setInputTestId(inputTestDetailId);   // lotMaster 에 해당하는 검사번호 찾아서 추가
+            boolean inputTestYn = getInputTestYnInLotMasterId(res.getLotId());
+            res.setInputTestYn(inputTestYn);   // lotMaster 에 해당하는 검사 완료 여부
         }
         return responses;
     }
@@ -295,14 +299,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     // lotMaster 에 해당하는 검사번호 찾아서 추가
-    private Long getInputTestIdInLotMasterId(Long lotMasterId, Long shipmentLotId) throws NotFoundException {
-        return inputTestRequestRepo.findInputTestDetailIdByLotMasterId(lotMasterId)
-                .orElseThrow(() -> new NotFoundException("해당 검사번호를 찾을 수 없음. " +
-                        "경우1. 검사요청에 대한 검사가 완료되지 않음, " +
-                        "경우2. 해당 Lot 에 대한 검사등록이 되지 않음. " +
-                        "lotMaster id: " + lotMasterId + ", " +
-                        "shipmentLotId: " + shipmentLotId)
-                );
+    private boolean getInputTestYnInLotMasterId(Long lotMasterId) {
+        return inputTestRequestRepo.findInputTestYnByLotMasterId(lotMasterId);
     }
 
     // lotMaster 단일 조회 및 예외
@@ -315,8 +313,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     private ShipmentLotInfoResponse getShipmentLotInfoResponse(Long shipmentLotId) throws NotFoundException {
         ShipmentLotInfoResponse shipmentLotInfoResponse = shipmentLotRepo.findShipmentLotResponseById(shipmentLotId)
                 .orElseThrow(() -> new NotFoundException("shipmentLot does not exist. input id: " + shipmentLotId));
-        Long inputTestDetailId = getInputTestIdInLotMasterId(shipmentLotInfoResponse.getLotId(), shipmentLotId);
-        shipmentLotInfoResponse.setInputTestId(inputTestDetailId);      // lotMaster 에 해당하는 검사번호 찾아서 추가
+        boolean inputTestYn = getInputTestYnInLotMasterId(shipmentLotInfoResponse.getLotId());
+        shipmentLotInfoResponse.setInputTestYn(inputTestYn);      // lotMaster 에 해당하는 검사 완료 여부
         return shipmentLotInfoResponse;
     }
 
@@ -330,7 +328,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     // 입력한 contractItem 이 이미 있는지 체크
     private void throwIfContractItemInShipment(Long shipmentId, Long contractItemId) throws BadRequestException {
         boolean existsByContractItemInShipment = shipmentItemRepo.existsByContractItemInShipment(shipmentId, contractItemId);
-        if (!existsByContractItemInShipment) {
+        if (existsByContractItemInShipment) {
             throw new BadRequestException("입력한 수주품목은 출하정보에 이미 등록되어 있습니다.");
         }
     }
@@ -348,7 +346,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     // 수주품목 수정, 삭제 시 해당 출하품목 정보에 해당하는 LOT 정보가 있는지 체크
     private void throwIfShipmentLotInShipmentItem(Long shipmentItemId) throws BadRequestException {
         boolean existsByShipmentItemInShipmentLot = shipmentLotRepo.existsByShipmentItemInShipmentLot(shipmentItemId);
-        if (!existsByShipmentItemInShipmentLot) {
+        if (existsByShipmentItemInShipmentLot) {
             throw new BadRequestException("출하 품목에 대한 수정이나 삭제는 해당하는 LOT 정보 삭제 후에 가능합니다.");
         }
     }
@@ -370,8 +368,8 @@ public class ShipmentServiceImpl implements ShipmentService {
     // 해당 출하에 등록된 출하 품목 정보가 있는지 체크
     private void throwShipmentItemInShipment(Long shipmentId) throws BadRequestException {
         boolean existsByShipmentItemInShipment = shipmentRepo.existsByShipmentItemInShipment(shipmentId);
-        if (!existsByShipmentItemInShipment) {
-            throw new BadRequestException("등록된 품목정보가 있으면 삭제할 수 없습니다.");
+        if (existsByShipmentItemInShipment) {
+            throw new BadRequestException("등록된 출하 품목정보가 있으면 삭제할 수 없습니다. 품목정보 삭제 후 다시 시도 바랍니다.");
         }
     }
 }

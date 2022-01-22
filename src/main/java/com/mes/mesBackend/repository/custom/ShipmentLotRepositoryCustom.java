@@ -15,4 +15,6 @@ public interface ShipmentLotRepositoryCustom {
     List<ShipmentLotInfoResponse> findShipmentLotResponsesByShipmentItemId(Long shipmentItemId);
     // 출하 품목정보에 해당하는 LOT 정보가 있는지 여부
     boolean existsByShipmentItemInShipmentLot(Long shipmentId);
+    // 출하 품목에 등록 된 lotMaster 의 재고수량 모듀
+    List<Integer> findShipmentLotShipmentAmountByShipmentItemId(Long shipmentItemId);
 }

@@ -33,6 +33,6 @@ public interface InputTestRequestRepositoryCustom {
     Optional<InputTestRequest> findByIdAndInputTestDivisionAndDeleteYnFalse(Long inputTestRequestId, InputTestDivision inputTestDivision);
     // lot id 로 생산실적의 workOrderDetailNo 조회
     Optional<String> findWorkOrderNoByLotId(Long lotMasterId);
-    // 해당 lotMasterId 와 같은 검사 id 가져옴
-    Optional<Long> findInputTestDetailIdByLotMasterId(Long lotMasterId);
+    // 해당 lotMasterId 가 검사를 완료 했는지 여부
+    boolean findInputTestYnByLotMasterId(Long lotMasterId);
 }

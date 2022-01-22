@@ -223,7 +223,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     // 입력받은 공정이 기존에 제조오더에 등록되어 있는 공정이면 예외(하나의 제조오더에 하나의 작업공정만 등록 가능)
     private void throwIfWorkProcessByProduceOrder(Long produceOrderId, Long workProcessId) throws BadRequestException {
         boolean existByWorkProcess = workOrderDetailRepo.existByWorkProcess(produceOrderId, workProcessId);
-        if (!existByWorkProcess) {
+        if (existByWorkProcess) {
             throw new BadRequestException("해당 공정에 대한 작업지시가 이미 등록되어 있으므로, 삭제 후 등록 바랍니다.");
         }
     }
