@@ -119,7 +119,7 @@ public class ShipmentController {
             @PathVariable(value = "shipment-id") @Parameter(description = "출하 id") Long shipmentId,
             @RequestBody @Valid ShipmentUpdateRequest shipmentUpdateRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         ShipmentResponse shipment = shipmentService.updateShipment(shipmentId, shipmentUpdateRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + shipment.getId() + " from updateShipment.");
