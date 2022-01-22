@@ -95,7 +95,7 @@ public class ShipmentController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "출하기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "출하기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "화폐 id") Long currencyId,
-            @RequestParam(required = false) @Parameter(description = "담당자 명") Long userId,
+            @RequestParam(required = false) @Parameter(description = "담당자 id") Long userId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<ShipmentResponse> shipments = shipmentService.getShipments(clientId, fromDate, toDate, currencyId, userId);
@@ -267,7 +267,7 @@ public class ShipmentController {
     public ResponseEntity<ShipmentLotInfoResponse> createShipmentLot(
             @PathVariable(value = "shipment-id") @Parameter(description = "출하 id") Long shipmentId,
             @PathVariable(value = "shipment-item-id") @Parameter(description = "출하 품목 id") Long shipmentItemId,
-            @RequestParam @Parameter(description = "출하 품목정보와 lotMaster 의 품목이랑 같으며 포장공정 끝나고 현재 재고가 0 이 아닌 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "출하 품목정보의 품목과 lotMaster 의 품목이랑 같으며 포장공정 끝나고 현재 재고가 0 이 아닌 lotMaster id") Long lotMasterId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         ShipmentLotInfoResponse shipmentLot = shipmentService.createShipmentLot(shipmentId, shipmentItemId, lotMasterId);

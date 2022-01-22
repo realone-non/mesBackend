@@ -41,7 +41,7 @@ public class LotLogHelperImpl implements LotLogHelper {
     // workProcessDivision 으로 해당 공정 id 값 찾음
     @Override
     public Long getWorkProcessByDivisionOrThrow(WorkProcessDivision workProcessDivision) throws NotFoundException {
-        return workProcessRepo.findIdByWorkProcessDivisionAndDeleteYnFalse(workProcessDivision)
+        return lotLogRepo.findWorkProcessIdByWorkProcessDivision(workProcessDivision)
                 .orElseThrow(() -> new NotFoundException("[LotLogHelper] 해당하는 workProcessDivision 에 대한 작업공정이 존재하지 않음."));
     }
 

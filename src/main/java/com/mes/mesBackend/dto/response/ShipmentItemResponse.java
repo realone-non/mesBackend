@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -37,7 +38,7 @@ public class ShipmentItemResponse {
     String contractUnit;
 
     @Schema(description = "수주미출하수량")
-    int notShippedAmount;           // 수주미출하수량 = 수주수량 - 출하수량
+    int notShippedAmount;           // lot에 등록된 재고수량 - contractItem 의 수주수량
 
     @Schema(description = "출하수량")
     int shipmentAmount;
@@ -50,4 +51,17 @@ public class ShipmentItemResponse {
 
     @Schema(description = "비고")
     String note;
+
+    @JsonIgnore
+    int contractItemAmount;     // 수주품목의 수주수량
+    @JsonIgnore
+    int itemInputUnitPrice;     // 품목단가
+
+    public ShipmentItemResponse converter(int shipmentAmount) {
+        setNotShippedAmount(contractItemAmount - shipmentAmount);
+        setShipmentAmount(shipmentAmount);
+        setShipmentPrice(shipmentAmount * itemInputUnitPrice);
+        setShipmentPriceWon(shipmentAmount * itemInputUnitPrice);
+        return this;
+    }
 }
