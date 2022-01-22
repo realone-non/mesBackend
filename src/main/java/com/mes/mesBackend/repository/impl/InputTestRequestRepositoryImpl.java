@@ -3,6 +3,7 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InputTestState;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.repository.custom.InputTestRequestRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+
+import static com.mes.mesBackend.entity.enumeration.InputTestState.COMPLETION;
 
 // 14-1. 검사의뢰 등록
 @RequiredArgsConstructor
@@ -207,6 +210,22 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                 productionPerformance.deleteYn.isFalse(),
                                 workOrderDetail.deleteYn.isFalse(),
                                 lotMaster.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // 해당 lotMasterId 와 같은 검사 id 가져옴
+    @Override
+    public Optional<Long> findInputTestDetailIdByLotMasterId(Long lotMasterId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(inputTestRequest.id)
+                        .from(inputTestRequest)
+                        .where(
+                                inputTestRequest.lotMaster.id.eq(lotMasterId),
+                                inputTestRequest.inputTestState.eq(COMPLETION),
+                                inputTestRequest.deleteYn.isFalse()
                         )
                         .fetchOne()
         );

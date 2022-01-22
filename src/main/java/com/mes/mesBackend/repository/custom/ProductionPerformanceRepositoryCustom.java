@@ -1,9 +1,11 @@
 package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.ProductionPerformanceResponse;
+import com.mes.mesBackend.entity.ProductionPerformance;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 // 8-6. 생산실적 관리
 public interface ProductionPerformanceRepositoryCustom {

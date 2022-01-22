@@ -20,5 +20,6 @@ public enum ItemLogType {
     SHIPMENT_AMOUNT,
     REAL_AMOUNT,
     MOVE_AMOUNT,
-    RETURN_AMOUNT
+    RETURN_AMOUNT,
+    STOCK_AMOUNT
 }

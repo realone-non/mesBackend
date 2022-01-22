@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service;
 
-import com.mes.mesBackend.dto.request.WorkOrderRequest;
+import com.mes.mesBackend.dto.request.WorkOrderCreateRequest;
+import com.mes.mesBackend.dto.request.WorkOrderUpdateRequest;
 import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
 import com.mes.mesBackend.dto.response.WorkOrderResponse;
 import com.mes.mesBackend.entity.ProduceOrder;
@@ -26,15 +27,15 @@ public interface WorkOrderService {
             OrderState orderState
     );
     // 작업지시 생성
-    WorkOrderResponse createWorkOrder(Long produceOrderId, WorkOrderRequest workOrderRequest) throws NotFoundException, BadRequestException;
+    WorkOrderResponse createWorkOrder(Long produceOrderId, WorkOrderCreateRequest workOrderRequest) throws NotFoundException, BadRequestException;
     // 작업지시 단일조회
     WorkOrderResponse getWorkOrderResponseOrThrow(Long produceOrderId, Long workOrderId) throws NotFoundException;
     // 작업지시 리스트 조회
     List<WorkOrderResponse> getWorkOrders(Long produceOrderId) throws NotFoundException;
     // 작업지시 수정
-    WorkOrderResponse updateWorkOrder(Long produceOrderId, Long workOrderId, WorkOrderRequest workOrderRequest) throws NotFoundException, BadRequestException;
+    WorkOrderResponse updateWorkOrder(Long produceOrderId, Long workOrderId, WorkOrderUpdateRequest workOrderUpdateRequest) throws NotFoundException, BadRequestException;
     // 작업지시 삭제
-    void deleteWorkOrder(Long produceOrderId, Long workOrderId) throws NotFoundException;
+    void deleteWorkOrder(Long produceOrderId, Long workOrderId) throws NotFoundException, BadRequestException;
     // 작업지시 단일 조회 및 예외
     WorkOrderDetail getWorkOrderDetailOrThrow(Long id, Long produceOrderId) throws NotFoundException;
     // produceOrder(제조오더): 제조오더에 해당하는 workOrderDetail(작업지시) 의 orderState 상태값 별로 제조오더의 상태값도 변경됨.

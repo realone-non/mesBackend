@@ -2,6 +2,7 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.LotLogResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.repository.custom.LotLogRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -101,6 +102,23 @@ public class LotLogRepositoryImpl implements LotLogRepositoryCustom {
                         isLotMasterIdEq(lotMasterId)
                 )
                 .fetch();
+    }
+
+    // 수주품목과 작업공정에 해당하는 작업지시 가져옴
+    @Override
+    public Optional<Long> findWorkOrderDetailIdByContractItemAndWorkProcess(Long contractItemId, Long workProcessId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(workOrderDetail.id)
+                        .from(workOrderDetail)
+                        .innerJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
+                        .where(
+                                workOrderDetail.produceOrder.contractItem.id.eq(contractItemId),
+                                workOrderDetail.workProcess.id.eq(workProcessId),
+                                workOrderDetail.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
     }
 
     private BooleanExpression isWorkProcessIdEq(Long workProcessId) {
