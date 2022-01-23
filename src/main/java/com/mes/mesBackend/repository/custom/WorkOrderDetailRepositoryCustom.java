@@ -32,11 +32,11 @@ public interface WorkOrderDetailRepositoryCustom {
 
     // 생산계획 수립 단일 조회
     Optional<ProductionPlanResponse> findProductionPlanByIdAndDeleteYnFalse(Long id);
-    // 제조오더에 해당하는 작업지시의 orderState 들
-    List<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId);
+    // 제조오더에 해당하는 가장 마지막 등록 된 orderState
+    Optional<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId);
 
     // ==================================== 6-2. 작업지시 등록 ====================================
-    // 작업지시 리시트 조회
+    // 작업지시 리스트 조회
     List<WorkOrderResponse> findWorkOrderResponseByProduceOrderIdAndDeleteYnFalse(Long produceOrderId);
     // 작업지시 단일 조회
     Optional<WorkOrderResponse> findWorkOrderResponseByProduceOrderIdAndWorkOrderId(Long produceOrderId, Long workOrderId);

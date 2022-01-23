@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDate;
 
+import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -63,7 +64,7 @@ public class ProduceOrder extends BaseTimeEntity {
 
     @Enumerated(STRING)
     @Column(name = "ORDER_STATE", columnDefinition = "varchar(255) COMMENT '지시상태'", nullable = false)
-    private OrderState orderState = OrderState.SCHEDULE;    // 지시상태
+    private OrderState orderState = SCHEDULE;    // 지시상태
 
     @Column(name = "RATE", columnDefinition = "int COMMENT '보정율'", nullable = false)
     private int rate = 0;                   // 보정율
@@ -74,9 +75,10 @@ public class ProduceOrder extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
-    public void add(Contract contract, ContractItem contractItem) {
+    public void created(Contract contract, ContractItem contractItem) {
         setContract(contract);
         setContractItem(contractItem);
+        setOrderState(SCHEDULE);
     }
 
     public void update(ProduceOrder newProduceOrder, Contract newContract, ContractItem newContractItem) {

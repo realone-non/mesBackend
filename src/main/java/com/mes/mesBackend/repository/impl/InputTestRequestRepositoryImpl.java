@@ -217,18 +217,27 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
 
     // 해당 lotMasterId 와 같은 검사 id 가져옴
     @Override
-    public Optional<Long> findInputTestDetailIdByLotMasterId(Long lotMasterId) {
-        return Optional.ofNullable(
-                jpaQueryFactory
-                        .select(inputTestRequest.id)
-                        .from(inputTestRequest)
-                        .where(
-                                inputTestRequest.lotMaster.id.eq(lotMasterId),
-                                inputTestRequest.inputTestState.eq(COMPLETION),
-                                inputTestRequest.deleteYn.isFalse()
-                        )
-                        .fetchOne()
-        );
+    public boolean findInputTestYnByLotMasterId(Long lotMasterId) {
+         Integer fetchOne = jpaQueryFactory
+                 .selectOne()
+                 .from(inputTestRequest)
+                 .where(
+                         inputTestRequest.deleteYn.isFalse(),
+                         inputTestRequest.inputTestState.eq(COMPLETION)
+                 )
+                 .fetchFirst();
+         return fetchOne != null;
+//        return Optional.ofNullable(
+//                jpaQueryFactory
+//                        .select(inputTestRequest.id)
+//                        .from(inputTestRequest)
+//                        .where(
+//                                inputTestRequest.lotMaster.id.eq(lotMasterId),
+//                                inputTestRequest.inputTestState.eq(COMPLETION),
+//                                inputTestRequest.deleteYn.isFalse()
+//                        )
+//                        .fetchOne()
+//        );
     }
 
     // 창고 id

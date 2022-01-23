@@ -11,5 +11,4 @@ import java.util.Optional;
 @Repository
 public interface WorkProcessRepository extends JpaCustomRepository<WorkProcess, Long> {
     boolean existsByWorkProcessCodeAndDeleteYnFalse(WorkProcessCode workProcessCode);
-    Optional<Long> findIdByWorkProcessDivisionAndDeleteYnFalse(WorkProcessDivision workProcessDivision);
 }

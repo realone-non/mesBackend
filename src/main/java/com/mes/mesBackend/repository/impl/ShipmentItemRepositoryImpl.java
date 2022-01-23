@@ -20,6 +20,7 @@ public class ShipmentItemRepositoryImpl implements ShipmentItemRepositoryCustom 
     final QContractItem contractItem = QContractItem.contractItem;
     final QUnit unit = QUnit.unit;
     final QItem item = QItem.item;
+    final QLotMaster lotMaster = QLotMaster.lotMaster;
 
     // shipmentItem 에 해당되는 제일 처음 등록된 contract 조회
     @Override
@@ -55,10 +56,13 @@ public class ShipmentItemRepositoryImpl implements ShipmentItemRepositoryCustom 
                                         item.itemName.as("itemName"),
                                         item.standard.as("itemStandard"),
                                         unit.unitCodeName.as("contractUnit"),
-                                        shipmentItem.note.as("note")
+                                        shipmentItem.note.as("note"),
+                                        contractItem.amount.as("contractItemAmount"),
+                                        item.inputUnitPrice.as("itemInputUnitPrice")
                                 )
                         )
                         .from(shipmentItem)
+                        .innerJoin(shipment).on(shipment.id.eq(shipmentItem.shipment.id))
                         .leftJoin(contractItem).on(contractItem.id.eq(shipmentItem.contractItem.id))
                         .leftJoin(contract).on(contract.id.eq(contractItem.contract.id))
                         .leftJoin(item).on(item.id.eq(contractItem.item.id))
@@ -87,10 +91,13 @@ public class ShipmentItemRepositoryImpl implements ShipmentItemRepositoryCustom 
                                 item.itemName.as("itemName"),
                                 item.standard.as("itemStandard"),
                                 unit.unitCodeName.as("contractUnit"),
-                                shipmentItem.note.as("note")
+                                shipmentItem.note.as("note"),
+                                contractItem.amount.as("contractItemAmount"),
+                                item.inputUnitPrice.as("itemInputUnitPrice")
                         )
                 )
                 .from(shipmentItem)
+                .innerJoin(shipment).on(shipment.id.eq(shipmentItem.shipment.id))
                 .leftJoin(contractItem).on(contractItem.id.eq(shipmentItem.contractItem.id))
                 .leftJoin(contract).on(contract.id.eq(contractItem.contract.id))
                 .leftJoin(item).on(item.id.eq(contractItem.item.id))
@@ -100,6 +107,21 @@ public class ShipmentItemRepositoryImpl implements ShipmentItemRepositoryCustom 
                         isShipmentItemDeleteYnFalse()
                 )
                 .fetch();
+    }
+
+    // 출하에 수주품목이 있는지
+    @Override
+    public boolean existsByContractItemInShipment(Long shipmentId, Long contractItemId) {
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(shipmentItem)
+                .where(
+                        shipmentItem.shipment.id.eq(shipmentId),
+                        shipmentItem.contractItem.id.eq(contractItemId),
+                        shipmentItem.deleteYn.isFalse()
+                )
+                .fetchFirst();
+        return fetchOne != null;
     }
 
     // shipment id eq

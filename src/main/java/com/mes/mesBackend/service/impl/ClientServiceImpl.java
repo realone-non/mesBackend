@@ -8,15 +8,14 @@ import com.mes.mesBackend.entity.ClientType;
 import com.mes.mesBackend.entity.CountryCode;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.impl.S3UploaderImpl;
 import com.mes.mesBackend.mapper.ModelMapper;
-import com.mes.mesBackend.helper.S3Service;
 import com.mes.mesBackend.repository.ClientRepository;
 import com.mes.mesBackend.service.BusinessTypeService;
 import com.mes.mesBackend.service.ClientService;
 import com.mes.mesBackend.service.ClientTypeService;
 import com.mes.mesBackend.service.CountryCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,7 +38,7 @@ public class ClientServiceImpl implements ClientService {
     CountryCodeService countryCodeService;
 
     @Autowired
-    S3Service s3Service;
+    S3UploaderImpl s3Service;
 
     @Autowired
     ModelMapper modelMapper;

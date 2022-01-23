@@ -79,7 +79,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
                 .orElseThrow(() -> new NotFoundException("inputTestRequest does not exist. input id: " + inputTestId));
         if (inputTestDivision.equals(PRODUCT)) {
             String workOrderNo = inputTestRequestRepo.findWorkOrderNoByLotId(response.getLotId())
-                    .orElseThrow(() -> new NotFoundException("해당하는 lot 로 등록된 작업지시 정보가 없음."));
+                    .orElseThrow(() -> new NotFoundException("[InputTestRequest] 해당하는 lot 로 등록된 작업지시 정보가 없음."));
             response.setWorkOrderNo(workOrderNo);
         }
         return response.division(inputTestDivision);
@@ -172,7 +172,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
         lotMasterRepo.save(findLotMaster);
     }
 
-    // 입고된 갯수만큼만 요청수량을 등록 할 수 있음.
+    // lotMaster 의 재고수량 갯수만큼만 요청수량을 등록 할 수 있음.
     // 요청수량 재고수량 비교
     private void throwIfRequestAmountGreaterThanInputAmount(Long lotId, int requestAmount) throws BadRequestException {
         Integer stockAmountFromLotMaster = inputTestRequestRepo.findLotMasterStockAmountByLotMasterId(lotId);
