@@ -222,7 +222,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     //재고현황 조회
     @Transactional(readOnly = true)
     public List<MaterialStockReponse> findStockByItemAccountAndItemAndItemAccountCode(
-            Long itemAccountId, Long itemId, Long itemGroupId, Long warehouseId){
+            Long itemAccountId, Long itemId, Long itemGroupId, Long warehouseId, List<Long> warehouseList){
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -242,7 +242,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
                 .where(
                         isWarehouseEq(warehouseId),
-                        isItemGroupEq(itemGroupId),
+                        lotMaster.item.id.eq(itemId),
                         isItemAccountEq(itemAccountId),
                         isDeleteYnFalse()
                 )

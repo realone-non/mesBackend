@@ -39,5 +39,5 @@ public interface LotMasterRepositoryCustom {
     OutsourcingInputLOTResponse findLotMasterByInputAndId(OutSourcingInput input, Long id);
     //재고현황 조회
     List<MaterialStockReponse> findStockByItemAccountAndItemAndItemAccountCode(
-            Long itemAccountId, Long itemId, Long itemGroupId, Long warehouseId);
+            Long itemAccountId, Long itemId, Long itemGroupId, Long warehouseId, List<Long> warehouseList);
 }
