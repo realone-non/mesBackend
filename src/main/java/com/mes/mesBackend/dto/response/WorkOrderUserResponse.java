@@ -1,17 +1,13 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mes.mesBackend.entity.enumeration.OrderState;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Objects;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
@@ -64,41 +60,4 @@ public class WorkOrderUserResponse {
             setCostTime(costTime);
         }
     }
-
-//    // scheduleDateTime, startDateTime, endDateTime check
-//    public WorkOrderUserResponse dateTimeCheckingConverter() {
-//        if (scheduleDateTime != null && startDateTime == null && endDateTime == null) {
-//            return null;
-//        } else if (scheduleDateTime != null && startDateTime != null && endDateTime != null) {
-//            if (scheduleDateTime.isAfter(startDateTime) || scheduleDateTime.isAfter(endDateTime)) {
-//                return null;
-//            } else if (startDateTime.isAfter(endDateTime)) {
-//                this.setEndDateTime(null);
-//            }
-//            return this;
-//        }
-//        return this;
-//    }
-//
-//    // 지시상태 조회
-//    public WorkOrderUserResponse orderStateCondition(OrderState orderState) {
-//        if (orderState != null) {
-//            if (orderState == OrderState.ONGOING) {
-//                if (startDateTime != null && endDateTime == null) {
-//                    return this;
-//                } else {
-//                    return null;
-//                }
-//            } else if (orderState == OrderState.COMPLETION) {
-//                if (startDateTime != null && endDateTime != null) {
-//                    return this;
-//                } else {
-//                    return null;
-//                }
-//            } else if (orderState == OrderState.SCHEDULE) {
-//                return null;
-//            }
-//        }
-//        return this;
-//    }
 }

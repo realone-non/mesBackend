@@ -1,6 +1,5 @@
 package com.mes.mesBackend.dto.request;
 
-import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -56,10 +55,6 @@ public class WorkOrderCreateRequest {
     @Schema(description = "예정시간")
     @NotBlank(message = NOT_EMPTY)
     String expectedWorkTime;
-
-    @Schema(description = "지시상태")
-    @NotNull(message = NOT_NULL)
-    OrderState orderState = OrderState.SCHEDULE;
 
     @Schema(description = "검사의뢰")
     @NotNull(message = NOT_NULL)

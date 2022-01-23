@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 // 8-6. 생산실적 관리
 @RequiredArgsConstructor
@@ -90,6 +91,21 @@ public class ProductionPerformanceRepositoryImpl implements ProductionPerformanc
                         .or(productionPerformance.shipment.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
                 : null;
     }
+
+    @Override
+    public Optional<ProductionPerformance> findByProduceOrderId(Long produceOrderId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(productionPerformance)
+                        .from(productionPerformance)
+                        .where(
+                                productionPerformance.workOrderDetail.produceOrder.id.eq(produceOrderId),
+                                productionPerformance.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
+    }
+
     // 품목그룹 id
     private BooleanExpression isItemGroupIdEq(Long itemGroupId){
         return itemGroupId != null ? itemGroup.id.eq(itemGroupId) : null;

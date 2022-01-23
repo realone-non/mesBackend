@@ -1,5 +1,6 @@
 package com.mes.mesBackend.entity;
 
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,15 +8,17 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static com.mes.mesBackend.entity.enumeration.OrderState.ONGOING;
+import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
-import static lombok.AccessLevel.PROTECTED;
+import static lombok.AccessLevel.PUBLIC;
 
 /*
 * 8-6. 생산실적 관리
 * */
 @AllArgsConstructor
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = PUBLIC)
 @Entity(name = "PRODUCTION_PERFORMANCES")
 @Data
 public class ProductionPerformance extends BaseTimeEntity {
@@ -67,4 +70,43 @@ public class ProductionPerformance extends BaseTimeEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "LOT_MASTER", columnDefinition = "bigint COMMENT 'lot master'")
     private LotMaster lotMaster;
+
+    public void updateProcessDateTime(WorkProcess workProcess, OrderState orderState) {
+        if (orderState.equals(OrderState.COMPLETION)) {
+            LocalDateTime now = LocalDateTime.now();
+            switch (workProcess.getWorkProcessDivision()) {
+                case MATERIAL_INPUT: setMaterialInput(now);
+                    break;
+                case MATERIAL_MIXING: setMaterialMixing(now);
+                    break;
+                case FILLING: setFilling(now);
+                    break;
+                case CAP_ASSEMBLY: setCapAssembly(now);
+                    break;
+                case LABELING: setLabeling(now);
+                    break;
+                case PACKAGING: setPackaging(now);
+                    break;
+                case SHIPMENT: setShipment(now);
+                    break;
+            }
+        } else if (orderState.equals(SCHEDULE) || orderState.equals(ONGOING)){
+            switch (workProcess.getWorkProcessDivision()) {
+                case MATERIAL_INPUT: setMaterialInput(null);
+                    break;
+                case MATERIAL_MIXING: setMaterialMixing(null);
+                    break;
+                case FILLING: setFilling(null);
+                    break;
+                case CAP_ASSEMBLY: setCapAssembly(null);
+                    break;
+                case LABELING: setLabeling(null);
+                    break;
+                case PACKAGING: setPackaging(null);
+                    break;
+                case SHIPMENT: setShipment(null);
+                    break;
+            }
+        }
+    }
 }

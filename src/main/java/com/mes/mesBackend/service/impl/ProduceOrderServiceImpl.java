@@ -36,7 +36,7 @@ public class ProduceOrderServiceImpl implements ProduceOrderService {
         ContractItem contractItem =
                 contractService.getContractItemOrThrow(produceOrderRequest.getContract(), produceOrderRequest.getContractItem());
         ProduceOrder produceOrder = mapper.toEntity(produceOrderRequest, ProduceOrder.class);
-        produceOrder.add(contract, contractItem);
+        produceOrder.created(contract, contractItem);
         String produceOrderNo = numberAutomatic.createDateTimeNo();
 
         produceOrder.setProduceOrderNo(produceOrderNo);

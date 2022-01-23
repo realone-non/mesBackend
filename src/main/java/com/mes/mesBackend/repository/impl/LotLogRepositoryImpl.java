@@ -19,6 +19,8 @@ public class LotLogRepositoryImpl implements LotLogRepositoryCustom {
     final QWorkOrderDetail workOrderDetail = QWorkOrderDetail.workOrderDetail;
     final QLotMaster lotMaster = QLotMaster.lotMaster;
     final QWorkProcess workProcess = QWorkProcess.workProcess;
+    final QProduceOrder produceOrder = QProduceOrder.produceOrder;
+    final QContractItem contractItem = QContractItem.contractItem;
 
     // 작업지시 id 로 createdDate 가 제일 최근인 workProcess 를 가져옴
     @Override
@@ -111,10 +113,12 @@ public class LotLogRepositoryImpl implements LotLogRepositoryCustom {
                 jpaQueryFactory
                         .select(workOrderDetail.id)
                         .from(workOrderDetail)
-                        .innerJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
+                        .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                        .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contract.id))
+                        .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
                         .where(
-                                workOrderDetail.produceOrder.contractItem.id.eq(contractItemId),
-                                workOrderDetail.workProcess.id.eq(workProcessId),
+                                contractItem.id.eq(contractItemId),
+                                workProcess.id.eq(workProcessId),
                                 workOrderDetail.deleteYn.isFalse()
                         )
                         .fetchOne()

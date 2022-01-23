@@ -97,8 +97,8 @@ public class WorkOrderUserController {
     public ResponseEntity<WorkOrderUserResponse> updateWorkOrderUser(
             @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
             @RequestParam(required = false) @Parameter(description = "작업자 id") Long userId,
-            @RequestParam(required = false) @Parameter(description = "시작일시") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime startDate,
-            @RequestParam(required = false) @Parameter(description = "종료일시") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime endDate,
+            @RequestParam(required = false) @Parameter(description = "시작일시 / yyyy-MM-dd HH:mm") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime startDate,
+            @RequestParam(required = false) @Parameter(description = "종료일시 / yyyy-MM-dd HH:mm") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime endDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         WorkOrderUserResponse workOrderUser = workOrderUserService.updateWorkOrderUser(workOrderId, userId, startDate, endDate);

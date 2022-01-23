@@ -3,11 +3,9 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
-import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.repository.custom.WorkOrderDetailRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -177,15 +175,20 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
 
     // 제조오더에 해당하는 작업지시의 orderState 들
     @Override
-    public List<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId) {
-        return jpaQueryFactory
-                .select(workOrderDetail.orderState)
-                .from(workOrderDetail)
-                .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
-                .where(
-                        workOrderDetail.produceOrder.id.eq(produceOrderId)
-                )
-                .fetch();
+    public Optional<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(workOrderDetail.orderState)
+                        .from(workOrderDetail)
+                        .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                        .where(
+                                workOrderDetail.produceOrder.id.eq(produceOrderId),
+                                workOrderDetail.deleteYn.isFalse()
+                        )
+                        .orderBy(workOrderDetail.createdDate.desc())
+                        .limit(1)
+                        .fetchOne()
+        );
     }
 
     // ==================================== 6-2. 작업지시 등록 ====================================
