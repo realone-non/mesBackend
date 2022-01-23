@@ -83,10 +83,9 @@ public class MaterialStockInspectController {
     public ResponseEntity<Void> createStockInspectData(
             @PathVariable(value = "request-id") @Parameter(description = "실사의뢰 ID") Long requestId,
             @RequestParam(required = false) @Parameter(description = "품목계정ID") Long itemAccountId,
-            @RequestParam(required = true) @Parameter(description = "실사의뢰 타입") InspectionType type,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException{
-        materialWarehouseService.createMaterialStockInspect(requestId, itemAccountId, type);
+        materialWarehouseService.createMaterialStockInspect(requestId, itemAccountId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the stockInspect requestId:" + requestId + " from createStockInspectData.");
         return new ResponseEntity<>(HttpStatus.CREATED);

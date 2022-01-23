@@ -106,7 +106,7 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
     }
 
     //DB재고실사 데이터 등록
-    public void createMaterialStockInspect (Long requestId, Long itemAccountId, InspectionType type) throws NotFoundException {
+    public void createMaterialStockInspect (Long requestId, Long itemAccountId) throws NotFoundException {
         List<MaterialStockInspect> dbInspect = materialStockInspectRepository.findInspectFromDB(itemAccountId);
         MaterialStockInspectRequest request = materialStockInspectRequestRepository.findByIdAndDeleteYnFalse(requestId)
                 .orElseThrow(() -> new NotFoundException("stockInspect does not exist. input id: " + requestId));
@@ -161,9 +161,9 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
     }
 
     //재고현황 조회
-    public List<MaterialStockReponse> getMaterialStock(Long itemAccountId, Long itemId, Long itemAccoutCodeId, Long warehouseId){
+    public List<MaterialStockReponse> getMaterialStock(Long itemAccountId, Long itemId, Long itemAccoutCodeId, Long warehouseId, List<Long> warehouseList){
         return lotMasterRepository.findStockByItemAccountAndItemAndItemAccountCode(
-                itemAccountId, itemId, itemAccoutCodeId, warehouseId);
+                itemAccountId, itemId, itemAccoutCodeId, warehouseId, warehouseList);
     }
 
     //헤더용 창고 목록 조회

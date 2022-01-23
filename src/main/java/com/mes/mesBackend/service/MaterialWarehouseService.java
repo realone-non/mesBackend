@@ -31,7 +31,7 @@ public interface MaterialWarehouseService {
     //재고조사 단일 조회
     MaterialStockInspectResponse getMaterialStockInspect(Long requestId, Long id) throws NotFoundException;
     //DB재고실사 데이터 등록
-    void createMaterialStockInspect (Long requestId, Long itemAccountId, InspectionType type) throws NotFoundException;
+    void createMaterialStockInspect (Long requestId, Long itemAccountId) throws NotFoundException;
     //재고조사 수정
     List<MaterialStockInspectResponse> modifyMaterialStockInspect(Long requestId, List<RequestMaterialStockInspect> requestList)
             throws NotFoundException;
@@ -40,7 +40,7 @@ public interface MaterialWarehouseService {
     //재고실사 승인 등록
     List<MaterialStockInspectResponse> createStockInspectApproval(Long requestId, Long userId) throws NotFoundException;
     //재고현황 조회
-    List<MaterialStockReponse> getMaterialStock(Long itemAccountId, Long itemId, Long itemAccoutCodeId, Long warehouseId);
+    List<MaterialStockReponse> getMaterialStock(Long itemAccountId, Long itemId, Long itemAccoutCodeId, Long warehouseId, List<Long> warehouseList);
     //헤더용 창고 목록 조회
     List<HeaderWarehouseResponse> getHeaderWarehouse();
 }

@@ -1,5 +1,6 @@
 package com.mes.mesBackend.entity;
 
+import com.mes.mesBackend.dto.request.DevelopmentRequest;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,10 +27,10 @@ import java.time.LocalDate;
  * 수주 파일 (0 Files)               -> 미구현
  */
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "DEVELOPMENTS")
 @Data
-public class Development extends BaseTimeEntity {
+public class ProductDevelopment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '개발등록 고유아이디'")
@@ -65,4 +66,17 @@ public class Development extends BaseTimeEntity {
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
+
+    public void update(DevelopmentRequest request){
+        setItemNo(request.getItemNo());
+        setItemName(request.getItemName());
+        setBusinessName(request.getBusinessName());
+        setStartDate(request.getStartDate());
+        setEndDate(request.getEndDate());
+        setDeliverAmount(request.getDeliverAmount());
+    }
+
+    public void delete(){
+        setDeleteYn(true);
+    }
 }
