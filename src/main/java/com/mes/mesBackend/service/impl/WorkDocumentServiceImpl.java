@@ -8,7 +8,7 @@ import com.mes.mesBackend.entity.WorkLine;
 import com.mes.mesBackend.entity.WorkProcess;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.S3Service;
+import com.mes.mesBackend.helper.impl.S3UploaderImpl;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.WorkDocumentRepository;
 import com.mes.mesBackend.service.ItemService;
@@ -16,8 +16,6 @@ import com.mes.mesBackend.service.WorkDocumentService;
 import com.mes.mesBackend.service.WorkLineService;
 import com.mes.mesBackend.service.WorkProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,7 +35,7 @@ public class WorkDocumentServiceImpl implements WorkDocumentService {
     @Autowired
     ItemService itemService;
     @Autowired
-    S3Service s3Service;
+    S3UploaderImpl s3Service;
 
     // 작업표준서 생성
     @Override

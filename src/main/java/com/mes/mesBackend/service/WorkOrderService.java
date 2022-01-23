@@ -4,7 +4,6 @@ import com.mes.mesBackend.dto.request.WorkOrderCreateRequest;
 import com.mes.mesBackend.dto.request.WorkOrderUpdateRequest;
 import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
 import com.mes.mesBackend.dto.response.WorkOrderResponse;
-import com.mes.mesBackend.entity.ProduceOrder;
 import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -39,5 +38,5 @@ public interface WorkOrderService {
     // 작업지시 단일 조회 및 예외
     WorkOrderDetail getWorkOrderDetailOrThrow(Long id, Long produceOrderId) throws NotFoundException;
     // produceOrder(제조오더): 제조오더에 해당하는 workOrderDetail(작업지시) 의 orderState 상태값 별로 제조오더의 상태값도 변경됨.
-    void changeOrderStateOfProduceOrder(ProduceOrder produceOrder);
+//    void changeOrderStateOfProduceOrder(ProduceOrder produceOrder);
 }

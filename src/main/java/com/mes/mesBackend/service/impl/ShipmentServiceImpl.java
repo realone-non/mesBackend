@@ -44,6 +44,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final InputTestRequestRepository inputTestRequestRepo;
     private final LotLogHelper lotLogHelper;
     private final AmountHelper amountHelper;
+    private final WorkProcessRepository workProcessRepository;
 
     // ====================================================== 출하 ======================================================
     // 출하 생성
@@ -85,9 +86,25 @@ public class ShipmentServiceImpl implements ShipmentService {
             // shipmentItem 에 제일 첨에 등록된 contractItem 의  contract 조회
             Contract contract = shipmentItemRepo.findContractsByShipmentId(res.getId()).orElse(null);
             res.addContractInfo(contract);
-            if (currencyId != null) response.add(res.currencyIdEq(currencyId));
-            if (userId != null) response.add(res.userIdEq(userId));                   // 담당자 조회
-//            response.add(res);
+
+            // 화폐 id, 담당자 id 검색
+            if (res.getCurrencyId() != null && res.getUserId() != null) {
+                if (currencyId != null && userId != null) {
+                    if (!res.getCurrencyId().equals(currencyId) && !res.getUserId().equals(userId)) res = null;
+                    else if (res.getCurrencyId().equals(currencyId) && !res.getUserId().equals(userId)) res = null;
+                } else if (!res.getCurrencyId().equals(currencyId) && res.getUserId().equals(userId)) {
+                    res = null;
+                } else if (currencyId != null) {
+                    if (!res.getCurrencyId().equals(currencyId)) res = null;
+                } else if (userId != null) {
+                    if (!res.getUserId().equals(userId)) res = null;
+                }
+            } else {
+                if (currencyId != null && userId != null) res = null;
+                else if (currencyId != null) res = null;
+                else if (userId != null) res = null;
+            }
+            response.add(res);
         }
         response.remove(null);
         return response;
@@ -126,14 +143,13 @@ public class ShipmentServiceImpl implements ShipmentService {
                 .orElseThrow(() -> new NotFoundException("shipment does not exist. input id: " + id));
     }
 
-
     // =================================================== 출하 품목 ====================================================
     // 출하 품목정보 생성
     /*
     * 등록조건
     * - 수주품목 중복 등록 불가능(입력한 contractItem 이 이미 있는지 체크)
     * - 생성된 출하의 거래처가 같은것만 등록 가능
-    *
+    * - 출하의 상태가 COMPLETION 이면 추가 불가능
     * */
     @Override
     public ShipmentItemResponse createShipmentItem(Long shipmentId, Long contractItemId, String note) throws NotFoundException, BadRequestException {
@@ -185,8 +201,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         // 기존 contractItem 과 입력받은 contractItem 이 다르면
         if (!findShipmentItem.getContractItem().getId().equals(contractItemId)) {
-            // 수주품목 변경 시 해당 출하품목 정보에 해당하는 LOT 정보가 있는지 체크
-            throwIfShipmentLotInShipmentItem(findShipmentItem.getId());
+            throwIfShipmentLotInShipmentItem(findShipmentItem.getId()); // 수주품목 변경 시 해당 출하품목 정보에 해당하는 LOT 정보가 있는지 체크
         }
 
         ContractItem newContractItem = getContractItemOrThrow(contractItemId);
@@ -221,7 +236,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         throwIfShipmentStateCompletion(shipmentItem.getShipment().getOrderState());
 
         // lotMaster: shipmentItem 의 item 에 해당되는 lotMaster 가져옴, 조건? 공정이 포장까지 완료된, stockAmount 가 1 이상
-        List<Long> lotMasterIds = shipmentLotRepo.findLotMasterIdByItemIdAndWorkProcessShipment(shipmentItem.getContractItem().getItem().getId(), SHIPMENT);
+        List<Long> lotMasterIds = shipmentLotRepo.findLotMasterIdByItemIdAndWorkProcessShipment(shipmentItem.getContractItem().getItem().getId(), PACKAGING);
         boolean lotMasterIdAnyMatch = lotMasterIds.stream().anyMatch(id -> id.equals(lotMasterId));
         if (!lotMasterIdAnyMatch) {
             throw new BadRequestException("입력한 lotMaster id 는 shipmentItem 의 item 에 해당하고, 포장공정까지 완료하고, stockAmount 가 1 이상인 lotMaster 가 아닙니다. " +
@@ -239,16 +254,20 @@ public class ShipmentServiceImpl implements ShipmentService {
         int stockAmountLotMaster = lotMaster.getStockAmount();       // lotMaster 재고수량
         lotMaster.setShipmentAmount(stockAmountLotMaster);        // 출하수량 변경(재고수량)
         lotMaster.setStockAmount(0);                                    // 재고수량 0으로 변경
-
-        shipmentLotRepo.save(shipmentLot);
+        Long workProcessShipmentId = lotLogHelper.getWorkProcessByDivisionOrThrow(SHIPMENT);
+        WorkProcess workProcessShipment = workProcessRepository.findByIdAndDeleteYnFalse(workProcessShipmentId)
+                .orElseThrow(() -> new NotFoundException("[ShipmentLot]workProcess does not exist. workProcessId: " + workProcessShipmentId));
+        lotMaster.setWorkProcess(workProcessShipment);
 
         // lotLog insert
-        Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(SHIPMENT);
-        Long workOrderDetailId = lotLogHelper.getWorkOrderDetailByContractItemAndWorkProcess(shipmentItem.getContractItem().getId(), workProcessId);
+        Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(PACKAGING);
+        Long workOrderDetailId = lotLogHelper.getWorkOrderDetailByContractItemAndWorkProcess(shipmentItem.getContractItem().getContract().getId(), workProcessId);
         lotLogHelper.createLotLog(lotMasterId, workOrderDetailId, workProcessId);
 
         // amountHelper insert
         amountHelper.amountUpdate(shipmentItem.getContractItem().getItem().getId(), lotMaster.getWareHouse().getId(), null, SHIPMENT_AMOUNT, stockAmountLotMaster, false);
+
+        shipmentLotRepo.save(shipmentLot);
         return getShipmentLotInfoResponse(shipmentLot.getId());
     }
 
@@ -281,15 +300,15 @@ public class ShipmentServiceImpl implements ShipmentService {
         lotMaster.setStockAmount(shipmentAmount);       // 재고수량 -> lotMaster 의 shipmentAmount
         lotMaster.setShipmentAmount(0);                 // 출하수량 -> 0
 
-        shipmentLotRepo.save(findShipmentLot);
-        lotMasterRepository.save(lotMaster);
-
         // lotLog insert
         Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(PACKAGING);          // 작업공정 division 으로 공정 id 찾음
         Long workOrderDetailId = lotLogHelper.getWorkOrderDetailByContractItemAndWorkProcess(findShipmentItem.getContractItem().getId(), workProcessId);// 수주품목, 작업공정으로 해당 작업지시 정보 가져옴
         lotLogHelper.createLotLog(findShipmentLot.getLotMaster().getId(), workOrderDetailId, workProcessId);
         // amountHelper insert
         amountHelper.amountUpdate(findShipmentItem.getContractItem().getItem().getId(), lotMaster.getWareHouse().getId(), null, STOCK_AMOUNT, shipmentAmount, false);
+
+        shipmentLotRepo.save(findShipmentLot);
+        lotMasterRepository.save(lotMaster);
     }
 
     // shipmentLot 단일 조회 및 예외
@@ -350,7 +369,6 @@ public class ShipmentServiceImpl implements ShipmentService {
             throw new BadRequestException("출하 품목에 대한 수정이나 삭제는 해당하는 LOT 정보 삭제 후에 가능합니다.");
         }
     }
-
 
     // shipmentItem 단일 조회 및 예외
     private ShipmentItem getShipmentItemOrThrow(Long shipmentId, Long shipmentItemId) throws NotFoundException {

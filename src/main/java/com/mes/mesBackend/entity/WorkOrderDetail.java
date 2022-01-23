@@ -16,6 +16,7 @@ import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+import static lombok.AccessLevel.PUBLIC;
 
 /*
  * 6-2. 작업지시 정보
@@ -39,7 +40,7 @@ import static lombok.AccessLevel.PROTECTED;
  * 비고 ()
  * */
 @AllArgsConstructor
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = PUBLIC)
 @Entity(name = "WORK_ORDER_DETAILS")
 @Data
 public class WorkOrderDetail extends BaseTimeEntity {
@@ -146,6 +147,7 @@ public class WorkOrderDetail extends BaseTimeEntity {
         setUnit(unit);
         setTestProcess(testProcess);
         setProduceOrder(produceOrder);
+        setOrderState(SCHEDULE);
     }
 
     public void update(
@@ -179,8 +181,20 @@ public class WorkOrderDetail extends BaseTimeEntity {
 
     // 지시상태 별 날짜 변경
     public void changeOrderStateDate() {
-        if (this.orderState.equals(SCHEDULE)) setScheduleDate(LocalDateTime.now());
-        if (this.orderState.equals(ONGOING)) setStartDate(LocalDateTime.now());
-        if (this.orderState.equals(COMPLETION)) setEndDate(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        switch (orderState){
+            case SCHEDULE:
+                setScheduleDate(now);
+                setStartDate(null);
+                setEndDate(null);
+                break;
+            case ONGOING:
+                setStartDate(now);
+                setEndDate(null);
+                break;
+            case COMPLETION:
+                setEndDate(now);
+                break;
+        }
     }
 }

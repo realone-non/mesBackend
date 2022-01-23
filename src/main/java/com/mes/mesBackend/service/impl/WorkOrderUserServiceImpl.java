@@ -2,15 +2,17 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.response.WorkOrderUserResponse;
 import com.mes.mesBackend.entity.ProduceOrder;
+import com.mes.mesBackend.entity.ProductionPerformance;
 import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.WorkOrderStateHelper;
 import com.mes.mesBackend.repository.ProduceOrderRepository;
+import com.mes.mesBackend.repository.ProductionPerformanceRepository;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
 import com.mes.mesBackend.service.UserService;
-import com.mes.mesBackend.service.WorkOrderService;
 import com.mes.mesBackend.service.WorkOrderUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,8 +29,10 @@ import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 public class WorkOrderUserServiceImpl implements WorkOrderUserService {
     private final WorkOrderDetailRepository workOrderDetailRepository;
     private final UserService userService;
-    private final WorkOrderService workOrderService;
     private final ProduceOrderRepository produceOrderRepo;
+    private final WorkOrderDetailRepository workOrderDetailRepo;
+    private final WorkOrderStateHelper workOrderStateHelper;
+    private final ProductionPerformanceRepository productionPerformanceRepo;
 
     @Override
     public List<WorkOrderUserResponse> getWorkOrderUsers(
@@ -74,25 +78,41 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
             orderState = COMPLETION;
         } else if (newStartDate != null) {
             orderState = ONGOING;
-        } else if (newEndDate == null) {
-            orderState = SCHEDULE;
-        } else {
+        } else if (newEndDate != null) {
             throw new BadRequestException("startDate cannot be null if endDate exists.");
+        } else {
+            throw new BadRequestException("startDate, endDate cannot be null.");
         }
 
         workOrderDetail.setOrderState(orderState);
         workOrderDetail.setStartDate(newStartDate);
         workOrderDetail.setEndDate(newEndDate);
         workOrderDetail.setUser(newUser);
-
         workOrderDetailRepository.save(workOrderDetail);
 
         // produceOrder(제조오더): 제조오더에 해당하는 workOrderDetail(작업지시) 의 orderState 상태값 별로 제조오더의 상태값도 변경됨.
-        ProduceOrder produceOrder = workOrderDetail.getProduceOrder();
-        workOrderService.changeOrderStateOfProduceOrder(produceOrder);
+        ProduceOrder produceOrder = getProduceOrderOrThrow(workOrderDetail.getProduceOrder().getId());
+        produceOrder.setOrderState(getWorkOrderStateDesc(produceOrder.getId()));
         produceOrderRepo.save(produceOrder);
 
+        // 생산실적: 작업지시에 해당하는 생산실적 없으면 새로 생성, 있으면 공정에 해당하는 컬럼에 update
+        ProductionPerformance productionPerformance = workOrderStateHelper.getProductionPerformanceOrCreate(workOrderDetail);
+        productionPerformance.updateProcessDateTime(workOrderDetail.getWorkProcess(), workOrderDetail.getOrderState());
+        productionPerformanceRepo.save(productionPerformance);
+
         return getWorkOrderUserResponseOrThrow(workOrderDetailId);
+    }
+
+    // 제조오더 단일 조회 및 예외
+    private ProduceOrder getProduceOrderOrThrow(Long id) throws NotFoundException {
+        return produceOrderRepo.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("[workOrderStateHelperError] produceOrder does not exist. produceOrderId: " + id));
+    }
+
+    // 제조오더에 해당하는 가장 최근 등록된 작업지시의 orderState
+    private OrderState getWorkOrderStateDesc(Long produceOrderId) {
+        return workOrderDetailRepo.findOrderStatesByProduceOrderId(produceOrderId)
+                .orElse(SCHEDULE);
     }
 
 //     시작날짜, 종료날자 둘다 입력 받았을 시 endDate 가 startDate 보다 과거면 badRequestException.

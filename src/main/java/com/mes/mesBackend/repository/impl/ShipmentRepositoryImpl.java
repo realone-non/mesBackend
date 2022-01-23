@@ -1,7 +1,9 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.ShipmentResponse;
-import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.QClient;
+import com.mes.mesBackend.entity.QShipment;
+import com.mes.mesBackend.entity.QShipmentItem;
 import com.mes.mesBackend.repository.custom.ShipmentRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -20,13 +22,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
     final QShipment shipment = QShipment.shipment;
     final QClient client = QClient.client;
-    final QUser user = QUser.user;
-    final QCurrency currency = QCurrency.currency1;
     final QShipmentItem shipmentItem = QShipmentItem.shipmentItem;
-    final QContractItem contractItem = QContractItem.contractItem;
-    final QContract contract = QContract.contract;
-    final QUnit unit = QUnit.unit;
-    final QItem item = QItem.item;
 
     // 출하 등록 리스트 조회 검색조건 : 거래처 명, 출하기간, 화폐 id, 담당자 명
     @Override
@@ -45,7 +41,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
                                 shipment.id.as("id"),
                                 shipment.shipmentNo.as("shipmentNo"),
                                 client.id.as("clientId"),
-                                client.clientCode.as("clientNo"),
+                                client.clientCode.as("clientCode"),
                                 client.clientName.as("clientName"),
                                 shipment.shipmentDate.as("shipmentDate"),
                                 shipment.clientManager.as("clientManager"),     // 거래처 담당자

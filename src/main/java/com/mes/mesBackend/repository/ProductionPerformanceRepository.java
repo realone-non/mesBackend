@@ -12,4 +12,5 @@ import java.util.Optional;
 @Repository
 public interface ProductionPerformanceRepository extends JpaCustomRepository<ProductionPerformance, Long>, ProductionPerformanceRepositoryCustom {
     Optional<ProductionPerformance> findByWorkOrderDetailAndLotMasterAndDeleteYnFalse(WorkOrderDetail workOrderDetail, LotMaster lotMaster);
+//    Optional<ProductionPerformance> findByWorkOrderDetailAndDeleteYnFalse(WorkOrderDetail workOrderDetail);
 }
