@@ -30,41 +30,44 @@ public class ItemLog extends  BaseTimeEntity{
     @JoinColumn(name = "WAREHOUSE", columnDefinition = "bigint COMMENT '창고'")
     private WareHouse wareHouse;
 
+    @Column(name = "BEFORE_DAY_STOCK_AMOUNT", columnDefinition = "int COMMENT '전일재고'")
+    private int beforeDayStockAmount = 0;
+
     @Column(name = "LOG_DATE", columnDefinition = "date COMMENT '변동일자'")
     private LocalDate logDate;
 
     @Column(name = "STORE_AMOUNT", columnDefinition = "int COMMENT '입고수량'")
-    private int storeAmount;
+    private int storeAmount = 0;
 
     @Column(name = "CREATED_AMOUNT", columnDefinition = "int COMMENT '생산수량'")
-    private int createdAmount;
+    private int createdAmount = 0;
 
     @Column(name = "BAD_ITEM_AMOUNT", columnDefinition = "int COMMENT '불량수량'")
-    private int badItemAmount;
+    private int badItemAmount = 0;
 
     @Column(name = "INPUT_AMOUNT", columnDefinition = "int COMMENT '투입수량'")
-    private int inputAmount;
+    private int inputAmount = 0;
 
     @Column(name = "SHIPMENT_AMOUNT", columnDefinition = "int COMMENT '출하수량'")
-    private int shipmentAmount;
+    private int shipmentAmount = 0;
 
     @Column(name = "STOCK_REAL_AMOUNT", columnDefinition = "int COMMENT '재고실사수량'")
-    private int stockRealAmount;
+    private int stockRealAmount = 0;
 
     @Column(name = "MOVE_AMOUNT", columnDefinition = "int COMMENT '이동수량'")
-    private int moveAmount;
+    private int moveAmount = 0;
 
     @Column(name = "RETURN_AMOUNT", columnDefinition = "int COMMENT '반품수량'")
-    private int returnAmount;
+    private int returnAmount = 0;
 
     @Column(name = "STOCK_AMOUNT", columnDefinition = "int COMMENT '재고수량'")
-    private int stockAmount;
+    private int stockAmount = 0;
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
-    private boolean deleteYn;
+    private boolean deleteYn = false;
 
     @Column(name = "OUTSOURCING_YN", columnDefinition = "bit(1) COMMENT '외주 여부'")
-    private boolean outsourcingYn;
+    private boolean outsourcingYn = false;
 
     public void update(int amount, ItemLogType logType){
         switch (logType){

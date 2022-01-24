@@ -84,6 +84,20 @@ public class ItemLogRepositoryImpl implements ItemLogRepositoryCustom {
                 .fetchOne();
     }
 
+    //전날 재고 확인
+    public ItemLog findByItemIdAndWareHouseAndBeforeDay(Long itemId, Long warehouseId, LocalDate beforeDay){
+        return jpaQueryFactory
+                .selectFrom(itemLog)
+                .leftJoin(item).on(item.id.eq(itemLog.item.id))
+                .leftJoin(wareHouse).on(wareHouse.id.eq(itemLog.wareHouse.id))
+                .where(
+                        item.id.eq(itemId),
+                        wareHouse.id.eq(warehouseId),
+                        itemLog.logDate.eq(beforeDay)
+                )
+                .fetchOne();
+    }
+
     private BooleanExpression isItemLogBetween(LocalDate fromDate, LocalDate toDate) {
         return fromDate != null ? itemLog.logDate.between(fromDate, toDate) : null;
     }
