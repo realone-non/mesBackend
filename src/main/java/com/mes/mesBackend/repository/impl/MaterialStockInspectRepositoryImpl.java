@@ -39,6 +39,7 @@ public class MaterialStockInspectRepositoryImpl implements MaterialStockInspectR
                 .select(
                         Projections.fields(
                                 MaterialStockInspectResponse.class,
+                                materialStockInspect.warehouse.as("wareHouse"),
                                 materialStockInspect.id.as("id"),
                                 materialStockInspect.itemNo.as("itemNo"),
                                 materialStockInspect.itemName.as("itemName"),

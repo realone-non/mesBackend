@@ -17,6 +17,9 @@ public class MaterialStockInspectResponse {
     @Schema(description = "요청번호, ID")
     Long id;
 
+    @Schema(description = "창고이름")
+    String wareHouse;
+
     @Schema(description = "품번")
     String itemNo;
 

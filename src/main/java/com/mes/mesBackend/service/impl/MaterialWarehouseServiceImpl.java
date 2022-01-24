@@ -106,7 +106,7 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
     }
 
     //DB재고실사 데이터 등록
-    public void createMaterialStockInspect (Long requestId, Long itemAccountId, InspectionType type) throws NotFoundException {
+    public void createMaterialStockInspect (Long requestId, Long itemAccountId) throws NotFoundException {
         List<MaterialStockInspect> dbInspect = materialStockInspectRepository.findInspectFromDB(itemAccountId);
         MaterialStockInspectRequest request = materialStockInspectRequestRepository.findByIdAndDeleteYnFalse(requestId)
                 .orElseThrow(() -> new NotFoundException("stockInspect does not exist. input id: " + requestId));
