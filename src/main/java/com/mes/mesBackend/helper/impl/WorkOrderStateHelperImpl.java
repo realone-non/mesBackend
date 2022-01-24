@@ -52,7 +52,6 @@ public class WorkOrderStateHelperImpl implements WorkOrderStateHelper {
         productionPerformance.setLotMaster(lotMaster);
         productionPerformance.setWorkOrderDetail(workOrder);
         productionPerformanceRepo.save(productionPerformance);
-
     }
 
     // lot 단일 조회 및 예외
