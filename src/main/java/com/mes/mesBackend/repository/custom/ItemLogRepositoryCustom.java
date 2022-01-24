@@ -16,4 +16,7 @@ public interface ItemLogRepositoryCustom {
 
     //일자별 품목 변동 사항 전체 조회(Response반환) / 검색조건 : 수불일자, 창고, 생성기간
     List<ReceiptAndPaymentResponse> findAllConditionResponse(Long warehouseId, Long itemAccountId, LocalDate startDate, LocalDate endDate, boolean isOut);
+
+    //전날 재고 확인
+    ItemLog findByItemIdAndWareHouseAndBeforeDay(Long itemId, Long warehouseId, LocalDate beforeDay);
 }
