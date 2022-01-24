@@ -11,18 +11,15 @@ import lombok.Setter;
 @Schema(description = "재고현황 조회")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MaterialStockReponse {
-    @Schema(description = "품목코드")
-    String itemNo;
-
-    @Schema(description = "품명")
-    String itemName;
-
-    @Schema(description = "제조사품번")
-    String manufacturerCode;
+    @Schema(description = "품목 ID")
+    Long itemId;
 
     @Schema(description = "창고 ID")
     Long warehouseId;
 
     @Schema(description = "재고량")
     int amount;
+
+    @Schema(description = "입고단가")
+    int inputUnitPrice;
 }

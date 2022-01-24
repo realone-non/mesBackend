@@ -12,9 +12,9 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Schema(description = "헤더용 창고 목록")
 @JsonInclude(NON_NULL)
 public class HeaderWarehouseResponse {
-    @Schema(description = "창고 ID")
-    Long id;
-
     @Schema(description = "창고 이름")
-    String wareHouseName;
+    String header;
+
+    @Schema(description = "창고 ID")
+    Long columnName;
 }

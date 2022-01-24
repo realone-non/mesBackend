@@ -284,6 +284,32 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .fetch();
     }
 
+    //ITEM으로 현재 재고현황 조회
+    public List<MaterialStockReponse> findStockAmountByItemId(Long itemId, Long warehouseId){
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                MaterialStockReponse.class,
+                                lotMaster.item.id.as("itemId"),
+                                lotMaster.wareHouse.id.as("warehouseId"),
+                                lotMaster.stockAmount.sum().as("amount"),
+                                item.inputUnitPrice.as("inputUnitPrice")
+
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
+                .where(
+                        isWarehouseEq(warehouseId),
+                        item.id.eq(itemId),
+                        lotMaster.deleteYn.isFalse(),
+                        lotMaster.stockAmount.gt(0)
+                )
+                .groupBy(lotMaster.wareHouse, lotMaster.item)
+                .fetch();
+    }
+
     // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 유효여부
     // 품목그룹
     private BooleanExpression isItemGroupEq(Long itemGroupId) {

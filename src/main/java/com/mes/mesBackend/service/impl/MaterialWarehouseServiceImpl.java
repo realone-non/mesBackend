@@ -4,13 +4,14 @@ import com.mes.mesBackend.dto.request.MaterialStockInspectRequestRequest;
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.dto.request.RequestMaterialStockInspect;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.AmountHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.MaterialWarehouseService;
 import lombok.RequiredArgsConstructor;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -163,14 +164,45 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
     }
 
     //재고현황 조회
-    public List<MaterialStockReponse> getMaterialStock(Long itemAccountId, Long itemId, Long itemAccoutCodeId, Long warehouseId){
-        return lotMasterRepository.findStockByItemAccountAndItemAndItemAccountCode(
-                itemAccountId, itemId, itemAccoutCodeId, warehouseId);
+    public JSONArray getMaterialStock(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Long warehouseId){
+        List<Item> items = itemRepository.findAllByCondition(itemGroupId, itemAccountId, itemNo, itemName, null);
+        JSONArray materialStocks = new JSONArray();
+
+        for (Item item:items) {
+            int sum = 0;
+            List<MaterialStockReponse> responseList = lotMasterRepository.findStockAmountByItemId(item.getId(), warehouseId);
+            JSONObject itemAmount = new JSONObject();
+            itemAmount.put("itemNo", item.getItemNo());
+            itemAmount.put("itemName", item.getItemName());
+            for (MaterialStockReponse response:responseList) {
+                itemAmount.put(response.getWarehouseId().toString(), response.getAmount());
+                itemAmount.put("inputUnitPrice", response.getInputUnitPrice());
+                sum = sum + response.getAmount();
+            }
+            itemAmount.put("sum", sum);
+            if(itemAmount.get("inputUnitPrice") != null){
+                itemAmount.put("stockPrice", sum * (Integer.parseInt(itemAmount.get("inputUnitPrice").toString())));
+            }
+            materialStocks.add(itemAmount);
+        }
+        
+        return materialStocks;
     }
 
     //헤더용 창고 목록 조회
-    public List<HeaderWarehouseResponse> getHeaderWarehouse(){
+    public JSONArray getHeaderWarehouse(){
         List<WareHouse> wareHouseList = wareHouseRepository.findAllByDeleteYnFalse();
-        return modelMapper.toListResponses(wareHouseList, HeaderWarehouseResponse.class);
+        JSONArray headerList = new JSONArray();
+        int seq = 3;
+        for (WareHouse wareHouse:wareHouseList) {
+            JSONObject header = new JSONObject();
+            header.put("header", wareHouse.getWareHouseName());
+            header.put("columnName", wareHouse.getId());
+            header.put("seq", seq);
+            headerList.add(header);
+            seq++;
+        }
+
+        return headerList;
     }
 }
