@@ -121,19 +121,6 @@ public class ShipmentReturnRepositoryImpl implements ShipmentReturnRepositoryCus
         );
     }
 
-    // 출하 LOT 정보 id 로 등록된 모든 반품수량 가져옴
-    @Override
-    public List<Integer> findReturnAmountsByShipmentLotId(Long shipmentLotId) {
-        return jpaQueryFactory
-                .select(shipmentReturn.returnAmount)
-                .from(shipmentReturn)
-                .where(
-                        shipmentReturn.shipmentLot.id.eq(shipmentLotId),
-                        isDeleteYnFalse()
-                )
-                .fetch();
-    }
-
     // 품번|품명
     private BooleanExpression isItemNoAndItemNameContain(String itemNoAndName) {
         return itemNoAndName != null ? item.itemNo.contains(itemNoAndName).or(item.itemName.contains(itemNoAndName)) : null;

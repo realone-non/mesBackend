@@ -8,14 +8,21 @@ import com.mes.mesBackend.entity.ShipmentReturn;
 import com.mes.mesBackend.entity.WareHouse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.AmountHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
-import com.mes.mesBackend.repository.*;
+import com.mes.mesBackend.repository.LotMasterRepository;
+import com.mes.mesBackend.repository.ShipmentLotRepository;
+import com.mes.mesBackend.repository.ShipmentReturnRepository;
+import com.mes.mesBackend.repository.WareHouseRepository;
 import com.mes.mesBackend.service.ShipmentReturnService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import static com.mes.mesBackend.entity.enumeration.ItemLogType.STOCK_AMOUNT;
+import static com.mes.mesBackend.entity.enumeration.ItemLogType.STORE_AMOUNT;
 
 // 4-6. 출하반품 등록
 @Service
@@ -26,6 +33,7 @@ public class ShipmentReturnServiceImpl implements ShipmentReturnService {
     private final LotMasterRepository lotMasterRepo;
     private final ModelMapper mapper;
     private final WareHouseRepository wareHouseRepository;
+    private final AmountHelper amountHelper;
 
     // 출하반품 생성
     @Override
@@ -34,9 +42,8 @@ public class ShipmentReturnServiceImpl implements ShipmentReturnService {
         LotMaster lotMaster = shipmentLot.getLotMaster();
         int returnAmount = shipmentReturnRequest.getReturnAmount();
 
-        // 입력받은 반품수량이 lotMaster 의 출하수량보다 크면 예외
-//        int findReturnAmountSum = shipmentReturnRepo.findReturnAmountsByShipmentLotId(shipmentLot.getId()).stream().mapToInt(Integer::intValue).sum();
         int stockAmount = lotMaster.getStockAmount();
+        // 입력받은 반품수량이 lotMaster 의 출하수량보다 크면 예외
         throwIfReturnAmountGreaterThanLotMasterShipment(returnAmount + stockAmount, lotMaster.getShipmentAmount());
 
         WareHouse wareHouse = getWareHouseOrThrow(shipmentReturnRequest.getInputWarehouseId());
@@ -46,6 +53,8 @@ public class ShipmentReturnServiceImpl implements ShipmentReturnService {
         shipmentReturnRepo.save(shipmentReturn);
         lotMaster.setStockAmount(lotMaster.getStockAmount() + returnAmount);     // LotMaster 재고수량 변경
         lotMasterRepo.save(lotMaster);
+
+//        amountHelper.amountUpdate(lotMaster.getItem().getId(), wareHouse.getId(), null, STORE_AMOUNT, lotMaster.getStockAmount(), false);
         return getShipmentReturnResponseOrThrow(shipmentReturn.getId());
     }
 
@@ -62,9 +71,9 @@ public class ShipmentReturnServiceImpl implements ShipmentReturnService {
 
         int newReturnAmount = shipmentReturnRequest.getReturnAmount();
         LotMaster lotMaster = findShipmentReturn.getShipmentLot().getLotMaster();
+        int amountHelperStockAmount = lotMaster.getStockAmount();
 
         // 입력받은 반품수량이 lotMaster 의 출하수량보다 크면 예외
-//        int findReturnAmountSum = shipmentReturnRepo.findReturnAmountsByShipmentLotId(findShipmentReturn.getShipmentLot().getId()).stream().mapToInt(Integer::intValue).sum();
         int stockAmount = lotMaster.getStockAmount();
         int updateBeforeAmount = stockAmount - findShipmentReturn.getReturnAmount();
 
@@ -77,6 +86,8 @@ public class ShipmentReturnServiceImpl implements ShipmentReturnService {
         lotMaster.setStockAmount(updateBeforeAmount + newReturnAmount);
         lotMasterRepo.save(lotMaster);
         shipmentReturnRepo.save(findShipmentReturn);
+
+//        amountHelper.amountUpdate(lotMaster.getItem().getId(), newWarehouse.getId(), null, STORE_AMOUNT, shipmentReturnRequest.getReturnAmount() - amountHelperStockAmount, false);
         return getShipmentReturnResponseOrThrow(id);
     }
 
@@ -89,6 +100,7 @@ public class ShipmentReturnServiceImpl implements ShipmentReturnService {
         lotMaster.setStockAmount(lotMaster.getStockAmount() - shipmentReturn.getReturnAmount());
         shipmentReturnRepo.save(shipmentReturn);
         lotMasterRepo.save(lotMaster);
+//        amountHelper.amountUpdate(lotMaster.getItem().getId(), shipmentReturn.getWareHouse().getId(), null, STORE_AMOUNT, shipmentReturn.getReturnAmount() * -1, false);
     }
 
     // 출하 반품 단일 조회 및 예외
