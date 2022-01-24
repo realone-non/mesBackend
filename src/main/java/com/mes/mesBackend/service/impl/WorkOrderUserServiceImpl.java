@@ -70,10 +70,19 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
         WorkOrderDetail workOrderDetail = workOrderDetailRepository.findByIdAndDeleteYnFalse(workOrderDetailId)
                 .orElseThrow(() -> new NotFoundException("workOrderDetail does not exist. input id: " + workOrderDetailId));
 
-        // 완료된 작업지시에 대해서만 날짜 수정 가능.
-        if (!workOrderDetail.getOrderState().equals(COMPLETION)) throw new BadRequestException("작업지시 상태가 완료가 아니면 입력 또는 변경이 불가능 합니다.");
         // 시작날짜보다 종료날짜가 뒤면 예외
         checkStartDateAndEndDate(newStartDate, newEndDate);
+
+        if (!workOrderDetail.getOrderState().equals(COMPLETION)) {  // 작업지시 상태가 완료가 아닌데
+            if (workOrderDetail.getStartDate() != newStartDate && workOrderDetail.getEndDate() != newEndDate) {     // 기존 작업지시의 시작날짜 종료일자와 입력받은 데이터가 다를경우 예외
+                throw new BadRequestException("작업지시의 지시상태가 완료일 경우에만 시작일시, 종료일시를 변경 또는 입력 할 수 있습니다.");
+            }
+        } else {
+            // 작업지시의 상태가 완료인데 입력받은 newStartDate, newEndDate 가 null 이면 예외
+            if (newStartDate == null || newEndDate == null) {
+                throw new BadRequestException("작업지시의 지시상태가 완료일 경우에는 시작일시, 종료일시를 삭제할 수 없습니다.");
+            }
+        }
 
         OrderState orderState;
         if (newStartDate != null && newEndDate != null) {
@@ -87,21 +96,21 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
         }
 
         User newUser = userService.getUserOrThrow(newUserId);
+        workOrderDetail.setUser(newUser);
         workOrderDetail.setOrderState(orderState);
         workOrderDetail.setStartDate(newStartDate);
         workOrderDetail.setEndDate(newEndDate);
-        workOrderDetail.setUser(newUser);
         workOrderDetailRepository.save(workOrderDetail);
 
         // produceOrder(제조오더): 제조오더에 해당하는 workOrderDetail(작업지시) 의 orderState 상태값 별로 제조오더의 상태값도 변경됨.
-        ProduceOrder produceOrder = getProduceOrderOrThrow(workOrderDetail.getProduceOrder().getId());
-        produceOrder.setOrderState(getWorkOrderStateDesc(produceOrder.getId()));
-        produceOrderRepo.save(produceOrder);
+//        ProduceOrder produceOrder = getProduceOrderOrThrow(workOrderDetail.getProduceOrder().getId());
+//        produceOrder.setOrderState(getWorkOrderStateDesc(produceOrder.getId()));
+//        produceOrderRepo.save(produceOrder);
 
         // 생산실적: 작업지시에 해당하는 생산실적 없으면 새로 생성, 있으면 공정에 해당하는 컬럼에 update
-        ProductionPerformance productionPerformance = workOrderStateHelper.getProductionPerformanceOrCreate(workOrderDetail);
-        productionPerformance.updateProcessDateTime(workOrderDetail.getWorkProcess(), workOrderDetail.getOrderState());
-        productionPerformanceRepo.save(productionPerformance);
+//        ProductionPerformance productionPerformance = workOrderStateHelper.getProductionPerformanceOrCreate(workOrderDetail);
+//        productionPerformance.updateProcessDateTime(workOrderDetail.getWorkProcess(), workOrderDetail.getOrderState());
+//        productionPerformanceRepo.save(productionPerformance);
 
         return getWorkOrderUserResponseOrThrow(workOrderDetailId);
     }

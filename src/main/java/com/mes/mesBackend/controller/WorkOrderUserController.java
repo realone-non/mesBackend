@@ -28,16 +28,14 @@ import java.util.List;
 
 // 8-2. 작업자 투입 수정
 @RequestMapping("/work-order-users")
-@Tag(name = "work-order-user", description = "작업자 투입 API")
+@Tag(name = "work-order-user", description = "8-2. 작업자 투입 수정 API")
 @RestController
 @SecurityRequirement(name = "Authorization")
 @RequiredArgsConstructor
 public class WorkOrderUserController {
-
     private final WorkOrderUserService workOrderUserService;
     private final LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(WorkOrderUserController.class);
+    private final Logger logger = LoggerFactory.getLogger(WorkOrderUserController.class);
     private CustomLogger cLogger;
 
     // 작업자 투입 리스트 검색 조회, 검색조건: 작업라인 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
