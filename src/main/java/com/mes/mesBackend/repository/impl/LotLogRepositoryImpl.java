@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
+
 @RequiredArgsConstructor
 public class LotLogRepositoryImpl implements LotLogRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
@@ -135,6 +137,26 @@ public class LotLogRepositoryImpl implements LotLogRepositoryCustom {
                         .where(
                                 workProcess.workProcessDivision.eq(workProcessDivision),
                                 workProcess.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // lotMaster id 로 PACKAGING 끝난 작업지시 가져옴
+    @Override
+    public Optional<String> findWorkOrderIdByLotMasterIdAndWorkProcessDivision(
+            Long lotMasterId,
+            WorkProcessDivision workProcessDivision
+    ) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(lotLog.workOrderDetail.orderNo)
+                        .from(lotLog)
+                        .where(
+                                lotLog.lotMaster.id.eq(lotMasterId),
+                                lotLog.workProcess.workProcessDivision.eq(workProcessDivision),
+                                lotLog.workOrderDetail.orderState.eq(COMPLETION),
+                                lotLog.workOrderDetail.deleteYn.isFalse()
                         )
                         .fetchOne()
         );

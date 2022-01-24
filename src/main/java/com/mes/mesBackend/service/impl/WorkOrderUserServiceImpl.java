@@ -69,9 +69,11 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
     ) throws NotFoundException, BadRequestException {
         WorkOrderDetail workOrderDetail = workOrderDetailRepository.findByIdAndDeleteYnFalse(workOrderDetailId)
                 .orElseThrow(() -> new NotFoundException("workOrderDetail does not exist. input id: " + workOrderDetailId));
-        User newUser = userService.getUserOrThrow(newUserId);
 
-        checkStartDateAndEndDate(newStartDate, newEndDate);         // 시작날짜보다 종료날짜가 뒤면 예외
+        // 완료된 작업지시에 대해서만 날짜 수정 가능.
+        if (!workOrderDetail.getOrderState().equals(COMPLETION)) throw new BadRequestException("작업지시 상태가 완료가 아니면 입력 또는 변경이 불가능 합니다.");
+        // 시작날짜보다 종료날짜가 뒤면 예외
+        checkStartDateAndEndDate(newStartDate, newEndDate);
 
         OrderState orderState;
         if (newStartDate != null && newEndDate != null) {
@@ -84,6 +86,7 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
             throw new BadRequestException("startDate, endDate cannot be null.");
         }
 
+        User newUser = userService.getUserOrThrow(newUserId);
         workOrderDetail.setOrderState(orderState);
         workOrderDetail.setStartDate(newStartDate);
         workOrderDetail.setEndDate(newEndDate);

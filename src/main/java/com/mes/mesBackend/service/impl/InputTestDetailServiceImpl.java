@@ -9,6 +9,7 @@ import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.TestType;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.AmountHelper;
@@ -16,6 +17,7 @@ import com.mes.mesBackend.helper.S3Uploader;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.InputTestDetailRepository;
 import com.mes.mesBackend.repository.InputTestRequestRepository;
+import com.mes.mesBackend.repository.LotLogRepository;
 import com.mes.mesBackend.repository.LotMasterRepository;
 import com.mes.mesBackend.service.InputTestDetailService;
 import com.mes.mesBackend.service.InputTestRequestService;
@@ -32,6 +34,8 @@ import java.util.stream.Collectors;
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
 import static com.mes.mesBackend.entity.enumeration.InputTestState.*;
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.BAD_AMOUNT;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.SHIPMENT;
 
 // 14-2. 검사 등록
 // 15-2. 검사 등록
@@ -47,6 +51,7 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
     private final LotMasterRepository lotMasterRepo;
     private final S3Uploader s3Uploader;
     private final AmountHelper amountHelper;
+    private final LotLogRepository lotLogRepository;
 
     // 검사요청정보 리스트 조회
     // 검색조건: 창고 id, 품명|품목, 완료여부, 입고번호, 품목그룹 id, LOT 유형 id, 요청기간 from~toDate, 제조사 id
@@ -71,8 +76,10 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
             int testAmount = inputTestDetailRepo.findTestAmountByInputTestRequestId(response.getId()).stream().mapToInt(Integer::intValue).sum();
             response.setTestAmount(testAmount);
             if (inputTestDivision.equals(PRODUCT)) {
-                    String workOrderNo = inputTestRequestRepo.findWorkOrderNoByLotId(response.getLotMasterId()).orElseThrow(() -> new NotFoundException("lot 에 해당하는 작업지시가 없음."));
-                    response.setWorkOrderNo(workOrderNo);
+                // lotMaster id 로 PACKAGING 끝난 작업지시 가져옴
+                String workOrderNo = lotLogRepository.findWorkOrderIdByLotMasterIdAndWorkProcessDivision(response.getLotMasterId(), PACKAGING)
+                        .orElseThrow(() -> new NotFoundException("lot 에 해당하는 작업지시가 없음. 조건: 공정 PACKAGING 이 끝난 작업지시"));
+                response.setWorkOrderNo(workOrderNo);
                 }
             }
         return responses.stream().map(res -> res.division(inputTestDivision)).collect(Collectors.toList());

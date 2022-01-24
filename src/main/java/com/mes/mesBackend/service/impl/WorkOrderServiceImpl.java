@@ -8,9 +8,11 @@ import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.LotLogHelper;
 import com.mes.mesBackend.helper.NumberAutomatic;
 import com.mes.mesBackend.helper.WorkOrderStateHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
+import com.mes.mesBackend.repository.LotLogRepository;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
 import com.mes.mesBackend.service.*;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
 
 // 6-2. 작업지시 등록
@@ -35,6 +38,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private final NumberAutomatic numberAutomatic;
     private final TestProcessService testProcessService;
     private final WorkOrderStateHelper workOrderStateHelper;
+    private final LotLogRepository lotLogRepository;        // 이거 작업 로직 추가해야됨
+    private final LotLogHelper lotLogHelper;
 
     // 제조오더 정보 리스트 조회
     // 검색조건: 품목그룹 id, 품명|품번, 수주번호, 제조오더번호, 착수예정일 fromDate~endDate, 지시상태
@@ -109,6 +114,9 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     @Override
     public WorkOrderResponse updateWorkOrder(Long produceOrderId, Long workOrderId, WorkOrderUpdateRequest newWorkOrderRequest) throws NotFoundException, BadRequestException {
         WorkOrderDetail findWorkOrderDetail = getWorkOrderDetailOrThrow(workOrderId, produceOrderId);
+
+        if (newWorkOrderRequest.getOrderState().equals(COMPLETION)) throw new BadRequestException("지시상태를 완료로 변경 할 수 없습니다.");
+
         WorkLine newWorkLine = workLineService.getWorkLineOrThrow(newWorkOrderRequest.getWorkLine());
         User newUser = newWorkOrderRequest.getUser() != null ? userService.getUserOrThrow(newWorkOrderRequest.getUser()) : null;
         Unit newUnit = unitService.getUnitOrThrow(newWorkOrderRequest.getUnit());
