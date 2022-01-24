@@ -135,7 +135,7 @@ public class MaterialStockInspectController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     //재고실사 수정
-    @PatchMapping("/{request-id}/stock-inspects/{inspect-id}")
+    @PatchMapping("/{request-id}/stock-inspects")
     @ResponseBody()
     @Operation(summary = "재고실사 수정", description = "")
     @ApiResponses(
@@ -167,7 +167,7 @@ public class MaterialStockInspectController {
     )
     public ResponseEntity<Void> deleteMaterialStockInspect(
             @PathVariable(value = "request-id") @Parameter(description = "재고실사의뢰 id") Long requestId,
-            @PathVariable(value = "id") @Parameter(description = "재고실사 id") Long inspectId,
+            @PathVariable(value = "inspect-id") @Parameter(description = "재고실사 id") Long inspectId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         materialWarehouseService.deleteMaterialStockInspect(requestId, inspectId);

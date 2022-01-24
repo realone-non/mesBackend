@@ -284,6 +284,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .fetch();
     }
 
+    @Transactional(readOnly = true)
     //ITEM으로 현재 재고현황 조회
     public List<MaterialStockReponse> findStockAmountByItemId(Long itemId, Long warehouseId){
         return jpaQueryFactory
