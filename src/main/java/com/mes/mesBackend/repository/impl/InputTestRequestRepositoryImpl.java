@@ -197,23 +197,23 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     }
 
     // lot id 로 생산실적의 workOrderDetailNo 조회
-    @Override
-    public Optional<String> findWorkOrderNoByLotId(Long lotMasterId) {
-        return Optional.ofNullable(
-                jpaQueryFactory
-                        .select(workOrderDetail.orderNo)
-                        .from(productionPerformance)
-                        .innerJoin(lotMaster).on(lotMaster.id.eq(productionPerformance.lotMaster.id))
-                        .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(productionPerformance.workOrderDetail.id))
-                        .where(
-                                lotMaster.id.eq(lotMasterId),
-                                productionPerformance.deleteYn.isFalse(),
-                                workOrderDetail.deleteYn.isFalse(),
-                                lotMaster.deleteYn.isFalse()
-                        )
-                        .fetchOne()
-        );
-    }
+//    @Override
+//    public Optional<String> findWorkOrderNoByLotId(Long lotMasterId) {
+//        return Optional.ofNullable(
+//                jpaQueryFactory
+//                        .select(workOrderDetail.orderNo)
+//                        .from(productionPerformance)
+//                        .leftJoin(lotMaster).on(lotMaster.id.eq(productionPerformance.lotMaster.id))
+//                        .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(productionPerformance.workOrderDetail.id))
+//                        .where(
+//                                lotMaster.id.eq(lotMasterId),
+//                                productionPerformance.deleteYn.isFalse(),
+//                                workOrderDetail.deleteYn.isFalse(),
+//                                lotMaster.deleteYn.isFalse()
+//                        )
+//                        .fetchOne()
+//        );
+//    }
 
     // 해당 lotMasterId 와 같은 검사 id 가져옴
     @Override

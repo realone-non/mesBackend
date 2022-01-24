@@ -31,8 +31,6 @@ public interface InputTestRequestRepositoryCustom {
     Integer findLotMasterStockAmountByLotMasterId(Long lotMasterId);
     // 검사요청상태값 별 검사요청 조회
     Optional<InputTestRequest> findByIdAndInputTestDivisionAndDeleteYnFalse(Long inputTestRequestId, InputTestDivision inputTestDivision);
-    // lot id 로 생산실적의 workOrderDetailNo 조회
-    Optional<String> findWorkOrderNoByLotId(Long lotMasterId);
     // 해당 lotMasterId 가 검사를 완료 했는지 여부
     boolean findInputTestYnByLotMasterId(Long lotMasterId);
 }
