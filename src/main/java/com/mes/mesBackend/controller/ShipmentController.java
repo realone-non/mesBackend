@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.ShipmentCreateRequest;
 import com.mes.mesBackend.dto.request.ShipmentUpdateRequest;
+import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.ShipmentItemResponse;
 import com.mes.mesBackend.dto.response.ShipmentLotInfoResponse;
 import com.mes.mesBackend.dto.response.ShipmentResponse;
@@ -18,7 +19,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -35,10 +35,9 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 // 4-5. 출하 등록
 @RequestMapping(value = "/shipments")
-@Tag(name = "shipment", description = "출하등록 API")
+@Tag(name = "shipment", description = "4-5. 출하등록 API")
 @RestController
 @SecurityRequirement(name = AUTHORIZATION)
-@Slf4j
 @RequiredArgsConstructor
 public class ShipmentController {
     private final ShipmentService shipmentService;
@@ -48,7 +47,7 @@ public class ShipmentController {
 
     // ====================================================== 출하 ======================================================
     // 출하 생성
-    @Operation(summary = "출하 생성", description = "<br/>")
+    @Operation(summary = "출하 생성", description = "")
     @PostMapping
     @ApiResponses(
             value = {
@@ -106,7 +105,11 @@ public class ShipmentController {
     // 출하 수정
     @PatchMapping("/{shipment-id}")
     @ResponseBody()
-    @Operation(summary = "출하 수정", description = "")
+    @Operation(
+            summary = "출하 수정",
+            description = "수정 안되는 이유: " +
+                    "출하에 해당되는 출하 품목이 존재할 경우. <br/> " +
+                    "출하가 완료될 경우 수정.")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -127,7 +130,12 @@ public class ShipmentController {
     // 출하 삭제
     @DeleteMapping("/{shipment-id}")
     @ResponseBody()
-    @Operation(summary = "출하 삭제", description = "")
+    @Operation(
+            summary = "출하 삭제",
+            description = "삭제 안되는 이유: " +
+                    "출하에 해당되는 출하 품목이 존재할 경우. <br/>" +
+                    "출하가 완료될 경우."
+    )
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "204", description = "no content"),
@@ -146,7 +154,13 @@ public class ShipmentController {
 
     // =================================================== 출하 품목 ====================================================
     // 출하 품목정보 생성
-    @Operation(summary = "출하 품목 생성", description = "")
+    @Operation(
+            summary = "출하 품목 생성",
+            description = "생성 안되는 경우: " +
+                    "수주품목은 해당 출하에 중복등록 불가능. <br/>" +
+                    "출하에 등록 된 거래처와 입력할 수주품목에 해당하는 수주의 고객사가 다르면 등록 불가능. <br/>" +
+                    "출하가 완료될 경우 생성 불가능."
+    )
     @PostMapping("/{shipment-id}/shipment-items")
     @ApiResponses(
             value = {
@@ -209,8 +223,14 @@ public class ShipmentController {
 
     // 출하 품목정보 수정
     @PatchMapping("/{shipment-id}/shipment-items/{shipment-item-id}")
-    @ResponseBody()
-    @Operation(summary = "출하 품목 수정", description = "해당하는 출하 품목정보에 대한 LOT 정보가 존재하면 삭제 불가능")
+    @ResponseBody
+    @Operation(
+            summary = "출하 품목 수정",
+            description = "수정 안되는 이유: <br/> " +
+                    "해당하는 출하 품목정보에 대한 LOT 정보가 존재하면 수정 불가능(LOT 정보 삭제 후 다시 수정). <br/> " +
+                    "출하가 완료되었으면 수정 불가능. <br/> " +
+                    "수주품목은 해당 출하에 중복등록 불가능."
+    )
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -233,8 +253,13 @@ public class ShipmentController {
 
     // 출하 품목정보 삭제
     @DeleteMapping("/{shipment-id}/shipment-items/{shipment-item-id}")
-    @ResponseBody()
-    @Operation(summary = "출하 품목 삭제", description = "")
+    @ResponseBody
+    @Operation(
+            summary = "출하 품목 삭제",
+            description = "삭제 안되는 이유: <br/>" +
+                    "해당하는 출하 품목정보에 대한 LOT 정보가 존재하면 수정 불가능(LOT 정보 삭제 후 다시 수정). <br/>" +
+                    "출하가 완료되었으면 수정 불가능."
+    )
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "204", description = "no content"),
@@ -255,7 +280,11 @@ public class ShipmentController {
 
     // ==================================================== LOT 정보 ====================================================
     // LOT 정보 생성
-    @Operation(summary = "LOT 정보 생성", description = "")
+    @Operation(
+            summary = "LOT 정보 생성",
+            description = "출하가 완료되었으면 생성 불가능. <br/> " +
+                    "입력한 lotMasterId 가 출하품목의 품목과 lotMaster 의 품목과 같으며 포장공정이 완료 되고 현재 재고가 0 이상인 lotMaster 가 아닐 경우. <br/>"
+    )
     @PostMapping("/{shipment-id}/shipment-items/{shipment-item-id}/shipment-lots")
     @ApiResponses(
             value = {
@@ -300,7 +329,10 @@ public class ShipmentController {
     // 출하 LOT 정보 삭제
     @DeleteMapping("/{shipment-id}/shipment-items/{shipment-item-id}/shipment-lots/{shipment-lot-id}")
     @ResponseBody
-    @Operation(summary = "출하 LOT 정보 삭제", description = "")
+    @Operation(
+            summary = "출하 LOT 정보 삭제",
+            description = "출하가 완료되었으면 삭제 불가능."
+    )
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "204", description = "no content"),
@@ -317,6 +349,30 @@ public class ShipmentController {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + shipmentLotId + " from deleteShipmentLot.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    // 출하 LOT 정보 생성 시 LOT 정보 조회 API
+    // 출하 품목정보의 품목과 lotMaster 의 품목이랑 같으며 포장공정 끝나고 현재 재고가 0 이 아닌 lotMaster id
+    @GetMapping("/lot-masters")
+    @ResponseBody
+    @Operation(
+            summary = "출하 LOT 정보 생성 시 조건에 맞는 LOT 조회",
+            description = "출하 품목정보의 품목과 lotMaster 의 품목이랑 같으며 포장공정 끝나고 현재 재고가 0 이 아닌 lotMaster id"
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+            }
+    )
+    public ResponseEntity<List<LotMasterResponse.idAndLotNo>> getShipmentLotMasters(
+            @RequestParam @Parameter(description = "수주품목 id") Long contractItemId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        List<LotMasterResponse.idAndLotNo> lotMasters = shipmentService.getShipmentLotMasters(contractItemId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getShipmentLotMasters.");
+        return new ResponseEntity<>(lotMasters, HttpStatus.OK);
     }
 
     // ==================================================== Invoice ====================================================

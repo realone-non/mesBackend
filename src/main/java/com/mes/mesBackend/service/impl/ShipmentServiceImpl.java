@@ -2,6 +2,7 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.ShipmentCreateRequest;
 import com.mes.mesBackend.dto.request.ShipmentUpdateRequest;
+import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.ShipmentItemResponse;
 import com.mes.mesBackend.dto.response.ShipmentLotInfoResponse;
 import com.mes.mesBackend.dto.response.ShipmentResponse;
@@ -309,6 +310,14 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         shipmentLotRepo.save(findShipmentLot);
         lotMasterRepository.save(lotMaster);
+    }
+
+    // 출하 LOT 정보 생성 시 LOT 정보 조회 API
+    // 출하 품목정보의 품목과 lotMaster 의 품목이랑 같으며 포장공정 끝나고 현재 재고가 0 이 아닌 lotMaster id
+    @Override
+    public List<LotMasterResponse.idAndLotNo> getShipmentLotMasters(Long contractItemId) throws NotFoundException {
+        ContractItem contractItem = getContractItemOrThrow(contractItemId);
+        return lotMasterRepository.findLotMastersByShipmentLotCondition(contractItem.getItem().getId());
     }
 
     // shipmentLot 단일 조회 및 예외
