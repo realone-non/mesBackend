@@ -26,14 +26,16 @@ public class LotLogRepositoryImpl implements LotLogRepositoryCustom {
 
     // 작업지시 id 로 createdDate 가 제일 최근인 workProcess 를 가져옴
     @Override
-    public Optional<LotLog> findWorkProcessNameByWorkOrderId(Long workOrderId) {
-        return Optional.ofNullable(jpaQueryFactory
-                .selectFrom(lotLog)
-                .where(
-                        lotLog.workOrderDetail.id.eq(workOrderId)
-                )
-                .orderBy(lotLog.createdDate.desc())
-                .fetchFirst()
+    public Optional<LotLog> findLotLogByWorkOrderIdAndWorkProcessId(Long workOrderId, Long workProcessId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(lotLog)
+                        .where(
+                                lotLog.workOrderDetail.id.eq(workOrderId),
+                                lotLog.workProcess.id.eq(workProcessId)
+                        )
+                        .orderBy(lotLog.createdDate.desc())
+                        .fetchFirst()
         );
     }
 
@@ -52,18 +54,18 @@ public class LotLogRepositoryImpl implements LotLogRepositoryCustom {
     }
 
     // 작업지시에 해당하는 모든 생성수량 가져옴
-    @Override
-    public List<Integer> findCreatedAmountByWorkOrderId(Long workOrderId) {
-        return jpaQueryFactory
-                .select(lotMaster.createdAmount)
-                .from(lotLog)
-                .innerJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
-                .innerJoin(lotMaster).on(lotMaster.id.eq(lotLog.lotMaster.id))
-                .where(
-                        workOrderDetail.id.eq(workOrderId)
-                )
-                .fetch();
-    }
+//    @Override
+//    public List<Integer> findCreatedAmountByWorkOrderId(Long workOrderId) {
+//        return jpaQueryFactory
+//                .select(lotMaster.createdAmount)
+//                .from(lotLog)
+//                .innerJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
+//                .innerJoin(lotMaster).on(lotMaster.id.eq(lotLog.lotMaster.id))
+//                .where(
+//                        workOrderDetail.id.eq(workOrderId)
+//                )
+//                .fetch();
+//    }
 
     // 작업지시에 해당하는 lotMaster Id 모두 가져옴
     @Override
