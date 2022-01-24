@@ -35,6 +35,10 @@ public class ItemLogHelper {
                 ItemLog itemLog = new ItemLog();
                 WareHouse wareHouse = wareHouseRepository.findByIdAndDeleteYnFalse(response.getWarehouseId())
                         .orElseThrow(() -> new IllegalArgumentException("not found data"));
+                ItemLog todayLog = itemLogRepository.findByItemIdAndWareHouseAndBeforeDay(item.getId(), wareHouse.getId(), LocalDate.now());
+                if(todayLog != null){
+                    continue;
+                }
                 itemLog.setWareHouse(wareHouse);
                 itemLog.setStockAmount(response.getAmount());
                 itemLog.setLogDate(LocalDate.now());
