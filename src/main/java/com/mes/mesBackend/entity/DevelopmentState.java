@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "DEVELOPMENT_STATES")
 @Data
-public class ProductDevelopmentState extends BaseTimeEntity{
+public class DevelopmentState extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '개발등록 진행상태 고유아이디'")
@@ -28,7 +28,7 @@ public class ProductDevelopmentState extends BaseTimeEntity{
     // 다대일 단방향
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DEVELOPMENT", nullable = false, columnDefinition = "bigint COMMENT '개발품목 등록'")
-    private ProductDevelopment productDevelopment;       // 진행상태
+    private Development development;       // 진행상태
 
     @Enumerated(EnumType.STRING)
     @Column(name = "DEVELOPMENT_STATUS", nullable = false, columnDefinition = "nvarchar(255) COMMENT '개발 프로세스(상위)'")
@@ -45,7 +45,7 @@ public class ProductDevelopmentState extends BaseTimeEntity{
     @Column(name = "FILE_URL", nullable = false, columnDefinition = "nvarchar(500) COMMENT '파일URL'")
     private String fileUrl;
 
-    @Column(name = "APPROVE_DATE", columnDefinition = "datetime(6) COMMENT '승인날짜'")
+    @Column(name = "APPROVE_DATE", columnDefinition = "date COMMENT '승인날짜'")
     private LocalDate approveDate;
 
     @Column(name = "VER", columnDefinition = "int COMMENT '파일 버전'")
@@ -64,7 +64,6 @@ public class ProductDevelopmentState extends BaseTimeEntity{
         setDevelopmentStatus(request.getDevelopmentStatus());
         setDevelopmentChildrenStatus(request.getDevelopmentChildrenStatus());
         setApproveDate(request.getApproveDate());
-        setFileUrl(request.getFileUrl());
         setVer(request.getVer());
         setChangeContents(request.getChangeContents());
         setMeetingType(request.getMeetingType());

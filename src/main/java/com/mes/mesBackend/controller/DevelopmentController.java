@@ -40,16 +40,15 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Authorization")
 public class DevelopmentController {
-
     private final DevelopmentService developmentService;
     private final LogService logService;
-    private org.slf4j.Logger logger = LoggerFactory.getLogger(MaterialStockController.class);
+    private org.slf4j.Logger logger = LoggerFactory.getLogger(DevelopmentController.class);
     private CustomLogger cLogger;
 
     // 개발 품목 추가
     @PostMapping
     @ResponseBody
-    @Operation(summary = "개발 품목 추가", hidden = true)
+    @Operation(summary = "개발 품목 추가")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -70,7 +69,7 @@ public class DevelopmentController {
     // 개발 품목 리스트 조회
     @GetMapping
     @ResponseBody
-    @Operation(summary = "개발 품목 리스트 조회", hidden = true)
+    @Operation(summary = "개발 품목 리스트 조회")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -87,7 +86,7 @@ public class DevelopmentController {
             @RequestParam(required = false) @Parameter(description = "개발상태(상위)") DevelopmentStatusType status,
             @RequestParam(required = false) @Parameter(description = "개발상태(하위)") DevelopmentChildrenStatusType childrenStatus,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) {
         List<DevelopmentResponse> responseList = developmentService.getDevelopments(
                 fromDate, toDate, userId, itemNo, itemName, status, childrenStatus
         );
@@ -99,7 +98,7 @@ public class DevelopmentController {
     //개발 품목 단건 조회
     @GetMapping("/{development-id}")
     @ResponseBody
-    @Operation(summary = "개발 품목 단건 조회", hidden = true)
+    @Operation(summary = "개발 품목 단건 조회")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -120,7 +119,7 @@ public class DevelopmentController {
     //개발 품목 수정
     @PutMapping("/{development-id}")
     @ResponseBody
-    @Operation(summary = "개발 품목 수정", hidden = true)
+    @Operation(summary = "개발 품목 수정")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -142,7 +141,7 @@ public class DevelopmentController {
     //개발 품목 삭제
     @DeleteMapping("/{development-id}")
     @ResponseBody
-    @Operation(summary = "개발 품목 삭제", hidden = true)
+    @Operation(summary = "개발 품목 삭제")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -163,7 +162,7 @@ public class DevelopmentController {
     // 개발 품목 진행 상태 추가
     @PostMapping("/{development-id}/development-states")
     @ResponseBody
-    @Operation(summary = "개발 품목 진행 상태 추가", hidden = true)
+    @Operation(summary = "개발 품목 진행 상태 추가")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -185,7 +184,7 @@ public class DevelopmentController {
     // 개발 품목 진행 상태 리스트 조회
     @GetMapping("/{development-id}/development-states")
     @ResponseBody
-    @Operation(summary = "개발 품목 진행 상태 리스트 조회", hidden = true)
+    @Operation(summary = "개발 품목 진행 상태 리스트 조회")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -208,7 +207,7 @@ public class DevelopmentController {
     //개발 품목 진행 상태 단건 조회
     @GetMapping("/{development-id}/development-states/{state-id}")
     @ResponseBody
-    @Operation(summary = "개발 품목 단건 조회", hidden = true)
+    @Operation(summary = "개발 품목 단건 조회")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -230,7 +229,7 @@ public class DevelopmentController {
     //개발 품목 진행 상태 수정
     @PutMapping("/{development-id}/development-states/{state-id}")
     @ResponseBody
-    @Operation(summary = "개발 품목 진행 상태 수정", hidden = true)
+    @Operation(summary = "개발 품목 진행 상태 수정")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -253,7 +252,7 @@ public class DevelopmentController {
     //개발 품목 진행 상태 삭제
     @DeleteMapping("/{development-id}/development-states/{state-id}")
     @ResponseBody
-    @Operation(summary = "개발 품목 진행 상태 삭제", hidden = true)
+    @Operation(summary = "개발 품목 진행 상태 삭제")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -275,7 +274,7 @@ public class DevelopmentController {
     // 개발 품목 진행 상태 파일 추가
     @PutMapping(value = "/{development-id}/development-states/{state-id}/development-state-file",  consumes = MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    @Operation(summary = "개발 품목 진행 상태 파일 추가", hidden = true)
+    @Operation(summary = "개발 품목 진행 상태 파일 추가")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),

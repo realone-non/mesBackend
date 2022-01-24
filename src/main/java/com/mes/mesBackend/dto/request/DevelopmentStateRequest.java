@@ -19,12 +19,6 @@ public class DevelopmentStateRequest {
     @Schema(description = "진행상태(하위)")
     DevelopmentChildrenStatusType developmentChildrenStatus;
 
-    @Schema(description = "파일 URL")
-    String fileUrl;
-
-    @Schema(description = "등록일자")
-    LocalDate createdDate;
-
     @Schema(description = "승인날짜")
     LocalDate approveDate;
 
