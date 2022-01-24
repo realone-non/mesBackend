@@ -34,7 +34,7 @@ import java.util.List;
 
 //재고실사 등록
 @Tag(name = "material-stockinspect", description = "재고실사 등록 API")
-@RequestMapping(value = "/material-stockinspect")
+@RequestMapping(value = "/material-stockinspects")
 @RestController
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Authorization")
@@ -62,7 +62,7 @@ public class MaterialStockInspectController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "시작날짜") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "종료날짜") LocalDate toDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException{
+    ) {
         List<MaterialStockInspectRequestResponse> responseList = materialWarehouseService.getMaterialStockInspectRequestList(fromDate, toDate);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getMaterialStockInspects.");
@@ -70,7 +70,7 @@ public class MaterialStockInspectController {
     }
 
     //DB재고실사 데이터 등록
-    @PostMapping("/{request-id}/stock-inspect")
+    @PostMapping("/{request-id}/stock-inspects")
     @ResponseBody
     @Operation(summary = "DB재고실사 데이터 등록")
     @ApiResponses(
@@ -91,7 +91,7 @@ public class MaterialStockInspectController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
     //재고실사 조회
-    @GetMapping("/{request-id}")
+    @GetMapping("/{request-id}/stock-inspects")
     @ResponseBody
     @Operation(summary = "재고실사 조회")
     @ApiResponses(
@@ -114,7 +114,7 @@ public class MaterialStockInspectController {
         return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
     //재고실사 단일 조회
-    @GetMapping("/{request-id}/{inspect-id}")
+    @GetMapping("/{request-id}/stock-inspects/{inspect-id}")
     @ResponseBody
     @Operation(summary = "재고실사 단일 조회")
     @ApiResponses(
@@ -135,7 +135,7 @@ public class MaterialStockInspectController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     //재고실사 수정
-    @PatchMapping("/{request-id}")
+    @PatchMapping("/{request-id}/stock-inspects/{inspect-id}")
     @ResponseBody()
     @Operation(summary = "재고실사 수정", description = "")
     @ApiResponses(
@@ -156,7 +156,7 @@ public class MaterialStockInspectController {
         return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
     //재고실사 삭제
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{request-id}/stock-inspects/{inspect-id}")
     @ResponseBody()
     @Operation(summary = "재고실사 삭제", description = "")
     @ApiResponses(
@@ -166,12 +166,13 @@ public class MaterialStockInspectController {
             }
     )
     public ResponseEntity<Void> deleteMaterialStockInspect(
-            @PathVariable(value = "id") @Parameter(description = "재고실사 id") Long id,
+            @PathVariable(value = "request-id") @Parameter(description = "재고실사의뢰 id") Long requestId,
+            @PathVariable(value = "id") @Parameter(description = "재고실사 id") Long inspectId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        materialWarehouseService.deleteMaterialStockInspect(id);
+        materialWarehouseService.deleteMaterialStockInspect(requestId, inspectId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteMaterialStockInspect.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + inspectId + " from deleteMaterialStockInspect.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

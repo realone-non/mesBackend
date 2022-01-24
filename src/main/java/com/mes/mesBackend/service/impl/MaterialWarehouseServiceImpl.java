@@ -138,9 +138,11 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
     }
 
     //재고조사 삭제
-    public void deleteMaterialStockInspect(Long id) throws NotFoundException {
-        MaterialStockInspect dbInsepct = materialStockInspectRepository.findByIdAndDeleteYnFalse(id)
-                .orElseThrow(() -> new NotFoundException("stockInspect does not exist. input id: " + id));
+    public void deleteMaterialStockInspect(Long requestId, Long inspectId) throws NotFoundException {
+        MaterialStockInspectRequest dbRequest = materialStockInspectRequestRepository.findByIdAndDeleteYnFalse(requestId)
+                .orElseThrow(() -> new NotFoundException("inspectReqiest does not exist. input id: " + requestId));
+        MaterialStockInspect dbInsepct = materialStockInspectRepository.findByIdAndDeleteYnFalse(inspectId)
+                .orElseThrow(() -> new NotFoundException("stockInspect does not exist. input id: " + inspectId));
         dbInsepct.delete();
         materialStockInspectRepository.save(dbInsepct);
     }

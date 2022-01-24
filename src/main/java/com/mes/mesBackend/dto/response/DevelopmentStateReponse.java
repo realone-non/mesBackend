@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,7 +22,7 @@ public class DevelopmentStateReponse {
     String fileUrl;
 
     @Schema(description = "등록일자")
-    LocalDate addDate;
+    LocalDateTime addDate;
 
     @Schema(description = "등록자ID")
     Long userId;

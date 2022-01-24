@@ -30,7 +30,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "DEVELOPMENTS")
 @Data
-public class ProductDevelopment extends BaseTimeEntity {
+public class Development extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '개발등록 고유아이디'")
@@ -53,6 +53,9 @@ public class ProductDevelopment extends BaseTimeEntity {
 
     @Column(name = "DELIVER_AMOUNT", columnDefinition = "int COMMENT '납품수량'")
     private int deliverAmount;          // 납품수량
+
+    @Column(name = "진행상태", columnDefinition = "nvarchar(255) COMMENT '진행상황'")
+    private String processState;
 
     @ManyToOne
     @JoinColumn(name = "USER", columnDefinition = "bigint COMMENT '담당자'")
