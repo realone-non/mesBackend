@@ -9,6 +9,10 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDate;
 
+import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
+
 /*
  * 출하반품
  * 검색: 공장(드롭),거래처,품목,반품기간
@@ -29,42 +33,43 @@ import java.time.LocalDate;
  * 비고
  * */
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 @Entity(name = "SHIPMENT_RETURNS")
 @Data
 public class ShipmentReturn extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '출하반품 고유아이디'")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SHIPMENT_ITEM_LIST", columnDefinition = "bigint COMMENT '출하'")
-    private Shipment shipmentItemList;              // 출하
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "SHIPMENT_LOT", columnDefinition = "bigint COMMENT '출하 LOT 정보'", nullable = false)
+    private ShipmentLot shipmentLot;
 
-    @Column(name = "RETURN_DATE", columnDefinition = "date COMMENT '반품일시'")
+    @Column(name = "RETURN_DATE", columnDefinition = "date COMMENT '반품일시'", nullable = false)
     private LocalDate returnDate;       // 반품일시
 
-    @Column(name = "RETURN_AMOUNT", columnDefinition = "int COMMENT '반품수량'")
+    @Column(name = "RETURN_AMOUNT", columnDefinition = "int COMMENT '반품수량'", nullable = false)
     private int returnAmount;              // 반품수량
 
-    @Column(name = "TEST_REQUEST_TYPE", columnDefinition = "varchar(255) COMMENT '검사의뢰유형'")
-    private String testRequestType;         // 검사의뢰유형
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '입고창고'")
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '입고창고'", nullable = false)
     private WareHouse wareHouse;            // 입고창고
 
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                    // 비고
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
-    private Factory factory;                // 공장
-
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
-    private boolean useYn = true;   // 사용여부
-
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
+
+    public void update(ShipmentReturn newShipmentReturn, WareHouse newWarehouse) {
+        setReturnDate(newShipmentReturn.returnDate);
+        setReturnAmount(newShipmentReturn.returnAmount);
+        setWareHouse(newWarehouse);
+        setNote(newShipmentReturn.note);
+    }
+
+    public void delete() {
+        setDeleteYn(true);
+    }
 }
