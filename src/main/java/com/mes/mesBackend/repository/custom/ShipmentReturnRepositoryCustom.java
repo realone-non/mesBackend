@@ -12,6 +12,4 @@ public interface ShipmentReturnRepositoryCustom {
     List<ShipmentReturnResponse> findShipmentReturnResponsesByCondition(Long clientId, String itemNoAndItemName, LocalDate fromDate, LocalDate toDate);
     // 출하반품 단일 조회
     Optional<ShipmentReturnResponse> findShipmentReturnResponseByIdAndDeleteYnFalse(Long id);
-    // 출하 LOT 정보 id 로 등록된 모든 반품수량 가져옴
-    List<Integer> findReturnAmountsByShipmentLotId(Long shipmentLotId);
 }
