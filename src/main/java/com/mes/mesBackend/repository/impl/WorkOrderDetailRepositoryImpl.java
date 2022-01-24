@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
 
 @RequiredArgsConstructor
@@ -604,11 +605,14 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 BadItemWorkOrderResponse.class,
                                 workOrderDetail.id.as("workOrderId"),
                                 workOrderDetail.orderNo.as("workOrderNo"),
-                                workLine.workLineName.as("workProcessName"),
+                                workProcess.workProcessName.as("workProcessName"),
+                                workLine.workLineName.as("workLineName"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
+                                workOrderDetail.startDate.as("workDateTime"),
                                 user.korName.as("userKorName"),
-                                contract.contractNo.as("contractNo")
+                                contract.contractNo.as("contractNo"),
+                                workProcess.id.as("workProcessId")
                         )
                 )
                 .from(workOrderDetail)
@@ -619,17 +623,23 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
                 .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
                 .leftJoin(itemGroup).on(itemGroup.id.eq(item.itemGroup.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
                 .where(
                         isWorkLineIdEq(workLineId),
                         isItemGroupEq(itemGroupId),
                         isProduceOrderNoContain(produceOrderNo),
                         isWorkOrderNoContain(workOrderNo),
                         isItemNoAndItemNameContain(itemNoAndItemName),
+                        isWorkOrderStartDateBetween(fromDate, toDate),
                         isDeleteYnFalse(),
-//                        workOrderDetail.deleteYn.isTrue(),
-                        workOrderDetail.orderState.notIn(SCHEDULE)
+                        workOrderDetail.orderState.eq(COMPLETION)
                 )
                 .fetch();
+    }
+
+    // 작업지시 startDate 조회
+    private BooleanExpression isWorkOrderStartDateBetween(LocalDate fromDate, LocalDate toDate) {
+        return fromDate != null ? workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)) : null;
     }
 
     // JOB NO

@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,43 +44,22 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
             LocalDate toDate,
             String itemNoAndItemName
     ) throws NotFoundException {
-        List<BadItemWorkOrderResponse> workOrderResponses =
-                workOrderDetailRepo.findBadItemWorkOrderResponseByCondition(workCenterId, workLineId, itemGroupId, produceOrderNo, workOrderNo, fromDate, toDate, itemNoAndItemName);
+        // 작업지시의 지시상태가 COMPLETION 인것만 조회
+        List<BadItemWorkOrderResponse> workOrderResponses = workOrderDetailRepo.findBadItemWorkOrderResponseByCondition(
+                workCenterId,
+                workLineId,
+                itemGroupId,
+                produceOrderNo,
+                workOrderNo,
+                fromDate,
+                toDate,
+                itemNoAndItemName
+        );
         for (BadItemWorkOrderResponse response : workOrderResponses) {
-            Long workOrderId = response.getWorkOrderId();
-            LotLog lotLog = lotLogRepository.findWorkProcessNameByWorkOrderId(workOrderId)
-                    .orElseThrow(() -> new NotFoundException("공정 투입된 작업지시가 lotLog 테이블에 입력되지 않음."));
-
-            // 작업공정
-            WorkProcess workProcess = lotLog.getWorkProcess();
-            response.setWorkProcessName(workProcess.getWorkProcessName());
-
-            // 작업일시
-            LocalDateTime workDateTime = lotLog.getCreatedDate();
-            response.setWorkDateTime(workDateTime);
-
-            // 불량수량
-            List<Integer> badItemAmountList = lotLogRepository.findBadItemAmountByWorkOrderId(workOrderId);
-            int badItemAmounts = badItemAmountList.stream().mapToInt(Integer::intValue).sum();
-            response.setBadAmount(badItemAmounts);
-
-            // 생산수량
-            List<Integer> createdAmountList = lotLogRepository.findCreatedAmountByWorkOrderId(workOrderId);
-            int createdAmounts = createdAmountList.stream().mapToInt(Integer::intValue).sum();
-            response.setProductionAmount(createdAmounts);
-        }
-
-        List<BadItemWorkOrderResponse> list = new ArrayList<>();
-
-        if (fromDate != null && toDate != null) {
-            for (BadItemWorkOrderResponse response : workOrderResponses) {
-                LocalDateTime workDateTime = response.getWorkDateTime();
-
-                if (workDateTime.isAfter(fromDate.atStartOfDay()) && workDateTime.isBefore(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))) {
-                    list.add(response);
-                }
-            }
-            return list;
+            LotLog lotLog = lotLogRepository.findLotLogByWorkOrderIdAndWorkProcessId(response.getWorkOrderId(), response.getWorkProcessId())
+                    .orElseThrow(() -> new NotFoundException("공정 완료된 작업지시가 LotLog 에 등록되지 않았습니다."));
+            response.setBadAmount(lotLog.getLotMaster().getBadItemAmount());        // lotMaster 의 불량수량
+            response.setProductionAmount(lotLog.getLotMaster().getCreatedAmount()); // lotMaster 의 생성수량
         }
         return workOrderResponses;
     }

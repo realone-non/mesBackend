@@ -1,6 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -53,4 +54,7 @@ public class BadItemWorkOrderResponse {
 
     @Schema(description = "생산수량")
     int productionAmount;
+
+    @JsonIgnore
+    Long workProcessId;
 }

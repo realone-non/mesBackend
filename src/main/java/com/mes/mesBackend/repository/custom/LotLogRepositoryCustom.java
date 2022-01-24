@@ -9,11 +9,11 @@ import java.util.Optional;
 
 public interface LotLogRepositoryCustom {
     // 작업지시 id 로 createdDate 가 제일 최근인 workProcess 를 가져옴
-    Optional<LotLog> findWorkProcessNameByWorkOrderId(Long workOrderId);
+    Optional<LotLog> findLotLogByWorkOrderIdAndWorkProcessId(Long workOrderId, Long workProcessId);
     // 작업지시에 해당하는 모든 불량수량 가져옴
     List<Integer> findBadItemAmountByWorkOrderId(Long workOrderId);
     // 작업지시에 해당하는 모든 생성수량 가져옴
-    List<Integer> findCreatedAmountByWorkOrderId(Long workOrderId);
+//    List<Integer> findCreatedAmountByWorkOrderId(Long workOrderId);
     // 작업지시에 해당하는 lotMaster Id 모두 가져옴
     List<Long> findLotMasterIdByWorkOrderId(Long workOrderId);
     // Lot log 조회, 검색조건: 작업공정 id, 작업지시 id, lotMaster id
