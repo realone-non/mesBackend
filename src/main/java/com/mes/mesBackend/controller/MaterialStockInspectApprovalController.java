@@ -30,7 +30,7 @@ import java.util.List;
 
 //재고실사 승인등록
 @Tag(name = "material-stockinspect-approval", description = "재고실사승인 API")
-@RequestMapping(value = "/material-stockinspect-approval")
+@RequestMapping(value = "/material-stockinspect-approvals")
 @RestController
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Authorization")
@@ -44,7 +44,7 @@ public class MaterialStockInspectApprovalController {
     private CustomLogger cLogger;
 
     //재고실사 승인 등록
-    @PostMapping("/{request-id}/approval/{user-id}")
+    @PostMapping("/{request-id}/approvals/{user-id}")
     @ResponseBody
     @Operation(summary = "재고실사 승인 등록")
     @ApiResponses(

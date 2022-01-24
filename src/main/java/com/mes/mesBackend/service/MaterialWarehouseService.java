@@ -3,19 +3,15 @@ package com.mes.mesBackend.service;
 import com.mes.mesBackend.dto.request.MaterialStockInspectRequestRequest;
 import com.mes.mesBackend.dto.request.RequestMaterialStockInspect;
 import com.mes.mesBackend.dto.response.*;
-import com.mes.mesBackend.entity.MaterialStockInspect;
-import com.mes.mesBackend.entity.MaterialStockInspectRequest;
-import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.exception.NotFoundException;
-import jdk.vm.ci.meta.Local;
-import org.springframework.stereotype.Service;
+import net.minidev.json.JSONArray;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface MaterialWarehouseService {
-    //수불부 조회
-    List<ReceiptAndPaymentResponse> getReceiptAndPaymentList(Long warehouseId, Long itemAccountId, LocalDate fromDate, LocalDate toDate);
+            //수불부 조회
+            List<ReceiptAndPaymentResponse> getReceiptAndPaymentList(Long warehouseId, Long itemAccountId, LocalDate fromDate, LocalDate toDate);
     //재고실사의뢰 등록
     MaterialStockInspectRequestResponse createMaterialStockInspectRequest(MaterialStockInspectRequestRequest request) throws NotFoundException;
     //재고실사의뢰 조회
@@ -40,7 +36,7 @@ public interface MaterialWarehouseService {
     //재고실사 승인 등록
     List<MaterialStockInspectResponse> createStockInspectApproval(Long requestId, Long userId) throws NotFoundException;
     //재고현황 조회
-    List<MaterialStockReponse> getMaterialStock(Long itemAccountId, Long itemId, Long itemAccoutCodeId, Long warehouseId);
+    JSONArray getMaterialStock(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Long warehouseId);
     //헤더용 창고 목록 조회
-    List<HeaderWarehouseResponse> getHeaderWarehouse();
+    JSONArray getHeaderWarehouse();
 }
