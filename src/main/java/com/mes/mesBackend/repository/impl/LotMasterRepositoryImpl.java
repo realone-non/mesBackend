@@ -6,6 +6,8 @@ import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
+import com.mes.mesBackend.repository.LotMasterRepository;
 import com.mes.mesBackend.repository.custom.LotMasterRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -16,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 
 @RequiredArgsConstructor
 public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
@@ -29,6 +33,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     final QClient client = QClient.client;
     final QLotType lotType = QLotType.lotType1;
     final QOutSourcingInput outSourcingInput = QOutSourcingInput.outSourcingInput;
+    final QWorkProcess workProcess = QWorkProcess.workProcess;
 
     // id 로 itemAccountCode 의 symbol 조회
     @Override
@@ -222,7 +227,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     //재고현황 조회
     @Transactional(readOnly = true)
     public List<MaterialStockReponse> findStockByItemAccountAndItemAndItemAccountCode(
-            Long itemAccountId, Long itemId, Long itemGroupId, Long warehouseId, List<Long> warehouseList){
+            Long itemAccountId, Long itemId, Long itemGroupId, Long warehouseId){
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -242,7 +247,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
                 .where(
                         isWarehouseEq(warehouseId),
-                        lotMaster.item.id.eq(itemId),
+                        isItemGroupEq(itemGroupId),
                         isItemAccountEq(itemAccountId),
                         isDeleteYnFalse()
                 )
@@ -251,6 +256,33 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .fetch();
     }
 
+    // 출하 LOT 정보 생성 시 LOT 정보 조회 API
+    @Override
+    public List<LotMasterResponse.idAndLotNo> findLotMastersByShipmentLotCondition(Long itemId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                LotMasterResponse.idAndLotNo.class,
+                                lotMaster.id.as("id"),
+                                lotMaster.lotNo.as("lotNo"),
+                                lotMaster.item.id.as("itemId"),
+                                lotMaster.workProcess.id.as("workProcessId"),
+                                lotMaster.workProcess.workProcessDivision.as("workProcessDivision"),
+                                lotMaster.stockAmount.as("stockAmount")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
+                .where(
+                        item.id.eq(itemId),
+                        workProcess.workProcessDivision.eq(PACKAGING),
+                        lotMaster.stockAmount.goe(1),
+                        lotMaster.deleteYn.isFalse()
+
+                )
+                .fetch();
+    }
 
     // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 유효여부
     // 품목그룹

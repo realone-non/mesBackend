@@ -2,6 +2,7 @@ package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.ShipmentCreateRequest;
 import com.mes.mesBackend.dto.request.ShipmentUpdateRequest;
+import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.ShipmentItemResponse;
 import com.mes.mesBackend.dto.response.ShipmentLotInfoResponse;
 import com.mes.mesBackend.dto.response.ShipmentResponse;
@@ -44,4 +45,6 @@ public interface ShipmentService {
     List<ShipmentLotInfoResponse> getShipmentLots(Long shipmentId, Long shipmentItemId) throws NotFoundException;
     // 출하 LOT 정보 삭제
     void deleteShipmentLot(Long shipmentId, Long shipmentItemId, Long shipmentLotId) throws NotFoundException, BadRequestException;
+    // 출하 LOT 정보 생성 시 LOT 정보 조회 API
+    List<LotMasterResponse.idAndLotNo> getShipmentLotMasters(Long contractItemId) throws NotFoundException;
 }
