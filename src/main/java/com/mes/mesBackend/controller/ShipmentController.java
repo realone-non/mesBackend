@@ -104,12 +104,13 @@ public class ShipmentController {
     }
     // 출하 수정
     @PatchMapping("/{shipment-id}")
-    @ResponseBody()
+    @ResponseBody
     @Operation(
             summary = "출하 수정",
-            description = "수정 안되는 이유: " +
+            description = "수정 안되는 이유: <br/>" +
                     "출하에 해당되는 출하 품목이 존재할 경우. <br/> " +
-                    "출하가 완료될 경우 수정.")
+                    "출하가 완료될 경우 수정."
+    )
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
