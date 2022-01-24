@@ -7,6 +7,7 @@ import com.mes.mesBackend.entity.LotType;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.ProcessType;
 import com.mes.mesBackend.entity.enumeration.QualityLevel;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -101,5 +102,28 @@ public class LotMasterResponse {
 
     public void setReturnAmounts() {
         setReturnAmount(this.badItemReturnAmount + this.stockReturnAmount);
+    }
+
+    @Getter
+    @Setter
+    @Schema(description = "LOT 정보")
+    public static class idAndLotNo {
+        @Schema(description = "LOT 고유아이디")
+        Long id;
+
+        @Schema(description = "LOT 번호")
+        String lotNo;
+
+        @Schema(description = "품목 고유아이디")
+        Long itemId;
+
+        @Schema(description = "공정 고유아이디")
+        Long workProcessId;
+
+        @Schema(description = "공정")
+        WorkProcessDivision workProcessDivision;
+
+        @Schema(description = "재고수량")
+        int stockAmount;
     }
 }

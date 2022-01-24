@@ -161,9 +161,9 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
     }
 
     //재고현황 조회
-    public List<MaterialStockReponse> getMaterialStock(Long itemAccountId, Long itemId, Long itemAccoutCodeId, Long warehouseId, List<Long> warehouseList){
+    public List<MaterialStockReponse> getMaterialStock(Long itemAccountId, Long itemId, Long itemAccoutCodeId, Long warehouseId){
         return lotMasterRepository.findStockByItemAccountAndItemAndItemAccountCode(
-                itemAccountId, itemId, itemAccoutCodeId, warehouseId, warehouseList);
+                itemAccountId, itemId, itemAccoutCodeId, warehouseId);
     }
 
     //헤더용 창고 목록 조회

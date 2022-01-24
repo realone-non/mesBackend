@@ -43,10 +43,9 @@ public class MaterialStockController {
             @RequestParam(required = false) @Parameter(description = "품목 그룹 id") Long itemGroupId,
             @RequestParam(required = false) @Parameter(description = "품목 id") Long itemId,
             @RequestParam(required = false) @Parameter(description = "창고 id") Long warehouseId,
-            @RequestParam(required = true) @Parameter(description = "표시할 창고 id목록") List<Long> warehouseList,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<MaterialStockReponse> responseList = materialWarehouseService.getMaterialStock(itemAccountId, itemGroupId, itemId, warehouseId, warehouseList);
+        List<MaterialStockReponse> responseList = materialWarehouseService.getMaterialStock(itemAccountId, itemGroupId, itemId, warehouseId);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of itemGroupId: " + itemGroupId
                 + ", itemAccountId: " + itemGroupId + " from getItems.");

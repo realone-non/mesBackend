@@ -40,7 +40,7 @@ public interface MaterialWarehouseService {
     //재고실사 승인 등록
     List<MaterialStockInspectResponse> createStockInspectApproval(Long requestId, Long userId) throws NotFoundException;
     //재고현황 조회
-    List<MaterialStockReponse> getMaterialStock(Long itemAccountId, Long itemId, Long itemAccoutCodeId, Long warehouseId, List<Long> warehouseList);
+    List<MaterialStockReponse> getMaterialStock(Long itemAccountId, Long itemId, Long itemAccoutCodeId, Long warehouseId);
     //헤더용 창고 목록 조회
     List<HeaderWarehouseResponse> getHeaderWarehouse();
 }
