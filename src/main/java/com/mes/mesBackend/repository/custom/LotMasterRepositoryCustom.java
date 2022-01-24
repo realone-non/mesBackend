@@ -40,4 +40,6 @@ public interface LotMasterRepositoryCustom {
     //재고현황 조회
     List<MaterialStockReponse> findStockByItemAccountAndItemAndItemAccountCode(
             Long itemAccountId, Long itemId, Long itemGroupId, Long warehouseId);
+    // 출하 LOT 정보 생성 시 LOT 정보 조회 API
+    List<LotMasterResponse.idAndLotNo> findLotMastersByShipmentLotCondition(Long itemId);
 }

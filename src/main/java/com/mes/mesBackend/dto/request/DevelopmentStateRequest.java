@@ -31,6 +31,9 @@ public class DevelopmentStateRequest {
     @Schema(description = "파일 버전")
     int ver;
 
+    @Schema(description = "사용자 ID")
+    Long userId;
+
     @Schema(description = "변경 내용")
     String changeContents;
 
