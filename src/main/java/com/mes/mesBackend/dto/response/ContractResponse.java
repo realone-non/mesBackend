@@ -33,7 +33,7 @@ public class ContractResponse {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     LocalDate clientOrderDate;
 
-    @Schema(description = "생산유형")
+    @Schema(description = "[생산유형] MASS: 양산, TEST: 시험품")
     ProductionType productionType;
 
     @Schema(description = "고객발주번호")
