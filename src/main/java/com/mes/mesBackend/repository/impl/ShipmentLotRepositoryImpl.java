@@ -1,13 +1,16 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.ShipmentLotInfoResponse;
+import com.mes.mesBackend.dto.response.ShipmentStatusResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.repository.custom.ShipmentLotRepositoryCustom;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +23,13 @@ public class ShipmentLotRepositoryImpl implements ShipmentLotRepositoryCustom {
     final QContractItem contractItem = QContractItem.contractItem;
     final QItem item = QItem.item;
     final QUnit unit = QUnit.unit;
+    final QShipment shipment = QShipment.shipment;
+    final QWareHouse wareHouse = QWareHouse.wareHouse;
+    final QClient client = QClient.client;
+    final QUser user = QUser.user;
+    final QCurrency currency = QCurrency.currency1;
+    final QContract contract = QContract.contract;
+
 
     // lotMaster: shipmentItem 의 item 에 해당되는 lotMaster 가져옴, 조건? 공정이 포장까지 완료된, stockAmount 가 1 이상
     @Override
@@ -124,5 +134,104 @@ public class ShipmentLotRepositoryImpl implements ShipmentLotRepositoryCustom {
                         shipmentLot.deleteYn.isFalse()
                 )
                 .fetch();
+    }
+
+    // ==================================================== 4-7. 출하 현황 ====================================================
+    // 출하현황 검색 리스트 조회, 검색조건: 거래처 id, 출하기간 fromDate~toDate, 화폐 id, 담당자 id, 품번|품명
+    @Override
+    public List<ShipmentStatusResponse> findShipmentStatusesResponsesByCondition(
+            Long clientId,
+            LocalDate fromDate,
+            LocalDate toDate,
+            Long currencyId,
+            Long userId,
+            String itemNoAndItemName
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                ShipmentStatusResponse.class,
+                                shipment.id.as("shipmentId"),
+                                shipment.shipmentDate.as("shipmentDate"),
+                                shipment.shipmentNo.as("shipmentNo"),
+                                client.clientCode.as("clientCode"),
+                                client.clientName.as("clientName"),
+                                user.korName.as("userManager"),
+                                wareHouse.wareHouseName.as("wareHouseName"),
+                                contract.surtax.as("surtax"),
+                                shipmentItem.id.as("shipmentItemId"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                item.standard.as("itemStandard"),
+                                unit.unitCodeName.as("contractUnit"),
+                                contract.contractNo.as("contractNo"),
+                                lotMaster.shipmentAmount.as("shipmentAmount"),
+                                currency.currency.as("currency"),
+                                currency.exchangeRate.as("exchangeRate"),
+                                lotMaster.shipmentAmount.multiply(item.inputUnitPrice).as("shipmentPrice"),
+                                lotMaster.shipmentAmount.multiply(item.inputUnitPrice).as("shipmentPriceWon"),
+                                lotMaster.shipmentAmount.multiply(item.inputUnitPrice).doubleValue().multiply(0.1).as("vat"),
+                                shipmentLot.id.as("shipmentLotId"),
+                                lotMaster.lotNo.as("lotNo"),
+                                contract.periodDate.as("periodDate"),
+                                shipment.note.as("note")
+                        )
+                )
+                .from(shipmentLot)
+                .innerJoin(lotMaster).on(lotMaster.id.eq(shipmentLot.lotMaster.id))
+                .innerJoin(shipmentItem).on(shipmentItem.id.eq(shipmentLot.shipmentItem.id))
+                .innerJoin(shipment).on(shipment.id.eq(shipmentItem.shipment.id))
+                .leftJoin(client).on(client.id.eq(shipment.client.id))
+                .leftJoin(contractItem).on(contractItem.id.eq(shipmentItem.contractItem.id))
+                .leftJoin(contract).on(contract.id.eq(contractItem.contract.id))
+                .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
+                .leftJoin(user).on(user.id.eq(contract.user.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                .leftJoin(unit).on(unit.id.eq(item.unit.id))
+                .leftJoin(currency).on(currency.id.eq(contract.currency.id))
+                .where(
+                        isClientIdEq(clientId),
+                        isShipmentDateBetween(fromDate, toDate),
+                        isCurrencyEq(currencyId),
+                        isUserIdEq(userId),
+                        isItemNoAndItemNameContain(itemNoAndItemName),
+                        isShipmentDeleteYnFalse(),
+                        isShipmentItemDeleteYnFalse(),
+                        isShipmentLotDeleteYnFalse()
+                )
+                .fetch();
+    }
+    // 출하현황 검색 리스트 조회, 검색조건: 거래처 id, 출하기간 fromDate~toDate, 화폐 id, 담당자 id, 품번|품명
+    // 품번|품명
+    private BooleanExpression isItemNoAndItemNameContain(String itemNoAndName) {
+        return itemNoAndName != null ? item.itemNo.contains(itemNoAndName).or(item.itemName.contains(itemNoAndName)) : null;
+    }
+    // 거래처 조회
+    private BooleanExpression isClientIdEq(Long clientId) {
+        return clientId != null ? client.id.eq(clientId) : null;
+    }
+    // 출하기간 조회
+    private BooleanExpression isShipmentDateBetween(LocalDate fromDate, LocalDate toDate) {
+        return fromDate != null ? shipment.shipmentDate.between(fromDate, toDate) : null;
+    }
+    // 화폐로 조회
+    private BooleanExpression isCurrencyEq(Long currencyId) {
+        return currencyId != null ? currency.id.eq(currencyId) : null;
+    }
+    // 담당자
+    private BooleanExpression isUserIdEq(Long userId) {
+        return userId != null ? user.id.eq(userId) : null;
+    }
+    // shipment
+    private BooleanExpression isShipmentDeleteYnFalse() {
+        return shipment.deleteYn.isFalse();
+    }
+    // shipmentItem
+    private BooleanExpression isShipmentItemDeleteYnFalse() {
+        return shipmentItem.deleteYn.isFalse();
+    }
+    // shipmentLot
+    private BooleanExpression isShipmentLotDeleteYnFalse() {
+        return shipmentLot.deleteYn.isFalse();
     }
 }
