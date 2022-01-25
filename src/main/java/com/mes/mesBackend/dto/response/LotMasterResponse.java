@@ -3,7 +3,6 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mes.mesBackend.entity.LotType;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.ProcessType;
 import com.mes.mesBackend.entity.enumeration.QualityLevel;
@@ -12,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -46,7 +44,7 @@ public class LotMasterResponse {
     @Schema(description = "LOT 유형")
     String lotType;
 
-    @Schema(description = "등록유형")
+    @Schema(description = "등록유형 [불량: ERROR, 구매입고: PURCHASE_INPUT, 생산: PRODUCTION, 분할: SPLIT]")
     EnrollmentType enrollmentType;
 
     @Schema(description = "공정")

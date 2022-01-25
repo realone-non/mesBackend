@@ -7,6 +7,7 @@ public enum EnrollmentType {
     * 구매입고: PURCHASE_INPUT
     * 생산: PRODUCTION
     * 분할: SPLIT
+    * [불량: ERROR, 구매입고: PURCHASE_INPUT, 생산: PRODUCTION, 분할: SPLIT]
     * */
     ERROR, PURCHASE_INPUT, OUTSOURCING_INPUT, PRODUCTION, SPLIT
 }

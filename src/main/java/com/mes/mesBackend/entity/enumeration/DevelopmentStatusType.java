@@ -8,9 +8,9 @@ public enum DevelopmentStatusType {
      * DESIGN
      * CHECK
      * ACTION
-     * COMPLETE_REPORT
-     * ETC
-     *
+     * COMPLETE_REPORT: 완료보고
+     * ETC: 기타
+     * [COMPLETE_REPORT: 완료보고, ETC: 기타]
      */
 
     ORDER, PLAN, DESIGN, CHECK, ACTION, COMPLETE_REPORT, ETC

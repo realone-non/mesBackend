@@ -85,7 +85,7 @@ public class ItemRequest {
     @NotNull(message = NOT_NULL)
     boolean wasteProductLot;
 
-    @Schema(description = "개발상태")
+    @Schema(description = "개발상태 [BEFORE : 미개발, PROCEEDING : 개발중, COMPLETION : 개발완료]")
     @NotNull(message = NOT_NULL)
     DevelopStatus developStatus = DevelopStatus.BEFORE;
 

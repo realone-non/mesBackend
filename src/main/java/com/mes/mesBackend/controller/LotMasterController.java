@@ -46,7 +46,8 @@ public class LotMasterController {
             @RequestParam(required = false) @Parameter(description = "LOT 번호") String lotNo,
             @RequestParam(required = false) @Parameter(description = "품명|품목") String itemNoAndItemName,
             @RequestParam(required = false) @Parameter(description = "창고 id") Long wareHouseId,
-            @RequestParam(required = false) @Parameter(description = "등록유형") EnrollmentType enrollmentType,
+            @RequestParam(required = false)
+            @Parameter(description = "등록유형 [불량: ERROR, 구매입고: PURCHASE_INPUT, 생산: PRODUCTION, 분할: SPLIT]") EnrollmentType enrollmentType,
             @RequestParam(required = false) @Parameter(description = "재고유무") Boolean stockYn,
             @RequestParam(required = false) @Parameter(description = "LOT 유형 id") Long lotTypeId,
             @RequestParam(required = false) @Parameter(description = "검사중 여부") Boolean testingYn,
