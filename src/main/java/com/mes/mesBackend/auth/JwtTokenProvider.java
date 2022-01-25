@@ -29,8 +29,8 @@ public class JwtTokenProvider {
 //    private static final Long ACCESS_TOKEN_EXPIRE_TIME = 24 * 60 * 60 *  1000L;          // 24시간
 //    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;      // 7일
 
-    private static final Long ACCESS_TOKEN_EXPIRE_TIME = 60L;          // 24시간
-    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 120L;      // 7일
+    private static final Long ACCESS_TOKEN_EXPIRE_TIME = 60 * 1000L;          // 24시간
+    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 120 * 1000L;      // 7일
 
     // 객체 초기화, secretKey를 Base64로 인코딩한다.
     @PostConstruct
