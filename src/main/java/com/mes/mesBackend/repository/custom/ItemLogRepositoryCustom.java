@@ -18,5 +18,5 @@ public interface ItemLogRepositoryCustom {
     List<ReceiptAndPaymentResponse> findAllConditionResponse(Long warehouseId, Long itemAccountId, LocalDate startDate, LocalDate endDate, boolean isOut);
 
     //전날 재고 확인
-    ItemLog findByItemIdAndWareHouseAndBeforeDay(Long itemId, Long warehouseId, LocalDate beforeDay);
+    ItemLog findByItemIdAndWareHouseAndBeforeDay(Long itemId, Long warehouseId, LocalDate beforeDay, boolean outYn);
 }

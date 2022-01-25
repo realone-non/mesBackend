@@ -11,6 +11,8 @@ import org.hibernate.cache.spi.support.AbstractReadWriteAccess;
 import javax.persistence.*;
 import java.time.LocalDate;
 
+import static javax.persistence.FetchType.LAZY;
+
 //일자별 품목 변동 사항
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -68,6 +70,10 @@ public class ItemLog extends  BaseTimeEntity{
 
     @Column(name = "OUTSOURCING_YN", columnDefinition = "bit(1) COMMENT '외주 여부'")
     private boolean outsourcingYn = false;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint(1) COMMENT '작업 공정'")
+    private WorkProcess workProcess;
 
     public void update(int amount, ItemLogType logType){
         switch (logType){

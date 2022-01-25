@@ -22,4 +22,10 @@ public class MaterialStockReponse {
 
     @Schema(description = "입고단가")
     int inputUnitPrice;
+
+    @Schema(description = "외주ID")
+    Long outsourcingId;
+
+    @Schema(description = "공정ID")
+    Long workProcessId;
 }

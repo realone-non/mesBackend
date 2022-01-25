@@ -292,8 +292,9 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotMaster.item.id.as("itemId"),
                                 lotMaster.wareHouse.id.as("warehouseId"),
                                 lotMaster.stockAmount.sum().as("amount"),
-                                item.inputUnitPrice.as("inputUnitPrice")
-
+                                item.inputUnitPrice.as("inputUnitPrice"),
+                                lotMaster.outSourcingInput.id.as("outsourcingId"),
+                                lotMaster.workProcess.id.as("workProcessId")
                         )
                 )
                 .from(lotMaster)
@@ -305,7 +306,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         lotMaster.deleteYn.isFalse(),
                         lotMaster.stockAmount.gt(0)
                 )
-                .groupBy(lotMaster.wareHouse, lotMaster.item)
+                .groupBy(lotMaster.wareHouse, lotMaster.item, lotMaster.outSourcingInput)
                 .fetch();
     }
 
