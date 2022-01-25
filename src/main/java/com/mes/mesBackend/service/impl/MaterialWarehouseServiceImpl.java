@@ -1,5 +1,6 @@
 package com.mes.mesBackend.service.impl;
 
+import com.fasterxml.jackson.databind.ser.std.StdArraySerializers;
 import com.mes.mesBackend.dto.request.MaterialStockInspectRequestRequest;
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.dto.request.RequestMaterialStockInspect;
@@ -16,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +45,14 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
     UserRepository userRepository;
     @Autowired
     LotMasterRepository lotMasterRepository;
+    @Autowired
+    WorkOrderDetailRepository workOrderDetailRepository;
+    @Autowired
+    BomMasterRepository bomMasterRepository;
+    @Autowired
+    BomItemDetailRepository bomItemDetailRepository;
+    @Autowired
+    ProduceOrderRepository produceOrderRepository;
 
     //수불부 조회
     public List<ReceiptAndPaymentResponse> getReceiptAndPaymentList(Long warehouseId, Long itemAccountId, LocalDate fromDate, LocalDate toDate){
@@ -204,5 +216,30 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
         }
 
         return headerList;
+    }
+
+    //Shortage조회
+    public List<ShortageReponse> getShortage(Long itemGroupId, String itemNoAndName, LocalDate stdDate) throws NotFoundException {
+        if(stdDate == null){
+            stdDate = LocalDate.now();
+        }
+        List<ShortageReponse> shortageResponseList = null;
+        ShortageReponse shortageReponse = new ShortageReponse();
+        List<Item> itemList = itemRepository.findAllItemByAccount("원자재", "부자재", itemGroupId, itemNoAndName);
+        List<WorkOrderDetail> workOrderDetails = workOrderDetailRepository.findByWorkDate(stdDate);
+        for (Item item:itemList) {
+            for (WorkOrderDetail detail:workOrderDetails) {
+                int workAmount = detail.getOrderAmount();
+                ProduceOrder order = produceOrderRepository.findByIdAndDeleteYnFalse(detail.getProduceOrder().getId())
+                        .orElseThrow(() -> new NotFoundException("user does not exist. input id: " + detail.getProduceOrder().getId()));
+                List<ProduceOrderDetailResponse> detailList = produceOrderRepository.findAllProduceOrderDetail(order.getContractItem().getId());
+                for (ProduceOrderDetailResponse detailResponse: detailList) {
+                    if(detailResponse.getItemId().equals(item.getId())){
+                        shortageReponse.setMaterialNo(item.getItemNo());
+                        shortageReponse.setMaterialName(item.getItemName());
+                    }
+                }
+            }
+        }
     }
 }
