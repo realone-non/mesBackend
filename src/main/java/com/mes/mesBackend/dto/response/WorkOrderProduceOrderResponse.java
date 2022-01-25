@@ -11,6 +11,8 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
+import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 
 @Getter
@@ -31,7 +33,7 @@ public class WorkOrderProduceOrderResponse {
     String itemName;
 
     @Schema(description = "착수예정일")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate expectedStartedDate;
 
     @Schema(description = "오더수량")
@@ -43,7 +45,7 @@ public class WorkOrderProduceOrderResponse {
     @Schema(description = "지시상태")
     OrderState orderState = OrderState.SCHEDULE;
 
-    @Schema(description = "수주유형")
+    @Schema(description = "수주유형 [DIFFUSION: 방산 , DOMESTIC: 국내, OVERSEAS: 해외 , ODM: ODM]")
     ContractType contractType;
 
     @Schema(description = "수주처")
@@ -53,7 +55,7 @@ public class WorkOrderProduceOrderResponse {
     String contractNo;
 
     @Schema(description = "납기일자")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate periodDate;
 
     @Schema(description = "비고")
