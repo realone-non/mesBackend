@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,15 +29,11 @@ import java.security.NoSuchAlgorithmException;
 @Tag(name = "auth", description = "인증 API")
 @RequestMapping(value = "/auth")
 @RestController
+@RequiredArgsConstructor
 public class AuthController {
-
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private final UserService userService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(AuthController.class);
     private CustomLogger cLogger;
 
     // 직원(작업자) 생성
