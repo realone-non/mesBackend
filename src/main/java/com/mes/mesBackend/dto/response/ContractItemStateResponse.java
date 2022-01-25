@@ -3,7 +3,6 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.ContractType;
-import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -39,7 +38,7 @@ public class ContractItemStateResponse {
     @Schema(description = "담당자")
     String userName;
 
-    @Schema(description = "수주유형")
+    @Schema(description = "수주유형 [DIFFUSION: 방산 , DOMESTIC: 국내, OVERSEAS: 해외 , ODM: ODM]")
     ContractType contractType;
 
     @Schema(description = "출고창고")

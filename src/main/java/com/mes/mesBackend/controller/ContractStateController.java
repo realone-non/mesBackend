@@ -11,10 +11,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,14 +29,11 @@ import java.util.List;
 @RestController
 @SecurityRequirement(name = "Authorization")
 @Slf4j
+@RequiredArgsConstructor
 public class ContractStateController {
-    @Autowired
-    ContractItemStateService contractItemStateService;
-
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(ContractStateController.class);
+    private final ContractItemStateService contractItemStateService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(ContractStateController.class);
     private CustomLogger cLogger;
 
     // 수주 리스트 조회
@@ -51,7 +48,7 @@ public class ContractStateController {
             @RequestParam(required = false) @Parameter(description = "기간 구분") PeriodType periodType,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "기간 toDate") LocalDate toDate,
-            @RequestParam(required = false) @Parameter(description = "수주 유형") ContractType contractType,
+            @RequestParam(required = false) @Parameter(description = "수주 유형 [DIFFUSION: 방산 , DOMESTIC: 국내, OVERSEAS: 해외 , ODM: ODM]") ContractType contractType,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<ContractItemStateResponse> contractItemStates = contractItemStateService.getContractItemStates(clientName, itemNoAndItemName, contractNo, userName, periodType, fromDate, toDate, contractType);
