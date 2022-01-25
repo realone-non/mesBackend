@@ -2,10 +2,7 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.ShipmentCreateRequest;
 import com.mes.mesBackend.dto.request.ShipmentUpdateRequest;
-import com.mes.mesBackend.dto.response.LotMasterResponse;
-import com.mes.mesBackend.dto.response.ShipmentItemResponse;
-import com.mes.mesBackend.dto.response.ShipmentLotInfoResponse;
-import com.mes.mesBackend.dto.response.ShipmentResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -320,6 +317,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         return lotMasterRepository.findLotMastersByShipmentLotCondition(contractItem.getItem().getId());
     }
 
+
     // shipmentLot 단일 조회 및 예외
     private ShipmentLot getShipmentLotOrThrow(ShipmentItem shipmentItem, Long shipmentLotId) throws NotFoundException {
         return shipmentLotRepo.findByIdAndShipmentItemAndDeleteYnFalse(shipmentLotId, shipmentItem)
@@ -398,5 +396,19 @@ public class ShipmentServiceImpl implements ShipmentService {
         if (existsByShipmentItemInShipment) {
             throw new BadRequestException("등록된 출하 품목정보가 있으면 삭제할 수 없습니다. 품목정보 삭제 후 다시 시도 바랍니다.");
         }
+    }
+
+// ==================================================== 4-7. 출하 현황 ====================================================
+    // 출하현황 검색 리스트 조회, 검색조건: 거래처 id, 출하기간 fromDate~toDate, 화폐 id, 담당자 id, 품번|품명
+    @Override
+    public List<ShipmentStatusResponse> getShipmentStatuses(
+            Long clientId,
+            LocalDate fromDate,
+            LocalDate toDate,
+            Long currencyId,
+            Long userId,
+            String itemNoAndItemName
+    ) {
+        return shipmentLotRepo.findShipmentStatusesResponsesByCondition(clientId, fromDate, toDate, currencyId, userId, itemNoAndItemName);
     }
 }
