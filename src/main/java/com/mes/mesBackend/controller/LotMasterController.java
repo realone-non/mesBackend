@@ -58,4 +58,19 @@ public class LotMasterController {
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getLotMasters.");
         return new ResponseEntity<>(lotMasters, HttpStatus.OK);
     }
+
+    //테스트용 당일 재고 생성
+    @GetMapping("/stock-creates")
+    @ResponseBody
+    @Operation(
+            summary = "테스트용 당일 재고 생성"
+    )
+    public ResponseEntity<Void> getStocks(
+            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        lotMasterService.getItemStock();
+        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getLotMasters.");
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 }

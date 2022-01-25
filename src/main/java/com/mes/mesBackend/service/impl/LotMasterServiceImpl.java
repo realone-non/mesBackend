@@ -2,15 +2,14 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.LotMasterRequest;
 import com.mes.mesBackend.dto.response.LotMasterResponse;
+import com.mes.mesBackend.dto.response.MaterialStockReponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
-import com.mes.mesBackend.repository.LotMasterRepository;
-import com.mes.mesBackend.repository.OutsourcingInputRepository;
-import com.mes.mesBackend.repository.PurchaseInputRepository;
+import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.ItemService;
 import com.mes.mesBackend.service.LotMasterService;
 import com.mes.mesBackend.service.LotTypeService;
@@ -34,6 +33,10 @@ public class LotMasterServiceImpl implements LotMasterService {
     private final OutsourcingInputRepository outsourcingInputRepo;
     private final ModelMapper modelMapper;
     private final LotTypeService lotTypeService;
+    private final ItemLogRepository itemLogRepository;
+    private final WareHouseRepository wareHouseRepository;
+    private final ItemRepository itemRepository;
+    private final WorkProcessRepository workProcessRepository;
 
     // LOT master 생성
     @Override
@@ -176,5 +179,36 @@ public class LotMasterServiceImpl implements LotMasterService {
     public LotMaster getLotMasterOrThrow(Long id) throws NotFoundException {
         return lotMasterRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("lotMaster does not exist. input id:" + id));
+    }
+
+    //당일 재고 생성(Test)
+    public void getItemStock() {
+        List<Item> itemList = itemRepository.findAllByCondition(null, null, null, null, null);
+        for (Item item : itemList) {
+            List<MaterialStockReponse> stockList = lotMasterRepo.findStockAmountByItemId(item.getId(), null);
+            for (MaterialStockReponse response : stockList) {
+                ItemLog itemLog = new ItemLog();
+                WareHouse wareHouse = wareHouseRepository.findByIdAndDeleteYnFalse(response.getWarehouseId())
+                        .orElseThrow(() -> new IllegalArgumentException("not found data"));
+                WorkProcess workProcess = workProcessRepository.findByIdAndDeleteYnFalse(response.getWarehouseId())
+                        .orElseThrow(() -> new IllegalArgumentException("not found data"));
+                ItemLog todayLog = itemLogRepository.findByItemIdAndWareHouseAndBeforeDay(item.getId(), wareHouse.getId(), LocalDate.now(), response.getOutsourcingId() == null ? false : true);
+                if (todayLog != null) {
+                    continue;
+                }
+                itemLog.setWareHouse(wareHouse);
+                itemLog.setItem(item);
+                itemLog.setWorkProcess(workProcess);
+                itemLog.setStockAmount(response.getAmount());
+                itemLog.setLogDate(LocalDate.now());
+                itemLog.setOutsourcingYn(response.getOutsourcingId() == null ? false : true);
+                LocalDate beforeDay = LocalDate.now().minusDays(1);
+                ItemLog beforeDayLog = itemLogRepository.findByItemIdAndWareHouseAndBeforeDay(item.getId(), wareHouse.getId(), beforeDay, response.getOutsourcingId() == null ? false : true);
+                if (beforeDayLog != null) {
+                    itemLog.setBeforeDayStockAmount(beforeDayLog.getStockAmount());
+                }
+                itemLogRepository.save(itemLog);
+            }
+        }
     }
 }
