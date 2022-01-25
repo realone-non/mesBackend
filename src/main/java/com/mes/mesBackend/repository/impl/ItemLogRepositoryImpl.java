@@ -85,7 +85,7 @@ public class ItemLogRepositoryImpl implements ItemLogRepositoryCustom {
     }
 
     //전날 재고 확인
-    public ItemLog findByItemIdAndWareHouseAndBeforeDay(Long itemId, Long warehouseId, LocalDate beforeDay){
+    public ItemLog findByItemIdAndWareHouseAndBeforeDay(Long itemId, Long warehouseId, LocalDate beforeDay, boolean outYn){
         return jpaQueryFactory
                 .selectFrom(itemLog)
                 .leftJoin(item).on(item.id.eq(itemLog.item.id))
@@ -93,7 +93,8 @@ public class ItemLogRepositoryImpl implements ItemLogRepositoryCustom {
                 .where(
                         item.id.eq(itemId),
                         wareHouse.id.eq(warehouseId),
-                        itemLog.logDate.eq(beforeDay)
+                        itemLog.logDate.eq(beforeDay),
+                        itemLog.outsourcingYn.eq(outYn)
                 )
                 .fetchOne();
     }

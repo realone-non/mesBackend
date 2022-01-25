@@ -26,4 +26,7 @@ public interface LotMasterService {
     );
     // lot master 단일 조회 및 예외
     LotMaster getLotMasterOrThrow(Long id) throws NotFoundException;
+
+    //테스트용 당일 재고 생성
+    void getItemStock();
 }
