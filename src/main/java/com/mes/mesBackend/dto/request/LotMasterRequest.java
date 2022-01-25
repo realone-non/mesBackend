@@ -1,6 +1,5 @@
 package com.mes.mesBackend.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mes.mesBackend.entity.Item;
 import com.mes.mesBackend.entity.WareHouse;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;

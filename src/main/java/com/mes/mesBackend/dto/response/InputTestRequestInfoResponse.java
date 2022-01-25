@@ -38,7 +38,7 @@ public class InputTestRequestInfoResponse {
     @Schema(description = "LOT 번호")
     String lotNo;
 
-    @Schema(description = "등록유형")
+    @Schema(description = "등록유형 [불량: ERROR, 구매입고: PURCHASE_INPUT, 생산: PRODUCTION, 분할: SPLIT]")
     EnrollmentType enrollmentType;
 
     @Schema(description = "구매입고 입고번호")

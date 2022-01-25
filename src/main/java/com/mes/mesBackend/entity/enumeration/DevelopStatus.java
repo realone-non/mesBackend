@@ -5,4 +5,5 @@ public enum DevelopStatus {
     // BEFORE : 미개발
     // PROCEEDING : 개발중
     // COMPLETION : 개발완료
+    // [BEFORE : 미개발, PROCEEDING : 개발중, COMPLETION : 개발완료]
 }

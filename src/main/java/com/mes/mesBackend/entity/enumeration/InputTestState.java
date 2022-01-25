@@ -6,6 +6,7 @@ public enum InputTestState {
     * 의뢰: SCHEDULE
     * 진행: ONGOING
     * 완료: COMPLETION
+    * [의뢰: SCHEDULE, 진행: ONGOING, 완료: COMPLETION]
     * */
     SCHEDULE, ONGOING, COMPLETION
 }
