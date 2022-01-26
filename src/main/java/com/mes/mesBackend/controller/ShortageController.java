@@ -1,6 +1,7 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.ShortageReponse;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
@@ -43,9 +44,10 @@ public class ShortageController {
             @RequestParam(required = false) @Parameter(description = "품번품명") String itemNoAndName,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "기준일자") LocalDate stdDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        List<ShortageReponse> reponseList = materialWarehouseService.getShortage(itemGroupId, itemNoAndName, stdDate);
+    ) throws NotFoundException {
+        List<ShortageReponse> responseList = materialWarehouseService.getShortage(itemGroupId, itemNoAndName, stdDate);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getDeadlines.");
-        return new ResponseEntity<>(deadlines, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
+    }
 }

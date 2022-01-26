@@ -1,6 +1,5 @@
 package com.mes.mesBackend.service.impl;
 
-import com.fasterxml.jackson.databind.ser.std.StdArraySerializers;
 import com.mes.mesBackend.dto.request.MaterialStockInspectRequestRequest;
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.dto.request.RequestMaterialStockInspect;
@@ -17,10 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 @Service
 @RequiredArgsConstructor
@@ -223,23 +220,60 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
         if(stdDate == null){
             stdDate = LocalDate.now();
         }
-        List<ShortageReponse> shortageResponseList = null;
-        ShortageReponse shortageReponse = new ShortageReponse();
+        List<ShortageReponse> shortageResponseList = new ArrayList<>();
         List<Item> itemList = itemRepository.findAllItemByAccount("원자재", "부자재", itemGroupId, itemNoAndName);
         List<WorkOrderDetail> workOrderDetails = workOrderDetailRepository.findByWorkDate(stdDate);
         for (Item item:itemList) {
+            ShortageReponse shortageResponse = new ShortageReponse();
+            int workAmount = 0;
+            int sumAmount = 0;
+            boolean isEmpty = false;
             for (WorkOrderDetail detail:workOrderDetails) {
-                int workAmount = detail.getOrderAmount();
-                ProduceOrder order = produceOrderRepository.findByIdAndDeleteYnFalse(detail.getProduceOrder().getId())
-                        .orElseThrow(() -> new NotFoundException("user does not exist. input id: " + detail.getProduceOrder().getId()));
-                List<ProduceOrderDetailResponse> detailList = produceOrderRepository.findAllProduceOrderDetail(order.getContractItem().getId());
+//                ProduceOrder order = produceOrderRepository.findByIdAndDeleteYnFalse(detail.getProduceOrder().getId())
+//                        .orElseGet(ProduceOrder::new);
+
+                ProduceOrder order = produceOrderRepository.findByIdforShortage(detail.getProduceOrder().getId());
+                if(order.getId().equals(null)){
+                    continue;
+                }
+                List<ProduceOrderDetailResponse> detailList = produceOrderRepository.findAllProduceOrderDetail(order.getContractItem().getItem().getId());
                 for (ProduceOrderDetailResponse detailResponse: detailList) {
-                    if(detailResponse.getItemId().equals(item.getId())){
-                        shortageReponse.setMaterialNo(item.getItemNo());
-                        shortageReponse.setMaterialName(item.getItemName());
+                    if(detailResponse.getItemAccount().equals("반제품")){
+                        workAmount = getDetailRecursive(detailResponse, item.getId(), workAmount);
+                        sumAmount = sumAmount + workAmount;
+                    }
+                    else if(detailResponse.getItemId().equals(item.getId())){
+                        workAmount = detailResponse.getBomAmount() * detail.getOrderAmount();
+                        sumAmount = sumAmount + workAmount;
                     }
                 }
             }
+            shortageResponse.setProductionCapacity(sumAmount);
+            shortageResponse.setMaterialNo(item.getItemNo());
+            shortageResponse.setMaterialName(item.getItemName());
+            ItemLog beforeAmount = itemLogRepository.findByItemIdAndWareHouseAndBeforeDayGroupBy(item.getId(), null, LocalDate.now().minusDays(1), null);
+            if(beforeAmount == null){
+                shortageResponse.setBeforeDayAmount(0);
+            }
+            else{
+                shortageResponse.setBeforeDayAmount(beforeAmount.getBeforeDayStockAmount());
+            }
+            shortageResponseList.add(shortageResponse);
         }
+        return shortageResponseList;
+    }
+
+    public int getDetailRecursive(ProduceOrderDetailResponse response, Long itemId, int workAmount){
+        List<ProduceOrderDetailResponse> detailList = produceOrderRepository.findAllProduceOrderDetail(response.getItemId());
+        for (ProduceOrderDetailResponse detail:detailList) {
+            if(detail.getItemAccount().equals("반제품")){
+                workAmount = getDetailRecursive(detail, itemId, workAmount);
+            }
+            else if(detail.getItemId().equals(itemId)){
+                workAmount = workAmount + detail.getReservationAmount();
+            }
+        }
+
+        return workAmount;
     }
 }

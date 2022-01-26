@@ -85,17 +85,33 @@ public class ItemLogRepositoryImpl implements ItemLogRepositoryCustom {
     }
 
     //전날 재고 확인
-    public ItemLog findByItemIdAndWareHouseAndBeforeDay(Long itemId, Long warehouseId, LocalDate beforeDay, boolean outYn){
+    public ItemLog findByItemIdAndWareHouseAndBeforeDay(Long itemId, Long warehouseId, LocalDate beforeDay, Boolean outYn){
         return jpaQueryFactory
                 .selectFrom(itemLog)
                 .leftJoin(item).on(item.id.eq(itemLog.item.id))
                 .leftJoin(wareHouse).on(wareHouse.id.eq(itemLog.wareHouse.id))
                 .where(
                         item.id.eq(itemId),
-                        wareHouse.id.eq(warehouseId),
+                        isWareHouseNull(warehouseId),
                         itemLog.logDate.eq(beforeDay),
-                        itemLog.outsourcingYn.eq(outYn)
+                        isOutNull(outYn)
                 )
+                .fetchOne();
+    }
+
+    //전날 재고 확인(Shortage)
+    public ItemLog findByItemIdAndWareHouseAndBeforeDayGroupBy(Long itemId, Long warehouseId, LocalDate beforeDay, Boolean outYn){
+        return jpaQueryFactory
+                .selectFrom(itemLog)
+                .leftJoin(item).on(item.id.eq(itemLog.item.id))
+                .leftJoin(wareHouse).on(wareHouse.id.eq(itemLog.wareHouse.id))
+                .where(
+                        item.id.eq(itemId),
+                        isWareHouseNull(warehouseId),
+                        itemLog.logDate.eq(beforeDay),
+                        isOutNull(outYn)
+                )
+                .groupBy(item.id)
                 .fetchOne();
     }
 
@@ -113,6 +129,10 @@ public class ItemLogRepositoryImpl implements ItemLogRepositoryCustom {
 
     private BooleanExpression isWareHouseNull(Long warehouseId){
         return warehouseId != null ? wareHouse.id.eq(warehouseId) : null;
+    }
+
+    private BooleanExpression isOutNull(Boolean outYn){
+        return outYn != null ? itemLog.outsourcingYn.eq(outYn) : null;
     }
 
     private BooleanExpression isItemLogBeforeBetween(LocalDate fromDate, LocalDate toDate) {
