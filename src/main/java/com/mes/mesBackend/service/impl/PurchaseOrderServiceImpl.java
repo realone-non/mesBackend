@@ -171,13 +171,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             throw new BadRequestException("해당 구매요청정보는 다른 구매발주에 등록되어 있습니다. " +
                     "input purchaseOrderId: " + purchaseOrderId + ", input purchaseRequestId: " + purchaseRequest.getId());
 
-        // 구매발주에 해당하는 구매요청의 orderAmount 필요.
-        List<Integer> orderAmounts = purchaseRequestRepo.findOrderAmountByPurchaseOrderId(purchaseOrderId);
-        int orderAmountSum = orderAmounts.stream().mapToInt(Integer::intValue).sum();
-        if (orderAmountSum > purchaseOrderDetailRequest.getPurchaseAmount()) {
-            throw new BadRequestException("total orderAmount cannot be greater than purchaseAmount.");
+        // 요청수량과 발주수량은 같아야함.
+        if (purchaseRequest.getRequestAmount() != purchaseOrderDetailRequest.getPurchaseAmount()) {
+            throw new BadRequestException("요청수량과 발수수량이 같아야합니다. " +
+                    "요청수량: " + purchaseRequest.getRequestAmount() + ", " +
+                    "입력 발주수량: " + purchaseOrderDetailRequest.getPurchaseAmount()
+            );
         }
-
         /*
         * 생성 전 체크 항목
         * if 해당 구매발주에 해당하는 구매요청이 있는지 ?
@@ -190,7 +190,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
         // 구매요청에 해당하는 구매발주를 집어넣고 구매요청의 orderState 의 상태값을 SCHEDULE -> ONGOING 으로 변경
         purchaseRequest.putPurchaseOrderAndOrderStateChangedOngoing(purchaseOrder);
-        purchaseRequest.setOrderAmount(purchaseOrderDetailRequest.getPurchaseAmount());
+        purchaseRequest.setOrderAmount(purchaseOrderDetailRequest.getPurchaseAmount());     // 발주수량 변경
 
         if (clientIds.isEmpty()) {
             purchaseRequestRepo.save(purchaseRequest);

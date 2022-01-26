@@ -70,18 +70,18 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
         PurchaseRequest purchaseRequest = purchaseRequestService.getPurchaseRequestOrThrow(purchaseRequestId);
         PurchaseInput purchaseInput = mapper.toEntity(purchaseInputRequest, PurchaseInput.class);
 
-        // 구매요청의 발주수량 만큼 모두 입고 완료 햇을때 구매요청의 지시상태값을 완료(COMPLETION) 으로 변경한다.
-        int orderAmount = purchaseRequest.getOrderAmount();     // 발주수량
+        // 구매요청의 요청수량 만큼 모두 입고 완료 햇을때 구매요청의 지시상태값을 완료(COMPLETION) 으로 변경한다.
+        int requestAmount = purchaseRequest.getRequestAmount();     // 발주수량
         List<Integer> purchaserInputAmounts = purchaseInputRepo.findInputAmountByPurchaseRequestId(purchaseRequest.getId());    // 현재 입고된 수량
         int inputAmountSum = purchaserInputAmounts.stream().mapToInt(Integer::intValue).sum() + purchaseInputRequest.getInputAmount();  // 현재 입고된 수량 + 입력된 입고수량
 
-        if (inputAmountSum == orderAmount) {
+        if (inputAmountSum == requestAmount) {
             purchaseRequest.putOrderStateChangedCompletion();       // 지시상태 값 변경
             purchaseRequestRepos.save(purchaseRequest);
-        } else if (inputAmountSum > orderAmount) {
-            throw new BadRequestException("등록 발주수량보다 입고수량이 클 수 없습니다." +
+        } else if (inputAmountSum > requestAmount) {
+            throw new BadRequestException("요청수량보다 입고수량이 클 수 없습니다." +
                     " input 입고수량: " + purchaseInput.getInputAmount()
-                    + " , 발주수량 : " + orderAmount);
+                    + " , 요청수량 : " + requestAmount);
         }
 
         purchaseInput.setPurchaseRequest(purchaseRequest);
