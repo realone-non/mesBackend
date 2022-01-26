@@ -11,6 +11,7 @@ import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.NumberAutomatic;
 import com.mes.mesBackend.mapper.ModelMapper;
+import com.mes.mesBackend.repository.PurchaseInputRepository;
 import com.mes.mesBackend.repository.PurchaseOrderRepository;
 import com.mes.mesBackend.repository.PurchaseRequestRepository;
 import com.mes.mesBackend.service.*;
@@ -35,6 +36,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     private final NumberAutomatic numberAutomatic;
     private final PurchaseRequestService purchaseRequestService;
     private final PurchaseRequestRepository purchaseRequestRepo;
+    private final PurchaseInputRepository purchaseInputRepo;
 
     // 구매발주 생성
     @Override
@@ -215,16 +217,27 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             Long purchaseOrderDetailId
     ) throws NotFoundException, BadRequestException {
         PurchaseRequest purchaseRequest = getPurchaseRequestOrThrow(purchaseOrderId, purchaseOrderDetailId);
-        return purchaseOrderRepo.findPurchaseRequestByIdAndPurchaseOrderIdAndDeleteYnFalse(purchaseOrderId, purchaseRequest.getId())
+        PurchaseOrderDetailResponse response = purchaseOrderRepo.findPurchaseRequestByIdAndPurchaseOrderIdAndDeleteYnFalse(purchaseOrderId, purchaseRequest.getId())
                 .orElseThrow(() -> new NotFoundException("해당 구매발주에 해당하는 구매발주상세 정보가 없습니다. input purchaseOrderId: " + purchaseOrderId
                         + ", input purchaseRequestId: " + purchaseOrderDetailId));
+        // 구매요청에 해당하는 구매입고의 입고수량 모두
+        int allInputAmount = purchaseInputRepo.findInputAmountByPurchaseRequestId(response.getId())
+                .stream().mapToInt(Integer::intValue).sum();
+        return response.putOrderPossibleAmountAndInputAmount(allInputAmount);
     }
 
     // 구매발주상세 전체 조회
     @Override
     public List<PurchaseOrderDetailResponse> getPurchaseOrderDetails(Long purchaseOrderId) throws NotFoundException {
         PurchaseOrder purchaseOrder = getPurchaseOrderOrThrow(purchaseOrderId);
-        return purchaseOrderRepo.findAllByPurchaseOrderIdAndDeleteYnFalse(purchaseOrder.getId());
+        List<PurchaseOrderDetailResponse> responses = purchaseOrderRepo.findAllByPurchaseOrderIdAndDeleteYnFalse(purchaseOrder.getId());
+        for (PurchaseOrderDetailResponse res : responses) {
+            // 구매요청에 해당하는 구매입고의 입고수량 모두
+            int allInputAmount = purchaseInputRepo.findInputAmountByPurchaseRequestId(res.getId())
+                    .stream().mapToInt(Integer::intValue).sum();
+            res.putOrderPossibleAmountAndInputAmount(allInputAmount);
+        }
+        return responses;
     }
 
     // 구매발주상세 수정 (비고 수정 가능)

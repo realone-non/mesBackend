@@ -1,5 +1,6 @@
 package com.mes.mesBackend.repository.impl;
 
+import com.mes.mesBackend.dto.response.PopPurchaseRequestResponse;
 import com.mes.mesBackend.dto.response.PurchaseRequestResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.PurchaseRequestRepositoryCustom;
@@ -185,6 +186,28 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                 .where(
                         purchaseRequest.produceOrder.id.eq(produceOrderId),
                         isDeleteYnFalse()
+                )
+                .fetch();
+    }
+
+    // pop 해당 구매발주에 해당하는 구매요청정보 list 조회
+    @Override
+    public List<PopPurchaseRequestResponse> findPopPurchaseRequestResponseByPurchaseOrderId(Long purchaseOrderId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                PopPurchaseRequestResponse.class,
+                                purchaseRequest.id.as("purchaseRequestId"),
+                                purchaseRequest.item.id.as("itemId"),
+                                purchaseRequest.item.itemName.as("itemName"),
+                                purchaseRequest.orderAmount.as("purchaseRequestAmount")
+                        )
+                )
+                .from(purchaseRequest)
+                .where(
+                        purchaseRequest.purchaseOrder.id.eq(purchaseOrderId),
+                        purchaseRequest.deleteYn.isFalse(),
+                        purchaseRequest.ordersState.notIn(COMPLETION)
                 )
                 .fetch();
     }

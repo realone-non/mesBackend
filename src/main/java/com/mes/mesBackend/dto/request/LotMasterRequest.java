@@ -1,10 +1,10 @@
 package com.mes.mesBackend.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mes.mesBackend.entity.Item;
 import com.mes.mesBackend.entity.WareHouse;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.QualityLevel;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,6 +38,8 @@ public class LotMasterRequest {
 
     Long purchaseInputId;       //구매입고 ID
     Long outsourcingInputId;        //외주입고 ID
+
+    WorkProcessDivision workProcessDivision;    // 공정 구분
 
     public void putPurchaseInput(
             Item item,

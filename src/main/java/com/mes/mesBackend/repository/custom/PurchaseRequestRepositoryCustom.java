@@ -1,5 +1,6 @@
 package com.mes.mesBackend.repository.custom;
 
+import com.mes.mesBackend.dto.response.PopPurchaseRequestResponse;
 import com.mes.mesBackend.dto.response.PurchaseRequestResponse;
 
 import java.time.LocalDate;
@@ -27,4 +28,6 @@ public interface PurchaseRequestRepositoryCustom {
     List<Integer> findOrderAmountByPurchaseOrderId(Long purchaseOrderId);
     // 제조오더에 해당하는 구매요청의 requestAmount 모두
     List<Integer> findRequestAmountByProduceOrderId(Long produceOrderId);
+    // pop 해당 구매발주에 해당하는 구매요청정보 list 조회
+    List<PopPurchaseRequestResponse> findPopPurchaseRequestResponseByPurchaseOrderId(Long purchaseOrderId);
 }

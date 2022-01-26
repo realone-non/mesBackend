@@ -10,12 +10,13 @@ import java.time.LocalDate;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+import static lombok.AccessLevel.PUBLIC;
 
 /*
 * 9-5. 구매입고 등록
 * */
 @AllArgsConstructor
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = PUBLIC)
 @Entity(name = "PURCHASE_INPUTS")
 @Data
 public class PurchaseInput extends BaseTimeEntity {

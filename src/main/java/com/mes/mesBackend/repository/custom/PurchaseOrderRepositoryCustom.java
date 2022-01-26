@@ -1,8 +1,6 @@
 package com.mes.mesBackend.repository.custom;
 
-import com.mes.mesBackend.dto.response.PurchaseOrderDetailResponse;
-import com.mes.mesBackend.dto.response.PurchaseOrderResponse;
-import com.mes.mesBackend.dto.response.PurchaseOrderStatusResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 
 import java.time.LocalDate;
@@ -45,4 +43,10 @@ public interface PurchaseOrderRepositoryCustom {
             LocalDate fromDate,
             LocalDate toDate
     );
+
+    // pop
+    // 구매발주 등록이 완료 된 구매발주 리스트 GET
+    List<PopPurchaseOrderResponse> findPopPurchaseOrderResponses();
+    // 구매발주에 등록 된 구매요청 리스트 GET
+    List<PopPurchaseRequestResponse> findPopPurchaseRequestResponses(Long id);
 }
