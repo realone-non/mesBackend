@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.ItemAccountRequest;
+import com.mes.mesBackend.dto.response.ItemAccountCodeResponse;
 import com.mes.mesBackend.dto.response.ItemAccountResponse;
 import com.mes.mesBackend.entity.ItemAccount;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -20,4 +21,6 @@ public interface ItemAccountService {
     void deleteItemAccount(Long id) throws NotFoundException;
     // 품목계정 조회 및 예외
     ItemAccount getItemAccountOrThrow(Long id) throws NotFoundException;
+    // 품목계정코드 리스트 조회
+    List<ItemAccountCodeResponse> getItemAccountCodes(Long itemAccountId);
 }
