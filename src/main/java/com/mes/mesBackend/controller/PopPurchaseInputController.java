@@ -38,7 +38,7 @@ public class PopPurchaseInputController {
     // 구매발주 등록이 완료 된 구매발주 리스트 GET
     @GetMapping
     @ResponseBody
-    @Operation(summary = "(pop) 구매발주 리스트", description = "")
+    @Operation(summary = "(pop) 구매발주 리스트", description = "화면 상 자재입고 화면")
     public ResponseEntity<List<PopPurchaseOrderResponse>> getPurchaseOrders(
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
@@ -51,7 +51,7 @@ public class PopPurchaseInputController {
     // 구매발주에 등록 된 구매요청 리스트 GET
     @GetMapping("/{id}/input-infos")
     @ResponseBody
-    @Operation(summary = "(pop) 구매요청 리스트", description = "")
+    @Operation(summary = "(pop) 구매요청 리스트", description = "자재 목록 화면")
     public ResponseEntity<List<PopPurchaseRequestResponse>> getPurchaseRequests(
             @PathVariable(value = "id") @Parameter(description = "구매발주 id") Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
@@ -63,7 +63,7 @@ public class PopPurchaseInputController {
     }
 
     // 구매요청에 대한 구매입고(request: 수량) POST
-    @Operation(summary = "구매입고 생성", description = "LOT 자동생성")
+    @Operation(summary = "구매입고 생성", description = "구매입고")
     @PostMapping("/{id}/input-infos")
     public ResponseEntity<Void> createPurchaseInput(
             @PathVariable(value = "id") @Parameter(description = "구매요청 id") Long purchaseRequestId,
