@@ -1,24 +1,26 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.ItemAccountRequest;
+import com.mes.mesBackend.dto.response.ItemAccountCodeResponse;
 import com.mes.mesBackend.dto.response.ItemAccountResponse;
 import com.mes.mesBackend.entity.ItemAccount;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
+import com.mes.mesBackend.repository.ItemAccountCodeRepository;
 import com.mes.mesBackend.repository.ItemAccountRepository;
 import com.mes.mesBackend.service.ItemAccountService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 // 품목계정
 @Service
+@RequiredArgsConstructor
 public class ItemAccountServiceImpl implements ItemAccountService {
-    @Autowired
-    ItemAccountRepository itemAccountRepository;
-    @Autowired
-    ModelMapper mapper;
+    private final ItemAccountRepository itemAccountRepository;
+    private final ItemAccountCodeRepository itemAccountCodeRepo;
+    private final ModelMapper mapper;
 
     // 품목계정 생성
     @Override
@@ -65,5 +67,11 @@ public class ItemAccountServiceImpl implements ItemAccountService {
     public ItemAccount getItemAccountOrThrow(Long id) throws NotFoundException {
         return itemAccountRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(()-> new NotFoundException("itemAccount does not exist. input id: " + id));
+    }
+
+    // 품목계정코드 리스트 조회
+    @Override
+    public List<ItemAccountCodeResponse> getItemAccountCodes(Long itemAccountId) {
+        return itemAccountCodeRepo.findItemAccountCodeResponseByItemAccountId(itemAccountId);
     }
 }
