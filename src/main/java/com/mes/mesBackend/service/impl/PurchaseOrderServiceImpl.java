@@ -63,7 +63,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
         // 요소가 empty 면 SCHEDULE 반환.
         // 모든 요소들이 주어진 조건을 하나라도 만족하면 true 반환.
-        return (orderStates.isEmpty()) ? SCHEDULE : orderStates.stream().anyMatch(orderState -> orderState.equals(ONGOING)) ? ONGOING : COMPLETION;
+        return orderStates.stream().allMatch(state -> state.equals(SCHEDULE)) ? SCHEDULE : orderStates.stream().allMatch(state -> state.equals(COMPLETION)) ? COMPLETION : ONGOING;
     }
 
     // 구매발주의 납기일자

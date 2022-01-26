@@ -45,7 +45,7 @@ public class ContractStateController {
             @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoAndItemName,
             @RequestParam(required = false) @Parameter(description = "수주 번호") String contractNo,
             @RequestParam(required = false) @Parameter(description = "담당자 명") String userName,
-            @RequestParam(required = false) @Parameter(description = "기간 구분") PeriodType periodType,
+            @RequestParam(required = false) @Parameter(description = "기간 구분 [수주: CONTRACT_DATE, 납기: PERIOD_DATE]") PeriodType periodType,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "수주 유형 [DIFFUSION: 방산 , DOMESTIC: 국내, OVERSEAS: 해외 , ODM: ODM]") ContractType contractType,
