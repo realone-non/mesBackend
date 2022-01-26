@@ -56,7 +56,7 @@ public class LotMaster extends BaseTimeEntity {
     private Item item;      // 품목
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '창고'", nullable = false)
+    @JoinColumn(name = "WARE_HOUSE", columnDefinition = "bigint COMMENT '창고'")
     private WareHouse wareHouse;        // 창고
 
     @Column(name = "LOT_NO", columnDefinition = "varchar(255) COMMENT 'LOT 번호'", nullable = false)
@@ -166,13 +166,15 @@ public class LotMaster extends BaseTimeEntity {
             LotType lotType,
             PurchaseInput purchaseInput,
             String lotNo,
-            GoodsType goodsType
+            GoodsType goodsType,
+            WorkProcess workProcess
     ) {
         setLotType(lotType);
         setPurchaseInput(purchaseInput);
         setEnrollmentType(PURCHASE_INPUT);
         setLotNo(lotNo);
         setGoodsType(goodsType);
+        setWorkProcess(workProcess);
     }
 
     public void updatePurchaseInput(int inputAmount) {
