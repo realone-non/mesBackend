@@ -74,6 +74,7 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
         int orderAmount = purchaseRequest.getOrderAmount();     // 발주수량
         List<Integer> purchaserInputAmounts = purchaseInputRepo.findInputAmountByPurchaseRequestId(purchaseRequest.getId());    // 현재 입고된 수량
         int inputAmountSum = purchaserInputAmounts.stream().mapToInt(Integer::intValue).sum() + purchaseInputRequest.getInputAmount();  // 현재 입고된 수량 + 입력된 입고수량
+
         if (inputAmountSum == orderAmount) {
             purchaseRequest.putOrderStateChangedCompletion();       // 지시상태 값 변경
             purchaseRequestRepos.save(purchaseRequest);

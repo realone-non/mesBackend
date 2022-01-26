@@ -8,6 +8,7 @@ import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.LotLogHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.ItemService;
@@ -37,6 +38,7 @@ public class LotMasterServiceImpl implements LotMasterService {
     private final WareHouseRepository wareHouseRepository;
     private final ItemRepository itemRepository;
     private final WorkProcessRepository workProcessRepository;
+    private final LotLogHelper lotLogHelper;
 
     // LOT master 생성
     @Override
@@ -44,7 +46,8 @@ public class LotMasterServiceImpl implements LotMasterService {
         LotType lotType = lotMasterRequest.getLotTypeId() != null ? lotTypeService.getLotTypeOrThrow(lotMasterRequest.getLotTypeId()) : null;
         PurchaseInput purchaseInput = lotMasterRequest.getPurchaseInputId() != null ? getPurchaseInputOrThrow(lotMasterRequest.getPurchaseInputId()) : null;
         OutSourcingInput outSourcingInput = lotMasterRequest.getOutsourcingInputId() != null ? getOutsourcingInputOrThrow(lotMasterRequest.getOutsourcingInputId()) : null;
-
+        Long workProcessId = lotMasterRequest.getWorkProcessDivision() != null ? lotLogHelper.getWorkProcessByDivisionOrThrow(lotMasterRequest.getWorkProcessDivision()) : null;
+        WorkProcess workProcess = workProcessId != null ? getWorkProcessIdOrThrow(workProcessId) : null;
         LotMaster lotMaster = modelMapper.toEntity(lotMasterRequest, LotMaster.class);
         GoodsType goodsType = null;
 
@@ -68,7 +71,7 @@ public class LotMasterServiceImpl implements LotMasterService {
                 default:
                     goodsType = GoodsType.NONE;
             }
-            lotMaster.putPurchaseInput(lotType, purchaseInput, lotNo, goodsType); // 등록유형 PURCHASE_INPUT
+            lotMaster.putPurchaseInput(lotType, purchaseInput, lotNo, goodsType, workProcess); // 등록유형 PURCHASE_INPUT
         }
         else if(outSourcingInput != null) {
             Long itemId = outsourcingInputRepo.findItemIdByInputId(outSourcingInput.getId());
@@ -210,5 +213,9 @@ public class LotMasterServiceImpl implements LotMasterService {
                 itemLogRepository.save(itemLog);
             }
         }
+    }
+    private WorkProcess getWorkProcessIdOrThrow(Long id) throws NotFoundException {
+        return workProcessRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("workProcess does not exist. input id: " + id));
     }
 }

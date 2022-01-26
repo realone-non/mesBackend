@@ -63,12 +63,12 @@ public class PurchaseRequest extends BaseTimeEntity {
     private boolean deleteYn = false;
 
     // 발주가능수량
-    @Column(name = "ORDER_POSSIBLE_AMOUNT", columnDefinition = "int COMMENT '발주가능수량'")
-    private int orderPossibleAmount;
+//    @Column(name = "ORDER_POSSIBLE_AMOUNT", columnDefinition = "int COMMENT '발주가능수량'")
+//    private int orderPossibleAmount;
 
-    // 입고수량
-    @Column(name = "INPUT_AMOUNT", columnDefinition = "int COMMENT '입고수량'")
-    private int inputAmount;
+//    // 입고수량
+//    @Column(name = "INPUT_AMOUNT", columnDefinition = "int COMMENT '입고수량'")
+//    private int inputAmount;
 
     // 취소수량
     @Column(name = "CANCEL_AMOUNT", columnDefinition = "int COMMENT '취소수량'")

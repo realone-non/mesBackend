@@ -9,7 +9,6 @@ import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.TestType;
-import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.AmountHelper;
@@ -35,7 +34,6 @@ import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
 import static com.mes.mesBackend.entity.enumeration.InputTestState.*;
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.BAD_AMOUNT;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
-import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.SHIPMENT;
 
 // 14-2. 검사 등록
 // 15-2. 검사 등록

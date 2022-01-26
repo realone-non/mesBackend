@@ -4,7 +4,6 @@ import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.MaterialStockReponse;
 import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
 import com.mes.mesBackend.entity.ItemAccountCode;
-import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.OutSourcingInput;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;

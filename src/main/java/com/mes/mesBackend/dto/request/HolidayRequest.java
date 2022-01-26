@@ -20,7 +20,7 @@ public class HolidayRequest {
     @Schema(description = "요일")
     String day;
 
-    @Schema(description = "휴일 유형")
+    @Schema(description = "휴일 유형 [EVERY_YEAR: 매년반복, NONE: 비반복, EVERY_WEEK: 주단위반복]")
     HolidayType type = HolidayType.EVERY_YEAR;
 
     @Schema(description = "비고")

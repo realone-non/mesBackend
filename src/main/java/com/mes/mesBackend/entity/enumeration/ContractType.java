@@ -1,10 +1,11 @@
 package com.mes.mesBackend.entity.enumeration;
 
 // 수주유형
+// [DIFFUSION: 방산 , DOMESTIC: 국내, OVERSEAS: 해외 , ODM: ODM]
 public enum ContractType {
-    // 방산: DIFFUSION
-    // 국내: DOMESTIC
-    // 해외: OVERSEAS
+    // DIFFUSION: 방산
+    // DOMESTIC: 국내
+    // OVERSEAS: 해외
     // ODM: ODM
     DIFFUSION, DOMESTIC, OVERSEAS, ODM
 }

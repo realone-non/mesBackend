@@ -3,7 +3,6 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
-import com.mes.mesBackend.entity.enumeration.InputTestState;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.repository.custom.InputTestRequestRepositoryCustom;
 import com.querydsl.core.types.Projections;

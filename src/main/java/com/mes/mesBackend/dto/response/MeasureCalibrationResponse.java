@@ -32,7 +32,7 @@ public class MeasureCalibrationResponse {
     @Schema(description = "계측기유형")
     String gaugeType;
 
-    @Schema(description = "검교정방법")
+    @Schema(description = "검교정방법 [IN_HOUSE: 사내R&R, OUT_COMPANY: 사외]")
     CalibrationMethod calibrationMethod;
 
     @Schema(description = "검교정 의뢰처 id")
@@ -47,7 +47,7 @@ public class MeasureCalibrationResponse {
     @Schema(description = "검교정일자")
     LocalDate calibrationDate;
 
-    @Schema(description = "검교정 결과")
+    @Schema(description = "검교정 결과 [PASS: 합격, FAIL: 불합격, RETEST: 재검정]")
     CalibrationResult calibrationResult;
 
     @Schema(description = "검교정비용")

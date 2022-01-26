@@ -25,7 +25,7 @@ public class ContractItemRequest {
     @NotNull(message = NOT_NULL)
     int amount;     // 수주수량
 
-    @Schema(description = "수주유형")
+    @Schema(description = "수주유형 [DIFFUSION: 방산 , DOMESTIC: 국내, OVERSEAS: 해외 , ODM: ODM]")
     @NotNull(message = NOT_NULL)
     ContractType contractType;
 
