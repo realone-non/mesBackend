@@ -46,7 +46,5 @@ public interface PurchaseOrderRepositoryCustom {
 
     // pop
     // 구매발주 등록이 완료 된 구매발주 리스트 GET
-    List<PopPurchaseOrderResponse> findPopPurchaseOrderResponses();
-    // 구매발주에 등록 된 구매요청 리스트 GET
-    List<PopPurchaseRequestResponse> findPopPurchaseRequestResponses(Long id);
+    List<PopPurchaseOrderResponse> findPopPurchaseOrderResponses(String clientName);
 }

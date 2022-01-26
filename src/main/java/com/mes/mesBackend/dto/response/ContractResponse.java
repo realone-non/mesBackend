@@ -10,6 +10,8 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
+import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 @Getter
 @Setter
@@ -26,14 +28,14 @@ public class ContractResponse {
     ClientResponse.CodeAndName client;
 
     @Schema(description = "수주일자")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate contractDate;
 
     @Schema(description = "고객발주일자")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate clientOrderDate;
 
-    @Schema(description = "[생산유형] MASS: 양산, TEST: 시험품")
+    @Schema(description = "생산유형 [MASS: 양산, SAMPLE: 샘플]")
     ProductionType productionType;
 
     @Schema(description = "고객발주번호")
@@ -52,7 +54,7 @@ public class ContractResponse {
     WareHouseResponse.idAndName outputWareHouse;
 
     @Schema(description = "납기일자")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate periodDate;
 
     @Schema(description = "변경사유")
@@ -104,7 +106,7 @@ public class ContractResponse {
         String cName;
 
         @Schema(description = "납기일자")
-        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
         LocalDate periodDate;
     }
 }

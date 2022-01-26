@@ -3,14 +3,11 @@ package com.mes.mesBackend.service.impl;
 import com.mes.mesBackend.dto.request.LotMasterRequest;
 import com.mes.mesBackend.dto.response.PopPurchaseOrderResponse;
 import com.mes.mesBackend.dto.response.PopPurchaseRequestResponse;
-import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.PurchaseInput;
 import com.mes.mesBackend.entity.PurchaseRequest;
-import com.mes.mesBackend.entity.enumeration.EnrollmentType;
-import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.LotLogHelper;
 import com.mes.mesBackend.repository.PurchaseInputRepository;
 import com.mes.mesBackend.repository.PurchaseOrderRepository;
 import com.mes.mesBackend.repository.PurchaseRequestRepository;
@@ -21,9 +18,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PURCHASE_INPUT;
+import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL_INPUT;
 
 @Service
@@ -36,8 +35,46 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
 
     // 구매발주 등록이 완료 된 구매발주 리스트 GET
     @Override
-    public List<PopPurchaseOrderResponse> getPurchaseOrders() {
-        return purchaseOrderRepo.findPopPurchaseOrderResponses();
+    public List<PopPurchaseOrderResponse> getPurchaseOrders(String clientName, OrderState orderState) {
+        List<PopPurchaseOrderResponse> response = purchaseOrderRepo.findPopPurchaseOrderResponses(clientName);
+        List<PopPurchaseOrderResponse> conditionResponse = new ArrayList<>();
+
+        for (PopPurchaseOrderResponse res : response) {
+            OrderState purchaseOrderState = findOrderState(res.getPurchaseOrderId());
+            res.setOrderState(purchaseOrderState);
+        }
+
+        if (orderState != null) {
+            if (orderState.equals(COMPLETION)) {
+                for (PopPurchaseOrderResponse res : response) {
+                    if (res.getOrderState().equals(COMPLETION)) {
+                        conditionResponse.add(res);
+                    }
+                }
+            } else if (orderState.equals(ONGOING)) {
+                for (PopPurchaseOrderResponse res : response) {
+                    if (res.getOrderState().equals(ONGOING)) {
+                        conditionResponse.add(res);
+                    }
+                }
+            } else if (orderState.equals(SCHEDULE)) {
+                for (PopPurchaseOrderResponse res : response) {
+                    if (res.getOrderState().equals(SCHEDULE)) {
+                        conditionResponse.add(res);
+                    }
+                }
+            }
+            return conditionResponse;
+        }
+        return response;
+    }
+
+    private OrderState findOrderState(Long purchaseOrderId) {
+        // 해당하는 구매발주상세의 지시상태를 모두 가져옴
+        List<OrderState> orderStates = purchaseOrderRepo.findOrderStateByPurchaseOrderId(purchaseOrderId);
+        return orderStates.stream().allMatch(state -> state.equals(SCHEDULE)) ? SCHEDULE
+                : orderStates.stream().allMatch(state -> state.equals(COMPLETION)) ? COMPLETION
+                : ONGOING;
     }
 
     // 구매발주에 등록 된 구매요청 리스트 GET
@@ -47,7 +84,7 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
         for (PopPurchaseRequestResponse res : response) {
             int allInputAmount = purchaseInputRepo.findInputAmountByPurchaseRequestId(res.getPurchaseRequestId())
                     .stream().mapToInt(Integer::intValue).sum();    // 현재 입고된 수량
-            res.setPurchaseRequestAmount(res.getPurchaseRequestAmount() - allInputAmount);
+            res.setPurchaseInputAmount(allInputAmount);       // 입고수량
         }
         return response;
     }
@@ -58,7 +95,7 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
         PurchaseRequest purchaseRequest = getPurchaseRequestOrThrow(purchaseRequestId);
 
         if (inputAmount == 0) {
-            throw new BadRequestException("입고수량이 0 일수는 없습니다.");
+            throw new BadRequestException("입고수량이 0일 수 없습니다.");
         }
 
         int purchaseInputAmount = purchaseInputRepo.findInputAmountByPurchaseRequestId(purchaseRequest.getId())
@@ -66,12 +103,8 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
 
         int allInputAmount = purchaseInputAmount + inputAmount;   // 현재 입고된 수량 + 입력된 입고수량
 
-        // 구매요청의 발주수량 만큼 모두 입고 완료 햇을때 구매요청의 지시상태값을 완료(COMPLETION) 으로 변경한다.
-        if (allInputAmount == purchaseRequest.getOrderAmount()) {
-            purchaseRequest.putOrderStateChangedCompletion();       // 지시상태 값 변경
-        } else if (allInputAmount > purchaseRequest.getOrderAmount()) {
-            throw new BadRequestException("구매요청 수량보다 입고수량이 클 수 없습니다.");
-        }
+        // orderState 변경: 구매요청의 발주수량 만큼 모두 입고 완료 햇을때 구매요청의 지시상태값을 완료(COMPLETION) 으로 변경한다.
+        if (allInputAmount >= purchaseRequest.getOrderAmount()) purchaseRequest.putOrderStateChangedCompletion();
 
         PurchaseInput purchaseInput = new PurchaseInput();
         purchaseInput.setPurchaseRequest(purchaseRequest);
