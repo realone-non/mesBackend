@@ -25,7 +25,7 @@ import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RequestMapping("/pop/input-materials")
-@Tag(name = "pop", description = "[pop] 1. 자재입고 API")
+@Tag(name = "pop-input-material", description = "[pop] 1. 자재입고")
 @RestController
 @RequiredArgsConstructor
 @SecurityRequirement(name = AUTHORIZATION)
@@ -63,7 +63,7 @@ public class PopPurchaseInputController {
     }
 
     // 구매요청에 대한 구매입고(request: 수량) POST
-    @Operation(summary = "구매입고 생성", description = "구매입고")
+    @Operation(summary = "(pop) 구매입고", description = "구매입고")
     @PostMapping("/{id}/input-infos")
     public ResponseEntity<Void> createPurchaseInput(
             @PathVariable(value = "id") @Parameter(description = "구매요청 id") Long purchaseRequestId,
