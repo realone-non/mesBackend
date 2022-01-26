@@ -206,8 +206,8 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                 .from(purchaseRequest)
                 .where(
                         purchaseRequest.purchaseOrder.id.eq(purchaseOrderId),
-                        purchaseRequest.deleteYn.isFalse(),
-                        purchaseRequest.ordersState.notIn(COMPLETION)
+                        purchaseRequest.deleteYn.isFalse()
+//                        purchaseRequest.ordersState.notIn(COMPLETION)
                 )
                 .fetch();
     }

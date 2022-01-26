@@ -92,7 +92,7 @@ public class ProduceOrderController {
     public ResponseEntity<List<ProduceOrderResponse>> getProduceOrders(
             @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
-            @RequestParam(required = false) @Parameter(description = "지시상태") OrderState orderState,
+            @RequestParam(required = false) @Parameter(description = "지시상태 [완료: COMPLETION, 진행중: ONGOING, 예정: SCHEDULE, 취소: CANCEL]") OrderState orderState,
             @RequestParam(required = false) @Parameter(description = "제조오더번호") String produceOrderNo,
             @RequestParam(required = false) @Parameter(description = "수주번호") String contractNo,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "착수예정일 fromDate") LocalDate fromDate,

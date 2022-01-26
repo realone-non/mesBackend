@@ -42,7 +42,7 @@ public class WorkOrderProduceOrderResponse {
     @Schema(description = "단위")
     String unitCodeName;
 
-    @Schema(description = "지시상태")
+    @Schema(description = "지시상태 [완료: COMPLETION, 진행중: ONGOING, 예정: SCHEDULE, 취소: CANCEL]")
     OrderState orderState = OrderState.SCHEDULE;
 
     @Schema(description = "수주유형 [DIFFUSION: 방산 , DOMESTIC: 국내, OVERSEAS: 해외 , ODM: ODM]")

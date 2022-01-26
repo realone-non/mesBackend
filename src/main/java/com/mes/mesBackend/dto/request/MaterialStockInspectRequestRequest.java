@@ -5,8 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Getter
 @Setter
 @Schema(description = "재고실사의뢰 등록")
@@ -23,6 +21,6 @@ public class MaterialStockInspectRequestRequest {
     @Schema(description = "품목그룹ID")
     Long itemAccountId;
 
-    @Schema(description = "재고실사기준")
+    @Schema(description = "재고실사기준 [전수: ALL, 품목계정: ITEM_ACCOUNT]")
     StockInspectionType inspectionType;
 }
