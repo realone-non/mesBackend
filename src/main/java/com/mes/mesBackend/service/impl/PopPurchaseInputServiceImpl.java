@@ -33,7 +33,6 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
     private final PurchaseInputRepository purchaseInputRepo;
     private final PurchaseRequestRepository purchaseRequestRepo;
     private final LotMasterService lotMasterService;
-    private final LotLogHelper lotLogHelper;
 
     // 구매발주 등록이 완료 된 구매발주 리스트 GET
     @Override
@@ -58,7 +57,9 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
     public Long createPurchaseInput(Long purchaseRequestId, int inputAmount) throws NotFoundException, BadRequestException {
         PurchaseRequest purchaseRequest = getPurchaseRequestOrThrow(purchaseRequestId);
 
-
+        if (inputAmount == 0) {
+            throw new BadRequestException("입고수량이 0 일수는 없습니다.");
+        }
 
         int purchaseInputAmount = purchaseInputRepo.findInputAmountByPurchaseRequestId(purchaseRequest.getId())
                 .stream().mapToInt(Integer::intValue).sum();        // 현재 입고된 수량
