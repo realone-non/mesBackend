@@ -11,6 +11,7 @@ import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.NumberAutomatic;
 import com.mes.mesBackend.mapper.ModelMapper;
+import com.mes.mesBackend.repository.PurchaseInputRepository;
 import com.mes.mesBackend.repository.PurchaseOrderRepository;
 import com.mes.mesBackend.repository.PurchaseRequestRepository;
 import com.mes.mesBackend.service.*;
@@ -35,6 +36,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     private final NumberAutomatic numberAutomatic;
     private final PurchaseRequestService purchaseRequestService;
     private final PurchaseRequestRepository purchaseRequestRepo;
+    private final PurchaseInputRepository purchaseInputRepo;
 
     // 구매발주 생성
     @Override
@@ -169,13 +171,13 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             throw new BadRequestException("해당 구매요청정보는 다른 구매발주에 등록되어 있습니다. " +
                     "input purchaseOrderId: " + purchaseOrderId + ", input purchaseRequestId: " + purchaseRequest.getId());
 
-        // 구매발주에 해당하는 구매요청의 orderAmount 필요.
-        List<Integer> orderAmounts = purchaseRequestRepo.findOrderAmountByPurchaseOrderId(purchaseOrderId);
-        int orderAmountSum = orderAmounts.stream().mapToInt(Integer::intValue).sum();
-        if (orderAmountSum > purchaseOrderDetailRequest.getPurchaseAmount()) {
-            throw new BadRequestException("total orderAmount cannot be greater than purchaseAmount.");
+        // 요청수량과 발주수량은 같아야함.
+        if (purchaseRequest.getRequestAmount() != purchaseOrderDetailRequest.getPurchaseAmount()) {
+            throw new BadRequestException("요청수량과 발수수량이 같아야합니다. " +
+                    "요청수량: " + purchaseRequest.getRequestAmount() + ", " +
+                    "입력 발주수량: " + purchaseOrderDetailRequest.getPurchaseAmount()
+            );
         }
-
         /*
         * 생성 전 체크 항목
         * if 해당 구매발주에 해당하는 구매요청이 있는지 ?
@@ -188,7 +190,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
         // 구매요청에 해당하는 구매발주를 집어넣고 구매요청의 orderState 의 상태값을 SCHEDULE -> ONGOING 으로 변경
         purchaseRequest.putPurchaseOrderAndOrderStateChangedOngoing(purchaseOrder);
-        purchaseRequest.setOrderAmount(purchaseOrderDetailRequest.getPurchaseAmount());
+        purchaseRequest.setOrderAmount(purchaseOrderDetailRequest.getPurchaseAmount());     // 발주수량 변경
 
         if (clientIds.isEmpty()) {
             purchaseRequestRepo.save(purchaseRequest);
@@ -215,16 +217,27 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
             Long purchaseOrderDetailId
     ) throws NotFoundException, BadRequestException {
         PurchaseRequest purchaseRequest = getPurchaseRequestOrThrow(purchaseOrderId, purchaseOrderDetailId);
-        return purchaseOrderRepo.findPurchaseRequestByIdAndPurchaseOrderIdAndDeleteYnFalse(purchaseOrderId, purchaseRequest.getId())
+        PurchaseOrderDetailResponse response = purchaseOrderRepo.findPurchaseRequestByIdAndPurchaseOrderIdAndDeleteYnFalse(purchaseOrderId, purchaseRequest.getId())
                 .orElseThrow(() -> new NotFoundException("해당 구매발주에 해당하는 구매발주상세 정보가 없습니다. input purchaseOrderId: " + purchaseOrderId
                         + ", input purchaseRequestId: " + purchaseOrderDetailId));
+        // 구매요청에 해당하는 구매입고의 입고수량 모두
+        int allInputAmount = purchaseInputRepo.findInputAmountByPurchaseRequestId(response.getId())
+                .stream().mapToInt(Integer::intValue).sum();
+        return response.putOrderPossibleAmountAndInputAmount(allInputAmount);
     }
 
     // 구매발주상세 전체 조회
     @Override
     public List<PurchaseOrderDetailResponse> getPurchaseOrderDetails(Long purchaseOrderId) throws NotFoundException {
         PurchaseOrder purchaseOrder = getPurchaseOrderOrThrow(purchaseOrderId);
-        return purchaseOrderRepo.findAllByPurchaseOrderIdAndDeleteYnFalse(purchaseOrder.getId());
+        List<PurchaseOrderDetailResponse> responses = purchaseOrderRepo.findAllByPurchaseOrderIdAndDeleteYnFalse(purchaseOrder.getId());
+        for (PurchaseOrderDetailResponse res : responses) {
+            // 구매요청에 해당하는 구매입고의 입고수량 모두
+            int allInputAmount = purchaseInputRepo.findInputAmountByPurchaseRequestId(res.getId())
+                    .stream().mapToInt(Integer::intValue).sum();
+            res.putOrderPossibleAmountAndInputAmount(allInputAmount);
+        }
+        return responses;
     }
 
     // 구매발주상세 수정 (비고 수정 가능)

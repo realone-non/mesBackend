@@ -24,7 +24,7 @@ public class MeasureCalibrationRequest {
     @NotNull(message = NOT_NULL)
     Long measureId;
 
-    @Schema(description = "검교정방법")
+    @Schema(description = "검교정방법 [IN_HOUSE: 사내R&R, OUT_COMPANY: 사외]")
     @NotNull(message = NOT_NULL)
     CalibrationMethod calibrationMethod;
 
@@ -42,7 +42,7 @@ public class MeasureCalibrationRequest {
     @DateTimeFormat(pattern = YYYY_MM_DD)
     LocalDate calibrationDate;
 
-    @Schema(description = "검교정 결과")
+    @Schema(description = "검교정 결과 [PASS: 합격, FAIL: 불합격, RETEST: 재검정]")
     CalibrationResult calibrationResult;
 
     @Schema(description = "검교정비용")

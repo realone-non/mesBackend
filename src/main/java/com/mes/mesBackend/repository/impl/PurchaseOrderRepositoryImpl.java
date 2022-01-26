@@ -1,8 +1,6 @@
 package com.mes.mesBackend.repository.impl;
 
-import com.mes.mesBackend.dto.response.PurchaseOrderDetailResponse;
-import com.mes.mesBackend.dto.response.PurchaseOrderResponse;
-import com.mes.mesBackend.dto.response.PurchaseOrderStatusResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.PurchaseOrderRepositoryCustom;
@@ -15,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 
 @RequiredArgsConstructor
 public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCustom {
@@ -180,14 +180,14 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 item.standard.as("itemStandard"),
                                 item.manufacturerPartNo.as("itemManufacturerPartNo"),
                                 unit.unitCodeName.as("orderUnitCodeName"),
-                                purchaseRequest.orderAmount.as("orderAmount"),
+                                purchaseRequest.requestAmount.as("orderAmount"),
                                 item.inputUnitPrice.as("unitPrice"),
                                 purchaseRequest.orderAmount.multiply(item.inputUnitPrice).as("orderPrice"),
                                 purchaseRequest.orderAmount.multiply(item.inputUnitPrice).as("orderPriceWon"),
                                 (purchaseRequest.orderAmount.multiply(item.inputUnitPrice).doubleValue()).multiply(0.1).as("vat"),
-                                purchaseRequest.orderPossibleAmount.as("orderPossibleAmount"),
-                                purchaseRequest.inputAmount.as("inputAmount"),
-                                purchaseRequest.cancelAmount.as("cancelAmount"),
+//                                purchaseRequest.orderPossibleAmount.as("orderPossibleAmount"),
+//                                purchaseRequest.inputAmount.as("inputAmount"),
+                                purchaseRequest.cancelAmount.as("cancelAmount"),    // 미구현
                                 purchaseRequest.periodDate.as("orderPeriodDate"),
                                 purchaseRequest.note.as("note"),
                                 item.inputTest.as("inputTestType"),
@@ -221,13 +221,13 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 item.standard.as("itemStandard"),
                                 item.manufacturerPartNo.as("itemManufacturerPartNo"),
                                 unit.unitCodeName.as("orderUnitCodeName"),
-                                purchaseRequest.orderAmount.as("orderAmount"),
+                                purchaseRequest.requestAmount.as("orderAmount"),
                                 item.inputUnitPrice.as("unitPrice"),
                                 purchaseRequest.orderAmount.multiply(item.inputUnitPrice).as("orderPrice"),
                                 purchaseRequest.orderAmount.multiply(item.inputUnitPrice).as("orderPriceWon"),
                                 (purchaseRequest.orderAmount.multiply(item.inputUnitPrice).doubleValue()).multiply(0.1).as("vat"),
-                                purchaseRequest.orderPossibleAmount.as("orderPossibleAmount"),
-                                purchaseRequest.inputAmount.as("inputAmount"),
+//                                purchaseRequest.orderPossibleAmount.as("orderPossibleAmount"),
+//                                purchaseRequest.inputAmount.as("inputAmount"),
                                 purchaseRequest.cancelAmount.as("cancelAmount"),
                                 purchaseRequest.periodDate.as("orderPeriodDate"),
                                 purchaseRequest.note.as("note"),
@@ -303,6 +303,40 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                         isDeleteYnFalse()
                 )
                 .fetch();
+    }
+
+    // pop
+    // 구매발주에 대한 입고가 완료되지 않은 구매발주
+    @Override
+    public List<PopPurchaseOrderResponse> findPopPurchaseOrderResponses() {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                PopPurchaseOrderResponse.class,
+                                purchaseOrder.id.as("purchaseOrderId"),
+                                purchaseOrder.purchaseOrderNo.as("purchaseOrderNo"),
+                                client.clientName.as("purchaseOrderClient"),
+                                purchaseOrder.purchaseOrderDate.as("purchaseOrderDate"),
+                                purchaseRequest.ordersState.as("orderState")
+                        )
+                )
+                .from(purchaseRequest)
+                .leftJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
+                .leftJoin(client).on(client.id.eq(purchaseOrder.client.id))
+                .where(
+                        purchaseRequest.deleteYn.isFalse(),
+                        purchaseOrder.deleteYn.isFalse(),
+                        purchaseRequest.ordersState.eq(SCHEDULE).or(purchaseRequest.ordersState.eq(ONGOING))
+                )
+                .groupBy(purchaseOrder.id)
+                .orderBy(purchaseOrder.purchaseOrderDate.desc())
+                .fetch();
+    }
+
+    // 구매발주에 등록 된 구매요청 리스트 GET
+    @Override
+    public List<PopPurchaseRequestResponse> findPopPurchaseRequestResponses(Long id) {
+        return null;
     }
 
     // 거래처

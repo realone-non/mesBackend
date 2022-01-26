@@ -41,7 +41,7 @@ public class EquipmentBreakdownRequest {
     @Schema(description = "요청비고")
     String breakNote;
 
-    @Schema(description = "고장유형")
+    @Schema(description = "고장유형 [LIGHT_BREAKDOWN: 경고장, MIDDLE_FAILURE: 중고장, FATAL_BREAKDOWN: 치명고장]")
     @NotNull(message = NOT_NULL)
     BreakReason breakReason;
 

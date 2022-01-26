@@ -1,12 +1,9 @@
 package com.mes.mesBackend.controller;
 
-import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.LotTrackingResponse;
-import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
-import com.mes.mesBackend.service.LotMasterService;
 import com.mes.mesBackend.service.LotTrackService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

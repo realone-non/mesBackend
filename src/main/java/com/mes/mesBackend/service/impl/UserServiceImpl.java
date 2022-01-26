@@ -152,7 +152,7 @@ public class UserServiceImpl implements UserService {
 
         TokenResponse tokenDto = new TokenResponse();
 
-        tokenDto.putToken(accessToken, refreshToken);
+        tokenDto.putToken(accessToken, refreshToken, user.getKorName());
 
         // 기존 저장소에 있던 RefreshToken False 로 변경
         refreshTokenUseYnTrueToUseYnFalse(authenticationToken);
@@ -207,7 +207,7 @@ public class UserServiceImpl implements UserService {
 
         TokenResponse tokenResponse = new TokenResponse();
 
-        return tokenResponse.putToken(newAccessToken, newRefreshToken);
+        return tokenResponse.putToken(newAccessToken, newRefreshToken, null);
     }
 
     // salt 값 생성

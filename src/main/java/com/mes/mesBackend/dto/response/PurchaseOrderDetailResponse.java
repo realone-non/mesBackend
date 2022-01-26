@@ -74,4 +74,10 @@ public class PurchaseOrderDetailResponse {
 
 //    @Schema(description = "지시상태")
 //    OrderState orderState;
+
+    public PurchaseOrderDetailResponse putOrderPossibleAmountAndInputAmount(int allInputAmount) {
+        setInputAmount(allInputAmount);
+        setOrderPossibleAmount(this.orderAmount - this.inputAmount);
+        return this;
+    }
 }
