@@ -17,9 +17,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +35,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 
 // 3-2-3. Bom 등록
-@Tag(name = "bom-master", description = "BOM API")
+@Tag(name = "bom-master", description = "3-2-3. BOM API")
 @RequestMapping("/bom-masters")
 @RestController
 @RequiredArgsConstructor
