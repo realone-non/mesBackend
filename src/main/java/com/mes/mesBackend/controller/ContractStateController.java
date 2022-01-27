@@ -16,18 +16,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
+
 // 4-3. 수주 상태 조회
 @RequestMapping(value = "/contract-item-states")
-@Tag(name = "contract-item-states", description = "수주 상태 API")
+@Tag(name = "contract-item-states", description = "4-3. 수주 상태 API")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @Slf4j
 @RequiredArgsConstructor
 public class ContractStateController {
@@ -46,15 +50,14 @@ public class ContractStateController {
             @RequestParam(required = false) @Parameter(description = "수주 번호") String contractNo,
             @RequestParam(required = false) @Parameter(description = "담당자 명") String userName,
             @RequestParam(required = false) @Parameter(description = "기간 구분 [수주: CONTRACT_DATE, 납기: PERIOD_DATE]") PeriodType periodType,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "기간 toDate") LocalDate toDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "수주 유형 [DIFFUSION: 방산 , DOMESTIC: 국내, OVERSEAS: 해외 , ODM: ODM]") ContractType contractType,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<ContractItemStateResponse> contractItemStates = contractItemStateService.getContractItemStates(clientName, itemNoAndItemName, contractNo, userName, periodType, fromDate, toDate, contractType);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getContractItemStates.");
-        return new ResponseEntity<>(contractItemStates, HttpStatus.OK);
+        return new ResponseEntity<>(contractItemStates, OK);
     }
-
 }

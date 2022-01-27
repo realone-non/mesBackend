@@ -71,7 +71,8 @@ public class ItemAccountServiceImpl implements ItemAccountService {
 
     // 품목계정코드 리스트 조회
     @Override
-    public List<ItemAccountCodeResponse> getItemAccountCodes(Long itemAccountId) {
-        return itemAccountCodeRepo.findItemAccountCodeResponseByItemAccountId(itemAccountId);
+    public List<ItemAccountCodeResponse> getItemAccountCodes(Long itemAccountId) throws NotFoundException {
+        Long accountId = itemAccountId != null ? getItemAccountOrThrow(itemAccountId).getId() : null;
+        return itemAccountCodeRepo.findItemAccountCodeResponseByItemAccountId(accountId);
     }
 }

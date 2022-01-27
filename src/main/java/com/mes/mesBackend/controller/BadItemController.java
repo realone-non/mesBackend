@@ -27,8 +27,9 @@ import java.util.List;
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+// 3-4-1. 불량항목 등록
 @RequestMapping(value = "/bad-items")
-@Tag(name = "bad-item", description = "불량항목 API")
+@Tag(name = "bad-item", description = "3-4-1. 불량항목 API")
 @RestController
 @SecurityRequirement(name = AUTHORIZATION)
 @RequiredArgsConstructor

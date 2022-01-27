@@ -16,12 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
+// 8-5. 불량 등록
 @Service
 @RequiredArgsConstructor
 public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
@@ -86,7 +83,6 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
         LotLog lotLog = lotLogRepository.findByWorkOrderDetailAndLotMaster(workOrderDetail, lotMaster)
                 .orElseThrow(() -> new NotFoundException("lotLog does not exist"));
 
-
         // 입력받은 불량이 해당하는 작업공정의 불량유형이랑 일치하는지 여부
         throwIfBadItemIdAnyMatchWorkProcess(lotLog.getWorkProcess().getId(), badItemId);
 
@@ -110,10 +106,13 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
 
     // 불량유형 정보 수정 (불량수량)
     @Override
-    public BadItemEnrollmentResponse updateBadItemEnrollment(Long workOrderId, Long badItemEnrollmentId, int badItemAmount) throws NotFoundException, BadRequestException {
+    public BadItemEnrollmentResponse updateBadItemEnrollment(
+            Long workOrderId,
+            Long badItemEnrollmentId,
+            int badItemAmount
+    ) throws NotFoundException, BadRequestException {
         getWorkOrderDetailOrThrow(workOrderId);
         WorkOrderBadItem findWorkOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
-
         LotMaster lotMaster = findWorkOrderBadItem.getLotLog().getLotMaster();
 
         int beforeBadItemAmount = (lotMaster.getBadItemAmount() - findWorkOrderBadItem.getBadItemAmount());
