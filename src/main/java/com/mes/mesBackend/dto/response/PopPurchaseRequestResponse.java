@@ -27,4 +27,8 @@ public class PopPurchaseRequestResponse {
     // 요청수량
     @Schema(description = "요청수량")
     int purchaseRequestAmount;
+
+    // 입고된 수량
+    @Schema(description = "입고수량")
+    int purchaseInputAmount;
 }

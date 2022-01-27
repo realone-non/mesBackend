@@ -24,10 +24,14 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
+// 3-4-1. 불량항목 등록
 @RequestMapping(value = "/bad-items")
-@Tag(name = "bad-item", description = "불량항목 API")
+@Tag(name = "bad-item", description = "3-4-1. 불량항목 API")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @RequiredArgsConstructor
 public class BadItemController {
     private final BadItemService badItemService;
@@ -46,10 +50,10 @@ public class BadItemController {
     )
     public ResponseEntity<BadItemResponse> createBadItem(
             @RequestBody @Valid BadItemRequest badItemRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws BadRequestException, NotFoundException {
         BadItemResponse badItem = badItemService.createBadItem(badItemRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + badItem.getId() + " from createBadItem.");
         return new ResponseEntity<>(badItem, HttpStatus.OK);
     }
@@ -65,10 +69,10 @@ public class BadItemController {
     )
     public ResponseEntity<BadItemResponse> getBadItem(
             @PathVariable(value = "id") Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         BadItemResponse badItem = badItemService.getBadItem(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + badItem.getId() + " from getBadItem.");
         return new ResponseEntity<>(badItem, HttpStatus.OK);
     }
@@ -77,10 +81,10 @@ public class BadItemController {
     @ResponseBody
     @Operation(summary = "불량항목 전체 조회", description = "")
     public ResponseEntity<List<BadItemResponse>> getBadItems(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<BadItemResponse> badItems = badItemService.getBadItems();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getBadItems.");
         return new ResponseEntity<>(badItems, HttpStatus.OK);
     }
@@ -99,10 +103,10 @@ public class BadItemController {
     public ResponseEntity<BadItemResponse> updateBadItem(
             @PathVariable(value = "id") Long id,
             @RequestBody @Valid BadItemRequest badItemRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         BadItemResponse badItem = badItemService.updateBadItem(id, badItemRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + badItem.getId() + " from updateBadItem.");
         return new ResponseEntity<>(badItem, HttpStatus.OK);
     }
@@ -118,10 +122,10 @@ public class BadItemController {
     )
     public ResponseEntity<Void> deleteBadItem(
             @PathVariable(value = "id") Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         badItemService.deleteBadItem(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteBadItem.");
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

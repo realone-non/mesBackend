@@ -67,7 +67,7 @@ public class WorkOrderResponse {
     @Schema(description = "예정시간")
     String expectedWorkTime;
 
-    @Schema(description = "지시상태")
+    @Schema(description = "지시상태 [완료: COMPLETION, 진행중: ONGOING, 예정: SCHEDULE, 취소: CANCEL]")
     OrderState orderState;
 
     @Schema(description = "검사의뢰")

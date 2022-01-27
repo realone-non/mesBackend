@@ -17,8 +17,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,20 +25,21 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
-@Tag(name = "client", description = "거래처 API")
+// 3-1-6. 거래처 등록
+@Tag(name = "client", description = "3-1-6. 거래처 등록 API")
 @RequestMapping(value = "/clients")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class ClientController {
-
-    @Autowired
-    ClientService clientService;
-    @Autowired
-    LogService logService;
-
+    private final ClientService clientService;
+    private final LogService logService;
     private Logger logger = LoggerFactory.getLogger(ClientController.class);
     private CustomLogger cLogger;
 
@@ -57,12 +56,12 @@ public class ClientController {
     )
     public ResponseEntity<ClientResponse> createClient(
             @RequestBody @Valid ClientRequest clientRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         ClientResponse client = clientService.createClient(clientRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + client.getId() + " from createClient.");
-        return new ResponseEntity<>(client, HttpStatus.OK);
+        return new ResponseEntity<>(client, OK);
     }
 
     // 거래처 단일 조회
@@ -77,12 +76,12 @@ public class ClientController {
     )
     public ResponseEntity<ClientResponse> getClient(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         ClientResponse client = clientService.getClient(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + client.getId() + " from getClient.");
-        return new ResponseEntity<>(client, HttpStatus.OK);
+        return new ResponseEntity<>(client, OK);
     }
 
     // 거래처 전체 조회 (거래처 유형, 거래처 코드, 거래처 명)
@@ -93,12 +92,12 @@ public class ClientController {
             @RequestParam(required = false) @Parameter(description = "거래처 유형 id") Long clientType,
             @RequestParam(required = false) @Parameter(description = "거래처 코드 id") String clientCode,
             @RequestParam(required = false) @Parameter(description = "거래처 명") String name,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<ClientResponse> clients = clientService.getClients(clientType, clientCode, name);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of clientTypeId: "+ clientType + " from getClients.");
-        return new ResponseEntity<>(clients, HttpStatus.OK);
+        return new ResponseEntity<>(clients, OK);
     }
 
     // 거래처 수정
@@ -115,12 +114,12 @@ public class ClientController {
     public ResponseEntity<ClientResponse> updateClient(
             @PathVariable Long id,
             @RequestBody @Valid ClientRequest clientRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         ClientResponse client = clientService.updateClient(id, clientRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + client.getId() + " from updateClient.");
-        return new ResponseEntity<>(client, HttpStatus.OK);
+        return new ResponseEntity<>(client, OK);
     }
 
     // 거래처 삭제
@@ -135,12 +134,12 @@ public class ClientController {
     )
     public ResponseEntity deleteClient(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         clientService.deleteClient(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteClient.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 사업자 등록증 파일 업로드
@@ -157,11 +156,11 @@ public class ClientController {
     public ResponseEntity<ClientResponse> createBusinessFileToClient(
             @PathVariable Long id,
             @RequestPart MultipartFile businessFile,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, IOException, BadRequestException {
         ClientResponse fileToClient = clientService.createBusinessFileToClient(id, businessFile);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + fileToClient.getId() + " from createBusinessFileToClient.");
-        return new ResponseEntity<>(fileToClient, HttpStatus.OK);
+        return new ResponseEntity<>(fileToClient, OK);
     }
 }

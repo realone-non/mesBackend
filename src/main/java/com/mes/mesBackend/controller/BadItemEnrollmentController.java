@@ -18,20 +18,23 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
 
 // 8-5. 불량 등록
-@RequestMapping("bad-item-enrollment-work-orders")
+@RequestMapping("/bad-item-enrollment-work-orders")
 @Tag(name = "bad-item-enrollment", description = "8-5. 불량 등록 API")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @RequiredArgsConstructor
 public class BadItemEnrollmentController {
     private final BadItemEnrollmentService badItemEnrollmentService;
@@ -52,16 +55,16 @@ public class BadItemEnrollmentController {
             @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
             @RequestParam(required = false) @Parameter(description = "제조오더번호") String produceOrderNo,
             @RequestParam(required = false) @Parameter(description = "JOB NO(작업지시번호)") String workOrderNo,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 toDate") LocalDate toDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "품번|품목") String itemNoAndItemName,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<BadItemWorkOrderResponse> badItemWorkOrderResponses =
                 badItemEnrollmentService.getWorkOrders(workCenterId, workLineId, itemGroupId, produceOrderNo, workOrderNo, fromDate, toDate, itemNoAndItemName);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkOrders.");
-        return new ResponseEntity<>(badItemWorkOrderResponses, HttpStatus.OK);
+        return new ResponseEntity<>(badItemWorkOrderResponses, OK);
     }
 
     // 불량유형 정보 생성
@@ -80,12 +83,12 @@ public class BadItemEnrollmentController {
             @RequestParam @Parameter(description = "불량 id") Long badItemId,
             @RequestParam @Parameter(description = "lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "불량수량") int badItemAmount,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         BadItemEnrollmentResponse badItemEnrollmentResponse = badItemEnrollmentService.createBadItemEnrollment(workOrderId, badItemId, lotMasterId, badItemAmount);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + badItemEnrollmentResponse.getBadItemId() + " from createBadItemEnrollment.");
-        return new ResponseEntity<>(badItemEnrollmentResponse, HttpStatus.OK);
+        return new ResponseEntity<>(badItemEnrollmentResponse, OK);
     }
 
     // 불량유형 정보 전체 조회
@@ -94,12 +97,12 @@ public class BadItemEnrollmentController {
     @ResponseBody
     public ResponseEntity<List<BadItemEnrollmentResponse>> getBadItemEnrollments(
             @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<BadItemEnrollmentResponse> badItemEnrollmentResponses = badItemEnrollmentService.getBadItemEnrollments(workOrderId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getBadItemEnrollments.");
-        return new ResponseEntity<>(badItemEnrollmentResponses, HttpStatus.OK);
+        return new ResponseEntity<>(badItemEnrollmentResponses, OK);
     }
 
     // 불량유형 정보 수정 (불량수량)
@@ -117,12 +120,12 @@ public class BadItemEnrollmentController {
             @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
             @PathVariable(value = "bad-item-enrollment-id") @Parameter(description = "불량유형 id") Long badItemEnrollmentId,
             @RequestParam @Parameter(description = "불량수량") int badItemAmount,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         BadItemEnrollmentResponse badItemEnrollmentResponse = badItemEnrollmentService.updateBadItemEnrollment(workOrderId, badItemEnrollmentId, badItemAmount);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + badItemEnrollmentId + " from updateBadItemEnrollment.");
-        return new ResponseEntity<>(badItemEnrollmentResponse, HttpStatus.OK);
+        return new ResponseEntity<>(badItemEnrollmentResponse, OK);
     }
 
     // 불량유형 정보 삭제
@@ -138,10 +141,10 @@ public class BadItemEnrollmentController {
     public ResponseEntity deleteBadItemEnrollment(
             @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
             @PathVariable(value = "bad-item-enrollment-id") @Parameter(description = "불량유형 id") Long badItemEnrollmentId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         badItemEnrollmentService.deleteBadItemEnrollment(workOrderId, badItemEnrollmentId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + badItemEnrollmentId + " from deleteBadItemEnrollment.");
         return new ResponseEntity(NO_CONTENT);
     }

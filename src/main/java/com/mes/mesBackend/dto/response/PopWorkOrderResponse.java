@@ -32,4 +32,6 @@ public class PopWorkOrderResponse {
 
     @Schema(description = "작업예정일")
     LocalDate expectedWorkDate;
+
+    // 품목 id, 품번, 품명, 작지번호, 작업지시의 지시수량,
 }

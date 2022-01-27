@@ -17,27 +17,26 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 @Tag(name = "client-type", description = "거래처 유형 API")
 @RequestMapping(value = "/client-types")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class ClientTypeController {
-
-    @Autowired
-    ClientTypeService clientTypeService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(ClientTypeController.class);
+    private final ClientTypeService clientTypeService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(ClientTypeController.class);
     private CustomLogger cLogger;
 
 
@@ -54,12 +53,12 @@ public class ClientTypeController {
     )
     public ResponseEntity<ClientTypeResponse> createClientType(
             @RequestBody @Valid ClientTypeRequest clientTypeRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         ClientTypeResponse clientType = clientTypeService.createClientType(clientTypeRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + clientType.getId() + " from createClientType.");
-        return new ResponseEntity<>(clientType, HttpStatus.OK);
+        return new ResponseEntity<>(clientType, OK);
     }
 
     // 거래처 유형 단일 조회
@@ -74,12 +73,12 @@ public class ClientTypeController {
     )
     public ResponseEntity<ClientTypeResponse> getClientType(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         ClientTypeResponse clientType = clientTypeService.getClientType(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + clientType.getId() + " from getClientType.");
-        return new ResponseEntity<>(clientType, HttpStatus.OK);
+        return new ResponseEntity<>(clientType, OK);
     }
 
     // 거래처 유형 전체 조회
@@ -87,12 +86,12 @@ public class ClientTypeController {
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<ClientTypeResponse>> getClientTypes(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<ClientTypeResponse> clientTypes = clientTypeService.getClientTypes();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getClientTypes.");
-        return new ResponseEntity<>(clientTypes, HttpStatus.OK);
+        return new ResponseEntity<>(clientTypes, OK);
     }
 
     // 거래처 유형 수정
@@ -109,12 +108,12 @@ public class ClientTypeController {
     public ResponseEntity<ClientTypeResponse> updateClientType(
             @PathVariable Long id,
             @RequestBody @Valid ClientTypeRequest clientTypeRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         ClientTypeResponse clientType = clientTypeService.updateClientType(id, clientTypeRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + clientType.getId() + " from updateClientType.");
-        return new ResponseEntity<>(clientType, HttpStatus.OK);
+        return new ResponseEntity<>(clientType, OK);
     }
 
     // 거래처유형 삭제
@@ -129,12 +128,12 @@ public class ClientTypeController {
     )
     public ResponseEntity<Void> deleteClientType(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         clientTypeService.deleteClientType(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteClientType.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
 //    @GetMapping
@@ -162,7 +161,6 @@ public class ClientTypeController {
 //    public ResponseEntity<Page<ClientTypeResponse>> getClientTypes(
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(clientTypeService.getClientTypes(pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(clientTypeService.getClientTypes(pageable), OK);
 //    }
-
 }

@@ -19,8 +19,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,15 +28,18 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
 
 // 3-2-1. 품목 등록
 @Tag(name = "item", description = "품목 API")
 @RequestMapping(value = "/items")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class ItemController {
-
     private final ItemService itemService;
     private final LogService logService;
     private Logger logger = LoggerFactory.getLogger(ItemController.class);
@@ -57,12 +58,12 @@ public class ItemController {
     )
     public ResponseEntity<ItemResponse> createItem(
             @Valid @RequestBody ItemRequest itemRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         ItemResponse item = itemService.createItem(itemRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + item.getId() + " from createItem.");
-        return new ResponseEntity<>(item, HttpStatus.OK);
+        return new ResponseEntity<>(item, OK);
     }
 
     // 품목 단일 조회
@@ -77,12 +78,12 @@ public class ItemController {
     )
     public ResponseEntity<ItemResponse> getItem(
             @PathVariable(value = "item-id") Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         ItemResponse item = itemService.getItem(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + item.getId() + " from getItem.");
-        return new ResponseEntity<>(item, HttpStatus.OK);
+        return new ResponseEntity<>(item, OK);
     }
 
     // 품목 전체 조회
@@ -95,13 +96,13 @@ public class ItemController {
             @RequestParam(required = false) @Parameter(description = "품번") String itemNo,
             @RequestParam(required = false) @Parameter(description = "품명") String itemName,
             @RequestParam(required = false) @Parameter(description = "검색어") String searchWord,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<ItemResponse> items = itemService.getItems(itemGroupId, itemAccountId, itemNo, itemName, searchWord);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of itemGroupId: " + itemGroupId
                 + ", itemAccountId: " + itemGroupId + " from getItems.");
-        return new ResponseEntity<>(items, HttpStatus.OK);
+        return new ResponseEntity<>(items, OK);
     }
 
     // 품목 수정
@@ -118,12 +119,12 @@ public class ItemController {
     public ResponseEntity<ItemResponse> updateItem(
             @PathVariable(value = "item-id") Long id,
             @RequestBody @Valid ItemRequest itemRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         ItemResponse itemResponse = itemService.updateItem(id, itemRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + itemResponse.getId() + " from updateItem.");
-        return new ResponseEntity<>(itemResponse, HttpStatus.OK);
+        return new ResponseEntity<>(itemResponse, OK);
     }
 
     // 품목 삭제
@@ -138,12 +139,12 @@ public class ItemController {
     )
     public ResponseEntity<Void> deleteItem(
             @PathVariable(value = "item-id") Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         itemService.deleteItem(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteItem.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 파일 정보 생성
@@ -160,12 +161,12 @@ public class ItemController {
     public ResponseEntity<ItemFileResponse> createItemFileInfo(
             @PathVariable(value = "item-id") Long itemId,
             @RequestBody @Valid ItemFileRequest itemFileRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         ItemFileResponse itemFileInfo = itemService.createItemFileInfo(itemId, itemFileRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + itemFileInfo.getId() + " from createItemFileInfo.");
-        return new ResponseEntity<>(itemFileInfo, HttpStatus.OK);
+        return new ResponseEntity<>(itemFileInfo, OK);
     }
 
     // 파일 생성
@@ -183,12 +184,12 @@ public class ItemController {
             @PathVariable(value = "item-id") Long itemId,
             @PathVariable(value = "item-file-id") Long itemFileId,
             @RequestPart MultipartFile file,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, IOException, BadRequestException {
         ItemFileResponse fileResponse = itemService.createFile(itemId, itemFileId, file);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + fileResponse.getId() + " from createItemFile.");
-        return new ResponseEntity<>(fileResponse, HttpStatus.OK);
+        return new ResponseEntity<>(fileResponse, OK);
     }
 
     // 파일 리스트 조회
@@ -197,12 +198,12 @@ public class ItemController {
     @Operation(summary = "품목 파일 리스트 조회")
     public ResponseEntity<List<ItemFileResponse>> getItemFiles(
             @PathVariable(value = "item-id") Long itemId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<ItemFileResponse> itemFiles = itemService.getItemFiles(itemId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getItemFiles.");
-        return new ResponseEntity<>(itemFiles, HttpStatus.OK);
+        return new ResponseEntity<>(itemFiles, OK);
     }
 
     // 품목 파일 정보 수정
@@ -221,12 +222,12 @@ public class ItemController {
             @PathVariable(value = "item-id") Long itemId,
             @PathVariable(value = "item-file-id") Long itemFileId,
             @RequestBody @Valid ItemFileRequest itemFileRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         ItemFileResponse itemFileResponse = itemService.updateItemFileInfo(itemId, itemFileId, itemFileRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + itemFileResponse.getId() + " from updateItemFileInfo.");
-        return new ResponseEntity<>(itemFileResponse, HttpStatus.OK);
+        return new ResponseEntity<>(itemFileResponse, OK);
     }
 
     // 파일 삭제
@@ -242,12 +243,12 @@ public class ItemController {
     public ResponseEntity deleteItemFile(
             @PathVariable(value = "item-id") Long itemId,
             @PathVariable(value = "item-file-id") Long itemFileId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         itemService.deleteItemFile(itemId, itemFileId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + itemFileId + " from deleteItemFile.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 품목 페이징 조회

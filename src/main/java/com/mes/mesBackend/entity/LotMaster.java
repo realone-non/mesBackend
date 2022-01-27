@@ -116,14 +116,6 @@ public class LotMaster extends BaseTimeEntity {
     private int recycleAmount;      // 재사용수량
 
     @Enumerated(STRING)
-    @Column(name = "PROCESS", columnDefinition = "varchar(255) COMMENT '공정 유형'")
-    private ProcessType process;
-
-    @Enumerated(STRING)
-    @Column(name = "GOODS_TYPE", columnDefinition = "varchar(255) COMMENT '제품 타입'" )
-    private GoodsType goodsType;
-
-    @Enumerated(STRING)
     @Column(name = "QUALITY_LEVEL", columnDefinition = "varchar(255) COMMENT '품질등급'")
     private QualityLevel qualityLevel;      // 품질등급
 
@@ -166,14 +158,12 @@ public class LotMaster extends BaseTimeEntity {
             LotType lotType,
             PurchaseInput purchaseInput,
             String lotNo,
-            GoodsType goodsType,
             WorkProcess workProcess
     ) {
         setLotType(lotType);
         setPurchaseInput(purchaseInput);
         setEnrollmentType(PURCHASE_INPUT);
         setLotNo(lotNo);
-        setGoodsType(goodsType);
         setWorkProcess(workProcess);
     }
 
@@ -185,14 +175,12 @@ public class LotMaster extends BaseTimeEntity {
     public void putOutsourcingInput(
             LotType lotType,
             OutSourcingInput input,
-            String lotNo,
-            GoodsType goodsType
+            String lotNo
     ) {
         setLotType(lotType);
         setOutSourcingInput(input);
         setEnrollmentType(OUTSOURCING_INPUT);
         setLotNo(lotNo);
-        setGoodsType(goodsType);
     }
 
     public void updateOutsourcingInput(int inputAmount) {

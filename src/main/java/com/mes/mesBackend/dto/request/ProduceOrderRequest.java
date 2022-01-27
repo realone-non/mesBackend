@@ -33,11 +33,11 @@ public class ProduceOrderRequest {
     @NotNull(message = NOT_NULL)
     LocalDate expectedCompletedDate;
 
-    @Schema(description = "지시상태")
+    @Schema(description = "지시상태 [완료: COMPLETION, 진행중: ONGOING, 예정: SCHEDULE, 취소: CANCEL]")
     @NotNull(message = NOT_NULL)
     OrderState orderState;
 
-    @Schema(description = "지시상태")
+    @Schema(description = "")
     @NotNull(message = NOT_NULL)
     int rate = 0;
 

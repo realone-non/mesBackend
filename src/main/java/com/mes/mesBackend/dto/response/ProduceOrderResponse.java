@@ -3,7 +3,6 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.OrderState;
-import com.querydsl.core.types.Order;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,7 +37,7 @@ public class ProduceOrderResponse {
     @JsonFormat(pattern = YYYY_MM_DD, timezone = "Asia/Seoul")
     LocalDate expectedCompletedDate;
 
-    @Schema(description = "지시상태")
+    @Schema(description = "지시상태 [완료: COMPLETION, 진행중: ONGOING, 예정: SCHEDULE, 취소: CANCEL]")
     OrderState orderState = OrderState.SCHEDULE;
 
     @Schema(description = "보정율")

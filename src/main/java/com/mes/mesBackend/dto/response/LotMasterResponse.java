@@ -86,7 +86,7 @@ public class LotMasterResponse {
     @Schema(description = "검사수량")
     int checkAmount;
 
-    @Schema(description = "품질등급")
+    @Schema(description = "품질등급 [LEVEL_A: A등급, LEVEL_B: B등급, LEVEL_C: C등급, LEVEL_D: D등급]")
     QualityLevel qualityLevel;
 
     @Schema(description = "생성일시")

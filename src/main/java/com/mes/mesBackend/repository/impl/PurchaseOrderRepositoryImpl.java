@@ -180,7 +180,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 item.standard.as("itemStandard"),
                                 item.manufacturerPartNo.as("itemManufacturerPartNo"),
                                 unit.unitCodeName.as("orderUnitCodeName"),
-                                purchaseRequest.orderAmount.as("orderAmount"),
+                                purchaseRequest.requestAmount.as("orderAmount"),
                                 item.inputUnitPrice.as("unitPrice"),
                                 purchaseRequest.orderAmount.multiply(item.inputUnitPrice).as("orderPrice"),
                                 purchaseRequest.orderAmount.multiply(item.inputUnitPrice).as("orderPriceWon"),
@@ -221,7 +221,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 item.standard.as("itemStandard"),
                                 item.manufacturerPartNo.as("itemManufacturerPartNo"),
                                 unit.unitCodeName.as("orderUnitCodeName"),
-                                purchaseRequest.orderAmount.as("orderAmount"),
+                                purchaseRequest.requestAmount.as("orderAmount"),
                                 item.inputUnitPrice.as("unitPrice"),
                                 purchaseRequest.orderAmount.multiply(item.inputUnitPrice).as("orderPrice"),
                                 purchaseRequest.orderAmount.multiply(item.inputUnitPrice).as("orderPriceWon"),
@@ -308,7 +308,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
     // pop
     // 구매발주에 대한 입고가 완료되지 않은 구매발주
     @Override
-    public List<PopPurchaseOrderResponse> findPopPurchaseOrderResponses() {
+    public List<PopPurchaseOrderResponse> findPopPurchaseOrderResponses(String clientName) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -316,7 +316,6 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 purchaseOrder.id.as("purchaseOrderId"),
                                 purchaseOrder.purchaseOrderNo.as("purchaseOrderNo"),
                                 client.clientName.as("purchaseOrderClient"),
-                                purchaseOrder.purchaseOrderDate.as("purchaseOrderDate"),
                                 purchaseRequest.ordersState.as("orderState")
                         )
                 )
@@ -326,17 +325,16 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                 .where(
                         purchaseRequest.deleteYn.isFalse(),
                         purchaseOrder.deleteYn.isFalse(),
-                        purchaseRequest.ordersState.eq(SCHEDULE).or(purchaseRequest.ordersState.eq(ONGOING))
+//                        purchaseRequest.ordersState.eq(SCHEDULE).or(purchaseRequest.ordersState.eq(ONGOING)),
+                        isClientNameContain(clientName)
                 )
                 .groupBy(purchaseOrder.id)
                 .orderBy(purchaseOrder.purchaseOrderDate.desc())
                 .fetch();
     }
 
-    // 구매발주에 등록 된 구매요청 리스트 GET
-    @Override
-    public List<PopPurchaseRequestResponse> findPopPurchaseRequestResponses(Long id) {
-        return null;
+    private BooleanExpression isClientNameContain(String clientName) {
+        return clientName != null ? client.clientName.contains(clientName) : null;
     }
 
     // 거래처

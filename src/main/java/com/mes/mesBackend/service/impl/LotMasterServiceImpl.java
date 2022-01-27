@@ -48,7 +48,23 @@ public class LotMasterServiceImpl implements LotMasterService {
         OutSourcingInput outSourcingInput = lotMasterRequest.getOutsourcingInputId() != null ? getOutsourcingInputOrThrow(lotMasterRequest.getOutsourcingInputId()) : null;
         Long workProcessId = lotMasterRequest.getWorkProcessDivision() != null ? lotLogHelper.getWorkProcessByDivisionOrThrow(lotMasterRequest.getWorkProcessDivision()) : null;
         WorkProcess workProcess = workProcessId != null ? getWorkProcessIdOrThrow(workProcessId) : null;
-        LotMaster lotMaster = modelMapper.toEntity(lotMasterRequest, LotMaster.class);
+//        LotMaster lotMaster = modelMapper.toEntity(lotMasterRequest, LotMaster.class);
+
+        LotMaster lotMaster = new LotMaster();
+        lotMaster.setItem(lotMasterRequest.getItem());
+        lotMaster.setWareHouse(lotMasterRequest.getWareHouse());
+        lotMaster.setLotType(lotType);
+        lotMaster.setSerialNo(lotMasterRequest.getSerialNo());
+        lotMaster.setEnrollmentType(lotMasterRequest.getEnrollmentType());
+        lotMaster.setProcessYn(lotMasterRequest.isProcessYn());
+        lotMaster.setStockAmount(lotMasterRequest.getStockAmount());
+        lotMaster.setCreatedAmount(lotMasterRequest.getCreatedAmount());
+        lotMaster.setBadItemAmount(lotMasterRequest.getBadItemAmount());
+        lotMaster.setInputAmount(lotMasterRequest.getInputAmount());
+        lotMaster.setPurchaseInput(purchaseInput);
+        lotMaster.setWorkProcess(workProcess);
+
+
         GoodsType goodsType = null;
 
         // 구매입고
@@ -71,7 +87,7 @@ public class LotMasterServiceImpl implements LotMasterService {
                 default:
                     goodsType = GoodsType.NONE;
             }
-            lotMaster.putPurchaseInput(lotType, purchaseInput, lotNo, goodsType, workProcess); // 등록유형 PURCHASE_INPUT
+            lotMaster.putPurchaseInput(lotType, purchaseInput, lotNo, workProcess); // 등록유형 PURCHASE_INPUT
         }
         else if(outSourcingInput != null) {
             Long itemId = outsourcingInputRepo.findItemIdByInputId(outSourcingInput.getId());
@@ -92,7 +108,7 @@ public class LotMasterServiceImpl implements LotMasterService {
                 default:
                     goodsType = GoodsType.NONE;
             }
-            lotMaster.putOutsourcingInput(lotType, outSourcingInput, lotNo, goodsType);
+            lotMaster.putOutsourcingInput(lotType, outSourcingInput, lotNo);
         }
 
         lotMasterRepo.save(lotMaster);

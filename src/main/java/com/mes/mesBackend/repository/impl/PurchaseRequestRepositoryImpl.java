@@ -163,19 +163,19 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                 .fetch();
     }
 
-    // 구매발주에 해당하는 구매요청의 orderAmount 모두
-    @Override
-    public List<Integer> findOrderAmountByPurchaseOrderId(Long purchaseOrderId) {
-        return jpaQueryFactory
-                .select(purchaseRequest.orderAmount)
-                .from(purchaseRequest)
-                .leftJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
-                .where(
-                        purchaseOrder.id.eq(purchaseOrderId),
-                        purchaseRequest.deleteYn.isFalse()
-                )
-                .fetch();
-    }
+    // 구매발주에 해당하는 구매요청의 requestAmount 모두
+//    @Override
+//    public List<Integer> findOrderAmountByPurchaseOrderId(Long purchaseOrderId) {
+//        return jpaQueryFactory
+//                .select(purchaseRequest.requestAmount)
+//                .from(purchaseRequest)
+//                .leftJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
+//                .where(
+//                        purchaseOrder.id.eq(purchaseOrderId),
+//                        purchaseRequest.deleteYn.isFalse()
+//                )
+//                .fetch();
+//    }
 
     // 제조오더에 해당하는 구매요청의 requestAmount 모두
     @Override
@@ -207,8 +207,8 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                 .from(purchaseRequest)
                 .where(
                         purchaseRequest.purchaseOrder.id.eq(purchaseOrderId),
-                        purchaseRequest.deleteYn.isFalse(),
-                        purchaseRequest.ordersState.notIn(COMPLETION)
+                        purchaseRequest.deleteYn.isFalse()
+//                        purchaseRequest.ordersState.notIn(COMPLETION)
                 )
                 .fetch();
     }

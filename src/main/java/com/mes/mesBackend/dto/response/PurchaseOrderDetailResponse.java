@@ -77,7 +77,7 @@ public class PurchaseOrderDetailResponse {
 
     public PurchaseOrderDetailResponse putOrderPossibleAmountAndInputAmount(int allInputAmount) {
         setInputAmount(allInputAmount);
-        setOrderPossibleAmount(this.inputAmount - this.orderAmount);
+        setOrderPossibleAmount(this.orderAmount - this.inputAmount);
         return this;
     }
 }

@@ -2,7 +2,6 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.response.WorkOrderUserResponse;
 import com.mes.mesBackend.entity.ProduceOrder;
-import com.mes.mesBackend.entity.ProductionPerformance;
 import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.OrderState;
@@ -31,8 +30,6 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
     private final UserService userService;
     private final ProduceOrderRepository produceOrderRepo;
     private final WorkOrderDetailRepository workOrderDetailRepo;
-    private final WorkOrderStateHelper workOrderStateHelper;
-    private final ProductionPerformanceRepository productionPerformanceRepo;
 
     @Override
     public List<WorkOrderUserResponse> getWorkOrderUsers(

@@ -27,7 +27,7 @@ public class ContractRequest {
     @NotNull(message = NOT_NULL)
     LocalDate clientOrderDate;
 
-    @Schema(description = "생산유형")
+    @Schema(description = "생산유형 [MASS: 양산, SAMPLE: 샘플]")
     @NotNull(message = NOT_NULL)
     ProductionType productionType = ProductionType.MASS;
 

@@ -16,25 +16,28 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 // 18-5. 마감일자
 @Tag(name = "deadline", description = "18-5.마감일자 API")
 @RequestMapping(value = "/deadlines")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class DeadlineController {
-
     private final DeadlineService deadlineService;
     private final LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(DeadlineController.class);
+    private final Logger logger = LoggerFactory.getLogger(DeadlineController.class);
     private CustomLogger cLogger;
 
     // 마감일자 생성
@@ -49,13 +52,13 @@ public class DeadlineController {
             }
     )
     public ResponseEntity<DeadlineResponse> createDeadline(
-            @RequestParam @Parameter(description = "마감일자 yyyy-MM-dd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate deadlineDate,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestParam @Parameter(description = "마감일자 yyyy-MM-dd") @DateTimeFormat(iso = DATE) LocalDate deadlineDate,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         DeadlineResponse deadline = deadlineService.createDeadline(deadlineDate);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + deadline.getId() + " from createDeadline.");
-        return new ResponseEntity<>(deadline, HttpStatus.OK);
+        return new ResponseEntity<>(deadline, OK);
     }
 
     // 마감일자 단일 조회
@@ -70,12 +73,12 @@ public class DeadlineController {
     )
     public ResponseEntity<DeadlineResponse> getDeadline(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         DeadlineResponse deadline = deadlineService.getDeadline(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + deadline.getId() + " from getDeadline.");
-        return new ResponseEntity<>(deadline, HttpStatus.OK);
+        return new ResponseEntity<>(deadline, OK);
     }
 
     // 마감일자 리스트 조회
@@ -83,12 +86,12 @@ public class DeadlineController {
     @ResponseBody
     @Operation(summary = "마감일자 리스트 조회")
     public ResponseEntity<List<DeadlineResponse>> getDeadlines(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<DeadlineResponse> deadlines = deadlineService.getDeadlines();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getDeadlines.");
-        return new ResponseEntity<>(deadlines, HttpStatus.OK);
+        return new ResponseEntity<>(deadlines, OK);
     }
 
     // 마감일자 수정
@@ -104,13 +107,13 @@ public class DeadlineController {
     )
     public ResponseEntity<DeadlineResponse> updateDeadline(
             @PathVariable Long id,
-            @RequestParam @Parameter(description = "마감일자 yyyy-MM-dd") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate deadlineDate,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestParam @Parameter(description = "마감일자 yyyy-MM-dd") @DateTimeFormat(iso = DATE) LocalDate deadlineDate,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         DeadlineResponse deadline = deadlineService.updateDeadline(id, deadlineDate);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + deadline.getId() + " from updateDeadline.");
-        return new ResponseEntity<>(deadline, HttpStatus.OK);
+        return new ResponseEntity<>(deadline,OK);
     }
 
     // 마감일자 삭제
@@ -125,11 +128,11 @@ public class DeadlineController {
     )
     public ResponseEntity deleteDeadline(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         deadlineService.deleteDeadline(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteDeadline.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 }

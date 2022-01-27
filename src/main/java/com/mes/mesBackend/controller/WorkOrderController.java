@@ -56,7 +56,7 @@ public class WorkOrderController {
             @RequestParam(required = false) @Parameter(description = "제조오더번호") String produceOrderNo,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "착수예정일 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "착수예정일 toDate") LocalDate toDate,
-            @RequestParam(required = false) @Parameter(description = "지시상태") OrderState orderState,
+            @RequestParam(required = false) @Parameter(description = "지시상태 [완료: COMPLETION, 진행중: ONGOING, 예정: SCHEDULE, 취소: CANCEL]") OrderState orderState,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<WorkOrderProduceOrderResponse> produceOrders = workOrderService.getProduceOrders(itemGroupId, itemNoAndName, contractNo, produceOrderNo, fromDate, toDate, orderState);

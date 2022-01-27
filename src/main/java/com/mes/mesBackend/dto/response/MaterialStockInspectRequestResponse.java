@@ -35,7 +35,7 @@ public class MaterialStockInspectRequestResponse {
     @Schema(description = "품목그룹")
     String itemAccount;
 
-    @Schema(description = "재고실사기준")
+    @Schema(description = "재고실사기준 [전수: ALL, 품목계정: ITEM_ACCOUNT]")
     StockInspectionType stockInspectionType;
 
 }

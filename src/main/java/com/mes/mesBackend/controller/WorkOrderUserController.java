@@ -49,7 +49,7 @@ public class WorkOrderUserController {
             @RequestParam(required = false) @Parameter(description = "작업라인 id") Long workLineId,
             @RequestParam(required = false) @Parameter(description = "제조오더번호") String produceOrderNo,
             @RequestParam(required = false) @Parameter(description = "품목계정 id") Long itemAccountId,
-            @RequestParam(required = false) @Parameter(description = "지시상태") OrderState orderState,
+            @RequestParam(required = false) @Parameter(description = "지시상태 [완료: COMPLETION, 진행중: ONGOING, 예정: SCHEDULE, 취소: CANCEL]") OrderState orderState,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "수주번호") String contractNo,

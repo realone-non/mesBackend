@@ -36,6 +36,8 @@ public class ShipmentLot extends BaseTimeEntity {
         setLotMaster(lotMaster);
     }
 
+
+
     public void delete() {
         setDeleteYn(true);
     }
