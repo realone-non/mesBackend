@@ -36,19 +36,19 @@ import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
-
     private final UserRepository userRepository;
     private final DepartmentService departmentService;
     private final ModelMapper mapper;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     private static final int SALT_SIZE = 16;
-
-    private Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
+    private static final String REFRESH_TOKEN = "refreshToken";
+    private final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
     private CustomLogger cLogger;
 
     public User getUserOrThrow(Long id) throws NotFoundException {
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
         boolean existsByUserCode = userRepository.existsByUserCode(userCode);
 
         if (existsByUserCode) {
-            throw new BadRequestException("user code exist. input userCode: " + userCode);
+            throw new BadRequestException("이미 존재하는 유저코드 입니다. 다른 유저코드를 입력 해주세요.");
         }
     }
 
@@ -131,9 +131,10 @@ public class UserServiceImpl implements UserService {
     // 로그인
     @Override
     public TokenResponse getLogin(UserLogin userLogin) throws NotFoundException, BadRequestException {
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info("userCode: " + userLogin.getUserCode() + ", password: " +userLogin.getPassword() + " 으로 로그인을 시도함.");
         User user = userRepository.findByUserCode(userLogin.getUserCode())
-                .orElseThrow(() -> new NotFoundException("user does not exist. input userCode: " + userLogin.getUserCode()));
+                .orElseThrow(() -> new NotFoundException("아이디가 잘못 입력 되었습니다. 아이디를 정확히 입력해 주세요."));
 
         // 입력받은 password를 기존 유저의 salt와 조합
         String hashing = passwordHashing(userLogin.getPassword().getBytes(), user.getSalt());
@@ -141,10 +142,11 @@ public class UserServiceImpl implements UserService {
         // 저장소에 해싱되어 있는 Password 와 입력받은 Password 의 해싱된 값과 맞는지 비교
         if (!user.getPassword().equals(hashing)) {
             cLogger.error("password is not correct.");
-            throw new BadRequestException("password is not correct.");
+            throw new BadRequestException("비밀번호가 잘못 입력 되었습니다. 비밀번호를 정확히 입력해 주세요.");
         }
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUserCode(), user.getPassword(), Collections.emptyList());
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(user.getUserCode(), user.getPassword(), Collections.emptyList());
 
         // AccessToken, RefreshToken 생성
         String accessToken = jwtTokenProvider.createAccessToken(authenticationToken);
@@ -178,9 +180,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public TokenResponse reissue(TokenRequest tokenRequestDto) throws CustomJwtException {
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         // 1. Refresh Token , AccessToken 검증
-        jwtTokenProvider.validateToken(tokenRequestDto.getRefreshToken(), "refreshToken");
+        jwtTokenProvider.validateToken(tokenRequestDto.getRefreshToken(), REFRESH_TOKEN);
 
         // 2. Access Token user 인증정보 조회
         Authentication authentication = jwtTokenProvider.getAuthenticationFromAccessToken(tokenRequestDto.getAccessToken());

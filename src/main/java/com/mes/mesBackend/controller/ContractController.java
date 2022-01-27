@@ -141,7 +141,7 @@ public class ContractController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteContract(
+    public ResponseEntity deleteContract(
             @PathVariable(value = "contract-id") @Parameter(description = "수주 id") Long contractId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
@@ -247,7 +247,7 @@ public class ContractController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteContractItem(
+    public ResponseEntity deleteContractItem(
             @PathVariable(value = "contract-id") @Parameter(description = "수주 id") Long contractId,
             @PathVariable(value = "contract-item-id") @Parameter(description = "수주 품목 id") Long contractItemId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
