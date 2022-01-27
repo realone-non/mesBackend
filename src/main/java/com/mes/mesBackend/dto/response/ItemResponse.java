@@ -27,6 +27,9 @@ public class ItemResponse {
     @Schema(description = "품목계정")
     ItemAccountResponse itemAccount;    // 품목계정
 
+    @Schema(description = "품목계정코드")
+    ItemAccountCodeResponse itemAccountCode;
+
     @Schema(description = "품목그룹")
     ItemGroupResponse.idAndGroupName itemGroup;        // 품목그룹
 
