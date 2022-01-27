@@ -120,7 +120,7 @@ public class BadItemController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteBadItem(
+    public ResponseEntity deleteBadItem(
             @PathVariable(value = "id") Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
