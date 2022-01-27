@@ -24,7 +24,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
-
     private final ItemAccountService itemAccountService;
     private final ItemGroupService itemGroupService;
     private final ItemFormService itemFormService;
@@ -36,9 +35,7 @@ public class ItemServiceImpl implements ItemService {
     private final TestCriteriaService testCriteriaService;
     private final TestProcessService testProcessService;
     private final ItemAccountCodeService itemAccountCodeService;
-
     private final ItemFileRepository itemFileRepository;
-
     private final UserService userService;
     private final ModelMapper mapper;
     private final S3Uploader s3Uploader;
@@ -96,7 +93,16 @@ public class ItemServiceImpl implements ItemService {
             String searchWord
     ) {
         List<Item> items = itemRepository.findAllByCondition(itemGroupId, itemAccountId, itemNo, itemName, searchWord);
-        return mapper.toListResponses(items, ItemResponse.class);
+        List<ItemResponse> itemResponses = mapper.toListResponses(items, ItemResponse.class);
+        for (ItemResponse res : itemResponses) {
+            for (Item item : items) {
+                if (res.getId().equals(item.getId())) {
+                    res.getItemAccountCode().setItemAccountId(item.getItemAccountCode().getItemAccount().getId());
+                    res.getItemAccountCode().setId(item.getItemAccountCode().getId());
+                }
+            }
+        }
+        return itemResponses;
     }
     // 품목 페이징 조회
 //    @Override
