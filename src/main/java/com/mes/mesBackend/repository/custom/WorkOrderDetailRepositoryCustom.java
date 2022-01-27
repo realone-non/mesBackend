@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.BomItemDetail;
 import com.mes.mesBackend.entity.BomMaster;
 import com.mes.mesBackend.entity.Item;
+import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 
 import java.time.LocalDate;
@@ -104,4 +105,7 @@ public interface WorkOrderDetailRepositoryCustom {
             LocalDate toDate,
             String itemNoAndItemName
     );
+
+    //Shortage용 날짜 기준 등록된 작업지시 가져오기
+    List<WorkOrderDetail> findByWorkDate(LocalDate stdDate);
 }

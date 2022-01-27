@@ -75,25 +75,25 @@ public class ProductionPlanController {
         return new ResponseEntity<>(productionPlan, HttpStatus.OK);
     }
 
-    // 생산계획 수립 등록(작업순번만)
-    @PutMapping(value = "/{work-order-id}")
-    @ResponseBody
-    @Operation(summary = "생산계획 수립 등록", description = "작업순번만 등록 가능")
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "200", description = "success"),
-                    @ApiResponse(responseCode = "404", description = "not found resource"),
-                    @ApiResponse(responseCode = "400", description = "bad request")
-            }
-    )
-    public ResponseEntity<ProductionPlanResponse> createProductionPlanOrder(
-            @PathVariable(value = "work-order-id") @Parameter(description = "작업 지시 id") Long workOrderId,
-            @RequestParam @Parameter(description = "작업순번") int orders,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+                // 생산계획 수립 등록(작업순번만)
+        @PutMapping(value = "/{work-order-id}")
+        @ResponseBody
+        @Operation(summary = "생산계획 수립 등록", description = "작업순번만 등록 가능")
+        @ApiResponses(
+                value = {
+                        @ApiResponse(responseCode = "200", description = "success"),
+                        @ApiResponse(responseCode = "404", description = "not found resource"),
+                        @ApiResponse(responseCode = "400", description = "bad request")
+                }
+        )
+        public ResponseEntity<ProductionPlanResponse> createProductionPlanOrder(
+                @PathVariable(value = "work-order-id") @Parameter(description = "작업 지시 id") Long workOrderId,
+        @RequestParam @Parameter(description = "작업순번") int orders,
+        @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        ProductionPlanResponse productionPlan = productionPlanService.createProductionPlanOrder(workOrderId, orders);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + productionPlan.getId() + " from createProductionPlanOrder.");
+            ProductionPlanResponse productionPlan = productionPlanService.createProductionPlanOrder(workOrderId, orders);
+            cLogger = new MongoLogger(logger, "mongoTemplate");
+            cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + productionPlan.getId() + " from createProductionPlanOrder.");
         return new ResponseEntity<>(productionPlan, HttpStatus.OK);
     }
 }

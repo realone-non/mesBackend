@@ -9,6 +9,7 @@ import com.mes.mesBackend.helper.AmountHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.MaterialWarehouseService;
+import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -41,6 +43,16 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
     UserRepository userRepository;
     @Autowired
     LotMasterRepository lotMasterRepository;
+    @Autowired
+    WorkOrderDetailRepository workOrderDetailRepository;
+    @Autowired
+    BomMasterRepository bomMasterRepository;
+    @Autowired
+    BomItemDetailRepository bomItemDetailRepository;
+    @Autowired
+    ProduceOrderRepository produceOrderRepository;
+    @Autowired
+    PurchaseRequestRepository purchaseRequestRepository;
 
     //수불부 조회
     public List<ReceiptAndPaymentResponse> getReceiptAndPaymentList(Long warehouseId, Long itemAccountId, LocalDate fromDate, LocalDate toDate){
@@ -204,5 +216,79 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
         }
 
         return headerList;
+    }
+
+    //Shortage조회
+    public List<ShortageReponse> getShortage(Long itemGroupId, String itemNoAndName, LocalDate stdDate) throws NotFoundException {
+        if(stdDate == null){
+            stdDate = LocalDate.now();
+        }
+        List<ShortageReponse> shortageResponseList = new ArrayList<>();
+        List<Item> itemList = itemRepository.findAllItemByAccount("원자재", "부자재", itemGroupId, itemNoAndName);
+        List<WorkOrderDetail> workOrderDetails = workOrderDetailRepository.findByWorkDate(stdDate);
+        for (Item item:itemList) {
+            ShortageReponse shortageResponse = new ShortageReponse();
+            int workAmount = 0;
+            int sumAmount = 0;
+            boolean isEmpty = false;
+            for (WorkOrderDetail detail:workOrderDetails) {
+//                ProduceOrder order = produceOrderRepository.findByIdAndDeleteYnFalse(detail.getProduceOrder().getId())
+//                        .orElseGet(ProduceOrder::new);
+
+                ProduceOrder order = produceOrderRepository.findByIdforShortage(detail.getProduceOrder().getId());
+                if(order.getId().equals(null)){
+                    continue;
+                }
+                List<ProduceOrderDetailResponse> detailList = produceOrderRepository.findAllProduceOrderDetail(order.getContractItem().getItem().getId());
+                for (ProduceOrderDetailResponse detailResponse: detailList) {
+                    if(detailResponse.getItemAccount().equals("반제품")){
+                        workAmount = getDetailRecursive(detailResponse, item.getId(), workAmount);
+                        sumAmount = sumAmount + workAmount;
+                    }
+                    else if(detailResponse.getItemId().equals(item.getId())){
+                        workAmount = detailResponse.getBomAmount() * detail.getOrderAmount();
+                        sumAmount = sumAmount + workAmount;
+                    }
+                }
+            }
+            Tuple scheduleInputAmount = purchaseRequestRepository.findItemByItemAndDateForShortage(item.getId(), LocalDate.now());
+            shortageResponse.setProductionCapacity(sumAmount);
+            shortageResponse.setMaterialNo(item.getItemNo());
+            shortageResponse.setMaterialName(item.getItemName());
+            if(scheduleInputAmount != null){
+                shortageResponse.setScheduleInputAmount(scheduleInputAmount.get(1, Integer.class));
+            }
+            else{
+                shortageResponse.setScheduleInputAmount(0);
+            }
+            ItemLog beforeAmount = itemLogRepository.findByItemIdAndWareHouseAndBeforeDayGroupBy(item.getId(), null, LocalDate.now().minusDays(1), null);
+            if(beforeAmount == null){
+                shortageResponse.setBeforeDayAmount(0);
+            }
+            else{
+                shortageResponse.setBeforeDayAmount(beforeAmount.getBeforeDayStockAmount());
+            }
+
+            shortageResponse.setOverLackAmount(
+                    shortageResponse.getBeforeDayAmount() +
+                        shortageResponse.getScheduleInputAmount() -
+                        shortageResponse.getProductionCapacity());
+            shortageResponseList.add(shortageResponse);
+        }
+        return shortageResponseList;
+    }
+
+    public int getDetailRecursive(ProduceOrderDetailResponse response, Long itemId, int workAmount){
+        List<ProduceOrderDetailResponse> detailList = produceOrderRepository.findAllProduceOrderDetail(response.getItemId());
+        for (ProduceOrderDetailResponse detail:detailList) {
+            if(detail.getItemAccount().equals("반제품")){
+                workAmount = getDetailRecursive(detail, itemId, workAmount);
+            }
+            else if(detail.getItemId().equals(itemId)){
+                workAmount = workAmount + detail.getReservationAmount();
+            }
+        }
+
+        return workAmount;
     }
 }

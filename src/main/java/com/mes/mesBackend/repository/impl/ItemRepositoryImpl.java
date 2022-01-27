@@ -41,6 +41,26 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .fetch();
     }
 
+    // 원,부자재 품목 정보 가져오기(Shortage)
+    @Transactional(readOnly = true)
+    public List<Item> findAllItemByAccount(
+            String rawMaterial,
+            String subMaterial,
+            Long itemGroupId,
+            String itemNoAndName
+    ) {
+        return jpaQueryFactory
+                .selectFrom(item)
+                .where(
+                        item.itemAccount.account.eq(rawMaterial).or(item.itemAccount.account.eq(subMaterial)),
+                        item.deleteYn.eq(false),
+                        isItemGroupEq(itemGroupId),
+                        isItemNameContaining(itemNoAndName),
+                        isItemNoContaining(itemNoAndName)
+                )
+                .fetch();
+    }
+
     // 품목그룹 검색
     private BooleanExpression isItemGroupEq(Long itemGroup) {
         return itemGroup != null ? item.itemGroup.id.eq(itemGroup) : null;
