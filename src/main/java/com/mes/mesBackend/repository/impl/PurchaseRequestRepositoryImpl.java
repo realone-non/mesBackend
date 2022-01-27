@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.response.PopPurchaseRequestResponse;
 import com.mes.mesBackend.dto.response.PurchaseRequestResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.PurchaseRequestRepositoryCustom;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -12,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
@@ -211,6 +211,21 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
 //                        purchaseRequest.ordersState.notIn(COMPLETION)
                 )
                 .fetch();
+    }
+
+    //특정 날짜에 입고 예정인 품목 검색
+    public Tuple findItemByItemAndDateForShortage(Long itemId, LocalDate fromDate){
+        return jpaQueryFactory
+                .select(purchaseRequest.item.id, purchaseRequest.orderAmount.sum())
+                .from(purchaseRequest)
+                .innerJoin(item).on(item.id.eq(purchaseRequest.item.id))
+                .where(
+                        purchaseRequest.periodDate.eq(fromDate),
+                        purchaseRequest.item.id.eq(itemId),
+                        purchaseRequest.deleteYn.eq(false)
+                )
+                .groupBy(purchaseRequest.item.id)
+                .fetchOne();
     }
 
     // 요청기간

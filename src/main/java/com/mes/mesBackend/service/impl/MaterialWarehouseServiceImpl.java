@@ -9,6 +9,7 @@ import com.mes.mesBackend.helper.AmountHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.MaterialWarehouseService;
+import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
@@ -50,6 +51,8 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
     BomItemDetailRepository bomItemDetailRepository;
     @Autowired
     ProduceOrderRepository produceOrderRepository;
+    @Autowired
+    PurchaseRequestRepository purchaseRequestRepository;
 
     //수불부 조회
     public List<ReceiptAndPaymentResponse> getReceiptAndPaymentList(Long warehouseId, Long itemAccountId, LocalDate fromDate, LocalDate toDate){
@@ -248,9 +251,16 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
                     }
                 }
             }
+            Tuple scheduleInputAmount = purchaseRequestRepository.findItemByItemAndDateForShortage(item.getId(), LocalDate.now());
             shortageResponse.setProductionCapacity(sumAmount);
             shortageResponse.setMaterialNo(item.getItemNo());
             shortageResponse.setMaterialName(item.getItemName());
+            if(scheduleInputAmount != null){
+                shortageResponse.setScheduleInputAmount(scheduleInputAmount.get(1, Integer.class));
+            }
+            else{
+                shortageResponse.setScheduleInputAmount(0);
+            }
             ItemLog beforeAmount = itemLogRepository.findByItemIdAndWareHouseAndBeforeDayGroupBy(item.getId(), null, LocalDate.now().minusDays(1), null);
             if(beforeAmount == null){
                 shortageResponse.setBeforeDayAmount(0);
@@ -258,6 +268,11 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
             else{
                 shortageResponse.setBeforeDayAmount(beforeAmount.getBeforeDayStockAmount());
             }
+
+            shortageResponse.setOverLackAmount(
+                    shortageResponse.getBeforeDayAmount() +
+                        shortageResponse.getScheduleInputAmount() -
+                        shortageResponse.getProductionCapacity());
             shortageResponseList.add(shortageResponse);
         }
         return shortageResponseList;

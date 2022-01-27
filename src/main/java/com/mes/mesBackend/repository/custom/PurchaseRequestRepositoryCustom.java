@@ -2,10 +2,10 @@ package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.PopPurchaseRequestResponse;
 import com.mes.mesBackend.dto.response.PurchaseRequestResponse;
+import com.querydsl.core.Tuple;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public interface PurchaseRequestRepositoryCustom {
@@ -32,5 +32,5 @@ public interface PurchaseRequestRepositoryCustom {
     // pop 해당 구매발주에 해당하는 구매요청정보 list 조회
     List<PopPurchaseRequestResponse> findPopPurchaseRequestResponseByPurchaseOrderId(Long purchaseOrderId);
     // 특정 날짜에 입고예정인 품목 검색(Shortage)
-    List<Map<Long, Integer>> findItemByItemAndDateForShortage(LocalDate fromDate);
+    Tuple findItemByItemAndDateForShortage(Long itemId, LocalDate fromDate);
 }
