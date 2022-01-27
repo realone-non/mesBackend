@@ -75,7 +75,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .select(lotMaster.lotNo)
                 .from(lotMaster)
                 .where(
-                        lotMaster.goodsType.eq(goodsType),
+//                        lotMaster.goodsType.eq(goodsType),
                         lotMaster.createdDate.between(startDate.atStartOfDay(), endDate.atStartOfDay())
                 )
                 .orderBy(lotMaster.createdDate.desc())
@@ -108,7 +108,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotMaster.serialNo.as("serialNo"),
                                 lotType.lotType.as("lotType"),
                                 lotMaster.enrollmentType.as("enrollmentType"),
-                                lotMaster.process.as("process"),
+//                                lotMaster.process.as("process"),
                                 lotMaster.processYn.as("processYn"),
                                 lotMaster.stockAmount.as("stockAmount"),
                                 lotMaster.createdAmount.as("createdAmount"),
