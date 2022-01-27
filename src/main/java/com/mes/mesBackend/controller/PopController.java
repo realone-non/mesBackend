@@ -11,6 +11,7 @@ import com.mes.mesBackend.service.PopService;
 import com.mes.mesBackend.service.WorkProcessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
 
 // pop
 @RequestMapping("/pop")
@@ -45,11 +49,12 @@ public class PopController {
         List<WorkProcessResponse> workProcesses = workProcessService.getWorkProcesses();
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info( "viewed the list of from getPopWorkProcesses.");
-        return new ResponseEntity<>(workProcesses, HttpStatus.OK);
+        return new ResponseEntity<>(workProcesses, OK);
     }
 
     // 작업지시 정보 리스트 api, 조건: 작업자, 작업공정
-    @SecurityRequirement(name = "Authorization")
+    // 작업지시 목록(공정)
+    @SecurityRequirement(name = AUTHORIZATION)
     @GetMapping("/work-orders")
     @ResponseBody
     @Operation(
@@ -59,14 +64,12 @@ public class PopController {
     public ResponseEntity<List<PopWorkOrderResponse>> getPopWorkOrders(
             @RequestParam @Parameter(description = "작업공정 id") Long workProcessId,
             @RequestParam @Parameter(description = "작업자 id") Long userId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "조회기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "조회기간 toDate") LocalDate toDate,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<PopWorkOrderResponse> popWorkOrderResponses = popService.getPopWorkOrders(workProcessId, userId, fromDate, toDate);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        List<PopWorkOrderResponse> popWorkOrderResponses = popService.getPopWorkOrders(workProcessId, userId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPopWorkOrders.");
-        return new ResponseEntity<>(popWorkOrderResponses, HttpStatus.OK);
+        return new ResponseEntity<>(popWorkOrderResponses, OK);
     }
 
     // 작업지시 상세 정보
@@ -78,11 +81,11 @@ public class PopController {
     public ResponseEntity<List<PopWorkOrderDetailResponse>> getPopWorkOrderDetails(
             @RequestParam @Parameter(description = "lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "작업지시 id") Long workOrderId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<PopWorkOrderDetailResponse> popWorkOrderDetailResponse = popService.getPopWorkOrderDetails(lotMasterId, workOrderId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPopWorkOrderDetails.");
-        return new ResponseEntity<>(popWorkOrderDetailResponse, HttpStatus.OK);
+        return new ResponseEntity<>(popWorkOrderDetailResponse, OK);
     }
 }

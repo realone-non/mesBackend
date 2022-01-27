@@ -21,8 +21,8 @@ public class PopServiceImpl implements PopService {
 
     // 작업지시 정보 리스트 api, 조건: 작업자, 작업공정
     @Override
-    public List<PopWorkOrderResponse> getPopWorkOrders(Long workProcessId, Long userId, LocalDate fromDate, LocalDate toDate) {
-        return workOrderDetailRepository.findPopWorkOrderResponsesByCondition(workProcessId, userId, fromDate, toDate);
+    public List<PopWorkOrderResponse> getPopWorkOrders(Long workProcessId, Long userId) {
+        return workOrderDetailRepository.findPopWorkOrderResponsesByCondition(workProcessId, userId, fromDate);
     }
 
     // 작업지시 상세 정보

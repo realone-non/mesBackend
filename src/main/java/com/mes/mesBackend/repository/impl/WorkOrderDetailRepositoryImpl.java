@@ -521,26 +521,24 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     public List<PopWorkOrderResponse> findPopWorkOrderResponsesByCondition(
             Long workProcessId,
             Long userId,
-            LocalDate fromDate,
-            LocalDate toDate
+            LocalDate now
     ) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
                                 PopWorkOrderResponse.class,
-                                workOrderDetail.id.as("id"),
-                                workOrderDetail.user.id.as("userId"),
-                                workOrderDetail.user.korName.as("userName"),
-                                workOrderDetail.orderNo.as("orderNo"),
-                                workOrderDetail.orderAmount.as("orderAmount"),
-                                workOrderDetail.expectedWorkDate.as("expectedWorkDate")
+                                workOrderDetail.id.as(""),
+                                workOrderDetail.orderNo.as(""),
+
                         )
                 )
                 .from(workOrderDetail)
+                .innerJoin(bomMaster).on(bomMaster)
                 .where(
                         isWorkProcessId(workProcessId),
                         isUserId(userId),
-                        isWorkOrderDateBetween(fromDate, toDate)
+                        workOrderDetail.expectedWorkDate.eq(now),
+                        workOrderDetail.deleteYn.isFalse()
                 )
                 .fetch();
 
