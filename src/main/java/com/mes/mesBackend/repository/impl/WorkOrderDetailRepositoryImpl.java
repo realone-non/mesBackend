@@ -637,6 +637,17 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .fetch();
     }
 
+    //Shortage용 날짜 기준 등록된 작업지시 가져오기
+    public List<WorkOrderDetail> findByWorkDate(LocalDate stdDate){
+        return jpaQueryFactory
+                .selectFrom(workOrderDetail)
+                .where(
+                        workOrderDetail.expectedWorkDate.eq(stdDate),
+                        workOrderDetail.orderState.ne(COMPLETION)
+                )
+                .fetch();
+    }
+
     // 작업지시 startDate 조회
     private BooleanExpression isWorkOrderStartDateBetween(LocalDate fromDate, LocalDate toDate) {
         return fromDate != null ? workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)) : null;

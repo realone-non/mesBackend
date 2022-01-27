@@ -19,4 +19,7 @@ public interface ProduceOrderRepositoryCustom {
 
     // 제조 오더 디테일 리스트 조회
     List<ProduceOrderDetailResponse> findAllProduceOrderDetail(Long itemId);
+
+    //제조 오더 조회(Shortage)
+    ProduceOrder findByIdforShortage(Long id);
 }

@@ -14,4 +14,5 @@ public interface PurchaseRequestRepository extends JpaCustomRepository<PurchaseR
     Optional<PurchaseRequest> findByIdAndPurchaseOrderAndDeleteYnFalse(Long id, PurchaseOrder purchaseOrder);
     // 해당 구매발주에 해당하는 구매요청정보들 조회
     List<PurchaseRequest> findAllByPurchaseOrderAndDeleteYnFalse(PurchaseOrder purchaseOrder);
+
 }

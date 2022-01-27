@@ -82,6 +82,16 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
                 )
                 .fetch();
     }
+    @Transactional(readOnly = true)
+    public ProduceOrder findByIdforShortage(Long id){
+        return jpaQueryFactory
+                .selectFrom(produceOrder)
+                .where(
+                        produceOrder.id.eq(id),
+                        produceOrder.deleteYn.eq(false)
+                )
+                .fetchOne();
+    }
 
     /*
     * > contract.item.itemGroup -> NullPointerException

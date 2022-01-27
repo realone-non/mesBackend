@@ -39,4 +39,6 @@ public interface MaterialWarehouseService {
     JSONArray getMaterialStock(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Long warehouseId);
     //헤더용 창고 목록 조회
     JSONArray getHeaderWarehouse();
+    //Shortage 조회
+    List<ShortageReponse> getShortage(Long itemGroupId, String itemNoAndName, LocalDate stdDate) throws NotFoundException;
 }
