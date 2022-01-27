@@ -18,20 +18,20 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.OK;
 
 // 8-5. 불량 등록
-@RequestMapping("bad-item-enrollment-work-orders")
+@RequestMapping("/bad-item-enrollment-work-orders")
 @Tag(name = "bad-item-enrollment", description = "8-5. 불량 등록 API")
 @RestController
 @SecurityRequirement(name = AUTHORIZATION)
@@ -55,8 +55,8 @@ public class BadItemEnrollmentController {
             @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
             @RequestParam(required = false) @Parameter(description = "제조오더번호") String produceOrderNo,
             @RequestParam(required = false) @Parameter(description = "JOB NO(작업지시번호)") String workOrderNo,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 toDate") LocalDate toDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "품번|품목") String itemNoAndItemName,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {

@@ -1,6 +1,5 @@
 package com.mes.mesBackend.entity;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,15 +7,16 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PUBLIC;
 
 // 8-5. 불량유형정보
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@NoArgsConstructor(access = PUBLIC)
 @Entity(name = "WORK_ORDER_BAD_ITEMS")
 @Data
 public class WorkOrderBadItem extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업지시 불량 등록 고유아이디'")
     private Long id;
 

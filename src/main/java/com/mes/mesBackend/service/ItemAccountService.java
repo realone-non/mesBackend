@@ -22,5 +22,5 @@ public interface ItemAccountService {
     // 품목계정 조회 및 예외
     ItemAccount getItemAccountOrThrow(Long id) throws NotFoundException;
     // 품목계정코드 리스트 조회
-    List<ItemAccountCodeResponse> getItemAccountCodes(Long itemAccountId);
+    List<ItemAccountCodeResponse> getItemAccountCodes(Long itemAccountId) throws NotFoundException;
 }

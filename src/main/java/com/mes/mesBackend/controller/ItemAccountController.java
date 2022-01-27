@@ -139,11 +139,11 @@ public class ItemAccountController {
     // 품목계정 리스트 조회
     @GetMapping("/item-account-codes")
     @ResponseBody
-    @Operation(summary = "품목계정코드 리스트 조회")
+    @Operation(summary = "품목계정코드 리스트 조회", description = "품목계정 id로 해당하는 코드 검색할 수 있음.")
     public ResponseEntity<List<ItemAccountCodeResponse>> getItemAccountCodes(
             @RequestParam(required = false) @Parameter(description = "품목계정 id") Long itemAccountId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
+    ) throws NotFoundException {
         List<ItemAccountCodeResponse> itemAccountCodes = itemAccountService.getItemAccountCodes(itemAccountId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getItemAccountCodes.");
