@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.GoodsType.HALF_PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
 
@@ -520,28 +521,32 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     @Override
     public List<PopWorkOrderResponse> findPopWorkOrderResponsesByCondition(
             Long workProcessId,
-            Long userId,
             LocalDate now
     ) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
                                 PopWorkOrderResponse.class,
-                                workOrderDetail.id.as(""),
-                                workOrderDetail.orderNo.as(""),
-
+                                workOrderDetail.id.as("workOrderId"),
+                                workOrderDetail.orderNo.as("workOrderNo"),
+                                workOrderDetail.orderAmount.as("orderAmount"),
+                                workOrderDetail.productionAmount.as("productAmount"),
+                                workOrderDetail.orderState.as("orderState"),
+                                workOrderDetail.produceOrder.contractItem.item.id.as("produceOrderItemId")
                         )
                 )
                 .from(workOrderDetail)
-                .innerJoin(bomMaster).on(bomMaster)
+                .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
+                .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
+                .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
                 .where(
                         isWorkProcessId(workProcessId),
-                        isUserId(userId),
                         workOrderDetail.expectedWorkDate.eq(now),
                         workOrderDetail.deleteYn.isFalse()
                 )
                 .fetch();
-
     }
 
     // 작업지시 상세 정보
@@ -581,6 +586,26 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isDeleteYnFalse()
                 )
                 .fetchOne();
+    }
+
+    @Override
+    public Optional<Item> findBomDetailByBomMasterItemIdAndWorkProcessId(Long itemId, Long workProcessId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(item)
+                        .from(qBomItemDetail)
+                        .leftJoin(bomMaster).on(bomMaster.id.eq(qBomItemDetail.bomMaster.id))
+                        .leftJoin(item).on(item.id.eq(qBomItemDetail.item.id))
+                        .leftJoin(workProcess).on(workProcess.id.eq(qBomItemDetail.workProcess.id))
+                        .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                        .where(
+                                qBomItemDetail.bomMaster.item.id.eq(itemId),
+                                workProcess.id.eq(workProcessId),
+                                itemAccount.goodsType.eq(HALF_PRODUCT),
+                                qBomItemDetail.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
     }
 
     // =============================================== 8-5. 불량등록 ===============================================

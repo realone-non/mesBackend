@@ -1,6 +1,9 @@
 package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.*;
+import com.mes.mesBackend.entity.BomItemDetail;
+import com.mes.mesBackend.entity.BomMaster;
+import com.mes.mesBackend.entity.Item;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 
 import java.time.LocalDate;
@@ -80,12 +83,14 @@ public interface WorkOrderDetailRepositoryCustom {
 
     // =============================================== pop ===============================================
     // 작업지시 정보 리스트, 조건: 작업자, 작업공정
-    List<PopWorkOrderResponse> findPopWorkOrderResponsesByCondition(Long workProcessId, Long userId, LocalDate fromDate);
+    List<PopWorkOrderResponse> findPopWorkOrderResponsesByCondition(Long workProcessId, LocalDate fromDate);
 
     // 작업지시 상세 정보
     List<PopWorkOrderDetailResponse> findPopWorkOrderDetailResponsesByItemId(Long itemId);
     // 수주수량
     Integer findContractItemAmountByWorkOrderId(Long workOrderId);
+    // 해당 공정에 해당하는 반제품 품목 가져옴
+    Optional<Item> findBomDetailByBomMasterItemIdAndWorkProcessId(Long itemId, Long workProcessId);
 
     // =============================================== 8-5. 불량등록 ===============================================
     // 작업지시 정보 리스트 조회, 검색조건: 작업장 id, 작업라인 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목

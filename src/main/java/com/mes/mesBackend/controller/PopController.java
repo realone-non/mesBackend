@@ -59,14 +59,13 @@ public class PopController {
     @ResponseBody
     @Operation(
             summary = "(pop) 작업지시 정보",
-            description = "조건: 작업자, 작업공정, 조회기간 fromDate~toDate"
+            description = "조건: 작업공정 id, 날짜(당일)"
     )
     public ResponseEntity<List<PopWorkOrderResponse>> getPopWorkOrders(
             @RequestParam @Parameter(description = "작업공정 id") Long workProcessId,
-            @RequestParam @Parameter(description = "작업자 id") Long userId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        List<PopWorkOrderResponse> popWorkOrderResponses = popService.getPopWorkOrders(workProcessId, userId);
+    ) throws NotFoundException {
+        List<PopWorkOrderResponse> popWorkOrderResponses = popService.getPopWorkOrders(workProcessId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPopWorkOrders.");
         return new ResponseEntity<>(popWorkOrderResponses, OK);

@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -42,6 +43,9 @@ public class PopWorkOrderResponse {
 
     @Schema(description = "지시상태")
     OrderState orderState;
+
+    @JsonIgnore
+    Long produceOrderItemId;
 
     // 품목 id, 품번, 품명, 작지번호, 작업지시의 지시수량,
 }
