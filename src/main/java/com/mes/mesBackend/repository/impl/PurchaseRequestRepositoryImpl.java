@@ -200,6 +200,7 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                                 PopPurchaseRequestResponse.class,
                                 purchaseRequest.id.as("purchaseRequestId"),
                                 purchaseRequest.item.id.as("itemId"),
+                                purchaseRequest.item.itemNo.as("itemNo"),
                                 purchaseRequest.item.itemName.as("itemName"),
                                 purchaseRequest.orderAmount.as("purchaseRequestAmount")
                         )
