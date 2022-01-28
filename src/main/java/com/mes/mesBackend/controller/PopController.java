@@ -16,15 +16,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
 
 // pop
 @RequestMapping("/pop")
@@ -45,44 +44,42 @@ public class PopController {
         List<WorkProcessResponse> workProcesses = workProcessService.getWorkProcesses();
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info( "viewed the list of from getPopWorkProcesses.");
-        return new ResponseEntity<>(workProcesses, HttpStatus.OK);
+        return new ResponseEntity<>(workProcesses, OK);
     }
 
     // 작업지시 정보 리스트 api, 조건: 작업자, 작업공정
-    @SecurityRequirement(name = "Authorization")
+    // 작업지시 목록(공정)
+    @SecurityRequirement(name = AUTHORIZATION)
     @GetMapping("/work-orders")
     @ResponseBody
     @Operation(
-            summary = "(pop) 작업지시 정보",
-            description = "조건: 작업자, 작업공정, 조회기간 fromDate~toDate"
+            summary = "[미구현] (pop) 작업지시 정보",
+            description = "조건: 작업공정 id, 날짜(당일)"
     )
     public ResponseEntity<List<PopWorkOrderResponse>> getPopWorkOrders(
             @RequestParam @Parameter(description = "작업공정 id") Long workProcessId,
-            @RequestParam @Parameter(description = "작업자 id") Long userId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "조회기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "조회기간 toDate") LocalDate toDate,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        List<PopWorkOrderResponse> popWorkOrderResponses = popService.getPopWorkOrders(workProcessId, userId, fromDate, toDate);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        List<PopWorkOrderResponse> popWorkOrderResponses = popService.getPopWorkOrders(workProcessId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPopWorkOrders.");
-        return new ResponseEntity<>(popWorkOrderResponses, HttpStatus.OK);
+        return new ResponseEntity<>(popWorkOrderResponses, OK);
     }
 
     // 작업지시 상세 정보
     // 위에 해당 작업지시로 bomItemDetail 항목들 가져오기(품번, 품명, 계정, bom 수량, 예약수량)
-    @SecurityRequirement(name = "Authorization")
+    @SecurityRequirement(name = AUTHORIZATION)
     @GetMapping("/work-order-details")
     @ResponseBody
-    @Operation(summary = "(pop) 작업지시 상세 정보", description = "")
+    @Operation(summary = "[미구현] (pop) 작업지시 상세 정보", description = "")
     public ResponseEntity<List<PopWorkOrderDetailResponse>> getPopWorkOrderDetails(
             @RequestParam @Parameter(description = "lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "작업지시 id") Long workOrderId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<PopWorkOrderDetailResponse> popWorkOrderDetailResponse = popService.getPopWorkOrderDetails(lotMasterId, workOrderId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPopWorkOrderDetails.");
-        return new ResponseEntity<>(popWorkOrderDetailResponse, HttpStatus.OK);
+        return new ResponseEntity<>(popWorkOrderDetailResponse, OK);
     }
 }
