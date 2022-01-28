@@ -20,6 +20,10 @@ public class PopPurchaseRequestResponse {
     @Schema(name = "품목 고유아이디")
     Long itemId;
 
+    // 품번
+    @Schema(name = "품번")
+    String itemNo;
+
     // 품명
     @Schema(description = "품명")
     String itemName;
