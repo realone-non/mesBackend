@@ -53,7 +53,7 @@ public class PopController {
     @GetMapping("/work-orders")
     @ResponseBody
     @Operation(
-            summary = "(pop) 작업지시 정보",
+            summary = "[미구현] (pop) 작업지시 정보",
             description = "조건: 작업공정 id, 날짜(당일)"
     )
     public ResponseEntity<List<PopWorkOrderResponse>> getPopWorkOrders(
@@ -71,7 +71,7 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @GetMapping("/work-order-details")
     @ResponseBody
-    @Operation(summary = "(pop) 작업지시 상세 정보", description = "")
+    @Operation(summary = "[미구현] (pop) 작업지시 상세 정보", description = "")
     public ResponseEntity<List<PopWorkOrderDetailResponse>> getPopWorkOrderDetails(
             @RequestParam @Parameter(description = "lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "작업지시 id") Long workOrderId,
