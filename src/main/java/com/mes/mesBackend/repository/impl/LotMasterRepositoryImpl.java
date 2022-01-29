@@ -3,10 +3,12 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.MaterialStockReponse;
 import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
+import com.mes.mesBackend.dto.response.PopRecycleResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.repository.custom.LotMasterRepositoryCustom;
+import com.mes.mesBackend.service.PopRecycleService;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -307,6 +309,29 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         lotMaster.stockAmount.gt(0)
                 )
                 .groupBy(lotMaster.wareHouse, lotMaster.item, lotMaster.outSourcingInput)
+                .fetch();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PopRecycleResponse> findBadAmountByWorkProcess(Long workProcessId){
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                PopRecycleResponse.class,
+                                item.id.as("id"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                lotMaster.badItemAmount.sum().as("badAmount"),
+                                lotMaster.recycleAmount.sum().as("recycleAmount")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
+                .where(
+                        lotMaster.workProcess.id.eq(workProcessId)
+                )
+                .groupBy(lotMaster.item.id)
                 .fetch();
     }
 

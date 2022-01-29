@@ -3,6 +3,7 @@ package com.mes.mesBackend.repository.custom;
 import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.MaterialStockReponse;
 import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
+import com.mes.mesBackend.dto.response.PopRecycleResponse;
 import com.mes.mesBackend.entity.ItemAccountCode;
 import com.mes.mesBackend.entity.OutSourcingInput;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
@@ -44,4 +45,7 @@ public interface LotMasterRepositoryCustom {
 
     //ITEM으로 현재 재고현황 조회
     List<MaterialStockReponse> findStockAmountByItemId(Long itemId, Long warehouseId);
+
+    //공정별 불량 갯수 조회
+    List<PopRecycleResponse> findBadAmountByWorkProcess(Long workProcessId);
 }
