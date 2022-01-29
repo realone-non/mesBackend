@@ -517,7 +517,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     }
 
     // =============================================== pop ===============================================
-    // 작업지시 정보 리스트, 조건: 작업자, 작업공정
+    // 작업지시 정보 리스트, 조건: 작업공정, 오늘
     @Override
     public List<PopWorkOrderResponse> findPopWorkOrderResponsesByCondition(
             Long workProcessId,
@@ -543,7 +543,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .leftJoin(item).on(item.id.eq(contractItem.item.id))
                 .where(
                         isWorkProcessId(workProcessId),
-                        workOrderDetail.expectedWorkDate.eq(now),
+//                        workOrderDetail.expectedWorkDate.eq(now),
                         workOrderDetail.deleteYn.isFalse()
                 )
                 .fetch();

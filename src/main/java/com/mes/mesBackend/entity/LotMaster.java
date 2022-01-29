@@ -135,17 +135,20 @@ public class LotMaster extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "BEFORE_LOT_NO", columnDefinition = "bigint(1) COMMENT '직전 로트번호'")
-    private LotMaster beforeLotNo;     // 직전 로트번호
-
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "NEXT_LOT_NO", columnDefinition = "bigint(1) COMMENT '다음 로트번호'")
-    private LotMaster nextLotNo;     // 다음 로트번호
+//    @ManyToOne(fetch = LAZY)
+//    @JoinColumn(name = "BEFORE_LOT_NO", columnDefinition = "bigint(1) COMMENT '직전 로트번호'")
+//    private LotMaster beforeLotNo;     // 직전 로트번호
+//
+//    @ManyToOne(fetch = LAZY)
+//    @JoinColumn(name = "NEXT_LOT_NO", columnDefinition = "bigint(1) COMMENT '다음 로트번호'")
+//    private LotMaster nextLotNo;     // 다음 로트번호
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint(1) COMMENT '작업 공정'")
     private WorkProcess workProcess;
+
+    @Column(name = "DUMMY_YN", columnDefinition = "bit(1) COMMENT '더미데이터 여부'")
+    private boolean dummyYn;
 
 //    @Column(name = "END_YN", columnDefinition = "bit(1) COMMENT '로트 엔드'")
 //    private boolean endYn;      // 로트엔드

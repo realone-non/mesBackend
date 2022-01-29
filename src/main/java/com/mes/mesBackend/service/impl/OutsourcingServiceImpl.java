@@ -176,7 +176,7 @@ public class OutsourcingServiceImpl implements OutsourcingService {
                 request.getLotType()
         );
 
-        String lotNo = lotMasterService.createLotMaster(lotMasterRequest);
+        String lotNo = lotMasterService.createLotMaster(lotMasterRequest).getLotNo();
 
         LotMaster lotMaster = lotMasterRepository.findByLotNoAndUseYnTrue(lotNo);
 

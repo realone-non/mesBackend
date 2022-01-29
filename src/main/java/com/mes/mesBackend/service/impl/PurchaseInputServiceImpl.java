@@ -98,7 +98,7 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
                 purchaseInputRequest.getLotType(),
                 purchaseInputRequest.isProcessYn()
         );
-        String lotMaster = lotMasterService.createLotMaster(lotMasterRequest);      // lotMaster 생성
+        String lotMaster = lotMasterService.createLotMaster(lotMasterRequest).getLotNo();      // lotMaster 생성
 
         if (lotMaster == null) {
             purchaseInputRepo.deleteById(purchaseInput.getId());
@@ -152,6 +152,7 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
     }
 
     // 구매입고 LOT 삭제
+    // TODO: 삭제되었을때 purchaseOrder 상태값 안바뀜
     @Override
     public void deletePurchaseInputDetail(Long purchaseRequestId, Long purchaseInputId) throws NotFoundException {
         // 구매입고 삭제
