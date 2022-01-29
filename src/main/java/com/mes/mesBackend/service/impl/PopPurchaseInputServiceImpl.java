@@ -125,7 +125,7 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
         lotMasterRequest.setWareHouse(purchaseInput.getPurchaseRequest().getPurchaseOrder().getWareHouse());        // 구매발주의 입고창고
         lotMasterRequest.setWorkProcessDivision(MATERIAL_INPUT);
 
-        String lotMaster = lotMasterService.createLotMaster(lotMasterRequest);  // lotMaster 생성
+        String lotMaster = lotMasterService.createLotMaster(lotMasterRequest).getLotNo();  // lotMaster 생성
 
         if (lotMaster == null) {
             purchaseInputRepo.deleteById(purchaseInput.getId());

@@ -33,4 +33,6 @@ public interface PurchaseRequestRepositoryCustom {
     List<PopPurchaseRequestResponse> findPopPurchaseRequestResponseByPurchaseOrderId(Long purchaseOrderId);
     // 특정 날짜에 입고예정인 품목 검색(Shortage)
     Tuple findItemByItemAndDateForShortage(Long itemId, LocalDate fromDate);
+    // 구매발주에 해당하는 구매요청이 존재하는지?
+    boolean existsPurchaseRequestByPurchaseOrder(Long purchaseOrderId);
 }

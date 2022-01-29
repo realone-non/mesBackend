@@ -229,6 +229,22 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                 .fetchOne();
     }
 
+    // 구매발주에 해당하는 구매요청이 존재하는지?
+    @Override
+    public boolean existsPurchaseRequestByPurchaseOrder(Long purchaseOrderId) {
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(purchaseRequest)
+                .leftJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
+                .where(
+                        purchaseRequest.purchaseOrder.id.eq(purchaseOrderId),
+                        purchaseOrder.deleteYn.isFalse(),
+                        purchaseRequest.purchaseOrder.deleteYn.isFalse()
+                )
+                .fetchFirst();
+        return fetchOne != null;
+    }
+
     // 요청기간
     private BooleanExpression isRequestDateBetween(LocalDate fromDate, LocalDate toDate) {
         return fromDate != null ? purchaseRequest.requestDate.between(fromDate, toDate) : null;

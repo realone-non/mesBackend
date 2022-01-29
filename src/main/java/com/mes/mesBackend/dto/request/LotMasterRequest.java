@@ -39,6 +39,8 @@ public class LotMasterRequest {
     Long purchaseInputId;       //구매입고 ID
     Long outsourcingInputId;        //외주입고 ID
 
+    Long workProcessId;
+
     WorkProcessDivision workProcessDivision;    // 공정 구분
 
     public void putPurchaseInput(

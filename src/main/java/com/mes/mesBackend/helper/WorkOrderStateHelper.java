@@ -11,9 +11,11 @@ public interface WorkOrderStateHelper {
     /*
     * - orderState 별로 workOrderDetail 의 scheduleDate, startDate, endDate 값 update
     * - 제조오더에 해당하는 젤 마지막 등록 작업지시의 orderState 값으로 제조오더 orderState 값 update
-    * - 제조오더에 해당하는 productionPerformance 가 없을 시 생성, 있으면 공정에 해당하는 컬럼에 값 update
     * */
-    void updateOrderState(Long workOrderDetailId, OrderState orderState, Long lotMasterId) throws NotFoundException;
+    void updateOrderState(Long workOrderDetailId, OrderState orderState) throws NotFoundException;
     // 생산실적 단일 조회 및 생성
     ProductionPerformance getProductionPerformanceOrCreate(WorkOrderDetail workOrderDetail);
+
+    // 작업수량, 지시수량으로 상태값 구하기
+    OrderState findOrderStateByOrderAmountAndProductAmount(int orderAmount, int productAmount);
 }
