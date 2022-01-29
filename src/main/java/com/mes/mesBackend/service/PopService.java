@@ -17,7 +17,7 @@ public interface PopService {
      *  request: 품목고유번호, 작업수량
      *  return: LOT 고유아이디
      * */
-    Long createCreateWorkOrder(Long workOrderId, Long itemId, String userCode, int productAmount) throws NotFoundException, BadRequestException;
+    Long createCreateWorkOrder(Long workOrderId, Long itemId, String userCode, int productAmount, Long equipmentId) throws NotFoundException, BadRequestException;
     // 작업지시 상세 정보
     // 위에 해당 작업지시로 bomItemDetail 항목들 가져오기(품번, 품명, 계정, bom 수량, 예약수량)
 //    List<PopWorkOrderDetailResponse> getPopWorkOrderDetails(Long lotMasterId, Long workOrderId) throws NotFoundException;

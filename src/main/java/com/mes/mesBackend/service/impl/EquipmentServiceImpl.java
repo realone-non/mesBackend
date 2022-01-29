@@ -5,12 +5,14 @@ import com.mes.mesBackend.dto.response.EquipmentResponse;
 import com.mes.mesBackend.entity.Client;
 import com.mes.mesBackend.entity.Equipment;
 import com.mes.mesBackend.entity.WorkLine;
+import com.mes.mesBackend.entity.WorkProcess;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.EquipmentRepository;
 import com.mes.mesBackend.service.ClientService;
 import com.mes.mesBackend.service.EquipmentService;
 import com.mes.mesBackend.service.WorkLineService;
+import com.mes.mesBackend.service.WorkProcessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,15 +26,16 @@ public class EquipmentServiceImpl implements EquipmentService {
     private final WorkLineService workLineService;
     private final ModelMapper mapper;
     private final ClientService clientService;
+    private final WorkProcessService workProcessService;
 
     // 설비 생성
     @Override
     public EquipmentResponse createEquipment(EquipmentRequest equipmentRequest) throws NotFoundException {
         Client client = clientService.getClientOrThrow(equipmentRequest.getClient());
         WorkLine workLine = workLineService.getWorkLineOrThrow(equipmentRequest.getWorkLine());
-
+        WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(equipmentRequest.getWorkProcessId());
         Equipment equipment = mapper.toEntity(equipmentRequest, Equipment.class);
-        equipment.addJoin(client, workLine);
+        equipment.addJoin(client, workLine, workProcess);
         equipmentRepository.save(equipment);
         return mapper.toResponse(equipment, EquipmentResponse.class);
     }
@@ -61,9 +64,9 @@ public class EquipmentServiceImpl implements EquipmentService {
         Equipment findEquipment = getEquipmentOrThrow(id);
         Client newClient = clientService.getClientOrThrow(equipmentRequest.getClient());
         WorkLine newWorkLine = workLineService.getWorkLineOrThrow(equipmentRequest.getWorkLine());
-
+        WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(equipmentRequest.getWorkProcessId());
         Equipment newEquipment = mapper.toEntity(equipmentRequest, Equipment.class);
-        findEquipment.update(newEquipment, newClient, newWorkLine);
+        findEquipment.update(newEquipment, newClient, newWorkLine, workProcess);
         equipmentRepository.save(findEquipment);
         return mapper.toResponse(findEquipment, EquipmentResponse.class);
     }

@@ -31,4 +31,10 @@ public class WorkOrderUserLog extends BaseTimeEntity {
 
     @Column(name = "PRODUCT_AMOUNT", columnDefinition = "int COMMENT '작업수량'")
     private int productAmount;
+
+    public void create(WorkOrderDetail workOrderDetail, User user, int productAmount) {
+        setWorkOrderDetail(workOrderDetail);
+        setUser(user);
+        setProductAmount(productAmount);
+    }
 }

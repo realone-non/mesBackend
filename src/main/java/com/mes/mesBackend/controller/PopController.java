@@ -48,6 +48,8 @@ public class PopController {
         return new ResponseEntity<>(workProcesses, OK);
     }
 
+    // TODO: 공정으로 공정에 해당하는 설비정보 가져오기 GET
+
     // 작업지시 정보 리스트 api, 조건: 작업자, 작업공정
     // 작업지시 목록(공정)
     @SecurityRequirement(name = AUTHORIZATION)
@@ -81,10 +83,11 @@ public class PopController {
             @PathVariable(value = "work-order-id") @Parameter(name = "작업지시 id") Long workOrderId,
             @RequestParam @Parameter(description = "품목 id") Long itemId,
             @RequestParam @Parameter(description = "수량") int productAmount,
+            @RequestParam @Parameter(description = "설비 id") Long equipmentId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
-        Long lotId = popService.createCreateWorkOrder(workOrderId, itemId, userCode, productAmount);
+        Long lotId = popService.createCreateWorkOrder(workOrderId, itemId, userCode, productAmount, equipmentId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is viewed the list of from getPopWorkOrders.");
         return new ResponseEntity<>(lotId, OK);

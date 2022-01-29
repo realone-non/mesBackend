@@ -10,13 +10,11 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.LotLogHelper;
 import com.mes.mesBackend.helper.ProductionPerformanceHelper;
 import com.mes.mesBackend.helper.WorkOrderStateHelper;
-import com.mes.mesBackend.repository.ItemRepository;
-import com.mes.mesBackend.repository.UserRepository;
-import com.mes.mesBackend.repository.WorkOrderDetailRepository;
-import com.mes.mesBackend.repository.WorkProcessRepository;
+import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.LotMasterService;
 import com.mes.mesBackend.service.PopService;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.internal.LogManagerStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -36,6 +34,7 @@ public class PopServiceImpl implements PopService {
     private final WorkOrderStateHelper workOrderStateHelper;
     private final ProductionPerformanceHelper productionPerformanceHelper;
     private final LotLogHelper lotLogHelper;
+    private final WorkOrderUserLogRepository workOrderUserLogRepo;
 
 
     // 작업지시 정보 리스트 api, 조건: 작업자, 작업공정
@@ -65,16 +64,22 @@ public class PopServiceImpl implements PopService {
     * lotMaster(작업지시의 상태값이 SCHEDULE -> ONGOING 으로 변경되는 시점에서 생성): 품목, 작업 공정, 창고, 생성수량, 등록유형(PRODUCTION)
     * lotLog(lotMaster 생성 후 생성)
     * productionPerformance(작업지시의 상태값이 ONGOING -> COMPLETION 으로 변경되는 시점에서 create or update):
+    * workOrderDetailUserLog: 작업지시에 수량이 update 될 때 마다 insert
     * */
     // TODO: 작업자 변경 log
     @Override
-    public Long createCreateWorkOrder(Long workOrderId, Long itemId, String userCode, int productAmount) throws NotFoundException, BadRequestException {
+    public Long createCreateWorkOrder(Long workOrderId, Long itemId, String userCode, int productAmount, Long equipmentId) throws NotFoundException, BadRequestException {
         WorkOrderDetail workOrder = getWorkOrderDetailOrThrow(workOrderId);
         WorkProcess workProcess = workOrder.getWorkProcess();
         int beforeProductionAmount = workOrder.getProductionAmount();
 
+        // 작업지시의 상태가 COMPLETION 일 경우 더 이상 추가 할 수 없음. 추가하려면 workOrderDetail 의 productionAmount(지시수량) 을 늘려야함
         if (workOrder.getOrderState().equals(COMPLETION)) throw new BadRequestException("작업지시의 상태가 완료일 경우엔 더 이상 추가 할 수 없습니다.");
         if (productAmount == 0) throw new BadRequestException("입력한 작업수량은 0 일 수 없습니다.");
+
+        // workOderDetail: user 변경
+        User user = getUserByUserCode(userCode);
+        workOrder.setUser(user);
 
         // 작업완료를 여러번에 거쳐서 완료할 수 있음. ex) 10개 씩 세번
         // lotMaster 생성시점? workOrderDetail 의 orderState 가 SCHEDULE 이면서 1이상일때.
@@ -85,18 +90,19 @@ public class PopServiceImpl implements PopService {
         // workOrderDetail: 상태값 변경 및 startDate 및 endDate 변경
         // productOrder: 상태값 변경
         // lotLog: 생성
+        LotMaster lotMaster = new LotMaster();
         if (workOrder.getOrderState().equals(SCHEDULE)) {
             LotMasterRequest lotMasterRequest = new LotMasterRequest();
             Item item = getItemOrThrow(itemId);
             WareHouse wareHouse = lotMasterService.getLotMasterWareHouseOrThrow();
 
             // lotMaster 생성
-            lotMasterRequest.setItem(item);                                           // 품목
-            lotMasterRequest.setWorkProcessId(workProcess.getId());  // 작업공정
-            lotMasterRequest.setWareHouse(wareHouse);            // 창고
-            lotMasterRequest.setCreatedAmount(productAmount);    // 생성수량
-            lotMasterRequest.setEnrollmentType(PRODUCTION);     // 등록유형
-            LotMaster lotMaster = lotMasterService.createLotMaster(lotMasterRequest);
+            lotMasterRequest.setItem(item);                         // 품목
+            lotMasterRequest.setWorkProcessId(workProcess.getId()); // 작업공정
+            lotMasterRequest.setWareHouse(wareHouse);               // 창고
+            lotMasterRequest.setCreatedAmount(productAmount);       // 생성수량
+            lotMasterRequest.setEnrollmentType(PRODUCTION);         // 등록유형
+            lotMaster = lotMasterService.createLotMaster(lotMasterRequest);
 
             // workOrderDetail: 상태값 변경 및 startDate 및 endDate 변경
             // productOrder: 상태값 변경
@@ -114,14 +120,11 @@ public class PopServiceImpl implements PopService {
             // produceOrder: ONGOING -> COMPLETION ? orderState update
 
             // workOrderDetail id, workProcess id 로 LotLog 찾음
-            LotMaster lotMaster =
-                    lotLogHelper.getLotLogByWorkOrderDetailIdAndWorkProcessIdOrThrow(workOrder.getId(), workProcess.getId()).getLotMaster();
+            lotMaster = lotLogHelper.getLotLogByWorkOrderDetailIdAndWorkProcessIdOrThrow(workOrder.getId(), workProcess.getId()).getLotMaster();
+            lotMaster.setCreatedAmount(lotMaster.getCreatedAmount() + productAmount);   // lotMaster: 생성수량 update
 
-            // lotMaster: 생성수량 update
-            lotMaster.setCreatedAmount(lotMaster.getCreatedAmount() + productAmount);
-
-            // workOrderDetail: productionAmount 변경
-            workOrder.setProductionAmount(beforeProductionAmount + productAmount);
+            // workOrderDetail
+            workOrder.setProductionAmount(beforeProductionAmount + productAmount);  // productionAmount 변경
             OrderState orderState = workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(workOrder.getOrderAmount(), workOrder.getProductionAmount());
 
             // workOrderDetail: ONGOING -> COMPLETION ? orderState update 및 endDate update
@@ -136,11 +139,12 @@ public class PopServiceImpl implements PopService {
         }
         workOrderDetailRepository.save(workOrder);
 
-        User user = getUserByUserCode(userCode);
-        workOrder.setUser(user);
+        // workOrderDetailUserLog: 작업지시에 수량이 update 될 때 마다 insert
+        WorkOrderUserLog workOrderUserLog = new WorkOrderUserLog();
+        workOrderUserLog.create(workOrder, user, productAmount);
+        workOrderUserLogRepo.save(workOrderUserLog);
 
-
-        return null;
+        return lotMaster.getId();
     }
 
 
