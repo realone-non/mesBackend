@@ -93,7 +93,7 @@ public class RecycleController {
             summary = "재사용 유형 리스트 조회"
     )
     public ResponseEntity<List<RecycleResponse>> getRecycles(
-            @RequestParam(required = false) @Parameter(description = "공정id") Long workProcessId,
+            @RequestParam(required = false) @Parameter(description = "공정 id") Long workProcessId,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<RecycleResponse> responseList = recycleService.getRecycles(workProcessId);
@@ -102,10 +102,10 @@ public class RecycleController {
         return new ResponseEntity<>(responseList, HttpStatus.OK);
     }
 
-    // 제조 오더 수정
+    // 재사용 유형 수정
     @PatchMapping("/{recycle-id}")
     @ResponseBody()
-    @Operation(summary = "제조 오더 수정", description = "")
+    @Operation(summary = "재사용 유형 수정", description = "")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -124,10 +124,10 @@ public class RecycleController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    // 제조 오더 삭제
+    // 재사용 유형 삭제
     @DeleteMapping("/{recycle-id}")
     @ResponseBody()
-    @Operation(summary = "제조 오더 삭제", description = "")
+    @Operation(summary = "재사용 유형 삭제", description = "")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "204", description = "no content"),

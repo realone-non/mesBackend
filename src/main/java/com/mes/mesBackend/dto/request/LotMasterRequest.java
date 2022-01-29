@@ -44,6 +44,8 @@ public class LotMasterRequest {
     WorkProcessDivision workProcessDivision;    // 공정 구분
     Long equipmentId;       // 설비 id
 
+    boolean dummyYn;
+
     public void putPurchaseInput(
             Item item,
             WareHouse wareHouse,
