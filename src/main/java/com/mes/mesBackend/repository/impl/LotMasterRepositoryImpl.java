@@ -3,10 +3,12 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.MaterialStockReponse;
 import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
+import com.mes.mesBackend.dto.response.PopRecycleResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.repository.custom.LotMasterRepositoryCustom;
+import com.mes.mesBackend.service.PopRecycleService;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -81,6 +83,23 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .orderBy(lotMaster.createdDate.desc())
                 .limit(1)
                 .fetchOne());
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<String> findLotNoByAccountCode(Long itemAccountCodeId, LocalDate startDate, LocalDate endDate){
+        return Optional.ofNullable(jpaQueryFactory
+                    .select(lotMaster.lotNo)
+                    .from(lotMaster)
+                        .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                        .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                        .leftJoin(itemAccountCode).on(itemAccountCode.itemAccount.id.eq(itemAccountCode.id))
+                    .where(
+                            lotMaster.createdDate.between(startDate.atStartOfDay(), endDate.atStartOfDay()),
+                            itemAccountCode.id.eq(itemAccountCodeId)
+                    )
+                    .orderBy(lotMaster.createdDate.desc())
+                    .limit(1)
+                    .fetchOne());
     }
 
     // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 유효여부
@@ -307,6 +326,73 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         lotMaster.stockAmount.gt(0)
                 )
                 .groupBy(lotMaster.wareHouse, lotMaster.item, lotMaster.outSourcingInput)
+                .fetch();
+    }
+
+    //공정별 불량 수량 가져오기
+    @Transactional(readOnly = true)
+    public List<PopRecycleResponse> findBadAmountByWorkProcess(Long workProcessId){
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                PopRecycleResponse.class,
+                                item.id.as("id"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                lotMaster.badItemAmount.sum().as("badAmount"),
+                                lotMaster.recycleAmount.sum().as("recycleAmount")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
+                .where(
+                        lotMaster.workProcess.id.eq(workProcessId)
+                )
+                .groupBy(lotMaster.item.id)
+                .fetch();
+    }
+
+    //공정별 불량 개수 단일 조회
+    @Transactional(readOnly = true)
+    public PopRecycleResponse findBadAmountByWorkProcess(Long workProcessId, Long itemId){
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                PopRecycleResponse.class,
+                                item.id.as("id"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                lotMaster.badItemAmount.sum().as("badAmount"),
+                                lotMaster.recycleAmount.sum().as("recycleAmount")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
+                .where(
+                        lotMaster.workProcess.id.eq(workProcessId),
+                        lotMaster.item.id.eq(itemId)
+                )
+                .groupBy(lotMaster.item.id)
+                .fetchOne();
+    }
+
+    //재사용 가능한 LOT검색
+    @Transactional(readOnly = true)
+    public List<LotMaster> findBadLotByItemIdAndWorkProcess(Long itemId, Long workProcessId){
+        return jpaQueryFactory
+                .selectFrom(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
+                .where(
+                        lotMaster.item.id.eq(itemId),
+                        lotMaster.workProcess.id.eq(workProcessId),
+                        lotMaster.badItemAmount.gt(0),
+                        lotMaster.deleteYn.eq(false),
+                        lotMaster.useYn.eq(true)
+                )
+                .orderBy(lotMaster.createdDate.desc())
                 .fetch();
     }
 

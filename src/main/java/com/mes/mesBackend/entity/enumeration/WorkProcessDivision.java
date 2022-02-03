@@ -9,6 +9,7 @@ package com.mes.mesBackend.entity.enumeration;
 * 라벨링: LABELING
 * 포장: PACKAGING
 * 출하: SHIPMENT
+* 재사용 : RECYCLE
 * */
 public enum WorkProcessDivision {
     MATERIAL_INPUT,
@@ -17,5 +18,6 @@ public enum WorkProcessDivision {
     CAP_ASSEMBLY,
     LABELING,
     PACKAGING,
-    SHIPMENT
+    SHIPMENT,
+    RECYCLE
 }

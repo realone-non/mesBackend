@@ -59,6 +59,9 @@ public class WareHouse extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
+    @Column(name = "WORK_PROCESS_YN", columnDefinition = "bit(1) COMMENT '작업공정용 분류 여부'")
+    private boolean workProcessYn;
+
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "FACTORY", columnDefinition = "bigint COMMENT '공장'")
 //    private Factory factory;                // 공장 (검색)

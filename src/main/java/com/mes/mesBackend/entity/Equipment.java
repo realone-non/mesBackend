@@ -82,12 +82,17 @@ public class Equipment extends BaseTimeEntity {
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    public void addJoin(Client client, WorkLine workLine) {
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '작업공정'")
+    private WorkProcess workProcess;
+
+    public void addJoin(Client client, WorkLine workLine, WorkProcess workProcess) {
         setClient(client);
         setWorkLine(workLine);
+        setWorkProcess(workProcess);
     }
 
-    public void update(Equipment newEquipment, Client newClient, WorkLine newWorkLine) {
+    public void update(Equipment newEquipment, Client newClient, WorkLine newWorkLine, WorkProcess workProcess) {
         setEquipmentCode(newEquipment.equipmentCode);
         setEquipmentName(newEquipment.equipmentName);
         setModel(newEquipment.model);
@@ -100,6 +105,7 @@ public class Equipment extends BaseTimeEntity {
         setWorkLine(newWorkLine);
         setCheckCycle(newEquipment.checkCycle);
         setUseYn(newEquipment.useYn);
+        setWorkProcess(workProcess);
     }
 
     public void delete() {

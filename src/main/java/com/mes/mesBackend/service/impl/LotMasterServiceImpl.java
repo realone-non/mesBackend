@@ -40,9 +40,11 @@ public class LotMasterServiceImpl implements LotMasterService {
     private final WorkProcessRepository workProcessRepository;
     private final LotLogHelper lotLogHelper;
 
+    // TODO: lotMaster 에 넣을 warehouse 로직 추가, 변경 해야함
+
     // LOT master 생성
     @Override
-    public String createLotMaster(LotMasterRequest lotMasterRequest) throws NotFoundException, BadRequestException {
+    public LotMaster createLotMaster(LotMasterRequest lotMasterRequest) throws NotFoundException, BadRequestException {
         LotType lotType = lotMasterRequest.getLotTypeId() != null ? lotTypeService.getLotTypeOrThrow(lotMasterRequest.getLotTypeId()) : null;
         PurchaseInput purchaseInput = lotMasterRequest.getPurchaseInputId() != null ? getPurchaseInputOrThrow(lotMasterRequest.getPurchaseInputId()) : null;
         OutSourcingInput outSourcingInput = lotMasterRequest.getOutsourcingInputId() != null ? getOutsourcingInputOrThrow(lotMasterRequest.getOutsourcingInputId()) : null;
@@ -112,7 +114,7 @@ public class LotMasterServiceImpl implements LotMasterService {
         }
 
         lotMasterRepo.save(lotMaster);
-        return lotMaster.getLotNo();
+        return lotMaster;
     }
 
     // lot 번호 생성
@@ -230,6 +232,14 @@ public class LotMasterServiceImpl implements LotMasterService {
             }
         }
     }
+
+    // lotMaster 용 wareHouse 찾기
+    @Override
+    public WareHouse getLotMasterWareHouseOrThrow() throws NotFoundException {
+        return wareHouseRepository.findByWorkProcessYnIsTrueAndDeleteYnFalse()
+                .orElseThrow(() -> new NotFoundException("공정 용 창고가 없습니다. 공정 용 창고 생성 후 다시 시도해 주세요."));
+    }
+
     private WorkProcess getWorkProcessIdOrThrow(Long id) throws NotFoundException {
         return workProcessRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("workProcess does not exist. input id: " + id));

@@ -189,6 +189,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         List<Long> clientIds = purchaseRequestRepo.findClientIdsByPurchaseOrder(purchaseOrder.getId());
 
         // 구매요청에 해당하는 구매발주를 집어넣고 구매요청의 orderState 의 상태값을 SCHEDULE -> ONGOING 으로 변경
+        // SCHEDULE 로 변경
         purchaseRequest.putPurchaseOrderAndOrderStateChangedOngoing(purchaseOrder);
         purchaseRequest.setOrderAmount(purchaseOrderDetailRequest.getPurchaseAmount());     // 발주수량 변경
 
@@ -254,12 +255,19 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     }
 
     // 구매발주상세 삭제
+    // 상세에 해당하는 구매발주가 하나일 땐 purchaseOrder 의 client 를 null 로 변경해야함
     @Override
     public void deletePurchaseOrderDetail(Long purchaseOrderId, Long purchaseOrderDetailId) throws NotFoundException, BadRequestException {
         PurchaseRequest purchaseRequest = getPurchaseRequestOrThrow(purchaseOrderId, purchaseOrderDetailId);
         // 구매발주에서 제거, orderState 변경 ONGOING -> SCHEDULE
         purchaseRequest.deleteFromPurchaseOrderAndOrderStateChangedSchedule();
         purchaseRequestRepo.save(purchaseRequest);
+
+        // 구매발주에 해당하는 구매요청이 하나라도 없으면 구매발주의 client 를 null 로 변경함
+        PurchaseOrder purchaseOrder = getPurchaseOrderOrThrow(purchaseOrderId);
+        boolean b = purchaseRequestRepo.existsPurchaseRequestByPurchaseOrder(purchaseOrderId);
+        if (b) purchaseOrder.setClient(null);
+        purchaseOrderRepo.save(purchaseOrder);
     }
 
     // 구매발주, 구매요청 id 를 기준으로 해당하는 구매요청 조회

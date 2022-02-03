@@ -3,6 +3,7 @@ package com.mes.mesBackend.helper.impl;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.ProductionPerformance;
 import com.mes.mesBackend.entity.WorkOrderDetail;
+import com.mes.mesBackend.entity.WorkProcess;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.ProductionPerformanceHelper;
@@ -15,21 +16,27 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
+
 @Component
 @RequiredArgsConstructor
 public class ProductionPerformanceHelperImpl implements ProductionPerformanceHelper {
     private final ProductionPerformanceRepository productionPerformanceRepo;
-    private final WorkProcessRepository workProcessRepo;
     private final LotMasterRepository lotMasterRepo;
     private final WorkOrderDetailRepository workOrderDetailRepo;
 
     // 해당하는 공정의 맞게 ProductionPerformance 수정
+    // - 제조오더에 해당하는 productionPerformance 가 없고, 작업시지의 상태값이 COMPLETION 이면 생성, 있으면 공정에 해당하는 컬럼에 값 update
     @Override
-    public void updateProductionPerformance(Long workOrderDetailId, Long lotMasterId, WorkProcessDivision workProcessDivision) throws NotFoundException {
+    public void updateOrInsertProductionPerformance(Long workOrderDetailId, Long lotMasterId) throws NotFoundException {
         WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderDetailId);
+        WorkProcess workProcess = workOrderDetail.getWorkProcess();
+        WorkProcessDivision workProcessDivision = workProcess.getWorkProcessDivision();
         LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);
-        ProductionPerformance productionPerformance = productionPerformanceRepo.findByWorkOrderDetailAndLotMasterAndDeleteYnFalse(workOrderDetail, lotMaster)
-                .orElseThrow(() -> new NotFoundException("[ProductionPerformanceHelper] productionPerformance does not exist."));
+
+        // 있으면 update, 없으면 create
+        ProductionPerformance productionPerformance = getProductionPerformanceOrCreate(workOrderDetail);
+        productionPerformance.setLotMaster(lotMaster);      // lotMaster update
 
         LocalDateTime now = LocalDateTime.now();
         switch (workProcessDivision) {
@@ -49,6 +56,18 @@ public class ProductionPerformanceHelperImpl implements ProductionPerformanceHel
                 break;
         }
         productionPerformanceRepo.save(productionPerformance);
+    }
+
+    @Override
+    public ProductionPerformance getProductionPerformanceOrCreate(WorkOrderDetail workOrderDetail) {
+        ProductionPerformance productionPerformance = productionPerformanceRepo.findByProduceOrderId(workOrderDetail.getProduceOrder().getId())
+                .orElseGet(ProductionPerformance::new);
+        // 작업지시에 해당하는 생산실적이 없고, 작업지시의 상태값이 완료 일때 새로 생성
+        if (productionPerformance.getId() == null && workOrderDetail.getOrderState().equals(COMPLETION)) {
+            productionPerformance.setWorkOrderDetail(workOrderDetail);
+            productionPerformanceRepo.save(productionPerformance);
+        }
+        return productionPerformance;
     }
 
     private LotMaster getLotMasterOrThrow(Long id) throws NotFoundException {

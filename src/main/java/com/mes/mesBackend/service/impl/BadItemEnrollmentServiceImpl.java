@@ -48,6 +48,7 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
                 itemGroupId,
                 produceOrderNo,
                 workOrderNo,
+
                 fromDate,
                 toDate,
                 itemNoAndItemName

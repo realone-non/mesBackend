@@ -55,6 +55,15 @@ public class LotLogHelperImpl implements LotLogHelper {
                 );
     }
 
+    // workOrderDetail id, workProcess id 로 LotLog 찾음
+    @Override
+    public LotLog getLotLogByWorkOrderDetailIdAndWorkProcessIdOrThrow(Long workOrderDetailId, Long workProcessId) throws NotFoundException {
+        WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderDetailId);
+        WorkProcess workProcess = getWorkProcessOrThrow(workProcessId);
+        return lotLogRepo.findByWorkOrderDetailAndWorkProcess(workOrderDetail, workProcess)
+                .orElseThrow(() -> new NotFoundException("[LotLogHelper] 해당 작업공정과 작업지시에 해당하는 lotMaster 가 없습니다. "));
+    }
+
     private LotMaster getLotMasterOrThrow(Long id) throws NotFoundException {
         return lotMasterRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("[LotLogHelper] lotMaster does not exist. input id:" + id));

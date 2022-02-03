@@ -8,11 +8,9 @@ import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.LotLogHelper;
 import com.mes.mesBackend.helper.NumberAutomatic;
 import com.mes.mesBackend.helper.WorkOrderStateHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
-import com.mes.mesBackend.repository.LotLogRepository;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
 import com.mes.mesBackend.service.*;
 import lombok.RequiredArgsConstructor;
@@ -38,8 +36,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private final NumberAutomatic numberAutomatic;
     private final TestProcessService testProcessService;
     private final WorkOrderStateHelper workOrderStateHelper;
-    private final LotLogRepository lotLogRepository;        // 이거 작업 로직 추가해야됨
-    private final LotLogHelper lotLogHelper;
 
     // 제조오더 정보 리스트 조회
     // 검색조건: 품목그룹 id, 품명|품번, 수주번호, 제조오더번호, 착수예정일 fromDate~endDate, 지시상태
@@ -84,7 +80,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         workOrderDetail.setOrderNo(workOrderNo);
         workOrderDetail.setOrderAmount(orderAmount);
         workOrderDetailRepo.save(workOrderDetail);
-        workOrderStateHelper.updateOrderState(workOrderDetail.getId(), SCHEDULE, null);
+        workOrderStateHelper.updateOrderState(workOrderDetail.getId(), SCHEDULE);
 
         return getWorkOrderResponseOrThrow(produceOrderId, workOrderDetail.getId());
     }
@@ -111,8 +107,14 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     /*
     * 작업공정 수정 불가
     * */
+
+    // TODO : 생산수량 변경 X, 이 쪽 다시 수정해야함
     @Override
-    public WorkOrderResponse updateWorkOrder(Long produceOrderId, Long workOrderId, WorkOrderUpdateRequest newWorkOrderRequest) throws NotFoundException, BadRequestException {
+    public WorkOrderResponse updateWorkOrder(
+            Long produceOrderId,
+            Long workOrderId,
+            WorkOrderUpdateRequest newWorkOrderRequest
+    ) throws NotFoundException, BadRequestException {
         WorkOrderDetail findWorkOrderDetail = getWorkOrderDetailOrThrow(workOrderId, produceOrderId);
 
         if (newWorkOrderRequest.getOrderState().equals(COMPLETION)) throw new BadRequestException("지시상태를 완료로 변경 할 수 없습니다.");
@@ -131,14 +133,14 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             // 사용자가 입력한 지시수량이 수주품목의 수량보다 크면 예외
             throwIfOrderAmountGreaterThanProduceOrderAmount(orderAmount, produceOrder.getContractItem().getAmount());
             // 사용자가 입력한 생산수량이 지시수량보다 크면 예외
-            throwIfProductionAmountGreaterThanOrderAmount(newWorkOrderRequest.getProductionAmount(), orderAmount);
+//            throwIfProductionAmountGreaterThanOrderAmount(newWorkOrderRequest.getProductionAmount(), orderAmount);
         }
 
         newWorkOrderRequest.setOrderAmount(orderAmount);
         WorkOrderDetail newWorkOrderDetail = mapper.toEntity(newWorkOrderRequest, WorkOrderDetail.class);
         findWorkOrderDetail.update(newWorkOrderDetail, newWorkLine, newUser, testProcess, newUnit);
         workOrderDetailRepo.save(findWorkOrderDetail);
-        workOrderStateHelper.updateOrderState(findWorkOrderDetail.getId(), findWorkOrderDetail.getOrderState(), null);
+        workOrderStateHelper.updateOrderState(findWorkOrderDetail.getId(), findWorkOrderDetail.getOrderState());
 
         return getWorkOrderResponseOrThrow(produceOrderId, workOrderId);
     }

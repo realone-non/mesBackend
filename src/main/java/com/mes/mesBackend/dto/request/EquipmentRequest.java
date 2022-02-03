@@ -68,4 +68,9 @@ public class EquipmentRequest {
     @Schema(description = "사용")
     @NotNull(message = NOT_NULL)
     boolean useYn;
+
+    @Schema(description = "작업공정")
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
+    Long workProcessId;
 }
