@@ -198,7 +198,7 @@ public class MapperConfig {
             WorkLineResponse.workLineAndWorkCenterAndWorkProcess workLineCustomResponse = modelMapper.map(workLine, WorkLineResponse.workLineAndWorkCenterAndWorkProcess.class);
             workLineCustomResponse.setWorkLineName(workLine.getWorkLineName());
             workLineCustomResponse.setWorkCenterName(workLine.getWorkCenter().getWorkCenterName());
-            workLineCustomResponse.setWorkProcessName(workLine.getWorkProcess().getWorkProcessName());
+//            workLineCustomResponse.setWorkProcessName(workLine.getWorkProcess().getWorkProcessName());
             return workLineCustomResponse;
         }
     };

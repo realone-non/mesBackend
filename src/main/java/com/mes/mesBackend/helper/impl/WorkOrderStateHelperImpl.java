@@ -34,7 +34,8 @@ public class WorkOrderStateHelperImpl implements WorkOrderStateHelper {
     public void updateOrderState(Long workOrderDetailId, OrderState orderState) throws NotFoundException {
         // 작업지시: orderState 따라 작업지시 날짜값 update
         WorkOrderDetail workOrder = getWorkOrderDetailOrThrow(workOrderDetailId);
-        workOrder.changeOrderStateDate();
+        workOrder.changeOrderStateDate(orderState);
+        workOrder.setOrderState(orderState);
         workOrderDetailRepo.save(workOrder);
 
         // 제조오더: 작업지시 상태값 따라서 제조오더 상태값 update
@@ -52,7 +53,7 @@ public class WorkOrderStateHelperImpl implements WorkOrderStateHelper {
     @Override
     public OrderState findOrderStateByOrderAmountAndProductAmount(int orderAmount, int productAmount) {
         OrderState orderState;
-        if (orderAmount >= productAmount) orderState = COMPLETION;
+        if (productAmount >= orderAmount) orderState = COMPLETION;
         else if (productAmount == 0) orderState = SCHEDULE;
         else  orderState = ONGOING;
         return orderState;

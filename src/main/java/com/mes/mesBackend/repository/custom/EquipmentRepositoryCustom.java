@@ -1,8 +1,14 @@
 package com.mes.mesBackend.repository.custom;
 
+import com.mes.mesBackend.dto.response.PopEquipmentResponse;
 import com.mes.mesBackend.entity.Equipment;
 
+import java.util.List;
+
 public interface EquipmentRepositoryCustom {
-    //공정으로 설비 가져오기
-     Equipment findByWorkProcess(Long workProcessId);
+    // 작업공정에 따라 설비 조회
+    List<PopEquipmentResponse> findPopEquipmentResponseByWorkProcess(Long workProcessId);
+
+    // 작업공정으로 단일 설비 조회
+    Equipment findByWorkProcess(Long workProcessId);
 }
