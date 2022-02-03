@@ -30,6 +30,9 @@ public class WareHouseResponse {
     @Schema(description = "사용여부")
     boolean useYn;
 
+    @Schema(description = "공정용 여부")
+    boolean workProcessYn;
+
     @Getter
     @Setter
     public static class idAndName {

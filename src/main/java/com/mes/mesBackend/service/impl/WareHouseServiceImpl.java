@@ -9,6 +9,7 @@ import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.WareHouseRepository;
 import com.mes.mesBackend.service.WareHouseService;
 import com.mes.mesBackend.service.WareHouseTypeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,16 +18,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class WareHouseServiceImpl implements WareHouseService {
-
-    @Autowired
-    WareHouseRepository wareHouseRepository;
-
-    @Autowired
-    WareHouseTypeService wareHouseTypeService;
-
-    @Autowired
-    ModelMapper mapper;
+    private final WareHouseRepository wareHouseRepository;
+    private final WareHouseTypeService wareHouseTypeService;
+    private final ModelMapper mapper;
 
     // 생성
     @Override

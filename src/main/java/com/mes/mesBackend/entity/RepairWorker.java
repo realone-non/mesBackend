@@ -22,7 +22,7 @@ public class RepairWorker extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "EQUIPMENT_BREAKDOWN", columnDefinition = "bigint COMMENT '설비고장수리내역'", nullable = false)
+    @JoinColumn(name = "EQUIPMENT_BREAKDOWN", columnDefinition = "bigint COMMENT '설비고장수리내역'")
     private EquipmentBreakdown equipmentBreakdown;
 
     @ManyToOne(fetch = LAZY)

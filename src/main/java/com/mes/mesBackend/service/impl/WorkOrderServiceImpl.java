@@ -69,9 +69,11 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         // 입력받은 공정이 기존에 제조오더에 등록되어 있는 공정이면 예외(하나의 제조오더에 하나의 작업공정만 등록 가능)
         throwIfWorkProcessByProduceOrder(produceOrderId, workOrderRequest.getWorkProcess());
         // 사용자가 입력한 지시수량이 수주품목의 수량보다 크면 예외
-        throwIfOrderAmountGreaterThanProduceOrderAmount(orderAmount, produceOrder.getContractItem().getAmount());
+        // 지시수량을 수주 수량보다 더 크게 할 수 있음.
+//        throwIfOrderAmountGreaterThanProduceOrderAmount(orderAmount, produceOrder.getContractItem().getAmount());
         // 사용자가 입력한 생산수량이 지시수량보다 크면 예외
-        throwIfProductionAmountGreaterThanOrderAmount(workOrderRequest.getProductionAmount(), orderAmount);
+        // 생상수량이 지시수량보다 클 수 있음.
+//        throwIfProductionAmountGreaterThanOrderAmount(workOrderRequest.getProductionAmount(), orderAmount);
 
         WorkOrderDetail workOrderDetail = mapper.toEntity(workOrderRequest, WorkOrderDetail.class);
         String workOrderNo = numberAutomatic.createDateTimeNo();
