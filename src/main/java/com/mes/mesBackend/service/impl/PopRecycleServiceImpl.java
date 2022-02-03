@@ -63,7 +63,7 @@ public class PopRecycleServiceImpl implements PopRecycleService {
         LotMaster lotmaster = lotHelper.createLotMaster(lotRequest);
 
         for (LotMaster dbLotMaster:usableLotList) {
-            if(createAmount < dbLotMaster.getBadItemAmount()){
+            if(createAmount <= dbLotMaster.getBadItemAmount()){
                 dbLotMaster.setBadItemAmount(dbLotMaster.getBadItemAmount() - createAmount);
                 createAmount = 0;
             }

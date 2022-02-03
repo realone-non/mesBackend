@@ -29,7 +29,7 @@ import java.util.List;
 
 //5-2. 신제품 BOM 등록
 @Tag(name = "new-product-bom-master", description = "신제품 BOM 등록 API")
-@RequestMapping(value = "/new-product-bom-master")
+@RequestMapping(value = "/new-product-bom-masters")
 @RestController
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Authorization")
