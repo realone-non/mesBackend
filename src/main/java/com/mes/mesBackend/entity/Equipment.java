@@ -82,6 +82,8 @@ public class Equipment extends BaseTimeEntity {
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
+    // TODO: 작업라인에 해당되는 작업공정을 사용자한테 보여줘야 하는지? 아님 설비 등록할 때 등록한 작업공정을 보여줘야 하는지?
+    // 지금은 일단 설비 등록할 때 등록 한 작업공정으로 보여주기로
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '작업공정'")
     private WorkProcess workProcess;

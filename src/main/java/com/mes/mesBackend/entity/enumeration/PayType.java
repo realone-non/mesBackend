@@ -7,6 +7,7 @@ package com.mes.mesBackend.entity.enumeration;
 * 발주 전 100% 현금:
 * 납품 전 100% 현금:
 * 등등?
+* [현금: CASH]
 * */
 public enum PayType {
     // [현금: CASH]

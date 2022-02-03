@@ -18,7 +18,6 @@ import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.GoodsType.HALF_PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
-import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
 
 @RequiredArgsConstructor
 public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryCustom {
@@ -543,7 +542,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .leftJoin(item).on(item.id.eq(contractItem.item.id))
                 .where(
                         isWorkProcessId(workProcessId),
-//                        workOrderDetail.expectedWorkDate.eq(now),
+                        workOrderDetail.expectedWorkDate.eq(now),
                         workOrderDetail.deleteYn.isFalse()
                 )
                 .fetch();

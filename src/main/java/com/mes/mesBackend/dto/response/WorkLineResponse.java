@@ -50,9 +50,8 @@ public class WorkLineResponse {
         @Schema(description = "작업장")
         String workCenterName;          // 작업장
 
-        @Schema(description = "작업공정")
-        String workProcessName;        // 작업공정
-
+//        @Schema(description = "작업공정")
+//        String workProcessName;        // 작업공정
     }
 
     @Getter
