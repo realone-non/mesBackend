@@ -135,8 +135,14 @@ public class LotHelperImpl implements LotHelper {
         // 1~6 입고년월일 예) 21년 12월 11일 211211
         String dateCode = LocalDate.now().format(DateTimeFormatter.ofPattern(YYMMDD));
         String productDateCode = LocalDate.now().format(DateTimeFormatter.ofPattern(YYMM));
+        Equipment equipment = equipmentRepository.findByIdAndDeleteYnFalse(equipmentId)
+                .orElse(null);
 
-        String equipmentNo = equipmentRepository.findByIdAndDeleteYnFalse(equipmentId).toString();
+        String equipmentNo = "";
+
+        if(equipment != null){
+             equipmentNo = equipment.getEquipmentCode();
+        }
 
         // 품목의 품목계정 코드 조회
         ItemAccountCode itemAccountCode = lotMasterRepo.findCodeByItemId(itemId);
