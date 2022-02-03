@@ -6,6 +6,7 @@ import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
 import com.mes.mesBackend.dto.response.ProduceOrderResponse;
 import com.mes.mesBackend.dto.response.RecycleResponse;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -93,10 +94,10 @@ public class RecycleController {
             summary = "재사용 유형 리스트 조회"
     )
     public ResponseEntity<List<RecycleResponse>> getRecycles(
-            @RequestParam(required = false) @Parameter(description = "공정 id") Long workProcessId,
+            @RequestParam(required = false) @Parameter(description = "공정 id") WorkProcessDivision workProcessDivision,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        List<RecycleResponse> responseList = recycleService.getRecycles(workProcessId);
+    ) throws NotFoundException {
+        List<RecycleResponse> responseList = recycleService.getRecycles(workProcessDivision);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getRecycles.");
         return new ResponseEntity<>(responseList, HttpStatus.OK);
