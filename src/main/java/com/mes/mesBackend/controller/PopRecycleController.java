@@ -83,6 +83,6 @@ public class PopRecycleController {
         PopRecycleResponse response = popRecycleService.createUseRecycle(request);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + response.getId());
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
