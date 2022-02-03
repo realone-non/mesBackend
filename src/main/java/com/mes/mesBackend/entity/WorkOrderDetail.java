@@ -65,6 +65,7 @@ public class WorkOrderDetail extends BaseTimeEntity {
     @JoinColumn(name = "USER", columnDefinition = "bigint COMMENT '생산담당자'")
     private User user;                // 생산담당자
 
+    // TODO: 단위에 대해서 다시 정의해야함
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "UNIT", columnDefinition = "bigint COMMENT '단위'")
     private Unit unit;
@@ -159,7 +160,6 @@ public class WorkOrderDetail extends BaseTimeEntity {
         setWorkLine(newWorkLine);
         setOrderAmount(newWorkOrderDetail.orderAmount);
         setUser(newUser);
-        setUnit(newUnit);
         setReadyTime(newWorkOrderDetail.readyTime);
         setUph(newWorkOrderDetail.uph);
         setExpectedWorkDate(newWorkOrderDetail.expectedWorkDate);
@@ -179,7 +179,7 @@ public class WorkOrderDetail extends BaseTimeEntity {
     }
 
     // 지시상태 별 날짜 변경
-    public void changeOrderStateDate() {
+    public void changeOrderStateDate(OrderState orderState) {
         LocalDateTime now = LocalDateTime.now();
         switch (orderState){
             case SCHEDULE:
@@ -192,6 +192,7 @@ public class WorkOrderDetail extends BaseTimeEntity {
                 setEndDate(null);
                 break;
             case COMPLETION:
+                if (startDate == null) setStartDate(now);
                 setEndDate(now);
                 break;
         }

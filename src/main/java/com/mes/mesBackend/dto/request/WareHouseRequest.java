@@ -33,4 +33,8 @@ public class WareHouseRequest {
     @Schema(description = "사용여부")
     @NotNull(message = NOT_NULL)
     boolean useYn;
+
+    @Schema(description = "공정용 여부")
+    @NotNull(message = NOT_NULL)
+    boolean workProcessYn;
 }

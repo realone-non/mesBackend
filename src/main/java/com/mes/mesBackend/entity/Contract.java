@@ -67,8 +67,8 @@ public class Contract extends BaseTimeEntity {
     @Column(name = "PRODUCTION_TYPE", columnDefinition = "varchar(255) COMMENT '생산유형'", nullable = false)
     private ProductionType productionType;  // 생산유형
 
-    @Column(name = "CLIENT_ORDER_NO", columnDefinition = "varchar(255) COMMENT '고객발주번호'", nullable = false)
-    private String clientOrderNo;       // 고객발주번호
+    @Column(name = "CLIENT_ORDER_NO", columnDefinition = "varchar(255) COMMENT '고객발주번호'")
+    private String clientOrderNo;       // 고객발주번호   01/29 팀장님이 nullable 로 바꾸라고 하심
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "USER", columnDefinition = "bigint COMMENT '담당자'", nullable = false)

@@ -9,6 +9,8 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
+import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 @Getter
 @Setter
@@ -34,7 +36,7 @@ public class EquipmentResponse {
     ClientResponse.idAndName client;
 
     @Schema(description = "구매일자")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDateTime purchaseDate;
 
     @Schema(description = "구입금액")
@@ -47,11 +49,14 @@ public class EquipmentResponse {
     String serialNo;
 
     @Schema(description = "생산개시일자")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDateTime startDate;
 
-    @Schema(description = "작업라인, 작업장, 작업공정")
+    @Schema(description = "작업라인, 작업장")
     WorkLineResponse.workLineAndWorkCenterAndWorkProcess workLine;
+
+    @Schema(description = "작업공정")
+    WorkProcessResponse.idAndName workProcess;
 
     @Schema(description = "점검주기")
     int checkCycle;

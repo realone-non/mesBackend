@@ -46,6 +46,4 @@ public class PopWorkOrderResponse {
 
     @JsonIgnore
     Long produceOrderItemId;
-
-    // 품목 id, 품번, 품명, 작지번호, 작업지시의 지시수량,
 }
