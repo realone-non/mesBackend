@@ -11,10 +11,7 @@ import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.LotHelper;
 import com.mes.mesBackend.helper.impl.LotHelperImpl;
-import com.mes.mesBackend.repository.EquipmentRepository;
-import com.mes.mesBackend.repository.ItemRepository;
-import com.mes.mesBackend.repository.LotMasterRepository;
-import com.mes.mesBackend.repository.RecycleRepository;
+import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.PopRecycleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +33,8 @@ public class PopRecycleServiceImpl implements PopRecycleService {
     EquipmentRepository equipmentRepository;
     @Autowired
     ItemRepository itemRepository;
-
+    @Autowired
+    WorkProcessRepository workProcessRepository;
 
     //재사용 목록 조회
     public List<PopRecycleResponse> getRecycles(Long workProcessId){
@@ -49,6 +47,8 @@ public class PopRecycleServiceImpl implements PopRecycleService {
                 .orElseThrow(() -> new NotFoundException("재사용 유형이 존재하지 않습니다. 입력 id: " + request.getRecycleId()));
         Item item = itemRepository.findByIdAndDeleteYnFalse(request.getItemId())
                 .orElseThrow(() -> new NotFoundException("해당 품목이 존재하지 않습니다. 입력 id: " + request.getItemId()));
+        WorkProcess workProcess = workProcessRepository.findByIdAndDeleteYnFalse(recycle.getWorkProcessId())
+                .orElseThrow(() -> new NotFoundException("해당 공정이 존재하지 않습니다. 입력 id: " + recycle.getWorkProcessId()));
         List<LotMaster> usableLotList = lotMasterRepository.findBadLotByItemIdAndWorkProcess(request.getItemId(), recycle.getWorkProcessId());
         int createAmount = request.getAmount();
         LotMasterRequest lotRequest = new LotMasterRequest();
@@ -58,7 +58,7 @@ public class PopRecycleServiceImpl implements PopRecycleService {
         lotRequest.setEnrollmentType(RECYCLE);
         lotRequest.setDummyYn(false);
         lotRequest.setItem(item);
-        lotRequest.setWorkProcessDivision(WorkProcessDivision.RECYCLE);
+        lotRequest.setWorkProcessDivision(workProcess.getWorkProcessDivision());
 
         LotMaster lotmaster = lotHelper.createLotMaster(lotRequest);
 

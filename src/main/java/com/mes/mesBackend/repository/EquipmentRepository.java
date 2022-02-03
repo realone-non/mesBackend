@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 // 3-5-1. 설비등록
 @Repository
 public interface EquipmentRepository extends JpaCustomRepository<Equipment, Long>, EquipmentRepositoryCustom {
+
 }
