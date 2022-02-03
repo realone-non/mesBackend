@@ -40,14 +40,11 @@ public class WorkOrderResponse {
     @Schema(description = "지시수량")
     int orderAmount;
 
-    @Schema(description = "생산담장자 id")
+    @Schema(description = "생산담당자 id")
     Long userId;
 
     @Schema(description = "생산담당자 이름")
     String userKorName;
-
-    @Schema(description = "단위 고유아이디")
-    Long unitCodeId;
 
     @Schema(description = "단위명")
     String unitCodeName;
@@ -95,6 +92,8 @@ public class WorkOrderResponse {
     LocalDateTime startDateTime;
     @JsonIgnore
     LocalDateTime endDateTime;
+    @JsonIgnore
+    Long produceOrderItemId;        // 제조오더의 item 고유아이디
 
     // costTime 변경
     public void setCostTime() {

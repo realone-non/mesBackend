@@ -30,7 +30,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private final WorkProcessService workProcessService;
     private final WorkLineService workLineService;
     private final UserService userService;
-    private final UnitService unitService;
     private final ProduceOrderService produceOrderService;
     private final ModelMapper mapper;
     private final NumberAutomatic numberAutomatic;
@@ -53,13 +52,13 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     }
 
     // 작업지시 생성
+    // TODO: 단위 삭제(공정에 해당하는 반제품의 단위로 보여줌)
     @Override
     public WorkOrderResponse createWorkOrder(Long produceOrderId, WorkOrderCreateRequest workOrderRequest) throws NotFoundException, BadRequestException {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
         WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(workOrderRequest.getWorkProcess());
         WorkLine workLine = workLineService.getWorkLineOrThrow(workOrderRequest.getWorkLine());
         User user = workOrderRequest.getUser() != null ? userService.getUserOrThrow(workOrderRequest.getUser()) : null;
-        Unit unit = unitService.getUnitOrThrow(workOrderRequest.getUnit());
         TestProcess testProcess = testProcessService.getTestProcessOrThrow(workOrderRequest.getTestProcess());
 
         // orderAmount 가 0 이면 제조오더 정보의(productOrder) 수주품목수량(contractItem.amount) 으로 저장
@@ -78,7 +77,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         WorkOrderDetail workOrderDetail = mapper.toEntity(workOrderRequest, WorkOrderDetail.class);
         String workOrderNo = numberAutomatic.createDateTimeNo();
 
-        workOrderDetail.add(workProcess, workLine, user, unit, testProcess, produceOrder);
+        workOrderDetail.add(workProcess, workLine, user, testProcess, produceOrder);
         workOrderDetail.setOrderNo(workOrderNo);
         workOrderDetail.setOrderAmount(orderAmount);
         workOrderDetailRepo.save(workOrderDetail);
@@ -92,7 +91,13 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     public WorkOrderResponse getWorkOrderResponseOrThrow(Long produceOrderId, Long workOrderId) throws NotFoundException {
         WorkOrderResponse workOrderResponse = workOrderDetailRepo.findWorkOrderResponseByProduceOrderIdAndWorkOrderId(produceOrderId, workOrderId)
                 .orElseThrow(() -> new NotFoundException("workOrderDetail does not exists. input id: " + workOrderId));
-        workOrderResponse.setCostTime();
+
+        Item bomDetailItem = workOrderDetailRepo.findBomDetailByBomMasterItemIdAndWorkProcessId(workOrderResponse.getProduceOrderItemId(), workOrderResponse.getWorkProcessId())
+                .orElse(null);
+
+        workOrderResponse.setCostTime();        // 소요시간
+        if (bomDetailItem != null) workOrderResponse.setUnitCodeName(bomDetailItem.getUnit().getUnitCode());
+
         return workOrderResponse;
     }
 
@@ -101,7 +106,14 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     public List<WorkOrderResponse> getWorkOrders(Long produceOrderId) throws NotFoundException {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
         List<WorkOrderResponse> workOrderDetails = workOrderDetailRepo.findWorkOrderResponseByProduceOrderIdAndDeleteYnFalse(produceOrder.getId());
-        workOrderDetails.forEach(WorkOrderResponse::setCostTime);
+
+        for (WorkOrderResponse response : workOrderDetails) {
+
+            Item bomDetailItem = workOrderDetailRepo.findBomDetailByBomMasterItemIdAndWorkProcessId(response.getProduceOrderItemId(), response.getWorkProcessId())
+                    .orElse(null);
+            response.setCostTime();
+            if (bomDetailItem != null) response.setUnitCodeName(bomDetailItem.getUnit().getUnitCode());
+        }
         return workOrderDetails;
     }
 
@@ -123,7 +135,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         WorkLine newWorkLine = workLineService.getWorkLineOrThrow(newWorkOrderRequest.getWorkLine());
         User newUser = newWorkOrderRequest.getUser() != null ? userService.getUserOrThrow(newWorkOrderRequest.getUser()) : null;
-        Unit newUnit = unitService.getUnitOrThrow(newWorkOrderRequest.getUnit());
         TestProcess testProcess = testProcessService.getTestProcessOrThrow(newWorkOrderRequest.getTestProcess());
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
 
@@ -140,7 +151,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         newWorkOrderRequest.setOrderAmount(orderAmount);
         WorkOrderDetail newWorkOrderDetail = mapper.toEntity(newWorkOrderRequest, WorkOrderDetail.class);
-        findWorkOrderDetail.update(newWorkOrderDetail, newWorkLine, newUser, testProcess, newUnit);
+        findWorkOrderDetail.update(newWorkOrderDetail, newWorkLine, newUser, testProcess);
         workOrderDetailRepo.save(findWorkOrderDetail);
         workOrderStateHelper.updateOrderState(findWorkOrderDetail.getId(), findWorkOrderDetail.getOrderState());
 
