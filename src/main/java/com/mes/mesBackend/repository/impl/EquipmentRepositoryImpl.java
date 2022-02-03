@@ -1,12 +1,14 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.PopEquipmentResponse;
+import com.mes.mesBackend.entity.Equipment;
 import com.mes.mesBackend.entity.QEquipment;
 import com.mes.mesBackend.entity.QWorkProcess;
 import com.mes.mesBackend.repository.custom.EquipmentRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -37,5 +39,19 @@ public class EquipmentRepositoryImpl implements EquipmentRepositoryCustom {
                         workProcess.id.eq(workProcessId)
                 )
                 .fetch();
+    }
+
+    //공정으로 설비 찾기
+    @Transactional(readOnly = true)
+    public Equipment findByWorkProcess(Long workProcessId){
+        return jpaQueryFactory
+                .selectFrom(equipment)
+                .where(
+                        equipment.workProcess.id.eq(workProcessId),
+                        equipment.deleteYn.eq(false),
+                        equipment.useYn.eq(true)
+                )
+                .limit(1)
+                .fetchOne();
     }
 }
