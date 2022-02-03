@@ -18,7 +18,7 @@ public interface WorkProcessService {
     // 작업공정 단일 조회
     WorkProcessResponse getWorkProcess(Long workProcessId) throws NotFoundException;
 
-    // 작업공정 페이징 조회
+    // 작업공정 조회
     List<WorkProcessResponse> getWorkProcesses();
 
     // 작업공정 페이징 조회

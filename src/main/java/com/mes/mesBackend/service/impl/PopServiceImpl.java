@@ -1,14 +1,19 @@
 package com.mes.mesBackend.service.impl;
 
+import com.mes.mesBackend.dto.request.LotMasterRequest;
+import com.mes.mesBackend.dto.response.PopBomDetailItemResponse;
 import com.mes.mesBackend.dto.response.PopEquipmentResponse;
 import com.mes.mesBackend.dto.response.PopWorkOrderResponse;
+import com.mes.mesBackend.dto.response.WorkProcessResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.LotHelper;
 import com.mes.mesBackend.helper.LotLogHelper;
 import com.mes.mesBackend.helper.ProductionPerformanceHelper;
 import com.mes.mesBackend.helper.WorkOrderStateHelper;
+import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.LotMasterService;
 import com.mes.mesBackend.service.PopService;
@@ -16,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PRODUCTION;
@@ -33,8 +39,27 @@ public class PopServiceImpl implements PopService {
     private final ProductionPerformanceHelper productionPerformanceHelper;
     private final LotLogHelper lotLogHelper;
     private final WorkOrderUserLogRepository workOrderUserLogRepo;
-    private final LotMasterRepository lotMasterRepository;
     private final EquipmentRepository equipmentRepository;
+    private final LotHelper lotHelper;
+    private final LotMasterRepository lotMasterRepo;
+    private final LotConnectRepository lotConnectRepo;
+    private final ModelMapper mapper;
+
+    // 작업공정 전체 조회
+    @Override
+    public List<WorkProcessResponse> getPopWorkProcesses(Boolean recycleYn) {
+        List<WorkProcess> workProcesses = workProcessRepository.findAllByDeleteYnFalse();
+        List<WorkProcessResponse> workProcessResponses = mapper.toListResponses(workProcesses, WorkProcessResponse.class);
+        List<WorkProcessResponse> responses = new ArrayList<>();
+        if (recycleYn && recycleYn != null) {
+            for (WorkProcessResponse res : workProcessResponses) {
+                if (!res.isRecycleYn()) res = null;
+                responses.add(res);
+            }
+        }
+        responses.remove(null);
+        return responses;
+    }
 
 
     // 작업지시 정보 리스트 api, 조건: 작업자, 작업공정
@@ -88,26 +113,30 @@ public class PopServiceImpl implements PopService {
         // lotLog: 생성
         LotMaster lotMaster = new LotMaster();
         if (workOrder.getOrderState().equals(SCHEDULE)) {
-//            LotMasterRequest lotMasterRequest = new LotMasterRequest();
+            LotMasterRequest lotMasterRequest = new LotMasterRequest();
             Item item = getItemOrThrow(itemId);
             WareHouse wareHouse = lotMasterService.getLotMasterWareHouseOrThrow();
 
             // lotMaster 생성
-//            lotMasterRequest.setItem(item);                         // 품목
+            lotMasterRequest.setItem(item);                         // 품목
 //            lotMasterRequest.setWorkProcessId(workProcess.getId()); // 작업공정
-//            lotMasterRequest.setWareHouse(wareHouse);               // 창고
-//            lotMasterRequest.setCreatedAmount(productAmount);       // 생성수량
-//            lotMasterRequest.setEnrollmentType(PRODUCTION);         // 등록유형
-//            lotMasterRequest.setEquipmentId(equipmentId);           // 설비유형
+            lotMasterRequest.setWorkProcessDivision(workProcess.getWorkProcessDivision());
+            lotMasterRequest.setWareHouse(wareHouse);               // 창고
+            lotMasterRequest.setCreatedAmount(productAmount);       // 생성수량
+            lotMasterRequest.setEnrollmentType(PRODUCTION);         // 등록유형
+            lotMasterRequest.setEquipmentId(equipmentId);           // 설비유형
+            lotMasterRequest.setDummyYn(true);
 
-            lotMaster.setItem(item);
-            lotMaster.setWorkProcess(workProcess);
-            lotMaster.setWareHouse(wareHouse);
-            lotMaster.setCreatedAmount(productAmount);
-            lotMaster.setEnrollmentType(PRODUCTION);
-            lotMaster.setLotNo("pop_test_원료혼합 공정");
-            lotMaster.setDummyYn(true);
-            lotMasterRepository.save(lotMaster);
+            lotHelper.createLotMaster(lotMasterRequest);
+
+//            lotMaster.setItem(item);
+//            lotMaster.setWorkProcess(workProcess);
+//            lotMaster.setWareHouse(wareHouse);
+//            lotMaster.setCreatedAmount(productAmount);
+//            lotMaster.setEnrollmentType(PRODUCTION);
+//            lotMaster.setLotNo("pop_test_원료혼합 공정");
+//            lotMaster.setDummyYn(true);
+//            lotMasterRepository.save(lotMaster);
 //            lotMaster = lotMasterService.createLotMaster(lotMasterRequest);
 
             // workOrderDetail: 상태값 변경 및 startDate 및 endDate 변경
@@ -164,6 +193,43 @@ public class PopServiceImpl implements PopService {
         return equipmentRepository.findPopEquipmentResponseByWorkProcess(workProcess.getId());
     }
 
+    // 해당 품목(반제품)에 대한 원자재, 부자재 정보 가져와야함
+    @Override
+    public List<PopBomDetailItemResponse> getPopBomDetailItems(Long lotMasterId) throws NotFoundException {
+        LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);
+        Item bomMasterItem = lotMaster.getItem();
+        // lotMaster 의 item 에 해당하는 bomDetail 의 item 정보 가져옴
+        List<Item> bomDetailItems = workOrderDetailRepository.findBomDetailItemByBomMasterItem(bomMasterItem.getId());
+
+        List<PopBomDetailItemResponse> popBomDetailItemResponses = new ArrayList<>();
+        for (Item bomDetailItem : bomDetailItems) {
+//            for (PopBomDetailItemResponse response : popBomDetailItemResponses) {
+                PopBomDetailItemResponse response = new PopBomDetailItemResponse();
+                response.setBomMasterItemId(bomMasterItem.getId());
+                response.setBomMasterItemNo(bomMasterItem.getItemNo());
+                response.setBomMasterItemName(bomMasterItem.getItemName());
+                response.setBomMasterItemAmount(lotMaster.getCreatedAmount());
+
+                response.setBomDetailItemId(bomDetailItem.getId());
+                response.setBomDetailItemNo(bomDetailItem.getItemNo());
+                response.setBomDetailItemName(bomDetailItem.getItemName());
+
+                // 소진량
+                List<LotConnect> lotConnects = lotConnectRepo.findLotConnectsByItemIdOfChildLotMasterEqAndDivisionExhaust(bomDetailItem.getId());
+                for (LotConnect lotConnect : lotConnects) {
+                    if (bomDetailItem.getId().equals(lotConnect.getChildLot().getItem().getId())) {
+                        int allAmount = lotConnects.stream().mapToInt(LotConnect::getAmount).sum();
+                        response.setBomDetailExhaustAmount(allAmount);
+                    } else
+                        response.setBomDetailExhaustAmount(0);
+                }
+
+                popBomDetailItemResponses.add(response);
+//            }
+        }
+        return popBomDetailItemResponses;
+    }
+
     // 작업공정 단일 조회 및 예외
     private WorkProcess getWorkProcessIdOrThrow(Long id) throws NotFoundException {
         return workProcessRepository.findByIdAndDeleteYnFalse(id)
@@ -183,5 +249,10 @@ public class PopServiceImpl implements PopService {
     private Item getItemOrThrow(Long id) throws NotFoundException {
         return itemRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("item does not exist. input id: " + id));
+    }
+    // lotMaster 단일 조회 및 예외
+    private LotMaster getLotMasterOrThrow(Long id) throws NotFoundException {
+        return lotMasterRepo.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("lotMaster does not exist. input id:" + id));
     }
 }

@@ -27,7 +27,7 @@ public class InputTestRequestCreateRequest {
     int requestAmount;
 
     @Schema(description = "검사유형")
-    TestType testType;      //
+    TestType testType;
 
     @Schema(description = "검사완료요청일")
     @DateTimeFormat(pattern = YYYY_MM_DD)

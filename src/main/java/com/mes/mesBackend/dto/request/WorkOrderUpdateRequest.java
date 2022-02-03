@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 import static com.mes.mesBackend.exception.Message.*;
-import static com.mes.mesBackend.exception.Message.NOT_NULL;
 
 @Getter
 @Setter
@@ -30,11 +29,6 @@ public class WorkOrderUpdateRequest {
     @Schema(description = "직원 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long user;
-
-    @Schema(description = "단위 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
-    Long unit;
 
     @Schema(description = "준비시간")
     @NotNull(message = NOT_NULL)

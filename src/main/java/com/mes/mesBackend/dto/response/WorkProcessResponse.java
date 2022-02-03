@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -29,6 +30,9 @@ public class WorkProcessResponse {
 
     @Schema(description = "사용여부")
     boolean useYn;              // 사용여부
+
+    @JsonIgnore
+    boolean recycleYn;
 
     @Getter
     @Setter

@@ -136,6 +136,7 @@ public class LotHelperImpl implements LotHelper {
         String dateCode = LocalDate.now().format(DateTimeFormatter.ofPattern(YYMMDD));
         String productDateCode = LocalDate.now().format(DateTimeFormatter.ofPattern(YYMM));
 
+        // TODO: 값이 이상하네요 .........................
         String equipmentNo = equipmentRepository.findByIdAndDeleteYnFalse(equipmentId).toString();
 
         // 품목의 품목계정 코드 조회
@@ -188,6 +189,7 @@ public class LotHelperImpl implements LotHelper {
             case NONE:
                 createdLotNo = null;
         }
+        System.out.println("==================================================================================================================================: "+createdLotNo);
         return createdLotNo;
     }
 

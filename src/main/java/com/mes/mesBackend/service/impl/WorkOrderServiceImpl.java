@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
@@ -31,7 +30,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private final WorkProcessService workProcessService;
     private final WorkLineService workLineService;
     private final UserService userService;
-    private final UnitService unitService;
     private final ProduceOrderService produceOrderService;
     private final ModelMapper mapper;
     private final NumberAutomatic numberAutomatic;
@@ -61,7 +59,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(workOrderRequest.getWorkProcess());
         WorkLine workLine = workLineService.getWorkLineOrThrow(workOrderRequest.getWorkLine());
         User user = workOrderRequest.getUser() != null ? userService.getUserOrThrow(workOrderRequest.getUser()) : null;
-//        Unit unit = unitService.getUnitOrThrow(workOrderRequest.getUnit());
         TestProcess testProcess = testProcessService.getTestProcessOrThrow(workOrderRequest.getTestProcess());
 
         // orderAmount 가 0 이면 제조오더 정보의(productOrder) 수주품목수량(contractItem.amount) 으로 저장
@@ -90,27 +87,33 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     }
 
     // 작업지시 단일조회
-    // TODO: 단위 삭제(공정에 해당하는 반제품의 단위로 보여줌)
     @Override
     public WorkOrderResponse getWorkOrderResponseOrThrow(Long produceOrderId, Long workOrderId) throws NotFoundException {
         WorkOrderResponse workOrderResponse = workOrderDetailRepo.findWorkOrderResponseByProduceOrderIdAndWorkOrderId(produceOrderId, workOrderId)
                 .orElseThrow(() -> new NotFoundException("workOrderDetail does not exists. input id: " + workOrderId));
 
         Item bomDetailItem = workOrderDetailRepo.findBomDetailByBomMasterItemIdAndWorkProcessId(workOrderResponse.getProduceOrderItemId(), workOrderResponse.getWorkProcessId())
-                .orElseThrow(() -> new NotFoundException("[데이터 오류] 공정에 맞는 반제품을 찾을 수 없습니다."));
+                .orElse(null);
 
         workOrderResponse.setCostTime();        // 소요시간
-        workOrderResponse.setUnitCodeName(bomDetailItem.getUnit().getUnitCodeName());       // 단위
+        if (bomDetailItem != null) workOrderResponse.setUnitCodeName(bomDetailItem.getUnit().getUnitCode());
+
         return workOrderResponse;
     }
 
     // 작업지시 리스트 조회
-    // TODO: 단위 삭제(공정에 해당하는 반제품의 단위로 보여줌)
     @Override
     public List<WorkOrderResponse> getWorkOrders(Long produceOrderId) throws NotFoundException {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
         List<WorkOrderResponse> workOrderDetails = workOrderDetailRepo.findWorkOrderResponseByProduceOrderIdAndDeleteYnFalse(produceOrder.getId());
-        workOrderDetails.forEach(WorkOrderResponse::setCostTime);
+
+        for (WorkOrderResponse response : workOrderDetails) {
+
+            Item bomDetailItem = workOrderDetailRepo.findBomDetailByBomMasterItemIdAndWorkProcessId(response.getProduceOrderItemId(), response.getWorkProcessId())
+                    .orElse(null);
+            response.setCostTime();
+            if (bomDetailItem != null) response.setUnitCodeName(bomDetailItem.getUnit().getUnitCode());
+        }
         return workOrderDetails;
     }
 
@@ -120,7 +123,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     * */
 
     // TODO : 생산수량 변경 X, 이 쪽 다시 수정해야함
-    // TODO: 단위 삭제(공정에 해당하는 반제품의 단위로 보여줌)
     @Override
     public WorkOrderResponse updateWorkOrder(
             Long produceOrderId,
@@ -133,7 +135,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         WorkLine newWorkLine = workLineService.getWorkLineOrThrow(newWorkOrderRequest.getWorkLine());
         User newUser = newWorkOrderRequest.getUser() != null ? userService.getUserOrThrow(newWorkOrderRequest.getUser()) : null;
-        Unit newUnit = unitService.getUnitOrThrow(newWorkOrderRequest.getUnit());
         TestProcess testProcess = testProcessService.getTestProcessOrThrow(newWorkOrderRequest.getTestProcess());
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
 

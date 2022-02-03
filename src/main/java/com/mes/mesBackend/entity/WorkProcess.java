@@ -53,6 +53,9 @@ public class WorkProcess extends BaseTimeEntity {
     @Column(name = "WORK_PROCESS_DIVISION", columnDefinition = "varchar(255) COMMENT '공정구분'")
     private WorkProcessDivision workProcessDivision;
 
+    @Column(name = "RECYCLE_YN", columnDefinition = "bit(1) COMMENT '재사용 공정 여부'")
+    private boolean recycleYn = false;  // 라벨링, 포장
+
     // 연관 매핑 편리메서드
     public void addWorkProcessCode(WorkProcessCode workProcessCode) {
         setWorkProcessCode(workProcessCode);

@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 @Getter
@@ -37,7 +38,7 @@ public class PurchaseInputResponse {
 
     // 어떤 입고일시 ?
     // 구매입고가 제일 최근에 생성 된 createdDate
-    @JsonFormat(pattern = YYYY_MM_DD, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     @Schema(description = "입고일시")
     LocalDate inputDate;
 

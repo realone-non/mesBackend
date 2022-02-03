@@ -283,7 +283,6 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
                         .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
                         .leftJoin(testProcess).on(testProcess.id.eq(workOrderDetail.testProcess.id))
-                        .leftJoin(unit).on(unit.id.eq(workOrderDetail.unit.id))
                         .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
                         .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
                         .leftJoin(item).on(item.id.eq(contractItem.item.id))
@@ -608,6 +607,20 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         )
                         .fetchOne()
         );
+    }
+
+    // bomMaster 의 item 에 해당하는 bomDetail 의 item 정보 가져옴
+    @Override
+    public List<Item> findBomDetailItemByBomMasterItem(Long bomMasterItemId) {
+        return jpaQueryFactory
+                .select(qBomItemDetail.item)
+                .from(qBomItemDetail)
+                .leftJoin(bomMaster).on(bomMaster.id.eq(qBomItemDetail.bomMaster.id))
+                .where(
+                        qBomItemDetail.bomMaster.item.id.eq(bomMasterItemId),
+                        qBomItemDetail.deleteYn.isFalse()
+                )
+                .fetch();
     }
 
     // =============================================== 8-5. 불량등록 ===============================================

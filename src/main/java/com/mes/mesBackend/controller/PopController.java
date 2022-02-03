@@ -36,11 +36,14 @@ public class PopController {
     private final Logger logger = LoggerFactory.getLogger(PopController.class);
     private CustomLogger cLogger;
 
+    // TODO: 공정 조회할 때 검색조건(재사용) 추가해야됨
     @GetMapping("/work-processes")
     @ResponseBody
-    @Operation(summary = "(pop) 작업공정 전체 조회")
-    public ResponseEntity<List<WorkProcessResponse>> getPopWorkProcesses() {
-        List<WorkProcessResponse> workProcesses = workProcessService.getWorkProcesses();
+    @Operation(summary = "(pop) 작업공정 전체 조회", description = "검색조건: 재사용 공정 여부")
+    public ResponseEntity<List<WorkProcessResponse>> getPopWorkProcesses(
+            @RequestParam(required = false) @Parameter(description = "재사용 공정(true: 재사용공정)") Boolean recycleYn
+    ) {
+        List<WorkProcessResponse> workProcesses = popService.getPopWorkProcesses(recycleYn);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info( "viewed the list of from getPopWorkProcesses.");
         return new ResponseEntity<>(workProcesses, OK);
@@ -99,4 +102,18 @@ public class PopController {
     }
 
     // 사용한 원자재 등록
+    // 해당 품목(반제품)에 대한 원자재, 부자재 정보 가져와야함
+    @SecurityRequirement(name = AUTHORIZATION)
+    @GetMapping("/bom-detail-items")
+    @ResponseBody
+    @Operation(summary = "[미구현] (pop) 사용한 레시피 조회", description = "사용한 원부자재 리스트 조회")
+    public ResponseEntity<List<PopBomDetailItemResponse>> getPopBomDetailItems(
+            @RequestParam @Parameter(description = "lot id") Long lotMasterId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        List<PopBomDetailItemResponse> popBomDetailItems = popService.getPopBomDetailItems(lotMasterId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPopBomDetailItems.");
+        return new ResponseEntity<>(popBomDetailItems, OK);
+    }
 }
