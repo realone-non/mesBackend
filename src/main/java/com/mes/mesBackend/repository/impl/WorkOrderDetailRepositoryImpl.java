@@ -209,8 +209,6 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.orderAmount.as("orderAmount"),
                                 workOrderDetail.user.id.as("userId"),
                                 user.korName.as("userKorName"),
-                                unit.id.as("unitCodeId"),
-                                unit.unitCodeName.as("unitCodeName"),
                                 workOrderDetail.readyTime.as("readyTime"),
                                 workOrderDetail.uph.as("uph"),
                                 workOrderDetail.expectedWorkDate.as("expectedWorkDate"),
@@ -224,7 +222,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.inputUser.as("inputUser"),
                                 workOrderDetail.note.as("note"),
                                 workOrderDetail.startDate.as("startDateTime"),
-                                workOrderDetail.endDate.as("endDateTime")
+                                workOrderDetail.endDate.as("endDateTime"),
+                                item.id.as("produceOrderItemId")
                         )
                 )
                 .from(workOrderDetail)
@@ -232,7 +231,9 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
                 .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
                 .leftJoin(testProcess).on(testProcess.id.eq(workOrderDetail.testProcess.id))
-                .leftJoin(unit).on(unit.id.eq(workOrderDetail.unit.id))
+                .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
                 .where(
                         isDeleteYnFalse(),
                         workOrderDetail.produceOrder.id.eq(produceOrderId)
@@ -260,8 +261,6 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                         workOrderDetail.orderAmount.as("orderAmount"),
                                         workOrderDetail.user.id.as("userId"),
                                         user.korName.as("userKorName"),
-                                        unit.id.as("unitCodeId"),
-                                        unit.unitCodeName.as("unitCodeName"),
                                         workOrderDetail.readyTime.as("readyTime"),
                                         workOrderDetail.uph.as("uph"),
                                         workOrderDetail.expectedWorkDate.as("expectedWorkDate"),
@@ -275,7 +274,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                         workOrderDetail.inputUser.as("inputUser"),
                                         workOrderDetail.note.as("note"),
                                         workOrderDetail.startDate.as("startDateTime"),
-                                        workOrderDetail.endDate.as("endDateTime")
+                                        workOrderDetail.endDate.as("endDateTime"),
+                                        item.id.as("produceOrderItemId")
                                 )
                         )
                         .from(workOrderDetail)
@@ -284,6 +284,9 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
                         .leftJoin(testProcess).on(testProcess.id.eq(workOrderDetail.testProcess.id))
                         .leftJoin(unit).on(unit.id.eq(workOrderDetail.unit.id))
+                        .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                        .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                        .leftJoin(item).on(item.id.eq(contractItem.item.id))
                         .where(
                                 workOrderDetail.produceOrder.id.eq(produceOrderId),
                                 workOrderDetail.id.eq(workOrderId),

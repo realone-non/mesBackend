@@ -65,10 +65,11 @@ public class WorkOrderDetail extends BaseTimeEntity {
     @JoinColumn(name = "USER", columnDefinition = "bigint COMMENT '생산담당자'")
     private User user;                // 생산담당자
 
-    // TODO: 단위에 대해서 다시 정의해야함
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "UNIT", columnDefinition = "bigint COMMENT '단위'")
-    private Unit unit;
+    // TODO: db WORK_ORDER_DETAIL 의 UNIT 삭제해야됨.
+    // 단위 삭제(공정에 해당하는 반제품의 단위로 보여지게 변경)
+//    @ManyToOne(fetch = LAZY)
+//    @JoinColumn(name = "UNIT", columnDefinition = "bigint COMMENT '단위'")
+//    private Unit unit;
 
     @Column(name = "READY_TIME", columnDefinition = "int COMMENT '준비시간'", nullable = false)
     private int readyTime;                 // 준비시간
@@ -137,14 +138,12 @@ public class WorkOrderDetail extends BaseTimeEntity {
             WorkProcess workProcess,
             WorkLine workLine,
             User user,
-            Unit unit,
             TestProcess testProcess,
             ProduceOrder produceOrder
     ) {
         setWorkProcess(workProcess);
         setWorkLine(workLine);
         setUser(user);
-        setUnit(unit);
         setTestProcess(testProcess);
         setProduceOrder(produceOrder);
         setOrderState(SCHEDULE);
@@ -154,8 +153,7 @@ public class WorkOrderDetail extends BaseTimeEntity {
             WorkOrderDetail newWorkOrderDetail,
             WorkLine newWorkLine,
             User newUser,
-            TestProcess newTestProcess,
-            Unit newUnit
+            TestProcess newTestProcess
     ) {
         setWorkLine(newWorkLine);
         setOrderAmount(newWorkOrderDetail.orderAmount);

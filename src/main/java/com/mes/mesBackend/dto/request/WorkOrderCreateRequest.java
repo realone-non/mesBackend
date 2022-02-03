@@ -34,10 +34,10 @@ public class WorkOrderCreateRequest {
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long user;
 
-    @Schema(description = "단위 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
-    Long unit;
+//    @Schema(description = "단위 id")
+//    @Min(value = ONE_VALUE, message = NOT_ZERO)
+//    @NotNull(message = NOT_NULL)
+//    Long unit;
 
     @Schema(description = "준비시간")
     @NotNull(message = NOT_NULL)
