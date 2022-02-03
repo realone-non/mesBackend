@@ -54,6 +54,7 @@ public class PopRecycleServiceImpl implements PopRecycleService {
         LotMasterRequest lotRequest = new LotMasterRequest();
         lotRequest.setCreatedAmount(createAmount);
         lotRequest.setStockAmount(createAmount);
+        lotRequest.setRecycleAmount(createAmount);
         lotRequest.setEnrollmentType(RECYCLE);
         lotRequest.setDummyYn(false);
         lotRequest.setItem(item);
@@ -64,6 +65,7 @@ public class PopRecycleServiceImpl implements PopRecycleService {
         for (LotMaster dbLotMaster:usableLotList) {
             if(createAmount < dbLotMaster.getBadItemAmount()){
                 dbLotMaster.setBadItemAmount(dbLotMaster.getBadItemAmount() - createAmount);
+                createAmount = 0;
             }
             else if(createAmount > dbLotMaster.getBadItemAmount()){
                 createAmount = createAmount - dbLotMaster.getBadItemAmount();

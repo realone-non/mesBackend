@@ -34,6 +34,7 @@ public class LotMasterRequest {
     int returnAmount;       // 반품수량
     int checkRequestAmount;     // 검사요청수량
     int checkAmount;            // 검사수량
+    int recycleAmount;          // 재사용 수량
     QualityLevel qualityLevel;      // 품질등급
 
     Long purchaseInputId;       //구매입고 ID
