@@ -10,6 +10,7 @@ import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.LotHelper;
+import com.mes.mesBackend.helper.LotLogHelper;
 import com.mes.mesBackend.helper.impl.LotHelperImpl;
 import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.PopRecycleService;
@@ -35,9 +36,12 @@ public class PopRecycleServiceImpl implements PopRecycleService {
     ItemRepository itemRepository;
     @Autowired
     WorkProcessRepository workProcessRepository;
+    @Autowired
+    LotLogHelper lotLogHelper;
 
     //재사용 목록 조회
-    public List<PopRecycleResponse> getRecycles(Long workProcessId){
+    public List<PopRecycleResponse> getRecycles(WorkProcessDivision workProcessDivision) throws NotFoundException {
+        Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(workProcessDivision);
         return lotMasterRepository.findBadAmountByWorkProcess(workProcessId);
     }
 

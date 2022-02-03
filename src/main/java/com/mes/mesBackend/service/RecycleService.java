@@ -2,6 +2,7 @@ package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.RecycleRequest;
 import com.mes.mesBackend.dto.response.RecycleResponse;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.NotFoundException;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface RecycleService {
     RecycleResponse getRecycle(Long id) throws NotFoundException;
 
     //재사용 리스트 조회
-    List<RecycleResponse> getRecycles(Long workProcessId);
+    List<RecycleResponse> getRecycles(WorkProcessDivision workProcessId) throws NotFoundException;
 
     //재사용 수정
     RecycleResponse modifyRecycle(Long id, RecycleRequest request) throws NotFoundException;

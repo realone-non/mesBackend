@@ -45,10 +45,10 @@ public class PopRecycleController {
     @ResponseBody
     @Operation(summary = "(pop) 재사용 목록 조회", description = "검색 조건: 공정타입")
     public ResponseEntity<List<PopRecycleResponse>> getUseRecycles(
-            @RequestParam @Parameter(description = "공정 id") Long workProcessId,
+            @RequestParam @Parameter(description = "공정 구분값") WorkProcessDivision workProcessDivision ,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-       List<PopRecycleResponse> responseList = popRecycleService.getRecycles(workProcessId);
+    ) throws NotFoundException {
+       List<PopRecycleResponse> responseList = popRecycleService.getRecycles(workProcessDivision);
        cLogger = new MongoLogger(logger, "mongoTemplate");
        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getUseRecycles");
        return new ResponseEntity<>(responseList, HttpStatus.OK);
@@ -61,10 +61,10 @@ public class PopRecycleController {
             summary = "재사용 유형 리스트 조회"
     )
     public ResponseEntity<List<RecycleResponse>> getRecycles(
-            @RequestParam(required = false) @Parameter(description = "공정 id") Long workProcessId,
+            @RequestParam(required = false) @Parameter(description = "공정 구분값") WorkProcessDivision workProcessDivision,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        List<RecycleResponse> responseList = recycleService.getRecycles(workProcessId);
+    ) throws NotFoundException {
+        List<RecycleResponse> responseList = recycleService.getRecycles(workProcessDivision);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getRecycles.");
         return new ResponseEntity<>(responseList, HttpStatus.OK);

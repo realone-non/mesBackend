@@ -11,7 +11,7 @@ import java.util.List;
 public interface PopRecycleService {
 
     //재사용 목록 조회
-    List<PopRecycleResponse> getRecycles(Long workProcessId);
+    List<PopRecycleResponse> getRecycles(WorkProcessDivision workProcessDivision) throws NotFoundException;
 
     //재사용 등록
     PopRecycleResponse createUseRecycle(PopRecycleRequest request) throws NotFoundException, BadRequestException;
