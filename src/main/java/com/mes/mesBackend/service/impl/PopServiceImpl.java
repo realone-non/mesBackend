@@ -7,6 +7,7 @@ import com.mes.mesBackend.dto.response.PopWorkOrderResponse;
 import com.mes.mesBackend.dto.response.WorkProcessResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.LotHelper;
@@ -44,6 +45,7 @@ public class PopServiceImpl implements PopService {
     private final LotMasterRepository lotMasterRepo;
     private final LotConnectRepository lotConnectRepo;
     private final ModelMapper mapper;
+    private final LotLogRepository lotLogRepository;
 
     // 작업공정 전체 조회
     @Override
@@ -63,10 +65,10 @@ public class PopServiceImpl implements PopService {
         }
     }
 
-
     // 작업지시 정보 리스트 api, 조건: 작업자, 작업공정
     @Override
-    public List<PopWorkOrderResponse> getPopWorkOrders(Long workProcessId) throws NotFoundException {
+    public List<PopWorkOrderResponse> getPopWorkOrders(WorkProcessDivision workProcessDivision) throws NotFoundException {
+        Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(workProcessDivision);
         WorkProcess workProcess = getWorkProcessIdOrThrow(workProcessId);
         LocalDate now = LocalDate.now();
         // 조건: 작업예정일이 오늘, 작업공정
@@ -86,13 +88,13 @@ public class PopServiceImpl implements PopService {
     }
 
     /*
-    * workOrderDetail: 상태값 변경, 작업자 변경, 작업수량 변경, startDate 변경, endDate 변경 update
-    * productOrder: 상태값 변경 update
-    * lotMaster(작업지시의 상태값이 SCHEDULE -> ONGOING 으로 변경되는 시점에서 생성): 품목, 작업 공정, 창고, 생성수량, 등록유형(PRODUCTION)
-    * lotLog(lotMaster 생성 후 생성)
-    * productionPerformance(작업지시의 상태값이 ONGOING -> COMPLETION 으로 변경되는 시점에서 create or update):
-    * workOrderDetailUserLog: 작업지시에 수량이 update 될 때 마다 insert
-    * */
+     * workOrderDetail: 상태값 변경, 작업자 변경, 작업수량 변경, startDate 변경, endDate 변경 update
+     * productOrder: 상태값 변경 update
+     * lotMaster(작업지시의 상태값이 SCHEDULE -> ONGOING 으로 변경되는 시점에서 생성): 품목, 작업 공정, 창고, 생성수량, 등록유형(PRODUCTION)
+     * lotLog(lotMaster 생성 후 생성)
+     * productionPerformance(작업지시의 상태값이 ONGOING -> COMPLETION 으로 변경되는 시점에서 create or update):
+     * workOrderDetailUserLog: 작업지시에 수량이 update 될 때 마다 insert
+     * */
     @Override
     public Long createCreateWorkOrder(Long workOrderId, Long itemId, String userCode, int productAmount, Long equipmentId) throws NotFoundException, BadRequestException {
         WorkOrderDetail workOrder = getWorkOrderDetailOrThrow(workOrderId);
@@ -100,7 +102,8 @@ public class PopServiceImpl implements PopService {
         int beforeProductionAmount = workOrder.getProductionAmount();
 
         // 작업지시의 상태가 COMPLETION 일 경우 더 이상 추가 할 수 없음. 추가하려면 workOrderDetail 의 productionAmount(지시수량) 을 늘려야함
-        if (workOrder.getOrderState().equals(COMPLETION)) throw new BadRequestException("작업지시의 상태가 완료일 경우엔 더 이상 추가 할 수 없습니다.");
+        if (workOrder.getOrderState().equals(COMPLETION))
+            throw new BadRequestException("작업지시의 상태가 완료일 경우엔 더 이상 추가 할 수 없습니다.");
         // 작업수량 0 은 입력 할 수 없음.
         if (productAmount == 0) throw new BadRequestException("입력한 작업수량은 0 일 수 없습니다.");
 
@@ -190,7 +193,8 @@ public class PopServiceImpl implements PopService {
 
     // 공정으로 공정에 해당하는 설비정보 가져오기 GET
     @Override
-    public List<PopEquipmentResponse> getPopEquipments(Long workProcessId) throws NotFoundException {
+    public List<PopEquipmentResponse> getPopEquipments(WorkProcessDivision workProcessDivision) throws NotFoundException {
+        Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(workProcessDivision);
         WorkProcess workProcess = getWorkProcessIdOrThrow(workProcessId);
         return equipmentRepository.findPopEquipmentResponseByWorkProcess(workProcess.getId());
     }
@@ -206,27 +210,27 @@ public class PopServiceImpl implements PopService {
         List<PopBomDetailItemResponse> popBomDetailItemResponses = new ArrayList<>();
         for (Item bomDetailItem : bomDetailItems) {
 //            for (PopBomDetailItemResponse response : popBomDetailItemResponses) {
-                PopBomDetailItemResponse response = new PopBomDetailItemResponse();
-                response.setBomMasterItemId(bomMasterItem.getId());
-                response.setBomMasterItemNo(bomMasterItem.getItemNo());
-                response.setBomMasterItemName(bomMasterItem.getItemName());
-                response.setBomMasterItemAmount(lotMaster.getCreatedAmount());
+            PopBomDetailItemResponse response = new PopBomDetailItemResponse();
+            response.setBomMasterItemId(bomMasterItem.getId());
+            response.setBomMasterItemNo(bomMasterItem.getItemNo());
+            response.setBomMasterItemName(bomMasterItem.getItemName());
+            response.setBomMasterItemAmount(lotMaster.getCreatedAmount());
 
-                response.setBomDetailItemId(bomDetailItem.getId());
-                response.setBomDetailItemNo(bomDetailItem.getItemNo());
-                response.setBomDetailItemName(bomDetailItem.getItemName());
+            response.setBomDetailItemId(bomDetailItem.getId());
+            response.setBomDetailItemNo(bomDetailItem.getItemNo());
+            response.setBomDetailItemName(bomDetailItem.getItemName());
 
-                // 소진량
-                List<LotConnect> lotConnects = lotConnectRepo.findLotConnectsByItemIdOfChildLotMasterEqAndDivisionExhaust(bomDetailItem.getId());
-                for (LotConnect lotConnect : lotConnects) {
-                    if (bomDetailItem.getId().equals(lotConnect.getChildLot().getItem().getId())) {
-                        int allAmount = lotConnects.stream().mapToInt(LotConnect::getAmount).sum();
-                        response.setBomDetailExhaustAmount(allAmount);
-                    } else
-                        response.setBomDetailExhaustAmount(0);
-                }
+            // 소진량
+            List<LotConnect> lotConnects = lotConnectRepo.findLotConnectsByItemIdOfChildLotMasterEqAndDivisionExhaust(bomDetailItem.getId());
+            for (LotConnect lotConnect : lotConnects) {
+                if (bomDetailItem.getId().equals(lotConnect.getChildLot().getItem().getId())) {
+                    int allAmount = lotConnects.stream().mapToInt(LotConnect::getAmount).sum();
+                    response.setBomDetailExhaustAmount(allAmount);
+                } else
+                    response.setBomDetailExhaustAmount(0);
+            }
 
-                popBomDetailItemResponses.add(response);
+            popBomDetailItemResponses.add(response);
 //            }
         }
         return popBomDetailItemResponses;
@@ -237,21 +241,25 @@ public class PopServiceImpl implements PopService {
         return workProcessRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("workProcess does not exist. input id: " + id));
     }
+
     // 작업지시 단일 조회 및 예외
     private WorkOrderDetail getWorkOrderDetailOrThrow(Long id) throws NotFoundException {
         return workOrderDetailRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("workOrder does not exist. input id: " + id));
     }
+
     // 직원 단일 조회 및 예외
     private User getUserByUserCode(String userCode) throws NotFoundException {
         return userRepository.findByUserCode(userCode)
                 .orElseThrow(() -> new NotFoundException("user does not exist. input userCode: " + userCode));
     }
+
     // 품목 단일 조회 및 예외
     private Item getItemOrThrow(Long id) throws NotFoundException {
         return itemRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("item does not exist. input id: " + id));
     }
+
     // lotMaster 단일 조회 및 예외
     private LotMaster getLotMasterOrThrow(Long id) throws NotFoundException {
         return lotMasterRepo.findByIdAndDeleteYnFalse(id)
