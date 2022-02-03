@@ -31,17 +31,15 @@ import static org.springframework.http.HttpStatus.OK;
 @RequiredArgsConstructor
 public class PopController {
     private final PopService popService;
-    private final WorkProcessService workProcessService;
     private final LogService logService;
     private final Logger logger = LoggerFactory.getLogger(PopController.class);
     private CustomLogger cLogger;
 
-    // TODO: 공정 조회할 때 검색조건(재사용) 추가해야됨
     @GetMapping("/work-processes")
     @ResponseBody
     @Operation(summary = "(pop) 작업공정 전체 조회", description = "검색조건: 재사용 공정 여부")
     public ResponseEntity<List<WorkProcessResponse>> getPopWorkProcesses(
-            @RequestParam(required = false) @Parameter(description = "재사용 공정(true: 재사용공정)") Boolean recycleYn
+            @RequestParam(required = false) @Parameter(description = "재사용 공정(true: 재사용 공정만 조회)") Boolean recycleYn
     ) {
         List<WorkProcessResponse> workProcesses = popService.getPopWorkProcesses(recycleYn);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
@@ -69,7 +67,7 @@ public class PopController {
     @GetMapping("/work-orders")
     @ResponseBody
     @Operation(
-            summary = "(pop) 작업지시 정보",
+            summary = "[미구현] (pop) 작업지시 정보",
             description = "조건: 작업공정 id, 날짜(당일)"
     )
     public ResponseEntity<List<PopWorkOrderResponse>> getPopWorkOrders(
@@ -86,7 +84,7 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @PostMapping("/work-orders/{work-order-id}")
     @ResponseBody
-    @Operation(summary = "(pop) 작업완료 수량 입력", description = "")
+    @Operation(summary = "[미구현] (pop) 작업완료 수량 입력", description = "")
     public ResponseEntity<Long> createWorkOrder(
             @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
             @RequestParam @Parameter(description = "품목 id") Long itemId,

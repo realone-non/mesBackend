@@ -51,14 +51,16 @@ public class PopServiceImpl implements PopService {
         List<WorkProcess> workProcesses = workProcessRepository.findAllByDeleteYnFalse();
         List<WorkProcessResponse> workProcessResponses = mapper.toListResponses(workProcesses, WorkProcessResponse.class);
         List<WorkProcessResponse> responses = new ArrayList<>();
-        if (recycleYn && recycleYn != null) {
+        if (recycleYn != null && recycleYn) {
             for (WorkProcessResponse res : workProcessResponses) {
                 if (!res.isRecycleYn()) res = null;
                 responses.add(res);
+                responses.remove(null);
             }
+            return responses;
+        } else {
+            return workProcessResponses;
         }
-        responses.remove(null);
-        return responses;
     }
 
 
