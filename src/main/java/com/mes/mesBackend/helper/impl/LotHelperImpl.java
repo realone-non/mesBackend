@@ -70,6 +70,7 @@ public class LotHelperImpl implements LotHelper {
         lotMaster.setCreatedAmount(lotMasterRequest.getCreatedAmount());
         lotMaster.setBadItemAmount(lotMasterRequest.getBadItemAmount());
         lotMaster.setInputAmount(lotMasterRequest.getInputAmount());
+        lotMaster.setRecycleAmount(lotMasterRequest.getRecycleAmount());
         lotMaster.setPurchaseInput(purchaseInput);
         lotMaster.setWorkProcess(workProcess);
         lotMaster.setDummyYn(lotMasterRequest.isDummyYn());
