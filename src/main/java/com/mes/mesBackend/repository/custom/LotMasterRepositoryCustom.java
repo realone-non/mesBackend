@@ -5,6 +5,7 @@ import com.mes.mesBackend.dto.response.MaterialStockReponse;
 import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
 import com.mes.mesBackend.dto.response.PopRecycleResponse;
 import com.mes.mesBackend.entity.ItemAccountCode;
+import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.OutSourcingInput;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
@@ -33,6 +34,9 @@ public interface LotMasterRepositoryCustom {
     );
     //제품분류에 따른 가장 마지막에 생성된 LOT NO 반환
     Optional<String> findLotNoByGoodsType(GoodsType goodsType, LocalDate startDate, LocalDate endDate);
+
+    //제품분류에 따른 가장 마지막에 생성된 LOT NO 반환(수정버전)
+    Optional<String> findLotNoByAccountCode(Long itemAccountCodeId, LocalDate startDate, LocalDate endDate);
     //외주입고정보로 LOT정보 가져오기
     List<OutsourcingInputLOTResponse> findLotMastersByOutsourcing(Long inputId);
     //LOT정보 조회
@@ -48,4 +52,10 @@ public interface LotMasterRepositoryCustom {
 
     //공정별 불량 갯수 조회
     List<PopRecycleResponse> findBadAmountByWorkProcess(Long workProcessId);
+
+    //공정별 불량 개수 단일 조회
+    PopRecycleResponse findBadAmountByWorkProcess(Long workProcessId, Long itemId);
+
+    //재사용 생성 가능 LOT검색
+    List<LotMaster> findBadLotByItemIdAndWorkProcess(Long itemId, Long workProcessId);
 }

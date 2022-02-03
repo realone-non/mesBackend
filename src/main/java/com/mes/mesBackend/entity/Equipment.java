@@ -83,7 +83,7 @@ public class Equipment extends BaseTimeEntity {
     private boolean deleteYn = false;  // 삭제여부
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '작업공정'", nullable = false)
+    @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '작업공정'")
     private WorkProcess workProcess;
 
     public void addJoin(Client client, WorkLine workLine, WorkProcess workProcess) {

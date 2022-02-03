@@ -244,7 +244,4 @@ public class LotMasterServiceImpl implements LotMasterService {
         return workProcessRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("workProcess does not exist. input id: " + id));
     }
-
-
-
 }
