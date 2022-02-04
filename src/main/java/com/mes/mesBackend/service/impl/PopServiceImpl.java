@@ -1,19 +1,13 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.LotMasterRequest;
-import com.mes.mesBackend.dto.response.PopBomDetailItemResponse;
-import com.mes.mesBackend.dto.response.PopEquipmentResponse;
-import com.mes.mesBackend.dto.response.PopWorkOrderResponse;
-import com.mes.mesBackend.dto.response.WorkProcessResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.LotHelper;
-import com.mes.mesBackend.helper.LotLogHelper;
-import com.mes.mesBackend.helper.ProductionPerformanceHelper;
-import com.mes.mesBackend.helper.WorkOrderStateHelper;
+import com.mes.mesBackend.helper.*;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.LotMasterService;
@@ -24,8 +18,12 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PRODUCTION;
+import static com.mes.mesBackend.entity.enumeration.ItemLogType.INPUT_AMOUNT;
+import static com.mes.mesBackend.entity.enumeration.ItemLogType.STORE_AMOUNT;
+import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 
 @Service
@@ -46,6 +44,7 @@ public class PopServiceImpl implements PopService {
     private final LotConnectRepository lotConnectRepo;
     private final ModelMapper mapper;
     private final LotLogRepository lotLogRepository;
+    private final AmountHelper amountHelper;
 
     // 작업공정 전체 조회
     @Override
@@ -132,7 +131,7 @@ public class PopServiceImpl implements PopService {
             lotMasterRequest.setEquipmentId(equipmentId);           // 설비유형
             lotMasterRequest.setDummyYn(true);
 
-            lotHelper.createLotMaster(lotMasterRequest);
+            lotMaster = lotHelper.createLotMaster(lotMasterRequest);
 
 //            lotMaster.setItem(item);
 //            lotMaster.setWorkProcess(workProcess);
@@ -219,6 +218,8 @@ public class PopServiceImpl implements PopService {
             response.setBomDetailItemId(bomDetailItem.getId());
             response.setBomDetailItemNo(bomDetailItem.getItemNo());
             response.setBomDetailItemName(bomDetailItem.getItemName());
+            response.setBomDetailExhaustYn(bomDetailItem.getUnit().isExhaustYn());
+            response.setBomDetailUnitCodeName(bomDetailItem.getUnit().getUnitCode());
 
             // 소진량
             List<LotConnect> lotConnects = lotConnectRepo.findLotConnectsByItemIdOfChildLotMasterEqAndDivisionExhaust(bomDetailItem.getId());
@@ -234,6 +235,139 @@ public class PopServiceImpl implements PopService {
 //            }
         }
         return popBomDetailItemResponses;
+    }
+
+    // 원자재, 부자재에 해당되는 lotMaster 조회, stockAmount 1 이상
+    @Override
+    public List<PopBomDetailLotMasterResponse> getPopBomDetailLotMasters(Long lotMasterId, Long itemId, String lotNo) throws NotFoundException {
+        // 해당 lot 에 등록된 사용정보는 보여주지 않음.
+        LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);
+        List<PopBomDetailLotMasterResponse> responses = lotMasterRepo.findAllByItemIdAndLotNo(itemId, lotNo);
+        // 부모 lotMaster 와 같은 자식 lotMasterId 모두 조회
+        List<Long> childLotIds = lotConnectRepo.findChildLotIdByParentLotIdAndDivisionExhaust(lotMaster.getId());
+
+        return responses.stream().filter(f -> !childLotIds.contains(f.getLotMasterId())).collect(Collectors.toList());
+    }
+
+    // 원부자재 lot 사용정보 등록
+    /*
+    * - lotMasterConnect insert: 반제품 lotMaster, 사용한 lotMaster, 수량
+    * */
+    @Override
+    public PopBomDetailLotMasterResponse createLotMasterExhaust(Long lotMasterId, Long itemId, Long exhaustLotMasterId, int exhaustAmount) throws NotFoundException, BadRequestException {
+        LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);                  // 반제품 lotMaster
+        LotMaster exhaustLotMaster = getLotMasterOrThrow(exhaustLotMasterId);    // 사용한 lotMaster1
+        int beforeLotMasterStockAmount = exhaustLotMaster.getStockAmount();      // 사용한 lotMaster 의 변경되기 전 재고수량
+        Item item = getItemOrThrow(itemId);     // 원부자재
+
+        // 기존에 등록되어 있는 사용정보는 등록 불가능, 재등록 요청 시 예외
+        LotConnect orElse = lotConnectRepo.findByParentLotIdAndChildLotIdAndDivisionExhaust(lotMasterId, exhaustLotMasterId).orElse(null);
+        if (orElse != null) throw new BadRequestException("해당 사용정보는 기존에 등록되어 있어 중복 생성이 불가능 합니다. 변동 사항은 수정이나 삭제를 해주세요.");
+
+        // 입력한 사용 lotMaster 의 품목과 입력한 품목이 다르면 예외
+       throwIfInputItemAndInputExhaustLotMasterEq(exhaustLotMaster.getItem(), item);
+
+        throwIfExhaustYnIsFalseCheck(exhaustLotMaster.getItem().getUnit().isExhaustYn(), exhaustAmount); // 소진유무가 false 인데 수량 0 이 들어오면 예외
+        throwIfExhaustAmountGreaterThanStockAmount(exhaustLotMaster.getStockAmount(), exhaustAmount);    // 소진수량이 재고수량 보다 클 경우 예외
+
+        exhaustLotMaster.setStockAmount(beforeLotMasterStockAmount - exhaustAmount);    // 사용한 lotMaster 재고수량 변경
+        lotMasterRepo.save(exhaustLotMaster);
+
+        LotConnect lotConnect = new LotConnect();
+        lotConnect.setParentLot(lotMaster);             // 만들어진 lot
+        lotConnect.setChildLot(exhaustLotMaster);       // 사용한 lot
+        lotConnect.setAmount(exhaustAmount);            // 소진수량
+        lotConnect.setDivision(EXHAUST);
+        lotConnectRepo.save(lotConnect);
+
+        PopBomDetailLotMasterResponse response = new PopBomDetailLotMasterResponse();
+        response.setLotMasterId(exhaustLotMaster.getId());                              // lot id
+        response.setLotNo(exhaustLotMaster.getLotNo());                                 // lot no
+        response.setStockAmount(exhaustLotMaster.getStockAmount());                     // 수량
+        response.setUnitCodeName(exhaustLotMaster.getItem().getUnit().getUnitCode());   // 단위
+        response.setExhaustYn(exhaustLotMaster.getItem().getUnit().isExhaustYn());      // 소진유무
+        response.setExhaustAmount(lotConnect.getAmount());                              // 소진량
+
+        amountHelper.amountUpdate(exhaustLotMaster.getItem().getId(), exhaustLotMaster.getWareHouse().getId(), null, INPUT_AMOUNT, exhaustAmount, false);
+
+        return response;
+    }
+
+    // 입력한 사용 lotMaster 의 품목과 입력한 품목이 다르면 예외
+    private void throwIfInputItemAndInputExhaustLotMasterEq(Item exhaustItem, Item inputItem) throws BadRequestException {
+        if (!exhaustItem.equals(inputItem)) throw new BadRequestException("소진할 로트의 품목정보는 입력한 품목정보와 다릅니다. ");
+    }
+
+    // 원부자재 lot 사용정보 수정
+    // 수량만 수정 가능
+    @Override
+    public PopBomDetailLotMasterResponse putLotMasterExhaust(Long lotMasterId, Long itemId, Long exhaustLotMasterId, int exhaustAmount) throws NotFoundException, BadRequestException {
+        LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);                  // 반제품 lotMaster
+        LotMaster exhaustLotMaster = getLotMasterOrThrow(exhaustLotMasterId);    // 사용한 lotMaster
+        Item item = getItemOrThrow(itemId);
+
+        // 입력한 사용 lotMaster 의 품목과 입력한 품목이 다르면 예외
+        throwIfInputItemAndInputExhaustLotMasterEq(exhaustLotMaster.getItem(), item);
+
+        LotConnect lotConnect = getLotConnectByOrThrow(lotMaster.getId(), exhaustLotMaster.getId());
+        int beforeLotMasterStockAmount = exhaustLotMaster.getStockAmount() + lotConnect.getAmount();        // 수정되기 전 수량
+
+        throwIfExhaustYnIsFalseCheck(exhaustLotMaster.getItem().getUnit().isExhaustYn(), exhaustAmount);  // 소진유무가 false 인데 수량 0 이 들어오면 예외
+        throwIfExhaustAmountGreaterThanStockAmount(beforeLotMasterStockAmount, exhaustAmount);      // 소진수량이 재고수량 보다 클 경우 예외
+
+        // 사용한 lotMaster 수량 변경
+        exhaustLotMaster.setStockAmount(beforeLotMasterStockAmount - exhaustAmount);
+        lotMasterRepo.save(exhaustLotMaster);
+        // lotConnect 수량변경
+        lotConnect.setAmount(exhaustAmount);
+        lotConnectRepo.save(lotConnect);
+
+        PopBomDetailLotMasterResponse response = new PopBomDetailLotMasterResponse();
+        response.setLotMasterId(exhaustLotMaster.getId());                              // lot id
+        response.setLotNo(exhaustLotMaster.getLotNo());                                 // lot no
+        response.setStockAmount(exhaustLotMaster.getStockAmount());                     // 수량
+        response.setUnitCodeName(exhaustLotMaster.getItem().getUnit().getUnitCode());   // 단위
+        response.setExhaustYn(exhaustLotMaster.getItem().getUnit().isExhaustYn());      // 소진유무
+        response.setExhaustAmount(lotConnect.getAmount());                              // 소진량
+
+        amountHelper.amountUpdate(exhaustLotMaster.getItem().getId(), exhaustLotMaster.getWareHouse().getId(), null, INPUT_AMOUNT, beforeLotMasterStockAmount - exhaustAmount, false);
+        return response;
+    }
+
+    // 원부자재 lot 사용정보 삭제
+    @Override
+    public void deleteLotMasterExhaust(Long lotMasterId, Long itemId, Long exhaustLotMasterId) throws NotFoundException {
+        LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);                  // 반제품 lotMaster
+        LotMaster exhaustLotMaster = getLotMasterOrThrow(exhaustLotMasterId);    // 사용한 lotMaster
+        LotConnect lotConnect = getLotConnectByOrThrow(lotMaster.getId(), exhaustLotMaster.getId());
+
+        exhaustLotMaster.setStockAmount(exhaustLotMaster.getStockAmount() + lotConnect.getAmount());
+
+        lotMasterRepo.save(exhaustLotMaster);
+        lotConnectRepo.deleteById(lotConnect.getId());
+
+        amountHelper.amountUpdate(exhaustLotMaster.getItem().getId(), exhaustLotMaster.getWareHouse().getId(), null, STORE_AMOUNT, exhaustLotMaster.getStockAmount(), false);
+    }
+
+    // 원부자재 lot 사용정보 조회
+    @Override
+    public List<PopBomDetailLotMasterResponse> getLotMasterExhaust(Long lotMasterId, Long itemId) {
+        return lotConnectRepo.findExhaustLotResponseByParentLotAndDivisionExhaust(lotMasterId, itemId);
+    }
+
+    // lotConnect 단일 조회 및 예외
+    private LotConnect getLotConnectByOrThrow(Long lotMasterId, Long exhaustLotMasterId) throws NotFoundException {
+        return lotConnectRepo.findByParentLotIdAndChildLotIdAndDivisionExhaust(lotMasterId, exhaustLotMasterId)
+                .orElseThrow(() -> new NotFoundException("해당 정보로 등록 된 원부자재 lot 사용정보가 없습니다."));
+    }
+
+    // 소진유무가 false 인데 수량 0 이 들어오면 예외
+    private void throwIfExhaustYnIsFalseCheck(boolean exhaustYn, int exhaustAmount) throws BadRequestException {
+        if (!exhaustYn && exhaustAmount == 0) throw new BadRequestException("소진유무에 해당하지 않는 품목 이므로, 소진수량 0 을 입력할 수 없습니다.");
+    }
+    // 소진수량이 재고수량 보다 클 경우 예외
+    private void throwIfExhaustAmountGreaterThanStockAmount(int stockAmount, int exhaustAmount) throws BadRequestException {
+        if (exhaustAmount > stockAmount) throw new BadRequestException("소진수량이 재고수량 보다 클 수 없습니다. ");
     }
 
     // 작업공정 단일 조회 및 예외

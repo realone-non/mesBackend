@@ -8,6 +8,7 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.UnitRepository;
 import com.mes.mesBackend.service.UnitService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,12 +17,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UnitServiceImpl implements UnitService {
-    @Autowired
-    UnitRepository unitRepository;
-
-    @Autowired
-    ModelMapper modelMapper;
+    private final UnitRepository unitRepository;
+    private final ModelMapper modelMapper;
 
 
     // 생성

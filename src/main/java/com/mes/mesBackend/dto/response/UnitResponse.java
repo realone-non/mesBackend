@@ -5,7 +5,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.exception.Message.NOT_NULL;
 
 @Getter
 @Setter
@@ -32,6 +35,9 @@ public class UnitResponse {
 
     @Schema(description = "소수점자리수")
     int decimalPoint;                // 소수점자리수
+
+    @Schema(description = "소진여부")
+    boolean exhaustYn;
 
     @Schema(description = "사용여부")
     boolean useYn = true;            // 사용여부
