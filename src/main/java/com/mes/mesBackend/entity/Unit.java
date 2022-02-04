@@ -45,6 +45,9 @@ public class Unit extends BaseTimeEntity {
     @Column(name = "DECIMAL_POINT", nullable = false, columnDefinition = "int COMMENT '소수점자리수'")
     private int decimalPoint;   // 소수점자리수
 
+    @Column(name = "EXHAUST_YN", columnDefinition = "bit(1) COMMENT '소진유무'", nullable = false)
+    private boolean exhaustYn;      // 소진유무
+
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;      // 사용여부
 
