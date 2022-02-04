@@ -37,6 +37,10 @@ public class UnitRequest {
     @NotNull(message = NOT_NULL)
     int decimalPoint;   // 소수점자리수
 
+    @Schema(description = "소진여부")
+    @NotNull(message = NOT_NULL)
+    boolean exhaustYn;
+
     @Schema(description = "사용여부")
     @NotNull(message = NOT_NULL)
     boolean useYn = true;      // 사용여부

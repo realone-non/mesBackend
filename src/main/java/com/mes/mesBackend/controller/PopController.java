@@ -8,7 +8,6 @@ import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.PopService;
-import com.mes.mesBackend.service.WorkProcessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -23,6 +22,7 @@ import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 // pop
@@ -69,7 +69,7 @@ public class PopController {
     @GetMapping("/work-orders")
     @ResponseBody
     @Operation(
-            summary = "[미구현] (pop) 작업지시 정보",
+            summary = "(pop) 작업지시 정보",
             description = "조건: 작업공정 구분 값, 날짜(당일) <br /> " +
                     " 작업공정 구분: [자재입고: MATERIAL_INPUT, 원료혼합: MATERIAL_MIXING, 충진: FILLING, 캡조립: CAP_ASSEMBLY, 라벨링: LABELING, 포장: PACKAGING, 출하: SHIPMENT, 재사용 : RECYCLE]"
     )
@@ -87,7 +87,7 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @PostMapping("/work-orders/{work-order-id}")
     @ResponseBody
-    @Operation(summary = "[미구현] (pop) 작업완료 수량 입력", description = "")
+    @Operation(summary = "(pop) 작업완료 수량 입력", description = "")
     public ResponseEntity<Long> createWorkOrder(
             @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
             @RequestParam @Parameter(description = "품목 id") Long itemId,
@@ -107,7 +107,11 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @GetMapping("/bom-detail-items")
     @ResponseBody
-    @Operation(summary = "[미구현] (pop) 사용한 레시피 조회", description = "사용한 원부자재 리스트 조회")
+    @Operation(
+            summary = "(pop) 사용한 레시피 조회",
+            description = "사용한 원부자재 리스트 조회 <br />" +
+                    "bomMasterItem: 만들어진 제품, bomDetailItem: 레시피"
+    )
     public ResponseEntity<List<PopBomDetailItemResponse>> getPopBomDetailItems(
             @RequestParam @Parameter(description = "lot id") Long lotMasterId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
@@ -116,5 +120,98 @@ public class PopController {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPopBomDetailItems.");
         return new ResponseEntity<>(popBomDetailItems, OK);
+    }
+
+    // 원자재 LOT NO 등록 및 수정
+    // 원자재, 부자재에 해당되는 lotMaster 조회
+    // bomDetail 의 Item 과 같은 lotMaster 조회, 1 이상인 것만
+    @SecurityRequirement(name = AUTHORIZATION)
+    @GetMapping("/bom-detail-item-lots")
+    @ResponseBody
+    @Operation(summary = "(pop) 원부자재에 해당되는 LOT 조회", description = "")
+    public ResponseEntity<List<PopBomDetailLotMasterResponse>> getPopBomDetailLotMasters(
+            @RequestParam @Parameter(description = "lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "품목 id") Long itemId,
+            @RequestParam(required = false) @Parameter(description = "lot no") String lotNo,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        List<PopBomDetailLotMasterResponse> popBomDetailLotMasters = popService.getPopBomDetailLotMasters(lotMasterId, itemId, lotNo);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPopBomDetailLotMasters.");
+        return new ResponseEntity<>(popBomDetailLotMasters, OK);
+    }
+
+    // 사용 lotMaster 조회
+    @SecurityRequirement(name = AUTHORIZATION)
+    @GetMapping("/exhaust-lots")
+    @ResponseBody
+    @Operation(summary = "(pop) 원부자재 lot 사용정보 조회", description = "")
+    public ResponseEntity<List<PopBomDetailLotMasterResponse>> getLotMasterExhaust(
+            @RequestParam @Parameter(description = "만들어진 반제품 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "품목 id") Long itemId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        List<PopBomDetailLotMasterResponse> popBomDetailLotMasterResponses = popService.getLotMasterExhaust(lotMasterId, itemId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from getLotMasterExhaust.");
+        return new ResponseEntity<>(popBomDetailLotMasterResponses, OK);
+    }
+
+    // 사용 lotMaster 생성
+    @SecurityRequirement(name = AUTHORIZATION)
+    @PostMapping("/exhaust-lots")
+    @ResponseBody
+    @Operation(summary = "(pop) 원부자재 lot 사용정보 등록", description = "")
+    public ResponseEntity<PopBomDetailLotMasterResponse> createLotMasterExhaust(
+            @RequestParam @Parameter(description = "만들어진 반제품 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "품목 id") Long itemId,
+            @RequestParam @Parameter(description = "사용한 lotMaster id") Long exhaustLotMasterId,
+            @RequestParam @Parameter(description = "사용한 수량(소진여부가 true 인 건 소진이 안되었으면 0, 소진이 되었으면 전체수량)") int exhaustAmount,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException, BadRequestException {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        PopBomDetailLotMasterResponse popBomDetailLotMasterResponse = popService.createLotMasterExhaust(lotMasterId, itemId, exhaustLotMasterId, exhaustAmount);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from createLotMasterExhaust.");
+        return new ResponseEntity<>(popBomDetailLotMasterResponse, OK);
+    }
+    // 소진되는 원부자재는 소진이 들어올때까지 수량의 변화는 없다.
+
+    // 사용 lotMaster 수정
+    @SecurityRequirement(name = AUTHORIZATION)
+    @PutMapping("/exhaust-lots")
+    @ResponseBody
+    @Operation(summary = "(pop) 원부자재 lot 사용정보 수정", description = "")
+    public ResponseEntity<PopBomDetailLotMasterResponse> putLotMasterExhaust(
+            @RequestParam @Parameter(description = "만들어진 반제품 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "품목 id") Long itemId,
+            @RequestParam @Parameter(description = "사용한 lotMaster id") Long exhaustLotMasterId,
+            @RequestParam @Parameter(description = "수량(소진X: 0, 소진O: 전체수량)") int exhaustAmount,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException, BadRequestException {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        PopBomDetailLotMasterResponse popBomDetailLotMasterResponse = popService.putLotMasterExhaust(lotMasterId, itemId, exhaustLotMasterId, exhaustAmount);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from putLotMasterExhaust.");
+        return new ResponseEntity<>(popBomDetailLotMasterResponse, OK);
+    }
+
+    // 사용 lotMaster 삭제
+    @SecurityRequirement(name = AUTHORIZATION)
+    @DeleteMapping("/exhaust-lots")
+    @ResponseBody
+    @Operation(summary = "(pop) 원부자재 lot 사용정보 삭제", description = "")
+    public ResponseEntity deleteLotMasterExhaust(
+            @RequestParam @Parameter(description = "만들어진 반제품 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "품목 id") Long itemId,
+            @RequestParam @Parameter(description = "사용한 lotMaster id") Long exhaustLotMasterId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        popService.deleteLotMasterExhaust(lotMasterId, itemId, exhaustLotMasterId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from deleteLotMasterExhaust.");
+        return new ResponseEntity<>(NO_CONTENT);
     }
 }
