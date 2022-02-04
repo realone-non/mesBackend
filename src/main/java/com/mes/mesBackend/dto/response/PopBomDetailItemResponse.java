@@ -38,4 +38,7 @@ public class PopBomDetailItemResponse {
 
     @Schema(description = "bomDetail 소진유무")
     boolean bomDetailExhaustYn;
+
+    @Schema(description = "bomDetail 단위")
+    String bomDetailUnitCodeName;
 }

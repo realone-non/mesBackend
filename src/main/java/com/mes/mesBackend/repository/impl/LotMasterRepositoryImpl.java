@@ -1,14 +1,10 @@
 package com.mes.mesBackend.repository.impl;
 
-import com.mes.mesBackend.dto.response.LotMasterResponse;
-import com.mes.mesBackend.dto.response.MaterialStockReponse;
-import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
-import com.mes.mesBackend.dto.response.PopRecycleResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.repository.custom.LotMasterRepositoryCustom;
-import com.mes.mesBackend.service.PopRecycleService;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -34,6 +30,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     final QLotType lotType = QLotType.lotType1;
     final QOutSourcingInput outSourcingInput = QOutSourcingInput.outSourcingInput;
     final QWorkProcess workProcess = QWorkProcess.workProcess;
+    final QUnit unit = QUnit.unit;
 
     // id 로 itemAccountCode 의 symbol 조회
     @Override
@@ -393,6 +390,32 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         lotMaster.useYn.eq(true)
                 )
                 .orderBy(lotMaster.createdDate.desc())
+                .fetch();
+    }
+
+    // 품목 id 에 해당되는 lotMaster 조회 1 이상
+    @Override
+    public List<PopBomDetailLotMasterResponse> findAllByItemIdAndLotNo(Long itemId, String lotNo) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                PopBomDetailLotMasterResponse.class,
+                                lotMaster.id.as("lotMasterId"),
+                                lotMaster.lotNo.as("lotNo"),
+                                lotMaster.stockAmount.as("stockAmount"),
+                                unit.unitCode.as("unitCodeName"),
+                                unit.exhaustYn.as("exhaustYn")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(unit).on(unit.id.eq(item.unit.id))
+                .where(
+                        lotMaster.item.id.eq(itemId),
+                        lotMaster.deleteYn.isFalse(),
+                        isLotNoContain(lotNo),
+                        lotMaster.stockAmount.goe(1)
+                )
                 .fetch();
     }
 

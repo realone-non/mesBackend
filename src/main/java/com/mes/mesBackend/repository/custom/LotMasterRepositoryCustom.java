@@ -1,9 +1,6 @@
 package com.mes.mesBackend.repository.custom;
 
-import com.mes.mesBackend.dto.response.LotMasterResponse;
-import com.mes.mesBackend.dto.response.MaterialStockReponse;
-import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
-import com.mes.mesBackend.dto.response.PopRecycleResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.ItemAccountCode;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.OutSourcingInput;
@@ -58,4 +55,7 @@ public interface LotMasterRepositoryCustom {
 
     //재사용 생성 가능 LOT검색
     List<LotMaster> findBadLotByItemIdAndWorkProcess(Long itemId, Long workProcessId);
+
+    // 품목 id 에 해당되는 lotMaster 조회
+    List<PopBomDetailLotMasterResponse> findAllByItemIdAndLotNo(Long itemId, String lotNo);
 }
