@@ -94,7 +94,7 @@ public class LotMasterRequest {
         setItem(item);                                    // 품목
         setWorkProcessDivision(workProcessDivision);    // 공정
         setWareHouse(wareHouse);                          // 창고
-        setCreatedAmount(createdAmount);                  // 생성수량
+        setCreatedAmount(this.createdAmount + createdAmount);                  // 생성수량
         setEnrollmentType(enrollmentType);               // 등록유형
         setEquipmentId(equipmentId);                     // 설비유형
         setLotMasterDivision(lotMasterDivision);            // lot 생성 구분

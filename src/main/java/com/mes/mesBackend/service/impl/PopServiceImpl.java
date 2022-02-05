@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PRODUCTION;
@@ -50,6 +51,7 @@ public class PopServiceImpl implements PopService {
     private final AmountHelper amountHelper;
     private final BadItemRepository badItemRepo;
     private final WorkOrderBadItemRepository workOrderBadItemRepo;
+    private final LotEquipmentConnectRepository lotEquipmentConnectRepo;
 
     // 작업공정 전체 조회
     @Override
@@ -142,14 +144,15 @@ public class PopServiceImpl implements PopService {
         // workOrderDetail: 상태값 변경 및 startDate 및 endDate 변경
         // productOrder: 상태값 변경
         // lotLog: 생성
-        LotMaster dummyLot = new LotMaster();
+        LotMaster dummyLot;
         LotMaster equipmentLot = new LotMaster();
+        LotMasterRequest dummyLotRequest = new LotMasterRequest();
+        LotMasterRequest equipmentLotRequest = new LotMasterRequest();
+        LotEquipmentConnect lotEquipmentConnect = new LotEquipmentConnect();
+        Item item = getItemOrThrow(itemId);
+        WareHouse wareHouse = lotMasterService.getLotMasterWareHouseOrThrow();
 
         if (workOrder.getOrderState().equals(SCHEDULE)) {
-            LotMasterRequest dummyLotRequest = new LotMasterRequest();
-            LotMasterRequest equipmentLotRequest = new LotMasterRequest();
-            Item item = getItemOrThrow(itemId);
-            WareHouse wareHouse = lotMasterService.getLotMasterWareHouseOrThrow();
 
             // dummyLot 생성: 품목, 창고, 생성수량, 등록유형, 설비유형, lot 생성 구분
             dummyLotRequest.putPopWorkOrder(
@@ -164,9 +167,8 @@ public class PopServiceImpl implements PopService {
             equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
 
             // lotEquipmentConnect 생성:
-            // TODO: 여기하고있었음
-            LotEquipmentConnect lotEquipmentConnect = new LotEquipmentConnect();
-//            lotEquipmentConnect.create();
+            lotEquipmentConnect.create(dummyLot, equipmentLot, null);
+            lotEquipmentConnectRepo.save(lotEquipmentConnect);
 
             // workOrderDetail: 상태값 변경 및 startDate 및 endDate 변경
             // productOrder: 상태값 변경
@@ -182,13 +184,35 @@ public class PopServiceImpl implements PopService {
             }
         } else if (workOrder.getOrderState().equals(ONGOING)) {
             // 기존의 작업지시 상태값이 진행중이면?
-            // lotMaster: lotLog 로 찾아서 값 update
+            // lotMaster:
+            //          dummyLot: lotLog 로 찾아서 값 update
+            //          equipmentLot: - 설비가 변경되었을땐 새로 생성 품목, 창고, 생성수량, 등록유형, 설비유형, lot 생성 구분
+            //                        - 당일, 같은설비 일 경우엔 찾아서 update
+            // lotEquipmentConnect: 생성
             // workOrderDetail: ONGOING -> COMPLETION ? orderState update 및 endDate update
             // produceOrder: ONGOING -> COMPLETION ? orderState update
 
             // workOrderDetail id, workProcess id 로 LotLog 찾음
             dummyLot = lotLogHelper.getLotLogByWorkOrderDetailIdAndWorkProcessIdOrThrow(workOrder.getId(), workProcess.getId()).getLotMaster();
+
+            // 오늘날짜, 같은 설비 기준으로 equipmentLot 조회해서 없으면 생성, 있으면 update
+            LotEquipmentConnect equipmentConnect = lotEquipmentConnectRepo.findByTodayAndEquipmentId(equipmentId, LocalDate.now()).orElse(null);
+
+            // 없으면 update
+            if (equipmentConnect == null) {
+                equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
+                equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
+                lotMasterRepo.save(equipmentLot);
+                lotEquipmentConnect.create(dummyLot, equipmentLot, null);
+                lotEquipmentConnectRepo.save(lotEquipmentConnect);
+            } else {
+                // 있으면 update
+                equipmentLot = equipmentConnect.getChildLot();
+                equipmentLot.setCreatedAmount(equipmentLot.getCreatedAmount() + productAmount);
+            }
+
             dummyLot.setCreatedAmount(dummyLot.getCreatedAmount() + productAmount);   // lotMaster: 생성수량 update
+            lotMasterRepo.save(dummyLot);
 
             // workOrderDetail
             OrderState orderState =
@@ -209,10 +233,10 @@ public class PopServiceImpl implements PopService {
 
         // workOrderDetailUserLog: 작업지시에 수량이 update 될 때 마다 insert
         WorkOrderUserLog workOrderUserLog = new WorkOrderUserLog();
-        workOrderUserLog.create(workOrder, user, productAmount);
+        workOrderUserLog.create(workOrder, user, productAmount, equipmentLot);
         workOrderUserLogRepo.save(workOrderUserLog);
 
-        return dummyLot.getId();
+        return equipmentLot.getId();
     }
 
     // 공정으로 공정에 해당하는 설비정보 가져오기 GET

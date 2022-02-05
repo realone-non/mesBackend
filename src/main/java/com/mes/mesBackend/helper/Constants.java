@@ -1,5 +1,8 @@
 package com.mes.mesBackend.helper;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class Constants {
     public static final String YYMMDDHHMMSSSS = "yyMMddHHmmssSS";
     public static final String YYYY_MM_DD_HH_MM = "yyyy-MM-dd HH:mm";
@@ -10,4 +13,5 @@ public class Constants {
     public static final String LOT_DEFAULT_SEQ = String.format("%04d", 0);
     public static final String PRODUCT_ITEM_ACCOUNT = "완제품";
     public static final String MONGO_TEMPLATE = "mongoTemplate";
+    public static final String NOW_YYMMDD = LocalDate.now().format(DateTimeFormatter.ofPattern(YYMMDD));
 }
