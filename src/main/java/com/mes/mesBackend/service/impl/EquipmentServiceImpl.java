@@ -2,6 +2,7 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.EquipmentRequest;
 import com.mes.mesBackend.dto.response.EquipmentResponse;
+import com.mes.mesBackend.dto.response.PopEquipmentResponse;
 import com.mes.mesBackend.entity.Client;
 import com.mes.mesBackend.entity.Equipment;
 import com.mes.mesBackend.entity.WorkLine;
@@ -84,5 +85,10 @@ public class EquipmentServiceImpl implements EquipmentService {
     public Equipment getEquipmentOrThrow(Long id) throws NotFoundException {
         return equipmentRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("equipment does not exist. input id: " + id));
+    }
+
+    //공정 id로 설비 조회
+    public List<PopEquipmentResponse> getEquipmentsByWorkProcess(Long workProcessId) throws NotFoundException {
+        return equipmentRepository.findPopEquipmentResponseByWorkProcess(workProcessId);
     }
 }

@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.LotMasterRequest;
+import com.mes.mesBackend.dto.response.LabelPrintResponse;
 import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.WareHouse;
@@ -33,4 +34,7 @@ public interface LotMasterService {
 
     // lotMaster 용 wareHouse 찾기
     WareHouse getLotMasterWareHouseOrThrow() throws NotFoundException;
+
+    //라벨프린트용 정보 조회
+    List<LabelPrintResponse> getPrints(Long workProcessId, Long equipmentId);
 }
