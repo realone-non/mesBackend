@@ -1,6 +1,8 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.BadItemEnrollmentResponse;
+import com.mes.mesBackend.dto.response.PopBadItemTypeResponse;
+import com.mes.mesBackend.dto.response.PopTestBadItemResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.WorkOrderBadItemRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -99,5 +101,48 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                 .where(badItem.workProcess.id.eq(workProcessId))
                 .fetch();
 
+    }
+
+    // pop 작업공정에 해당하는 badItemType 모두
+    @Override
+    public List<PopBadItemTypeResponse> findPopBadItemTypeByWorkProcessId(Long workProcessId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                PopBadItemTypeResponse.class,
+                                badItem.id.as("badItemTypeId"),
+                                badItem.badItemName.as("badItemTypeName")
+                        )
+                )
+                .from(badItem)
+                .where(
+                        badItem.workProcess.id.eq(workProcessId),
+                        badItem.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+
+    // lot 에 해당하는거 모두 조회
+    @Override
+    public List<PopTestBadItemResponse> findPopTestBadItemResponseByLotMasterId(Long lotMasterId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                PopTestBadItemResponse.class,
+                                workOrderBadItem.id.as("badItemId"),
+                                badItem.id.as("badItemTypeId"),
+                                badItem.badItemName.as("badItemTypeName"),
+                                workOrderBadItem.badItemAmount.as("badItemAmount")
+                        )
+                )
+                .from(workOrderBadItem)
+                .leftJoin(badItem).on(badItem.id.eq(workOrderBadItem.badItem.id))
+                .leftJoin(lotLog).on(lotLog.id.eq(workOrderBadItem.lotLog.id))
+                .leftJoin(lotMaster).on(lotMaster.id.eq(lotLog.lotMaster.id))
+                .where(
+                        lotMaster.id.eq(lotMasterId),
+                        workOrderBadItem.deleteYn.isFalse()
+                )
+                .fetch();
     }
 }

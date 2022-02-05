@@ -150,6 +150,10 @@ public class LotMaster extends BaseTimeEntity {
     @Column(name = "DUMMY_YN", columnDefinition = "bit(1) COMMENT '더미데이터 여부'")
     private boolean dummyYn;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "EQUIPMENT", columnDefinition = "bigint COMMENT '설비'")
+    private Equipment equipment;        // 설비
+
 //    @Column(name = "END_YN", columnDefinition = "bit(1) COMMENT '로트 엔드'")
 //    private boolean endYn;      // 로트엔드
 

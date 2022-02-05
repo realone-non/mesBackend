@@ -21,12 +21,32 @@ public interface PopService {
     List<PopBomDetailItemResponse> getPopBomDetailItems(Long lotMasterId) throws NotFoundException;
     // 원자재, 부자재에 해당되는 lotMaster 조회, stockAmount 1 이상
     List<PopBomDetailLotMasterResponse> getPopBomDetailLotMasters(Long lotMasterId, Long itemId, String lotNo) throws NotFoundException;
+    // 원부자재 lot 사용정보 조회
+    List<PopBomDetailLotMasterResponse> getLotMasterExhaust(Long lotMasterId, Long itemId);
     // 원부자재 lot 사용정보 등록
     PopBomDetailLotMasterResponse createLotMasterExhaust(Long lotMasterId, Long itemId, Long exhaustLotMasterId, int exhaustAmount) throws NotFoundException, BadRequestException;
     // 원부자재 lot 사용정보 수정
     PopBomDetailLotMasterResponse putLotMasterExhaust(Long lotMasterId, Long itemId, Long exhaustLotMasterId, int exhaustAmount) throws NotFoundException, BadRequestException;
     // 원부자재 lot 사용정보 삭제
     void deleteLotMasterExhaust(Long lotMasterId, Long itemId, Long exhaustLotMasterId) throws NotFoundException;
-    // 원부자재 lot 사용정보 조회
-    List<PopBomDetailLotMasterResponse> getLotMasterExhaust(Long lotMasterId, Long itemId);
+    // 중간검사 품목 정보 조회
+    PopTestItemResponse getPopTestItem(Long lotMasterId) throws NotFoundException;
+    // 공정에 해당하는 불량유형 조회
+    List<PopBadItemTypeResponse> getPopTestBadItemTypes(WorkProcessDivision workProcessDivision) throws NotFoundException;
+    // 중간검사 등록된 불량 조회
+    List<PopTestBadItemResponse> getPopBadItemEnrollments(Long lotMasterId) throws NotFoundException;
+    // 불량 등록
+    PopTestBadItemResponse createPopBadItemEnrollment(Long lotMasterId, WorkProcessDivision workProcessDivision, Long badItemTypeId, int badItemAmount) throws NotFoundException, BadRequestException;
+    // 불량 수량 수정
+    PopTestBadItemResponse putPopBadItemEnrollment(Long enrollmentBadItemId, int badItemAmount);
+    // 불량 삭제
+    void deletePopBadItemEnrollment(Long enrollmentBadItemId);
+    // 분할 lot 조회
+    List<PopLotMasterResponse> getPopLotMasters(Long lotMasterId);
+    // 분할 lot 생성
+    PopLotMasterResponse createPopLotMasters(Long lotMasterId, int amount);
+    // 분할 lot 수정
+    PopLotMasterResponse putPopLotMasters(Long lotMasterId, int amount);
+    // 분할 lot 삭제
+    void deletePopLotMasters(Long lotMasterId);
 }
