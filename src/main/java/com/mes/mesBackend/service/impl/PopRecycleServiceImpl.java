@@ -35,6 +35,8 @@ public class PopRecycleServiceImpl implements PopRecycleService {
     @Autowired
     ItemRepository itemRepository;
     @Autowired
+    WareHouseRepository wareHouseRepository;
+    @Autowired
     WorkProcessRepository workProcessRepository;
     @Autowired
     LotLogHelper lotLogHelper;
@@ -53,6 +55,8 @@ public class PopRecycleServiceImpl implements PopRecycleService {
                 .orElseThrow(() -> new NotFoundException("해당 품목이 존재하지 않습니다. 입력 id: " + request.getItemId()));
         WorkProcess workProcess = workProcessRepository.findByIdAndDeleteYnFalse(recycle.getWorkProcessId())
                 .orElseThrow(() -> new NotFoundException("해당 공정이 존재하지 않습니다. 입력 id: " + recycle.getWorkProcessId()));
+        WareHouse wareHouse = wareHouseRepository.findByWorkProcessYnIsTrueAndDeleteYnFalse()
+                .orElseThrow(() -> new NotFoundException("공정용 창고가 존재하지 않습니다. "));
         List<LotMaster> usableLotList = lotMasterRepository.findBadLotByItemIdAndWorkProcess(request.getItemId(), recycle.getWorkProcessId());
         int createAmount = request.getAmount();
         LotMasterRequest lotRequest = new LotMasterRequest();
@@ -60,6 +64,7 @@ public class PopRecycleServiceImpl implements PopRecycleService {
         lotRequest.setStockAmount(createAmount);
         lotRequest.setRecycleAmount(createAmount);
         lotRequest.setEnrollmentType(RECYCLE);
+        lotRequest.setWareHouse(wareHouse);
 //        lotRequest.setDummyYn(false); TODO: 수정해야됨
         lotRequest.setItem(item);
         lotRequest.setWorkProcessDivision(workProcess.getWorkProcessDivision());
