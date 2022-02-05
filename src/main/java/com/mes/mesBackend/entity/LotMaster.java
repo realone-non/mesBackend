@@ -1,9 +1,6 @@
 package com.mes.mesBackend.entity;
 
-import com.mes.mesBackend.entity.enumeration.EnrollmentType;
-import com.mes.mesBackend.entity.enumeration.GoodsType;
-import com.mes.mesBackend.entity.enumeration.ProcessType;
-import com.mes.mesBackend.entity.enumeration.QualityLevel;
+import com.mes.mesBackend.entity.enumeration.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -147,8 +144,9 @@ public class LotMaster extends BaseTimeEntity {
     @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint(1) COMMENT '작업 공정'")
     private WorkProcess workProcess;
 
-    @Column(name = "DUMMY_YN", columnDefinition = "bit(1) COMMENT '더미데이터 여부'")
-    private boolean dummyYn;
+    @Enumerated(STRING)
+    @Column(name = "LOT_MASTER_DIVISION", columnDefinition = "varchar(255) COMMENT '로트 생성 구분'")
+    private LotMasterDivision lotMasterDivision;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "EQUIPMENT", columnDefinition = "bigint COMMENT '설비'")
