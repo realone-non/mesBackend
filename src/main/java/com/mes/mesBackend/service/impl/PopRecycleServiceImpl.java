@@ -60,7 +60,7 @@ public class PopRecycleServiceImpl implements PopRecycleService {
         lotRequest.setStockAmount(createAmount);
         lotRequest.setRecycleAmount(createAmount);
         lotRequest.setEnrollmentType(RECYCLE);
-        lotRequest.setDummyYn(false);
+//        lotRequest.setDummyYn(false); TODO: 수정해야됨
         lotRequest.setItem(item);
         lotRequest.setWorkProcessDivision(workProcess.getWorkProcessDivision());
 

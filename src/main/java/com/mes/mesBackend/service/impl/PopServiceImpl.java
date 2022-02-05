@@ -3,6 +3,7 @@ package com.mes.mesBackend.service.impl;
 import com.mes.mesBackend.dto.request.LotMasterRequest;
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -24,6 +25,8 @@ import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PRODUCTION;
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.INPUT_AMOUNT;
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.STORE_AMOUNT;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.DUMMY_LOT;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.EQUIPMENT_LOT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 
 @Service
@@ -88,51 +91,82 @@ public class PopServiceImpl implements PopService {
         return todayWorkOrders;
     }
 
+    // 작업지시의 상태가 COMPLETION 일 경우 더 이상 추가 할 수 없음. 추가하려면 workOrderDetail 의 productionAmount(지시수량) 을 늘려야함
+    private void throwIfWorkOrderStateIsCompletion(OrderState orderState) throws BadRequestException {
+        if (orderState.equals(COMPLETION)) throw new BadRequestException("작업지시의 상태가 완료일 경우엔 더 이상 추가 할 수 없습니다.");
+    }
+
+    // 작업수량이 0 이면 예외
+    private void throwIfProductAmountIsNotZero(int productAmount) throws BadRequestException {
+        if (productAmount == 0) throw new BadRequestException("입력한 작업수량은 0 일 수 없습니다.");
+    }
+
+    // ========================================= TODO: 여기서부터 수정해야됨 ~~~~~~~ -=========================================
     /*
      * workOrderDetail: 상태값 변경, 작업자 변경, 작업수량 변경, startDate 변경, endDate 변경 update
      * productOrder: 상태값 변경 update
      * lotMaster(작업지시의 상태값이 SCHEDULE -> ONGOING 으로 변경되는 시점에서 생성): 품목, 작업 공정, 창고, 생성수량, 등록유형(PRODUCTION)
-     * lotLog(lotMaster 생성 후 생성)
-     * productionPerformance(작업지시의 상태값이 ONGOING -> COMPLETION 으로 변경되는 시점에서 create or update):
-     * workOrderDetailUserLog: 작업지시에 수량이 update 될 때 마다 insert
+     *      - lotMaster 2개 생성 해야됨
+     *              - 더미로트: 품목, 작업 공정, 창고, 생성수량, 등록유형(PRODUCTION), 더미여부 true
+     *              - 설비로트: 품목, 작업 공정, 창고, 생성수량, 등록유형(PRODUCTION), 더미여부 true
+     * lotEquipmentConnect: 위에 로트 2개 생성 후 생성 (parentLot: 더미로트, childLot: 설비로트)
+     * lotLog(lotMaster 생성 후 생성): 더미로트로 생성
+     * productionPerformance(작업지시의 상태값이 ONGOING -> COMPLETION 으로 변경되는 시점에서 create or update): 더미로트로 생성
+     * workOrderDetailUserLog: 작업지시에 수량이 update 될 때 마다 insert, equipmentLotMaster: 설비로트
      * */
     @Override
-    public Long createCreateWorkOrder(Long workOrderId, Long itemId, String userCode, int productAmount, Long equipmentId) throws NotFoundException, BadRequestException {
+    public Long createCreateWorkOrder(
+            Long workOrderId,
+            Long itemId,
+            String userCode,
+            int productAmount,
+            Long equipmentId
+    ) throws NotFoundException, BadRequestException {
         WorkOrderDetail workOrder = getWorkOrderDetailOrThrow(workOrderId);
         WorkProcess workProcess = workOrder.getWorkProcess();
         int beforeProductionAmount = workOrder.getProductionAmount();
 
         // 작업지시의 상태가 COMPLETION 일 경우 더 이상 추가 할 수 없음. 추가하려면 workOrderDetail 의 productionAmount(지시수량) 을 늘려야함
-        if (workOrder.getOrderState().equals(COMPLETION))
-            throw new BadRequestException("작업지시의 상태가 완료일 경우엔 더 이상 추가 할 수 없습니다.");
-        // 작업수량 0 은 입력 할 수 없음.
-        if (productAmount == 0) throw new BadRequestException("입력한 작업수량은 0 일 수 없습니다.");
+        throwIfWorkOrderStateIsCompletion(workOrder.getOrderState());
+        // 작업수량이 0 이면 예외
+        throwIfProductAmountIsNotZero(productAmount);
 
         // workOderDetail: user 변경
         User user = getUserByUserCode(userCode);
         workOrder.setUser(user);
 
         // 기존 작업지시의 상태값이 SCHEDULE 일 때 ?
-        // lotMaster: 생성
+        // dummyLotMaster: 생성
+        // EquipmentLotMaster: 생성
+        // lotEquipmentConnect: 위에 lot 2개 생성 후 생성, parentLot: dummyLot, childLot: equipmentLot
         // workOrderDetail: 상태값 변경 및 startDate 및 endDate 변경
         // productOrder: 상태값 변경
         // lotLog: 생성
-        LotMaster lotMaster = new LotMaster();
+        LotMaster dummyLot = new LotMaster();
+        LotMaster equipmentLot = new LotMaster();
+
         if (workOrder.getOrderState().equals(SCHEDULE)) {
-            LotMasterRequest lotMasterRequest = new LotMasterRequest();
+            LotMasterRequest dummyLotRequest = new LotMasterRequest();
+            LotMasterRequest equipmentLotRequest = new LotMasterRequest();
             Item item = getItemOrThrow(itemId);
             WareHouse wareHouse = lotMasterService.getLotMasterWareHouseOrThrow();
 
-            // lotMaster 생성
-            lotMasterRequest.setItem(item);                         // 품목
-            lotMasterRequest.setWorkProcessDivision(workProcess.getWorkProcessDivision());
-            lotMasterRequest.setWareHouse(wareHouse);               // 창고
-            lotMasterRequest.setCreatedAmount(productAmount);       // 생성수량
-            lotMasterRequest.setEnrollmentType(PRODUCTION);         // 등록유형
-            lotMasterRequest.setEquipmentId(equipmentId);           // 설비유형
-            lotMasterRequest.setDummyYn(true);
+            // dummyLot 생성: 품목, 창고, 생성수량, 등록유형, 설비유형, lot 생성 구분
+            dummyLotRequest.putPopWorkOrder(
+                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, PRODUCTION, equipmentId, DUMMY_LOT
+            );
+            dummyLot = lotHelper.createLotMaster(dummyLotRequest);
 
-            lotMaster = lotHelper.createLotMaster(lotMasterRequest);
+            // equipmentLot 생성: 품목, 창고, 생성수량, 등록유형, 설비유형, lot 생성 구분
+            equipmentLotRequest.putPopWorkOrder(
+                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT
+            );
+            equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
+
+            // lotEquipmentConnect 생성:
+            // TODO: 여기하고있었음
+            LotEquipmentConnect lotEquipmentConnect = new LotEquipmentConnect();
+//            lotEquipmentConnect.create();
 
             // workOrderDetail: 상태값 변경 및 startDate 및 endDate 변경
             // productOrder: 상태값 변경
@@ -141,10 +175,10 @@ public class PopServiceImpl implements PopService {
             workOrderStateHelper.updateOrderState(workOrderId, orderState);
 
             // lotLog 생성
-            lotLogHelper.createLotLog(lotMaster.getId(), workOrderId, workProcess.getId());
+            lotLogHelper.createLotLog(dummyLot.getId(), workOrderId, workProcess.getId());
 
             if (orderState.equals(COMPLETION)) {
-                productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, lotMaster.getId());  // productionPerformance: create 및 update
+                productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
             }
         } else if (workOrder.getOrderState().equals(ONGOING)) {
             // 기존의 작업지시 상태값이 진행중이면?
@@ -153,8 +187,8 @@ public class PopServiceImpl implements PopService {
             // produceOrder: ONGOING -> COMPLETION ? orderState update
 
             // workOrderDetail id, workProcess id 로 LotLog 찾음
-            lotMaster = lotLogHelper.getLotLogByWorkOrderDetailIdAndWorkProcessIdOrThrow(workOrder.getId(), workProcess.getId()).getLotMaster();
-            lotMaster.setCreatedAmount(lotMaster.getCreatedAmount() + productAmount);   // lotMaster: 생성수량 update
+            dummyLot = lotLogHelper.getLotLogByWorkOrderDetailIdAndWorkProcessIdOrThrow(workOrder.getId(), workProcess.getId()).getLotMaster();
+            dummyLot.setCreatedAmount(dummyLot.getCreatedAmount() + productAmount);   // lotMaster: 생성수량 update
 
             // workOrderDetail
             OrderState orderState =
@@ -167,7 +201,7 @@ public class PopServiceImpl implements PopService {
                 // workOrderDetail: ONGOING -> COMPLETION ? orderState update 및 endDate update
                 // produceOrder: ONGOING -> COMPLETION ? orderState update
                 workOrderStateHelper.updateOrderState(workOrderId, orderState);
-                productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, lotMaster.getId());  // productionPerformance: create 및 update
+                productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
             }
         }
         workOrder.setProductionAmount(beforeProductionAmount + productAmount);  // productionAmount 변경
@@ -178,7 +212,7 @@ public class PopServiceImpl implements PopService {
         workOrderUserLog.create(workOrder, user, productAmount);
         workOrderUserLogRepo.save(workOrderUserLog);
 
-        return lotMaster.getId();
+        return dummyLot.getId();
     }
 
     // 공정으로 공정에 해당하는 설비정보 가져오기 GET

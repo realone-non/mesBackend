@@ -13,6 +13,8 @@ public interface PopService {
     List<WorkProcessResponse> getPopWorkProcesses(Boolean recycleYn);
     // 작업지시 정보 리스트 api, 조건: 작업공정
     List<PopWorkOrderResponse> getPopWorkOrders(WorkProcessDivision workProcessDivision) throws NotFoundException;
+
+    // ========================================= TODO: 여기서부터 수정해야됨 ~~~~~~~ -=========================================
     // 작업지시 상태 변경
     Long createCreateWorkOrder(Long workOrderId, Long itemId, String userCode, int productAmount, Long equipmentId) throws NotFoundException, BadRequestException;
     // 공정으로 공정에 해당하는 설비정보 가져오기 GET

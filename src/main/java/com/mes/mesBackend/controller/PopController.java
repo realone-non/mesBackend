@@ -49,6 +49,7 @@ public class PopController {
         return new ResponseEntity<>(workProcesses, OK);
     }
 
+    // 작업 공정에 해당하는 설비 조회
     @SecurityRequirement(name = AUTHORIZATION)
     @GetMapping("/equipments")
     @ResponseBody
@@ -84,6 +85,7 @@ public class PopController {
         return new ResponseEntity<>(popWorkOrderResponses, OK);
     }
 
+    // ========================================= TODO: 여기서부터 수정해야됨 ~~~~~~~ -=========================================
     // 작업지시 상태 변경
     @SecurityRequirement(name = AUTHORIZATION)
     @PostMapping("/work-orders/{work-order-id}")
