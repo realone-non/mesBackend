@@ -32,4 +32,15 @@ public class LotEquipmentConnect extends BaseTimeEntity {
     @Enumerated(STRING)
     @Column(name = "PROCESS_STATUS", columnDefinition = "varchar(255) COMMENT '프로세스 상태값'")
     private ProcessStatus processStatus;
+
+    // 생성
+    public void create(
+            LotMaster parentLot,
+            LotMaster childLot,
+            ProcessStatus processStatus
+    ) {
+        setParentLot(parentLot);
+        setChildLot(childLot);
+        setProcessStatus(processStatus);
+    }
 }

@@ -32,6 +32,10 @@ public class WorkOrderUserLog extends BaseTimeEntity {
     @Column(name = "PRODUCT_AMOUNT", columnDefinition = "int COMMENT '작업수량'")
     private int productAmount;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "EQUIPMENT_LOT_MASTER", columnDefinition = "bigint COMMENT '설비 로트'")
+    private LotMaster equipmentLotMaster;
+
     public void create(WorkOrderDetail workOrderDetail, User user, int productAmount) {
         setWorkOrderDetail(workOrderDetail);
         setUser(user);

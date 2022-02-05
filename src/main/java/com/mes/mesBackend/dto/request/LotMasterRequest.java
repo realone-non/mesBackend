@@ -3,6 +3,7 @@ package com.mes.mesBackend.dto.request;
 import com.mes.mesBackend.entity.Item;
 import com.mes.mesBackend.entity.WareHouse;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
+import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.QualityLevel;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -45,7 +46,7 @@ public class LotMasterRequest {
     WorkProcessDivision workProcessDivision;    // 공정 구분
     Long equipmentId;       // 설비 id
 
-    boolean dummyYn;
+    LotMasterDivision lotMasterDivision;
 
     public void putPurchaseInput(
             Item item,
@@ -79,5 +80,23 @@ public class LotMasterRequest {
         setCreatedAmount(stockAmount);
         setCreatedAmount(stockAmount);
         setLotTypeId(lotType);
+    }
+
+    public void putPopWorkOrder(
+            Item item,
+            WorkProcessDivision workProcessDivision,
+            WareHouse wareHouse,
+            int createdAmount,
+            EnrollmentType enrollmentType,
+            Long equipmentId,
+            LotMasterDivision lotMasterDivision
+    ) {
+        setItem(item);                                    // 품목
+        setWorkProcessDivision(workProcessDivision);    // 공정
+        setWareHouse(wareHouse);                          // 창고
+        setCreatedAmount(createdAmount);                  // 생성수량
+        setEnrollmentType(enrollmentType);               // 등록유형
+        setEquipmentId(equipmentId);                     // 설비유형
+        setLotMasterDivision(lotMasterDivision);            // lot 생성 구분
     }
 }

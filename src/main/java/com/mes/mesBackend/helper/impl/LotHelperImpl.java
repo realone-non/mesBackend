@@ -81,7 +81,7 @@ public class LotHelperImpl implements LotHelper {
         lotMaster.setRecycleAmount(lotMasterRequest.getRecycleAmount());
         lotMaster.setPurchaseInput(purchaseInput);
         lotMaster.setWorkProcess(workProcess);
-        lotMaster.setDummyYn(lotMasterRequest.isDummyYn());
+//        lotMaster.setDummyYn(lotMasterRequest.isDummyYn());
         lotMaster.setEquipment(equipment);
 
         GoodsType goodsType = null;
