@@ -1,6 +1,7 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.*;
+import com.mes.mesBackend.entity.BadItem;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -176,7 +177,6 @@ public class PopController {
         cLogger.info(userCode + " is viewed the list of from createLotMasterExhaust.");
         return new ResponseEntity<>(popBomDetailLotMasterResponse, OK);
     }
-    // 소진되는 원부자재는 소진이 들어올때까지 수량의 변화는 없다.
 
     // 사용 lotMaster 수정
     @SecurityRequirement(name = AUTHORIZATION)
@@ -213,5 +213,173 @@ public class PopController {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is viewed the list of from deleteLotMasterExhaust.");
         return new ResponseEntity<>(NO_CONTENT);
+    }
+
+    // 중간검사 품목 정보 조회
+    @SecurityRequirement(name = AUTHORIZATION)
+    @GetMapping("/test-items")
+    @ResponseBody
+    @Operation(summary = "[미구현] (pop) 중간검사 품목 정보 조회", description = "")
+    public ResponseEntity<PopTestItemResponse> getPopTestItem(
+            @RequestParam @Parameter(description = "lotMaster id") Long lotMasterId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        PopTestItemResponse popTestResponse = popService.getPopTestItem(lotMasterId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from getPopTestItem.");
+        return new ResponseEntity<>(popTestResponse, OK);
+    }
+
+    // 공정에 해당하는 불량유형 조회
+    @SecurityRequirement(name = AUTHORIZATION)
+    @GetMapping("/bad-item-types")
+    @ResponseBody
+    @Operation(summary = "[미구현] (pop) 공정에 해당하는 불량항목 조회", description = "")
+    public ResponseEntity<List<PopBadItemTypeResponse>> getPopTestBadItemTypes(
+            @RequestParam @Parameter(description = "공정구분") WorkProcessDivision workProcessDivision,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        List<PopBadItemTypeResponse> badItemResponses = popService.getPopTestBadItemTypes(workProcessDivision);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from getPopTestBadItemTypes.");
+        return new ResponseEntity<>(badItemResponses, OK);
+    }
+
+    // 중간검사 등록된 불량 조회
+    @SecurityRequirement(name = AUTHORIZATION)
+    @GetMapping("/bad-items")
+    @ResponseBody
+    @Operation(summary = "[미구현] (pop) 중간검사 등록된 불량 리스트 조회", description = "")
+    public ResponseEntity<List<PopTestBadItemResponse>> getPopBadItemEnrollments(
+            @RequestParam @Parameter(description = "lotMaster id") Long lotMasterId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        List<PopTestBadItemResponse> popTestBadItemResponses = popService.getPopBadItemEnrollments(lotMasterId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from getPopBadItemEnrollments.");
+        return new ResponseEntity<>(popTestBadItemResponses, OK);
+    }
+
+    // 불량 등록
+    @SecurityRequirement(name = AUTHORIZATION)
+    @PostMapping("/enrollment-bad-items")
+    @ResponseBody
+    @Operation(summary = "[미구현] (pop) 불량 등록", description = "")
+    public ResponseEntity<PopTestBadItemResponse> createPopBadItemEnrollment(
+            @RequestParam @Parameter(description = "만들어진 반제품 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "공정 구분") WorkProcessDivision workProcessDivision,
+            @RequestParam @Parameter(description = "불량 항목 id") Long badItemTypeId,
+            @RequestParam @Parameter(description = "불량 수량") int badItemAmount,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException, BadRequestException {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        PopTestBadItemResponse response =
+                popService.createPopBadItemEnrollment(lotMasterId, workProcessDivision, badItemTypeId, badItemAmount);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from createPopBadItemEnrollment.");
+        return new ResponseEntity<>(response, OK);
+    }
+
+    // 불량 수량 수정
+    @SecurityRequirement(name = AUTHORIZATION)
+    @PutMapping("/enrollment-bad-items")
+    @ResponseBody
+    @Operation(summary = "[미구현] (pop) 불량 수량 수정", description = "")
+    public ResponseEntity<PopTestBadItemResponse> putPopBadItemEnrollment(
+            @RequestParam @Parameter(description = "불량 id") Long enrollmentBadItemId,
+            @RequestParam @Parameter(description = "불량 수량") int badItemAmount,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        PopTestBadItemResponse response = popService.putPopBadItemEnrollment(enrollmentBadItemId, badItemAmount);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from putPopBadItemEnrollment.");
+        return new ResponseEntity<>(response, OK);
+    }
+
+    // 불량 삭제
+    @SecurityRequirement(name = AUTHORIZATION)
+    @DeleteMapping("/enrollment-bad-items")
+    @ResponseBody
+    @Operation(summary = "[미구현] (pop) 불량 삭제", description = "")
+    public ResponseEntity deletePopBadItemEnrollment(
+            @RequestParam @Parameter(description = "불량 id") Long enrollmentBadItemId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        popService.deletePopBadItemEnrollment(enrollmentBadItemId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from deletePopBadItemEnrollment.");
+        return new ResponseEntity<>(NO_CONTENT);
+    }
+
+    // 분할 lot 조회
+    @SecurityRequirement(name = AUTHORIZATION)
+    @GetMapping("/enrollment-lots")
+    @ResponseBody
+    @Operation(summary = "[미구현] (pop) 분할 lot 리스트 조회", description = "")
+    public ResponseEntity<List<PopLotMasterResponse>> getPopLotMasters(
+            @RequestParam @Parameter(description = "만들어진 반제품 lotMaster id") Long lotMasterId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        List<PopLotMasterResponse> popLotMasterResponses = popService.getPopLotMasters(lotMasterId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from getPopLotMasters.");
+        return new ResponseEntity<>(popLotMasterResponses, OK);
+    }
+
+    // 분할 lot 생성
+    // 자식 lotMaster: createdAmount, stockAmount
+    @SecurityRequirement(name = AUTHORIZATION)
+    @PostMapping("/enrollment-lots")
+    @ResponseBody
+    @Operation(summary = "[미구현] (pop) 분할 lot 생성", description = "")
+    public ResponseEntity<PopLotMasterResponse> createPopLotMasters(
+            @RequestParam @Parameter(description = "만들어진 반제품 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "수량") int amount,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        PopLotMasterResponse popLotMasterResponse = popService.createPopLotMasters(lotMasterId, amount);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from createPopLotMasters.");
+        return new ResponseEntity<>(popLotMasterResponse, OK);
+    }
+
+    // 분할 lot 수정
+    @SecurityRequirement(name = AUTHORIZATION)
+    @PutMapping("/enrollment-lots")
+    @ResponseBody
+    @Operation(summary = "[미구현] (pop) 분할 lot 수정", description = "")
+    public ResponseEntity<PopLotMasterResponse> putPopLotMasters(
+            @RequestParam @Parameter(description = "분할 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "수량") int amount,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        PopLotMasterResponse popLotMasterResponse = popService.putPopLotMasters(lotMasterId, amount);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from putPopLotMasters.");
+        return new ResponseEntity<>(popLotMasterResponse, OK);
+    }
+
+    // 분할 lot 삭제
+    @SecurityRequirement(name = AUTHORIZATION)
+    @DeleteMapping("/enrollment-lots")
+    @ResponseBody
+    @Operation(summary = "[미구현] (pop) 분할 lot 삭제", description = "")
+    public ResponseEntity<PopLotMasterResponse> deletePopLotMasters(
+            @RequestParam @Parameter(description = "분할 lotMaster id") Long lotMasterId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        popService.deletePopLotMasters(lotMasterId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from deletePopLotMasters.");
+        return new ResponseEntity(OK);
     }
 }
