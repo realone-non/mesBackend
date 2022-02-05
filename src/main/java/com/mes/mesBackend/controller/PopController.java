@@ -85,7 +85,7 @@ public class PopController {
         return new ResponseEntity<>(popWorkOrderResponses, OK);
     }
 
-    // ========================================= TODO: 여기서부터 수정해야됨 ~~~~~~~ -=========================================
+    // TODO: 수정해야됨 -> 끝남
     // 작업지시 상태 변경
     @SecurityRequirement(name = AUTHORIZATION)
     @PostMapping("/work-orders/{work-order-id}")
@@ -116,7 +116,7 @@ public class PopController {
                     "bomMasterItem: 만들어진 제품, bomDetailItem: 레시피"
     )
     public ResponseEntity<List<PopBomDetailItemResponse>> getPopBomDetailItems(
-            @RequestParam @Parameter(description = "lot id") Long lotMasterId,
+            @RequestParam @Parameter(description = "설비 lot id") Long lotMasterId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<PopBomDetailItemResponse> popBomDetailItems = popService.getPopBomDetailItems(lotMasterId);

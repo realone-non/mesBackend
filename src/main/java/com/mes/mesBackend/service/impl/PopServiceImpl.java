@@ -250,50 +250,50 @@ public class PopServiceImpl implements PopService {
     // 해당 품목(반제품)에 대한 원자재, 부자재 정보 가져와야함
     @Override
     public List<PopBomDetailItemResponse> getPopBomDetailItems(Long lotMasterId) throws NotFoundException {
-//        LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);
-//        Item bomMasterItem = lotMaster.getItem();
-//        // lotMaster 의 item 에 해당하는 bomDetail 의 item 정보 가져옴
-//        List<Item> bomDetailItems = workOrderDetailRepository.findBomDetailItemByBomMasterItem(bomMasterItem.getId());
-//
-//        List<PopBomDetailItemResponse> popBomDetailItemResponses = new ArrayList<>();
-//        for (Item bomDetailItem : bomDetailItems) {
-//            PopBomDetailItemResponse response = new PopBomDetailItemResponse();
-//            response.setBomMasterItemId(bomMasterItem.getId());
-//            response.setBomMasterItemNo(bomMasterItem.getItemNo());
-//            response.setBomMasterItemName(bomMasterItem.getItemName());
-//            response.setBomMasterItemAmount(lotMaster.getCreatedAmount());
-//
-//            response.setBomDetailItemId(bomDetailItem.getId());
-//            response.setBomDetailItemNo(bomDetailItem.getItemNo());
-//            response.setBomDetailItemName(bomDetailItem.getItemName());
-//            response.setBomDetailExhaustYn(bomDetailItem.getUnit().isExhaustYn());
-//            response.setBomDetailUnitCodeName(bomDetailItem.getUnit().getUnitCode());
-//
-//            // 소진량
-//            List<LotConnect> lotConnects = lotConnectRepo.findLotConnectsByItemIdOfChildLotMasterEqAndDivisionExhaust(bomDetailItem.getId());
-//            for (LotConnect lotConnect : lotConnects) {
-//                if (bomDetailItem.getId().equals(lotConnect.getChildLot().getItem().getId())) {
-//                    int allAmount = lotConnects.stream().mapToInt(LotConnect::getAmount).sum();
-//                    response.setBomDetailExhaustAmount(allAmount);
-//                } else
-//                    response.setBomDetailExhaustAmount(0);
-//            }
-//            popBomDetailItemResponses.add(response);
-//        }
-//        return popBomDetailItemResponses;
-        return null;
+        LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);
+        Item bomMasterItem = lotMaster.getItem();
+        // lotMaster 의 item 에 해당하는 bomDetail 의 item 정보 가져옴
+        List<Item> bomDetailItems = workOrderDetailRepository.findBomDetailItemByBomMasterItem(bomMasterItem.getId());
+
+        List<PopBomDetailItemResponse> popBomDetailItemResponses = new ArrayList<>();
+        for (Item bomDetailItem : bomDetailItems) {
+            PopBomDetailItemResponse response = new PopBomDetailItemResponse();
+            response.setBomMasterItemId(bomMasterItem.getId());
+            response.setBomMasterItemNo(bomMasterItem.getItemNo());
+            response.setBomMasterItemName(bomMasterItem.getItemName());
+            response.setBomMasterItemAmount(lotMaster.getCreatedAmount());
+
+            response.setBomDetailItemId(bomDetailItem.getId());
+            response.setBomDetailItemNo(bomDetailItem.getItemNo());
+            response.setBomDetailItemName(bomDetailItem.getItemName());
+            response.setBomDetailExhaustYn(bomDetailItem.getUnit().isExhaustYn());
+            response.setBomDetailUnitCodeName(bomDetailItem.getUnit().getUnitCode());
+
+            // 소진량
+            List<LotConnect> lotConnects = lotConnectRepo.findLotConnectsByItemIdOfChildLotMasterEqAndDivisionExhaust(bomDetailItem.getId());
+            for (LotConnect lotConnect : lotConnects) {
+                if (bomDetailItem.getId().equals(lotConnect.getChildLot().getItem().getId())) {
+                    int allAmount = lotConnects.stream().mapToInt(LotConnect::getAmount).sum();
+                    response.setBomDetailExhaustAmount(allAmount);
+                } else
+                    response.setBomDetailExhaustAmount(0);
+            }
+            popBomDetailItemResponses.add(response);
+        }
+        return popBomDetailItemResponses;
     }
 
     // 원자재, 부자재에 해당되는 lotMaster 조회, stockAmount 1 이상
+    // TODO: 여기까지 했음.
     @Override
     public List<PopBomDetailLotMasterResponse> getPopBomDetailLotMasters(Long lotMasterId, Long itemId, String lotNo) throws NotFoundException {
 //        // 해당 lot 에 등록된 사용정보는 보여주지 않음.
 //        LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);
-//        List<PopBomDetailLotMasterResponse> responses = lotMasterRepo.findAllByItemIdAndLotNo(itemId, lotNo);
-//        // 부모 lotMaster 와 같은 자식 lotMasterId 모두 조회
-//        List<Long> childLotIds = lotConnectRepo.findChildLotIdByParentLotIdAndDivisionExhaust(lotMaster.getId());
-//
-//        return responses.stream().filter(f -> !childLotIds.contains(f.getLotMasterId())).collect(Collectors.toList());  // 이미 등록되어 있는 사용정보는 제외
+////        List<PopBomDetailLotMasterResponse> responses = lotMasterRepo.findAllByItemIdAndLotNo(itemId, lotNo);
+////        // 부모 lotMaster 와 같은 자식 lotMasterId 모두 조회
+////        List<Long> childLotIds = lotConnectRepo.findChildLotIdByParentLotIdAndDivisionExhaust(lotMaster.getId());
+////
+////        return responses.stream().filter(f -> !childLotIds.contains(f.getLotMasterId())).collect(Collectors.toList());  // 이미 등록되어 있는 사용정보는 제외
         return null;
     }
 

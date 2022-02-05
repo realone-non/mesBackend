@@ -19,10 +19,20 @@ public class LotConnectRepositoryImpl implements LotConnectRepositoryCustom {
     final QLotMaster lotMaster = QLotMaster.lotMaster;
     final QItem item = QItem.item;
     final QUnit unit = QUnit.unit;
+    final QLotEquipmentConnect lotEquipmentConnect = QLotEquipmentConnect.lotEquipmentConnect;
 
 //    // 부모 lotMaster 랑 같고, 자식 lotMaster 의 item 이 파라미터 itemId 와 같고, 구분값이 EXHAUST 인것 조회
-//    @Override
-//    public List<LotConnect> findLotConnectsByItemIdOfChildLotMasterEqAndDivisionExhaust(Long itemIdOfChildLotMaster) {
+    @Override
+    public List<LotConnect> findLotConnectsByItemIdOfChildLotMasterEqAndDivisionExhaust(Long itemIdOfChildLotMaster) {
+        return jpaQueryFactory
+                .select(lotConnect)
+                .from(lotConnect)
+                .where(
+                        lotConnect.childLot.item.id.eq(itemIdOfChildLotMaster),
+                        lotConnect.division.eq(EXHAUST)
+                )
+                .fetch();
+    }
 //        return jpaQueryFactory
 //                .select(lotConnect)
 //                .from(lotConnect)
