@@ -58,4 +58,7 @@ public interface LotMasterRepositoryCustom {
 
     // 품목 id 에 해당되는 lotMaster 조회
     List<PopBomDetailLotMasterResponse> findAllByItemIdAndLotNo(Long itemId, String lotNo);
+
+    // 공정, 설비로 라벨프린트 대상 조회
+    List<LabelPrintResponse> findPrintsByWorkProcessAndEquipment(Long workProcessId, Long equipmentId);
 }

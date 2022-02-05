@@ -2,10 +2,9 @@ package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.EquipmentRequest;
 import com.mes.mesBackend.dto.response.EquipmentResponse;
+import com.mes.mesBackend.dto.response.PopEquipmentResponse;
 import com.mes.mesBackend.entity.Equipment;
 import com.mes.mesBackend.exception.NotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -24,4 +23,6 @@ public interface EquipmentService {
     void deleteEquipment(Long id) throws NotFoundException;
     // 설비 단일 조회 및 예외
     Equipment getEquipmentOrThrow(Long id) throws NotFoundException;
+    //공정ID로 설비 조회
+    List<PopEquipmentResponse> getEquipmentsByWorkProcess(Long workProcessId) throws NotFoundException;
 }

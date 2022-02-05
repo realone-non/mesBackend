@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.LotMasterRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 
 @RequiredArgsConstructor
@@ -31,6 +33,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     final QOutSourcingInput outSourcingInput = QOutSourcingInput.outSourcingInput;
     final QWorkProcess workProcess = QWorkProcess.workProcess;
     final QUnit unit = QUnit.unit;
+    final QLotLog lotLog = QLotLog.lotLog;
+    final QWorkOrderDetail workOrderDetail = QWorkOrderDetail.workOrderDetail;
 
     // id 로 itemAccountCode 의 symbol 조회
     @Override
@@ -343,8 +347,13 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .from(lotMaster)
                 .leftJoin(item).on(item.id.eq(lotMaster.item.id))
                 .leftJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
+                .innerJoin(lotLog).on(lotLog.lotMaster.id.eq(lotMaster.id))
+                .innerJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
                 .where(
-                        lotMaster.workProcess.id.eq(workProcessId)
+                        lotMaster.workProcess.id.eq(workProcessId),
+                        workOrderDetail.orderState.eq(COMPLETION),
+                        lotMaster.deleteYn.eq(false),
+                        lotMaster.useYn.eq(true)
                 )
                 .groupBy(lotMaster.item.id)
                 .fetch();
@@ -415,6 +424,33 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         lotMaster.deleteYn.isFalse(),
                         isLotNoContain(lotNo),
                         lotMaster.stockAmount.goe(1)
+                )
+                .fetch();
+    }
+
+    // 공정, 설비로 라벨프린트 대상 조회
+    public List<LabelPrintResponse> findPrintsByWorkProcessAndEquipment(Long workProcessId, Long equipmentId){
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                LabelPrintResponse.class,
+                                lotMaster.lotNo.as("lotNo"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                lotMaster.stockAmount.as("amount")
+                        )
+                )
+                .from(lotMaster)
+                .innerJoin(item).on(item.id.eq(lotMaster.item.id))
+                .innerJoin(lotLog).on(lotLog.lotMaster.id.eq(lotMaster.id))
+                .innerJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
+                .innerJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
+                .where(
+                        workOrderDetail.orderState.eq(COMPLETION),
+                        lotMaster.deleteYn.eq(false),
+                        lotMaster.stockAmount.gt(0),
+                        lotMaster.useYn.eq(true),
+                        lotMaster.workProcess.id.eq(workProcessId)
                 )
                 .fetch();
     }
