@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.LotMasterRequest;
+import com.mes.mesBackend.dto.response.LabelPrintResponse;
 import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.MaterialStockReponse;
 import com.mes.mesBackend.entity.*;
@@ -231,6 +232,11 @@ public class LotMasterServiceImpl implements LotMasterService {
                 itemLogRepository.save(itemLog);
             }
         }
+    }
+
+    //라벨 프린트용 정보 반환
+    public List<LabelPrintResponse> getPrints(Long workProcessId, Long equipmentId){
+        return lotMasterRepo.findPrintsByWorkProcessAndEquipment(workProcessId, equipmentId);
     }
 
     // lotMaster 용 wareHouse 찾기

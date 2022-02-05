@@ -56,7 +56,15 @@ public class LotHelperImpl implements LotHelper {
         OutSourcingInput outSourcingInput = lotMasterRequest.getOutsourcingInputId() != null ? getOutsourcingInputOrThrow(lotMasterRequest.getOutsourcingInputId()) : null;
         Long workProcessId = lotMasterRequest.getWorkProcessDivision() != null ? lotLogHelper.getWorkProcessByDivisionOrThrow(lotMasterRequest.getWorkProcessDivision()) : null;
         WorkProcess workProcess = workProcessId != null ? getWorkProcessIdOrThrow(workProcessId) : null;
-        Equipment equipment = equipmentRepository.findByWorkProcess(workProcess.getId());
+
+        Equipment equipment;
+        if (lotMasterRequest.getEquipmentId() != null) {
+            equipment = equipmentRepository.findByIdAndDeleteYnFalse(lotMasterRequest.getEquipmentId())
+                    .orElseThrow(() -> new NotFoundException("[LotHelper] equipment does not exist. "));
+        } else {
+            equipment = equipmentRepository.findByWorkProcess(workProcess.getId());
+        }
+
 //        LotMaster lotMaster = modelMapper.toEntity(lotMasterRequest, LotMaster.class);
 
         LotMaster lotMaster = new LotMaster();
@@ -74,7 +82,7 @@ public class LotHelperImpl implements LotHelper {
         lotMaster.setPurchaseInput(purchaseInput);
         lotMaster.setWorkProcess(workProcess);
         lotMaster.setDummyYn(lotMasterRequest.isDummyYn());
-
+        lotMaster.setEquipment(equipment);
 
         GoodsType goodsType = null;
 
