@@ -6,29 +6,28 @@ import com.mes.mesBackend.dto.response.CodeResponse;
 import com.mes.mesBackend.dto.response.WorkProcessResponse;
 import com.mes.mesBackend.entity.WorkProcess;
 import com.mes.mesBackend.entity.WorkProcessCode;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.WorkProcessCodeRepository;
 import com.mes.mesBackend.repository.WorkProcessRepository;
 import com.mes.mesBackend.service.WorkProcessService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.NONE;
+
 // 작업공정 & 작업공정 코드 등록
 @Service
+@RequiredArgsConstructor
 public class WorkProcessServiceImpl implements WorkProcessService {
-
-    @Autowired
-    WorkProcessRepository workProcessRepository;
-
-    @Autowired
-    WorkProcessCodeRepository workProcessCodeRepository;
-
-    @Autowired
-    ModelMapper mapper;
+    private final WorkProcessRepository workProcessRepository;
+    private final WorkProcessCodeRepository workProcessCodeRepository;
+    private final ModelMapper mapper;
 
     // 작업공정 생성
     @Override
@@ -36,6 +35,7 @@ public class WorkProcessServiceImpl implements WorkProcessService {
         WorkProcessCode workProcessCode = getWorkProcessCodeOrThrow(workProcessRequest.getWorkProcessCode());
         WorkProcess workProcess = mapper.toEntity(workProcessRequest, WorkProcess.class);
         workProcess.addWorkProcessCode(workProcessCode);
+        workProcess.setWorkProcessDivision(NONE);
         workProcessRepository.save(workProcess);
         return mapper.toResponse(workProcess, WorkProcessResponse.class);
     }

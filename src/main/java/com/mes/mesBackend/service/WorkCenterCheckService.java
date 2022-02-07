@@ -1,13 +1,10 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.WorkCenterCheckDetailRequest;
-import com.mes.mesBackend.dto.request.WorkCenterCheckRequest;
 import com.mes.mesBackend.dto.response.WorkCenterCheckDetailResponse;
 import com.mes.mesBackend.dto.response.WorkCenterCheckResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 

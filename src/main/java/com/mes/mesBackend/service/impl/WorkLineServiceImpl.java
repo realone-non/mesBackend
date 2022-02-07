@@ -14,34 +14,22 @@ import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.WorkLineCodeRepository;
 import com.mes.mesBackend.repository.WorkLineRepository;
 import com.mes.mesBackend.service.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class WorkLineServiceImpl implements WorkLineService {
-
-    @Autowired
-    WorkLineRepository workLineRepository;
-
-    @Autowired
-    WorkLineCodeRepository workLineCodeRepository;
-
-    @Autowired
-    WorkCenterService workCenterService;
-
-    @Autowired
-    WareHouseService wareHouseService;
-
-    @Autowired
-    WorkProcessService workProcessService;
-
-    @Autowired
-    ClientService clientService;
-
-    @Autowired
-    ModelMapper mapper;
+    private final WorkLineRepository workLineRepository;
+    private final WorkLineCodeRepository workLineCodeRepository;
+    private final WorkCenterService workCenterService;
+    private final WareHouseService wareHouseService;
+    private final WorkProcessService workProcessService;
+    private final ClientService clientService;
+    private final ModelMapper mapper;
 
 
     // 작업라인 생성

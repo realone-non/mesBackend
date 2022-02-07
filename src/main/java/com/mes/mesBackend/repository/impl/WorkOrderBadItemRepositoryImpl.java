@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.response.BadItemEnrollmentResponse;
 import com.mes.mesBackend.dto.response.PopBadItemTypeResponse;
 import com.mes.mesBackend.dto.response.PopTestBadItemResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.repository.custom.WorkOrderBadItemRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -11,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.EQUIPMENT_LOT;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 
 @RequiredArgsConstructor
 public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositoryCustom {
@@ -38,7 +42,7 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                             )
                         )
                         .from(workOrderBadItem)
-                        .leftJoin(lotLog).on(lotLog.id.eq(workOrderBadItem.lotLog.id))
+//                        .leftJoin(lotLog).on(lotLog.id.eq(workOrderBadItem.lotLog.id))
                         .leftJoin(badItem).on(badItem.id.eq(workOrderBadItem.badItem.id))
                         .leftJoin(workProcess).on(workProcess.id.eq(badItem.workProcess.id))
                         .leftJoin(lotMaster).on(lotMaster.id.eq(lotLog.lotMaster.id))
@@ -64,7 +68,7 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                         )
                 )
                 .from(workOrderBadItem)
-                .leftJoin(lotLog).on(lotLog.id.eq(workOrderBadItem.lotLog.id))
+//                .leftJoin(lotLog).on(lotLog.id.eq(workOrderBadItem.lotLog.id))
                 .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
                 .leftJoin(badItem).on(badItem.id.eq(workOrderBadItem.badItem.id))
                 .leftJoin(workProcess).on(workProcess.id.eq(badItem.workProcess.id))
@@ -81,11 +85,11 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
         return jpaQueryFactory
                 .select(badItem.id)
                 .from(workOrderBadItem)
-                .innerJoin(lotLog).on(lotLog.id.eq(workOrderBadItem.lotLog.id))
                 .innerJoin(badItem).on(badItem.id.eq(workOrderBadItem.badItem.id))
-                .innerJoin(lotMaster).on(lotMaster.id.eq(lotLog.lotMaster.id))
+                .leftJoin(lotMaster).on(lotMaster.id.eq(workOrderBadItem.lotMaster.id))
                 .where(
-                        lotMaster.id.eq(lotMasterId),
+                        workOrderBadItem.lotMaster.id.eq(lotMasterId),
+                        workOrderBadItem.division.eq(EQUIPMENT_LOT),
                         workOrderBadItem.deleteYn.isFalse()
                 )
                 .fetch();
@@ -130,18 +134,16 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                         Projections.fields(
                                 PopTestBadItemResponse.class,
                                 workOrderBadItem.id.as("badItemId"),
-                                badItem.id.as("badItemTypeId"),
-                                badItem.badItemName.as("badItemTypeName"),
+                                workOrderBadItem.badItem.id.as("badItemTypeId"),
+                                workOrderBadItem.badItem.badItemName.as("badItemTypeName"),
                                 workOrderBadItem.badItemAmount.as("badItemAmount")
                         )
                 )
                 .from(workOrderBadItem)
-                .leftJoin(badItem).on(badItem.id.eq(workOrderBadItem.badItem.id))
-                .leftJoin(lotLog).on(lotLog.id.eq(workOrderBadItem.lotLog.id))
-                .leftJoin(lotMaster).on(lotMaster.id.eq(lotLog.lotMaster.id))
                 .where(
-                        lotMaster.id.eq(lotMasterId),
-                        workOrderBadItem.deleteYn.isFalse()
+                        workOrderBadItem.lotMaster.id.eq(lotMasterId),
+                        workOrderBadItem.deleteYn.isFalse(),
+                        workOrderBadItem.division.eq(EQUIPMENT_LOT)
                 )
                 .fetch();
     }

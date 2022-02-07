@@ -14,9 +14,9 @@ import static com.mes.mesBackend.exception.Message.*;
 @Setter
 @Schema(description = "작업라인")
 public class WorkLineRequest {
-
     @Schema(description = "라인코드 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
     Long workLineCode;           // 라인코드
 
     @Schema(description = "작업라인명")
@@ -25,6 +25,7 @@ public class WorkLineRequest {
 
     @Schema(description = "작업장 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
     Long workCenter;             // 작업장
 
     @Schema(description = "작업공정 id")
@@ -32,12 +33,10 @@ public class WorkLineRequest {
     Long workProcess;            // 작업공정
 
     @Schema(description = "POP 시작 FORMID")
-    @NotBlank(message = NOT_EMPTY)
     String popStartFormid;      // POP 시작 FORMID
 
     @Schema(description = "일 가동시간")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
     int time;                   // 일 가동시간
 
     @Schema(description = "사용여부")

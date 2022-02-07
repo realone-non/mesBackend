@@ -48,7 +48,6 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
                 itemGroupId,
                 produceOrderNo,
                 workOrderNo,
-
                 fromDate,
                 toDate,
                 itemNoAndItemName
@@ -63,6 +62,7 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
     }
 
     // 불량유형 정보 생성
+    // TODO: 여기 수정해야됨
     @Override
     public BadItemEnrollmentResponse createBadItemEnrollment(
             Long workOrderId,
@@ -112,38 +112,39 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
             Long badItemEnrollmentId,
             int badItemAmount
     ) throws NotFoundException, BadRequestException {
-        getWorkOrderDetailOrThrow(workOrderId);
-        WorkOrderBadItem findWorkOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
-        LotMaster lotMaster = findWorkOrderBadItem.getLotLog().getLotMaster();
+//        getWorkOrderDetailOrThrow(workOrderId);
+//        WorkOrderBadItem findWorkOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
+//        LotMaster lotMaster = findWorkOrderBadItem.getLotLog().getLotMaster();
+//
+//        int beforeBadItemAmount = (lotMaster.getBadItemAmount() - findWorkOrderBadItem.getBadItemAmount());
+//        int beforeStockAmount = lotMaster.getStockAmount() + findWorkOrderBadItem.getBadItemAmount();
+//        // 입력받은 불량 수량이 lotMaster 의 생성수량보다 큰지 체크
+//        throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(beforeBadItemAmount + badItemAmount, lotMaster.getCreatedAmount());
+//
+//        findWorkOrderBadItem.setBadItemAmount(badItemAmount);
+//        lotMaster.setBadItemAmount(beforeBadItemAmount + badItemAmount);    // 불량수량 변경
+//        lotMaster.setStockAmount(beforeStockAmount - badItemAmount);  // 재고수량 변경
+//
+//        workOrderBadItemRepo.save(findWorkOrderBadItem);
+//        lotMasterRepo.save(lotMaster);
 
-        int beforeBadItemAmount = (lotMaster.getBadItemAmount() - findWorkOrderBadItem.getBadItemAmount());
-        int beforeStockAmount = lotMaster.getStockAmount() + findWorkOrderBadItem.getBadItemAmount();
-        // 입력받은 불량 수량이 lotMaster 의 생성수량보다 큰지 체크
-        throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(beforeBadItemAmount + badItemAmount, lotMaster.getCreatedAmount());
-
-        findWorkOrderBadItem.setBadItemAmount(badItemAmount);
-        lotMaster.setBadItemAmount(beforeBadItemAmount + badItemAmount);    // 불량수량 변경
-        lotMaster.setStockAmount(beforeStockAmount - badItemAmount);  // 재고수량 변경
-
-        workOrderBadItemRepo.save(findWorkOrderBadItem);
-        lotMasterRepo.save(lotMaster);
-
-        return getBadItemEnrollmentResponse(findWorkOrderBadItem.getId());
+//        return getBadItemEnrollmentResponse(findWorkOrderBadItem.getId());
+        return null;
     }
 
     // 불량유형 정보 삭제
     @Override
     public void deleteBadItemEnrollment(Long workOrderId, Long badItemEnrollmentId) throws NotFoundException {
-        getWorkOrderDetailOrThrow(workOrderId);
-        WorkOrderBadItem findWorkOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
-        findWorkOrderBadItem.delete();
-        int beforeBadItemAmount = findWorkOrderBadItem.getBadItemAmount();
-
-        LotMaster lotMaster = findWorkOrderBadItem.getLotLog().getLotMaster();
-        lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() - beforeBadItemAmount); // 불량수량 변경
-        lotMaster.setStockAmount(lotMaster.getStockAmount() + beforeBadItemAmount);     // 재고수량 변경
-        workOrderBadItemRepo.save(findWorkOrderBadItem);
-        lotMasterRepo.save(lotMaster);
+//        getWorkOrderDetailOrThrow(workOrderId);
+//        WorkOrderBadItem findWorkOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
+//        findWorkOrderBadItem.delete();
+//        int beforeBadItemAmount = findWorkOrderBadItem.getBadItemAmount();
+//
+//        LotMaster lotMaster = findWorkOrderBadItem.getLotLog().getLotMaster();
+//        lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() - beforeBadItemAmount); // 불량수량 변경
+//        lotMaster.setStockAmount(lotMaster.getStockAmount() + beforeBadItemAmount);     // 재고수량 변경
+//        workOrderBadItemRepo.save(findWorkOrderBadItem);
+//        lotMasterRepo.save(lotMaster);
     }
 
     // 불량유형 단일 조회 및 예외
