@@ -26,4 +26,6 @@ public interface WorkDocumentService {
     void deleteWorkDocument(Long id) throws NotFoundException;
     // 작업표준서 파일 추가
     WorkDocumentResponse createFileToWorkDocument(Long id, MultipartFile file) throws NotFoundException, BadRequestException, IOException;
+    // 작업표준서 파일 삭제
+    void deleteFileToWorkDocument(Long id) throws NotFoundException;
 }

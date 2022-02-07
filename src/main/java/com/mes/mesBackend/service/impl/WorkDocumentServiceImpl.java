@@ -15,6 +15,7 @@ import com.mes.mesBackend.service.ItemService;
 import com.mes.mesBackend.service.WorkDocumentService;
 import com.mes.mesBackend.service.WorkLineService;
 import com.mes.mesBackend.service.WorkProcessService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,19 +24,14 @@ import java.io.IOException;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class WorkDocumentServiceImpl implements WorkDocumentService {
-    @Autowired
-    WorkDocumentRepository workDocumentRepository;
-    @Autowired
-    ModelMapper mapper;
-    @Autowired
-    WorkProcessService workProcessService;
-    @Autowired
-    WorkLineService workLineService;
-    @Autowired
-    ItemService itemService;
-    @Autowired
-    S3UploaderImpl s3Service;
+    private final WorkDocumentRepository workDocumentRepository;
+    private final ModelMapper mapper;
+    private final WorkProcessService workProcessService;
+    private final WorkLineService workLineService;
+    private final ItemService itemService;
+    private final S3UploaderImpl s3Service;
 
     // 작업표준서 생성
     @Override
@@ -106,5 +102,13 @@ public class WorkDocumentServiceImpl implements WorkDocumentService {
         workDocument.addFile(s3Service.upload(file, fileName));
         workDocumentRepository.save(workDocument);
         return mapper.toResponse(workDocument, WorkDocumentResponse.class);
+    }
+
+    // 작업표준서 파일 삭제
+    @Override
+    public void deleteFileToWorkDocument(Long id) throws NotFoundException {
+        WorkDocument workDocument = getWorkDocumentOrThrow(id);
+        workDocument.setFileNameUrl(null);
+        workDocumentRepository.save(workDocument);
     }
 }
