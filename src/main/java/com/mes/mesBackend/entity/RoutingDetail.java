@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.time.LocalDate;
 
+import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
+
 
 /* 라우팅 상세 등록
  * 작업순번 (01,02,03)
@@ -23,12 +26,12 @@ import java.time.LocalDate;
  * 사용
  * */
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 @Entity(name = "ROUTING_DETAILS")
 @Data
 public class RoutingDetail extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '라우팅 상세등록 고유아이디'")
     private Long id;
 

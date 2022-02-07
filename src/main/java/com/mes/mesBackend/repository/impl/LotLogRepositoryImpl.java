@@ -164,6 +164,34 @@ public class LotLogRepositoryImpl implements LotLogRepositoryCustom {
         );
     }
 
+    // 검색조건: lotMasterId, workProcessId, return: LotLog
+    @Override
+    public Optional<LotLog> findByLotMasterIdAndWorkProcessId(Long lotMasterId, Long workProcessId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(lotLog)
+                        .where(
+                                lotLog.lotMaster.id.eq(lotMasterId),
+                                lotLog.workProcess.id.eq(workProcessId)
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // 검색조건: workOrderDetailId, 반환: LotLog
+    @Override
+    public Optional<LotLog> findByWorkOrderDetailId(Long workOrderDetailId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(lotLog)
+                        .where(
+                                lotLog.workOrderDetail.id.eq(workOrderDetailId)
+                        )
+                        .orderBy(lotLog.createdDate.desc())
+                        .fetchOne()
+        );
+    }
+
     private BooleanExpression isWorkProcessIdEq(Long workProcessId) {
         return workProcessId != null ? workProcess.id.eq(workProcessId) : null;
     }

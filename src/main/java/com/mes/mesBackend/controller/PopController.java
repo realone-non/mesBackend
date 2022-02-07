@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.BadItem;
+import com.mes.mesBackend.entity.enumeration.ProcessStatus;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -41,7 +42,7 @@ public class PopController {
     @ResponseBody
     @Operation(summary = "(pop) 작업공정 전체 조회", description = "검색조건: 재사용 공정 여부")
     public ResponseEntity<List<WorkProcessResponse>> getPopWorkProcesses(
-            @RequestParam(required = false) @Parameter(description = "재사용 공정(true: 재사용 공정만 조회) ") Boolean recycleYn
+            @RequestParam(required = false) @Parameter(description = "재사용 공정(true: 재사용 공정만 조회)") Boolean recycleYn
     ) {
         List<WorkProcessResponse> workProcesses = popService.getPopWorkProcesses(recycleYn);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
@@ -73,7 +74,8 @@ public class PopController {
     @Operation(
             summary = "(pop) 작업지시 정보",
             description = "조건: 작업공정 구분 값, 날짜(당일) <br /> " +
-                    " 작업공정 구분: [자재입고: MATERIAL_INPUT, 원료혼합: MATERIAL_MIXING, 충진: FILLING, 캡조립: CAP_ASSEMBLY, 라벨링: LABELING, 포장: PACKAGING, 출하: SHIPMENT, 재사용 : RECYCLE]"
+                    " 작업공정 구분: [자재입고: MATERIAL_INPUT, 원료혼합: MATERIAL_MIXING, 충진: FILLING, " +
+                    "캡조립: CAP_ASSEMBLY, 라벨링: LABELING, 포장: PACKAGING, 출하: SHIPMENT, 재사용 : RECYCLE]"
     )
     public ResponseEntity<List<PopWorkOrderResponse>> getPopWorkOrders(
             @RequestParam @Parameter(description = "작업공정 구분 값") WorkProcessDivision workProcessDivision,
@@ -85,7 +87,43 @@ public class PopController {
         return new ResponseEntity<>(popWorkOrderResponses, OK);
     }
 
-    // ========================================= TODO: 여기서부터 수정해야됨 ~~~~~~~ -=========================================
+    // 작업지시 진행상태 정보 조회
+    @SecurityRequirement(name = AUTHORIZATION)
+    @GetMapping("/work-orders-states")
+    @ResponseBody
+    @Operation(
+            summary = "(pop) 작업지시 진행상태 정보 조회",
+            description = "[원자재 등록: MATERIAL_REGISTRATION, 중간 검사: MIDDLE_TEST, 로트 분할: LOT_DIVIDE]"
+    )
+    public ResponseEntity<List<PopWorkOrderStates>> getPopWorkOrderStates(
+            @RequestParam @Parameter(description = "작업지시 id") Long workOrderId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        List<PopWorkOrderStates> popWorkOrderStates = popService.getPopWorkOrderStates(workOrderId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPopWorkOrderStates.");
+        return new ResponseEntity<>(popWorkOrderStates, OK);
+    }
+
+    // 작업지시 진행상태 변경
+    @SecurityRequirement(name = AUTHORIZATION)
+    @PutMapping("/work-order-states")
+    @ResponseBody
+    @Operation(
+            summary = "(pop) 작업지시 진행상태 변경",
+            description = "[원자재 등록: MATERIAL_REGISTRATION, 중간 검사: MIDDLE_TEST, 로트 분할: LOT_DIVIDE]"
+    )
+    public ResponseEntity updatePopWorkOrderState(
+            @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "상태 값") ProcessStatus processStatus,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        popService.updatePopWorkOrderState(lotMasterId, processStatus);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from updatePopWorkOrderState.");
+        return new ResponseEntity<>(NO_CONTENT);
+    }
+
     // 작업지시 상태 변경
     @SecurityRequirement(name = AUTHORIZATION)
     @PostMapping("/work-orders/{work-order-id}")
@@ -99,7 +137,7 @@ public class PopController {
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
-        Long lotId = popService.createCreateWorkOrder(workOrderId, itemId, userCode, productAmount, equipmentId);
+        Long lotId = popService.createWorkOrder(workOrderId, itemId, userCode, productAmount, equipmentId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is viewed the list of from getPopWorkOrders.");
         return new ResponseEntity<>(lotId, OK);
@@ -116,7 +154,7 @@ public class PopController {
                     "bomMasterItem: 만들어진 제품, bomDetailItem: 레시피"
     )
     public ResponseEntity<List<PopBomDetailItemResponse>> getPopBomDetailItems(
-            @RequestParam @Parameter(description = "lot id") Long lotMasterId,
+            @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<PopBomDetailItemResponse> popBomDetailItems = popService.getPopBomDetailItems(lotMasterId);
@@ -133,7 +171,7 @@ public class PopController {
     @ResponseBody
     @Operation(summary = "(pop) 원부자재에 해당되는 LOT 조회", description = "")
     public ResponseEntity<List<PopBomDetailLotMasterResponse>> getPopBomDetailLotMasters(
-            @RequestParam @Parameter(description = "lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "품목 id") Long itemId,
             @RequestParam(required = false) @Parameter(description = "lot no") String lotNo,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
@@ -150,7 +188,7 @@ public class PopController {
     @ResponseBody
     @Operation(summary = "(pop) 원부자재 lot 사용정보 조회", description = "")
     public ResponseEntity<List<PopBomDetailLotMasterResponse>> getLotMasterExhaust(
-            @RequestParam @Parameter(description = "만들어진 반제품 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "품목 id") Long itemId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
@@ -167,7 +205,7 @@ public class PopController {
     @ResponseBody
     @Operation(summary = "(pop) 원부자재 lot 사용정보 등록", description = "")
     public ResponseEntity<PopBomDetailLotMasterResponse> createLotMasterExhaust(
-            @RequestParam @Parameter(description = "만들어진 반제품 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "품목 id") Long itemId,
             @RequestParam @Parameter(description = "사용한 lotMaster id") Long exhaustLotMasterId,
             @RequestParam @Parameter(description = "사용한 수량(소진여부가 true 인 건 소진이 안되었으면 0, 소진이 되었으면 전체수량)") int exhaustAmount,
@@ -186,7 +224,7 @@ public class PopController {
     @ResponseBody
     @Operation(summary = "(pop) 원부자재 lot 사용정보 수정", description = "")
     public ResponseEntity<PopBomDetailLotMasterResponse> putLotMasterExhaust(
-            @RequestParam @Parameter(description = "만들어진 반제품 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "품목 id") Long itemId,
             @RequestParam @Parameter(description = "사용한 lotMaster id") Long exhaustLotMasterId,
             @RequestParam @Parameter(description = "수량(소진X: 0, 소진O: 전체수량)") int exhaustAmount,
@@ -205,7 +243,7 @@ public class PopController {
     @ResponseBody
     @Operation(summary = "(pop) 원부자재 lot 사용정보 삭제", description = "")
     public ResponseEntity deleteLotMasterExhaust(
-            @RequestParam @Parameter(description = "만들어진 반제품 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "품목 id") Long itemId,
             @RequestParam @Parameter(description = "사용한 lotMaster id") Long exhaustLotMasterId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
@@ -221,9 +259,9 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @GetMapping("/test-items")
     @ResponseBody
-    @Operation(summary = "[미구현] (pop) 중간검사 품목 정보 조회", description = "")
+    @Operation(summary = "(pop) 중간검사 품목 정보 조회", description = "")
     public ResponseEntity<PopTestItemResponse> getPopTestItem(
-            @RequestParam @Parameter(description = "lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
@@ -237,13 +275,13 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @GetMapping("/bad-item-types")
     @ResponseBody
-    @Operation(summary = "[미구현] (pop) 공정에 해당하는 불량항목 조회", description = "")
+    @Operation(summary = "(pop) lot 에 해당하는 불량유형 조회", description = "")
     public ResponseEntity<List<PopBadItemTypeResponse>> getPopTestBadItemTypes(
-            @RequestParam @Parameter(description = "공정구분") WorkProcessDivision workProcessDivision,
+            @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
-        List<PopBadItemTypeResponse> badItemResponses = popService.getPopTestBadItemTypes(workProcessDivision);
+        List<PopBadItemTypeResponse> badItemResponses = popService.getPopTestBadItemTypes(lotMasterId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is viewed the list of from getPopTestBadItemTypes.");
         return new ResponseEntity<>(badItemResponses, OK);
@@ -253,9 +291,9 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @GetMapping("/bad-items")
     @ResponseBody
-    @Operation(summary = "[미구현] (pop) 중간검사 등록된 불량 리스트 조회", description = "")
+    @Operation(summary = "(pop) 중간검사 등록된 불량 리스트 조회", description = "")
     public ResponseEntity<List<PopTestBadItemResponse>> getPopBadItemEnrollments(
-            @RequestParam @Parameter(description = "lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
@@ -269,17 +307,16 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @PostMapping("/enrollment-bad-items")
     @ResponseBody
-    @Operation(summary = "[미구현] (pop) 불량 등록", description = "")
+    @Operation(summary = "(pop) 불량 등록", description = "")
     public ResponseEntity<PopTestBadItemResponse> createPopBadItemEnrollment(
-            @RequestParam @Parameter(description = "만들어진 반제품 lotMaster id") Long lotMasterId,
-            @RequestParam @Parameter(description = "공정 구분") WorkProcessDivision workProcessDivision,
+            @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "불량 항목 id") Long badItemTypeId,
             @RequestParam @Parameter(description = "불량 수량") int badItemAmount,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
         PopTestBadItemResponse response =
-                popService.createPopBadItemEnrollment(lotMasterId, workProcessDivision, badItemTypeId, badItemAmount);
+                popService.createPopBadItemEnrollment(lotMasterId, badItemTypeId, badItemAmount);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is viewed the list of from createPopBadItemEnrollment.");
         return new ResponseEntity<>(response, OK);
@@ -289,12 +326,12 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @PutMapping("/enrollment-bad-items")
     @ResponseBody
-    @Operation(summary = "[미구현] (pop) 불량 수량 수정", description = "")
+    @Operation(summary = "(pop) 불량 수량 수정", description = "")
     public ResponseEntity<PopTestBadItemResponse> putPopBadItemEnrollment(
             @RequestParam @Parameter(description = "불량 id") Long enrollmentBadItemId,
             @RequestParam @Parameter(description = "불량 수량") int badItemAmount,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
+    ) throws NotFoundException, BadRequestException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
         PopTestBadItemResponse response = popService.putPopBadItemEnrollment(enrollmentBadItemId, badItemAmount);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
@@ -306,11 +343,11 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @DeleteMapping("/enrollment-bad-items")
     @ResponseBody
-    @Operation(summary = "[미구현] (pop) 불량 삭제", description = "")
+    @Operation(summary = "(pop) 불량 삭제", description = "")
     public ResponseEntity deletePopBadItemEnrollment(
             @RequestParam @Parameter(description = "불량 id") Long enrollmentBadItemId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
+    ) throws NotFoundException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
         popService.deletePopBadItemEnrollment(enrollmentBadItemId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
@@ -322,11 +359,11 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @GetMapping("/enrollment-lots")
     @ResponseBody
-    @Operation(summary = "[미구현] (pop) 분할 lot 리스트 조회", description = "")
+    @Operation(summary = "(pop) 분할 lot 리스트 조회", description = "")
     public ResponseEntity<List<PopLotMasterResponse>> getPopLotMasters(
-            @RequestParam @Parameter(description = "만들어진 반제품 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
+    ) throws NotFoundException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
         List<PopLotMasterResponse> popLotMasterResponses = popService.getPopLotMasters(lotMasterId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
@@ -339,12 +376,12 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @PostMapping("/enrollment-lots")
     @ResponseBody
-    @Operation(summary = "[미구현] (pop) 분할 lot 생성", description = "")
+    @Operation(summary = "(pop) 분할 lot 생성", description = "")
     public ResponseEntity<PopLotMasterResponse> createPopLotMasters(
             @RequestParam @Parameter(description = "만들어진 반제품 lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "수량") int amount,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
+    ) throws NotFoundException, BadRequestException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
         PopLotMasterResponse popLotMasterResponse = popService.createPopLotMasters(lotMasterId, amount);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
@@ -356,12 +393,12 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @PutMapping("/enrollment-lots")
     @ResponseBody
-    @Operation(summary = "[미구현] (pop) 분할 lot 수정", description = "")
+    @Operation(summary = "(pop) 분할 lot 수정", description = "")
     public ResponseEntity<PopLotMasterResponse> putPopLotMasters(
             @RequestParam @Parameter(description = "분할 lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "수량") int amount,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
+    ) throws NotFoundException, BadRequestException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
         PopLotMasterResponse popLotMasterResponse = popService.putPopLotMasters(lotMasterId, amount);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
@@ -373,11 +410,11 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @DeleteMapping("/enrollment-lots")
     @ResponseBody
-    @Operation(summary = "[미구현] (pop) 분할 lot 삭제", description = "")
+    @Operation(summary = "(pop) 분할 lot 삭제", description = "")
     public ResponseEntity<PopLotMasterResponse> deletePopLotMasters(
             @RequestParam @Parameter(description = "분할 lotMaster id") Long lotMasterId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
+    ) throws NotFoundException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
         popService.deletePopLotMasters(lotMasterId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);

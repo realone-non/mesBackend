@@ -6,10 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-import static com.mes.mesBackend.exception.Message.ONE_VALUE;
-import static com.mes.mesBackend.exception.Message.NOT_ZERO;
+import static com.mes.mesBackend.exception.Message.*;
 
 @Getter
 @Setter
@@ -17,14 +17,17 @@ import static com.mes.mesBackend.exception.Message.NOT_ZERO;
 public class RoutingDetailRequest {
     @Schema(description = "작업순번")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
     int orders;
 
     @Schema(description = "작업공정 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
     Long workProcess;
 
     @Schema(description = "작업장 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
     Long workCenter;
 
     @Schema(description = "검사유형")
@@ -32,21 +35,27 @@ public class RoutingDetailRequest {
 
     @Schema(description = "원자재 창고 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
     Long rawMaterialWareHouse;
 
     @Schema(description = "입고 창고 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
     Long inputWareHouse;
 
     @Schema(description = "메인공정")
+    @NotNull(message = NOT_NULL)
     boolean mainProcessYn;
 
     @Schema(description = "최종공정")
+    @NotNull(message = NOT_NULL)
     boolean lastProcessYn;
 
     @Schema(description = "작업개시일")
+    @NotNull(message = NOT_NULL)
     LocalDate workStartDate;
 
     @Schema(description = "사용여부")
+    @NotNull(message = NOT_NULL)
     boolean useYn;
 }

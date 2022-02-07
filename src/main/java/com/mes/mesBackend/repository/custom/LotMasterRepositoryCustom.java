@@ -6,6 +6,7 @@ import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.OutSourcingInput;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
+import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -61,4 +62,6 @@ public interface LotMasterRepositoryCustom {
 
     // 공정, 설비로 라벨프린트 대상 조회
     List<LabelPrintResponse> findPrintsByWorkProcessAndEquipment(Long workProcessId, Long equipmentId);
+    // 생성날짜가 오늘이고, lotDivision 이 dummny 인 걸 찾아옴
+    Optional<String> findDummyNoByDivision(LotMasterDivision lotMasterDivision, LocalDate startDate);
 }

@@ -36,4 +36,16 @@ public class LotConnect extends BaseTimeEntity {
     @Enumerated(STRING)
     @Column(name = "DIVISION", columnDefinition = "varchar(255) COMMENT '데이터 타입 구분'", nullable = false)
     private LotConnectDivision division;
+
+    public void create(
+            LotEquipmentConnect parentLot,
+            LotMaster childLot,
+            int amount,
+            LotConnectDivision division
+    ) {
+        setParentLot(parentLot);
+        setChildLot(childLot);
+        setAmount(amount);
+        setDivision(division);
+    }
 }
