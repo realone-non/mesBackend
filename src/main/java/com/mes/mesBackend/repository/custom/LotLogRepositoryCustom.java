@@ -24,4 +24,8 @@ public interface LotLogRepositoryCustom {
      Optional<Long> findWorkProcessIdByWorkProcessDivision(WorkProcessDivision workProcessDivision);
      // lotMaster id 로 PACKAGING 끝난 작업지시 가져옴
     Optional<String> findWorkOrderIdByLotMasterIdAndWorkProcessDivision(Long lotMasterId, WorkProcessDivision workProcessDivision);
+    // 검색조건: lotMasterId, workProcessId, 반환: LotLog
+    Optional<LotLog> findByLotMasterIdAndWorkProcessId(Long lotMasterId, Long workProcessId);
+    // 검색조건: workOrderDetailId, 반환: LotLog
+    Optional<LotLog> findByWorkOrderDetailId(Long workOrderDetailId);
 }

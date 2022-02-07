@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
+import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.LotMasterRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -453,6 +456,21 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         lotMaster.workProcess.id.eq(workProcessId)
                 )
                 .fetch();
+    }
+
+    // 생성날짜가 오늘이고, lotDivision 이 dummny 인 걸 찾아옴
+    @Override
+    public Optional<String> findDummyNoByDivision(LotMasterDivision lotMasterDivision, LocalDate startDate) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(lotMaster.lotNo)
+                .from(lotMaster)
+                .where(
+                        lotMaster.createdDate.between(startDate.atStartOfDay(), LocalDateTime.of(startDate, LocalTime.MAX).withNano(0)),
+                        lotMaster.lotMasterDivision.eq(lotMasterDivision)
+                )
+                .orderBy(lotMaster.createdDate.desc())
+                .limit(1)
+                .fetchOne());
     }
 
     // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 유효여부

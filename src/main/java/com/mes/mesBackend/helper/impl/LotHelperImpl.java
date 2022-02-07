@@ -3,6 +3,7 @@ package com.mes.mesBackend.helper.impl;
 import com.mes.mesBackend.dto.request.LotMasterRequest;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
+import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.LotHelper;
@@ -11,42 +12,30 @@ import com.mes.mesBackend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.*;
 import static com.mes.mesBackend.helper.Constants.*;
 
 @Component
 @RequiredArgsConstructor
 public class LotHelperImpl implements LotHelper {
-
-    private String productHeader = "MFG";
-    @Autowired
-    LotMasterRepository lotMasterRepo;
-
-    @Autowired
-    PurchaseInputRepository purchaseInputRepo;
-
-    @Autowired
-    EquipmentRepository equipmentRepository;
-
-    @Autowired
-    OutsourcingInputRepository outsourcingInputRepository;
-
-    @Autowired
-    WareHouseRepository wareHouseRepository;
-
-    @Autowired
-    LotLogHelper lotLogHelper;
-
-    @Autowired
-    WorkProcessRepository workProcessRepository;
-
-    @Autowired
-    LotTypeRepository lotTypeRepository;
+    private final static String productHeader = "MFG";
+    private final LotMasterRepository lotMasterRepo;
+    private final PurchaseInputRepository purchaseInputRepo;
+    private final EquipmentRepository equipmentRepository;
+    private final OutsourcingInputRepository outsourcingInputRepository;
+    private final WareHouseRepository wareHouseRepository;
+    private final LotLogHelper lotLogHelper;
+    private final WorkProcessRepository workProcessRepository;
+    private final LotTypeRepository lotTypeRepository;
+    private final static String POP = "POP";
+    private final static String EQU = "EQU";
 
     // lot 생성
     @Override
@@ -81,7 +70,7 @@ public class LotHelperImpl implements LotHelper {
         lotMaster.setRecycleAmount(lotMasterRequest.getRecycleAmount());
         lotMaster.setPurchaseInput(purchaseInput);
         lotMaster.setWorkProcess(workProcess);
-//        lotMaster.setDummyYn(lotMasterRequest.isDummyYn());
+        lotMaster.setLotMasterDivision(lotMasterRequest.getLotMasterDivision());
         lotMaster.setEquipment(equipment);
 
         GoodsType goodsType = null;
@@ -89,7 +78,7 @@ public class LotHelperImpl implements LotHelper {
         // 구매입고
         if (purchaseInput != null) {
             Long itemId = purchaseInputRepo.findItemIdByPurchaseInputId(purchaseInput.getId());
-            String lotNo = createLotNo(itemId, equipment.getId(), purchaseInput.getId());
+            String lotNo = createLotNo(itemId, equipment.getId(), purchaseInput.getId(), lotMaster.getLotMasterDivision());
             ItemAccountCode itemAccountCode = lotMasterRepo.findCodeByItemId(itemId);
             switch (itemAccountCode.getItemAccount().getAccount()){
                 case "원자재":
@@ -110,7 +99,7 @@ public class LotHelperImpl implements LotHelper {
         }
         else if(outSourcingInput != null) {
             Long itemId = outsourcingInputRepository.findItemIdByInputId(outSourcingInput.getId());
-            String lotNo = createLotNo(itemId, equipment.getId(),outSourcingInput.getId());
+            String lotNo = createLotNo(itemId, equipment.getId(),outSourcingInput.getId(), lotMaster.getLotMasterDivision());
             ItemAccountCode itemAccountCode = lotMasterRepo.findCodeByItemId(itemId);
             switch (itemAccountCode.getItemAccount().getAccount()){
                 case "원자재":
@@ -130,7 +119,7 @@ public class LotHelperImpl implements LotHelper {
             lotMaster.putOutsourcingInput(lotType, outSourcingInput, lotNo);
         }
         else{
-            lotMaster.setLotNo(createLotNo(lotMasterRequest.getItem().getId(), equipment.getId(), null));
+            lotMaster.setLotNo(createLotNo(lotMasterRequest.getItem().getId(), equipment.getId(), null, lotMaster.getLotMasterDivision()));
         }
 
         lotMasterRepo.save(lotMaster);
@@ -138,7 +127,7 @@ public class LotHelperImpl implements LotHelper {
     }
 
     // lot 번호 생성
-    public String createLotNo(Long itemId, Long equipmentId, Long deleteId) throws BadRequestException {
+    public String createLotNo(Long itemId, Long equipmentId, Long deleteId, LotMasterDivision lotMasterDivision) throws BadRequestException {
         String createdLotNo = null;
         // 1~6 입고년월일 예) 21년 12월 11일 211211
         String dateCode = LocalDate.now().format(DateTimeFormatter.ofPattern(YYMMDD));
@@ -159,8 +148,11 @@ public class LotHelperImpl implements LotHelper {
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = LocalDate.now().plusDays(1);
 
-        String beforeLotNo = lotMasterRepo.findLotNoByAccountCode(itemAccountCode.getId(), startDate, endDate)
+        String beforeRealLotNo = lotMasterRepo.findLotNoByAccountCode(itemAccountCode.getId(), startDate, endDate)
                 .orElse(null);
+        // 생성날짜가 오늘이고, lotDivision 이 dummny 인 걸 찾아옴
+        String beforeDummyOrEquipmentLotNo = lotMasterRepo.findDummyNoByDivision(lotMasterDivision, startDate).orElse(null);
+
         startDate = LocalDate.now().withDayOfMonth(1);
         endDate = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
         String productLotNo = lotMasterRepo.findLotNoByAccountCode(itemAccountCode.getId(), startDate, endDate)
@@ -170,23 +162,45 @@ public class LotHelperImpl implements LotHelper {
         switch (itemAccountCode.getItemAccount().getGoodsType()){
             case RAW_MATERIAL:
             case SUB_MATERIAL:
-                if(beforeLotNo == null){
+                if(beforeRealLotNo == null){
                     createdLotNo = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd")) + code
                             + String.format("%04d", seq);
                 }
                 else{
-                    seq = Integer.parseInt(Objects.requireNonNull(beforeLotNo).substring(beforeLotNo.length() - 4)) + 1;
+                    seq = Integer.parseInt(Objects.requireNonNull(beforeRealLotNo).substring(beforeRealLotNo.length() - 4)) + 1;
                     createdLotNo = dateCode + code + String.format("%04d", seq);
                 }
                 break;
             case HALF_PRODUCT:
-                if(beforeLotNo == null){
-                    createdLotNo = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd")) + code
-                            + equipmentNo + String.format("%03d", seq);
+                // dummyLot
+                if (lotMasterDivision.equals(DUMMY_LOT)) {
+                    if (beforeDummyOrEquipmentLotNo == null) {
+                        createdLotNo = POP + NOW_YYMMDD + String.format("%04d", seq);
+                    } else {
+                        seq = Integer.parseInt(beforeDummyOrEquipmentLotNo.substring(beforeDummyOrEquipmentLotNo.length() - 4)) + 1;
+                        createdLotNo = POP + NOW_YYMMDD + String.format("%04d", seq);
+                    }
                 }
-                else{
-                    seq = Integer.parseInt(Objects.requireNonNull(beforeLotNo).substring(beforeLotNo.length() - 4)) + 1;
-                    createdLotNo = dateCode + code + equipmentNo + String.format("%03d", seq);
+                // equipmentLot
+                if (lotMasterDivision.equals(EQUIPMENT_LOT)) {
+                    if (beforeDummyOrEquipmentLotNo == null) {
+                        createdLotNo = EQU + NOW_YYMMDD + String.format("%04d", seq);;
+                    } else {
+                        seq = Integer.parseInt(beforeDummyOrEquipmentLotNo.substring(beforeDummyOrEquipmentLotNo.length() -4)) + 1;
+                        createdLotNo = EQU + NOW_YYMMDD + String.format("%04d", seq);
+                    }
+
+                }
+                // 분할 lot
+                if (lotMasterDivision.equals(REAL_LOT)) {
+                    if(beforeRealLotNo == null){
+                        createdLotNo = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd")) + code
+                                + equipmentNo + String.format("%03d", seq);
+                    }
+                    else{
+                        seq = Integer.parseInt(Objects.requireNonNull(beforeRealLotNo).substring(beforeRealLotNo.length() - 4)) + 1;
+                        createdLotNo = dateCode + code + equipmentNo + String.format("%03d", seq);
+                    }
                 }
                 break;
             case PRODUCT:
@@ -195,7 +209,7 @@ public class LotHelperImpl implements LotHelper {
                             + String.format("%04d", seq);
                 }
                 else{
-                    seq = Integer.parseInt(Objects.requireNonNull(beforeLotNo).substring(beforeLotNo.length() - 4)) + 1;
+                    seq = Integer.parseInt(Objects.requireNonNull(beforeRealLotNo).substring(beforeRealLotNo.length() - 4)) + 1;
                     createdLotNo = productHeader + productDateCode + code + equipmentNo + String.format("%04d", seq);
                 }
                 break;

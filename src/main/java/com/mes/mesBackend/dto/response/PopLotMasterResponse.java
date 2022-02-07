@@ -1,6 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.LotMaster;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,5 +20,12 @@ public class PopLotMasterResponse {
     String lotNo;
 
     @Schema(description = "분할 lot 재고수량")
-    String stockAmount;
+    int stockAmount;
+
+    public PopLotMasterResponse put(LotMaster lotMaster) {
+        setLotMasterId(lotMaster.getId());
+        setLotNo(lotMaster.getLotNo());
+        setStockAmount(lotMaster.getStockAmount());
+        return this;
+    }
 }

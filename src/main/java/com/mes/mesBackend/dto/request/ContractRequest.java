@@ -20,6 +20,8 @@ import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 @Schema(description = "수주")
 public class ContractRequest {
     @Schema(description = "고객사 id")
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
     Long client;
 
     @Schema(description = "수주일자")
@@ -70,7 +72,7 @@ public class ContractRequest {
     boolean paymentYn;
 
     @Schema(description = "지불조건 [현금: CASH]")
-    @NotBlank(message = NOT_EMPTY)
+    @NotNull(message = NOT_NULL)
     PayType payCondition;
 
     @Schema(description = "Forwader")

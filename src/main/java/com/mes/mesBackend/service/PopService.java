@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.response.*;
+import com.mes.mesBackend.entity.enumeration.ProcessStatus;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -13,10 +14,12 @@ public interface PopService {
     List<WorkProcessResponse> getPopWorkProcesses(Boolean recycleYn);
     // 작업지시 정보 리스트 api, 조건: 작업공정
     List<PopWorkOrderResponse> getPopWorkOrders(WorkProcessDivision workProcessDivision) throws NotFoundException;
-
-    // ========================================= TODO: 여기서부터 수정해야됨 ~~~~~~~ -=========================================
+    // 작업지시 진행상태 정보 조회
+    List<PopWorkOrderStates> getPopWorkOrderStates(Long workOrderId) throws NotFoundException;
+    // 작업지시 진행상태 변경
+    void updatePopWorkOrderState(Long lotMasterId, ProcessStatus processStatus) throws NotFoundException;
     // 작업지시 상태 변경
-    Long createCreateWorkOrder(Long workOrderId, Long itemId, String userCode, int productAmount, Long equipmentId) throws NotFoundException, BadRequestException;
+    Long createWorkOrder(Long workOrderId, Long itemId, String userCode, int productAmount, Long equipmentId) throws NotFoundException, BadRequestException;
     // 공정으로 공정에 해당하는 설비정보 가져오기 GET
     List<PopEquipmentResponse> getPopEquipments(WorkProcessDivision workProcessDivision) throws NotFoundException;
     // 해당 품목(반제품)에 대한 원자재, 부자재 정보 가져와야함
@@ -34,21 +37,21 @@ public interface PopService {
     // 중간검사 품목 정보 조회
     PopTestItemResponse getPopTestItem(Long lotMasterId) throws NotFoundException;
     // 공정에 해당하는 불량유형 조회
-    List<PopBadItemTypeResponse> getPopTestBadItemTypes(WorkProcessDivision workProcessDivision) throws NotFoundException;
+    List<PopBadItemTypeResponse> getPopTestBadItemTypes(Long lotMasterId) throws NotFoundException;
     // 중간검사 등록된 불량 조회
     List<PopTestBadItemResponse> getPopBadItemEnrollments(Long lotMasterId) throws NotFoundException;
     // 불량 등록
-    PopTestBadItemResponse createPopBadItemEnrollment(Long lotMasterId, WorkProcessDivision workProcessDivision, Long badItemTypeId, int badItemAmount) throws NotFoundException, BadRequestException;
+    PopTestBadItemResponse createPopBadItemEnrollment(Long lotMasterId, Long badItemTypeId, int badItemAmount) throws NotFoundException, BadRequestException;
     // 불량 수량 수정
-    PopTestBadItemResponse putPopBadItemEnrollment(Long enrollmentBadItemId, int badItemAmount);
+    PopTestBadItemResponse putPopBadItemEnrollment(Long enrollmentBadItemId, int badItemAmount) throws NotFoundException, BadRequestException;
     // 불량 삭제
-    void deletePopBadItemEnrollment(Long enrollmentBadItemId);
+    void deletePopBadItemEnrollment(Long enrollmentBadItemId) throws NotFoundException;
     // 분할 lot 조회
-    List<PopLotMasterResponse> getPopLotMasters(Long lotMasterId);
+    List<PopLotMasterResponse> getPopLotMasters(Long lotMasterId) throws NotFoundException;
     // 분할 lot 생성
-    PopLotMasterResponse createPopLotMasters(Long lotMasterId, int amount);
+    PopLotMasterResponse createPopLotMasters(Long lotMasterId, int amount) throws NotFoundException, BadRequestException;
     // 분할 lot 수정
-    PopLotMasterResponse putPopLotMasters(Long lotMasterId, int amount);
+    PopLotMasterResponse putPopLotMasters(Long lotMasterId, int amount) throws NotFoundException, BadRequestException;
     // 분할 lot 삭제
-    void deletePopLotMasters(Long lotMasterId);
+    void deletePopLotMasters(Long lotMasterId) throws NotFoundException;
 }

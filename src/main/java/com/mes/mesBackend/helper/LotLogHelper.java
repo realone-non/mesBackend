@@ -4,6 +4,8 @@ import com.mes.mesBackend.entity.LotLog;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.NotFoundException;
 
+import java.util.Optional;
+
 // lot log
 // 작업지시가 SCHEDULE 에서 ONGOING 으로 변경되는 시점에서 사용
 public interface LotLogHelper {
@@ -15,5 +17,4 @@ public interface LotLogHelper {
     Long getWorkOrderDetailByContractItemAndWorkProcess(Long contractId, Long workProcessId) throws NotFoundException;
     // workOrderDetail id, workProcess id 로 LotLog 찾음
     LotLog getLotLogByWorkOrderDetailIdAndWorkProcessIdOrThrow(Long workOrderDetailId, Long workProcessId) throws NotFoundException;
-
 }
