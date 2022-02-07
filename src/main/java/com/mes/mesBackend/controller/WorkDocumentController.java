@@ -26,6 +26,9 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @Tag(name = "work-document", description = "작업표준서 API")
@@ -162,6 +165,25 @@ public class WorkDocumentController {
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + fileToWorkDocument.getId() + " from createFileToWorkDocument.");
         return new ResponseEntity<>(fileToWorkDocument, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}/files")
+    @ResponseBody
+    @Operation(summary = "파일 삭제")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "204", description = "no content"),
+                    @ApiResponse(responseCode = "404", description = "not found resource")
+            }
+    )
+    public ResponseEntity deleteFileToWorkDocument(
+            @PathVariable(value = "id") Long id,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        workDocumentService.deleteFileToWorkDocument(id);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteFileToWorkDocument.");
+        return new ResponseEntity(NO_CONTENT);
     }
 
 //    @Operation(summary = "작업표준서 페이징 조회", description = "검색조건: 품목그룹, 품목계정, 품번, 품명")
