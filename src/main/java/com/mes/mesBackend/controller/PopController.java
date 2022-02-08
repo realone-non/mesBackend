@@ -1,7 +1,6 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.*;
-import com.mes.mesBackend.entity.BadItem;
 import com.mes.mesBackend.entity.enumeration.ProcessStatus;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
