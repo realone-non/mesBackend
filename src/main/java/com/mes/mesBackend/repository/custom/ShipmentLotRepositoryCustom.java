@@ -19,6 +19,7 @@ public interface ShipmentLotRepositoryCustom {
     boolean existsByShipmentItemInShipmentLot(Long shipmentId);
     // 출하 품목에 등록 된 lotMaster 의 재고수량 모듀
     List<Integer> findShipmentLotShipmentAmountByShipmentItemId(Long shipmentItemId);
+    // 출하 품목정보에 해당하는 LOT 정보가
     // ==================================================== 4-7. 출하 현황 ====================================================
     // 출하현황 검색 리스트 조회, 검색조건: 거래처 id, 출하기간 fromDate~toDate, 화폐 id, 담당자 id, 품번|품명
     List<ShipmentStatusResponse> findShipmentStatusesResponsesByCondition(Long clientId, LocalDate fromDate, LocalDate toDate, Long currencyId, Long userId, String itemNoAndItemName);

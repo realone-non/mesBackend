@@ -279,7 +279,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
 
     // 출하 LOT 정보 생성 시 LOT 정보 조회 API
     @Override
-    public List<LotMasterResponse.idAndLotNo> findLotMastersByShipmentLotCondition(Long itemId) {
+    public List<LotMasterResponse.idAndLotNo> findLotMastersByShipmentLotCondition(Long itemId, int notShippedAmount) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -299,6 +299,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         item.id.eq(itemId),
                         workProcess.workProcessDivision.eq(PACKAGING),
                         lotMaster.stockAmount.goe(1),
+                        lotMaster.stockAmount.loe(notShippedAmount),
                         lotMaster.deleteYn.isFalse()
 
                 )
