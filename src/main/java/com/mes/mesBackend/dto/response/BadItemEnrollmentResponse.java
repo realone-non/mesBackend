@@ -16,6 +16,9 @@ public class BadItemEnrollmentResponse {
     @Schema(description = "불량유형 고유아이디")
     Long badItemId;
 
+    @Schema(description = "작업공정 고유아이디")
+    Long workProcessId;
+
     @Schema(description = "작업공정")
     String workProcessName;
 
