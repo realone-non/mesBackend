@@ -358,7 +358,7 @@ public class ShipmentController {
     @ResponseBody
     @Operation(
             summary = "출하 LOT 정보 생성 시 조건에 맞는 LOT 조회",
-            description = "출하 품목정보의 품목과 lotMaster 의 품목이랑 같으며 포장공정 끝나고 현재 재고가 0 이 아닌 lotMaster id"
+            description = "출하 품목정보의 품목과 lotMaster 의 품목이랑 같으며 포장공정 끝나고 현재 재고가 0 이 아니면서, 재고수량이 수주미출하수량 보다 같거나 적은 lotMaster id"
     )
     @ApiResponses(
             value = {
@@ -368,9 +368,10 @@ public class ShipmentController {
     )
     public ResponseEntity<List<LotMasterResponse.idAndLotNo>> getShipmentLotMasters(
             @RequestParam @Parameter(description = "수주품목 id") Long contractItemId,
+            @RequestParam @Parameter(description = "수주미출하수량") int notShippedAmount,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        List<LotMasterResponse.idAndLotNo> lotMasters = shipmentService.getShipmentLotMasters(contractItemId);
+        List<LotMasterResponse.idAndLotNo> lotMasters = shipmentService.getShipmentLotMasters(contractItemId, notShippedAmount);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getShipmentLotMasters.");
         return new ResponseEntity<>(lotMasters, HttpStatus.OK);

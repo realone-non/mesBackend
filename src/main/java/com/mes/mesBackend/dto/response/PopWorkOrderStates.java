@@ -29,4 +29,7 @@ public class PopWorkOrderStates {
     @Schema(description = "업데이트 일시")
     @JsonFormat(pattern = YYYY_MM_DD_HH_MM_SS, timezone = ASIA_SEOUL)
     LocalDateTime updateDateTime;
+
+    @Schema(description = "작업 수량")
+    int createdAmount;
 }

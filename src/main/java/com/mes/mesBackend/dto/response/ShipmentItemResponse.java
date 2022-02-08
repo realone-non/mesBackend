@@ -38,7 +38,7 @@ public class ShipmentItemResponse {
     String contractUnit;
 
     @Schema(description = "수주미출하수량")
-    int notShippedAmount;           // lot에 등록된 재고수량 - contractItem 의 수주수량
+    int notShippedAmount;           //  contractItem 의 수주수량 - lot에 등록된 재고수량
 
     @Schema(description = "출하수량")
     int shipmentAmount;
