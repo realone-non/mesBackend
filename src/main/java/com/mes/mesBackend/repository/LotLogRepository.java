@@ -14,4 +14,5 @@ import java.util.Optional;
 public interface LotLogRepository extends JpaRepository<LotLog, Long>, LotLogRepositoryCustom {
     Optional<LotLog> findByWorkOrderDetailAndLotMaster(WorkOrderDetail workOrderDetail, LotMaster lotMaster);
     Optional<LotLog> findByWorkOrderDetailAndWorkProcess(WorkOrderDetail workOrderDetail, WorkProcess workProcess);
+    Optional<LotLog> findByWorkOrderDetail(WorkOrderDetail workOrderDetail);
 }

@@ -25,7 +25,6 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
     final QLotMaster lotMaster = QLotMaster.lotMaster;
     final QBadItem badItem = QBadItem.badItem;
     final QWorkProcess workProcess = QWorkProcess.workProcess;
-    final QLotLog lotLog = QLotLog.lotLog;
 
     @Override
     public Optional<BadItemEnrollmentResponse> findWorkOrderEnrollmentResponseById(Long id) {
@@ -42,10 +41,10 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                             )
                         )
                         .from(workOrderBadItem)
-//                        .leftJoin(lotLog).on(lotLog.id.eq(workOrderBadItem.lotLog.id))
+                        .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(workOrderBadItem.workOrderDetail.id))
+                        .leftJoin(lotMaster).on(lotMaster.id.eq(workOrderBadItem.lotMaster.id))
                         .leftJoin(badItem).on(badItem.id.eq(workOrderBadItem.badItem.id))
-                        .leftJoin(workProcess).on(workProcess.id.eq(badItem.workProcess.id))
-                        .leftJoin(lotMaster).on(lotMaster.id.eq(lotLog.lotMaster.id))
+                        .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.id))
                         .where(
                                 workOrderBadItem.id.eq(id),
                                 workOrderBadItem.deleteYn.isFalse()
@@ -68,11 +67,10 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                         )
                 )
                 .from(workOrderBadItem)
-//                .leftJoin(lotLog).on(lotLog.id.eq(workOrderBadItem.lotLog.id))
-                .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
+                .leftJoin(lotMaster).on(lotMaster.id.eq(workOrderBadItem.lotMaster.id))
+                .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(workOrderBadItem.workOrderDetail.id))
                 .leftJoin(badItem).on(badItem.id.eq(workOrderBadItem.badItem.id))
                 .leftJoin(workProcess).on(workProcess.id.eq(badItem.workProcess.id))
-                .leftJoin(lotMaster).on(lotMaster.id.eq(lotLog.lotMaster.id))
                 .where(
                         workOrderDetail.id.eq(workOrderId),
                         workOrderBadItem.deleteYn.isFalse()

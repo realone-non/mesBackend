@@ -10,15 +10,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-//@RequestMapping("/pop-shipments")
-//@Tag(name = "pop-shipment", description = "[pop] 출하 API")
-//@RestController
-//@RequiredArgsConstructor
+@RequestMapping("/pop-shipments")
+@Tag(name = "pop-shipment", description = "[pop] 출하 API")
+@RestController
+@RequiredArgsConstructor
 public class PopShipmentController {
-//    private final PopShipmentService popShipmentService;
-//    private final LogService logService;
-//    private final Logger logger = LoggerFactory.getLogger(PopShipmentController.class);
-//    private CustomLogger cLogger;
+    private final PopShipmentService popShipmentService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(PopShipmentController.class);
+    private CustomLogger cLogger;
 
     // 출하정보 전체 조회
 

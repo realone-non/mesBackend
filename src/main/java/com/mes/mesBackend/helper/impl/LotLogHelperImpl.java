@@ -66,6 +66,12 @@ public class LotLogHelperImpl implements LotLogHelper {
                 .orElseThrow(() -> new NotFoundException("[LotLogHelper] 해당 작업공정과 작업지시에 해당하는 lotMaster 가 없습니다. "));
     }
 
+    @Override
+    public LotLog getLotLogByWorkOrderDetailOrThrow(Long workOrderDetailId) throws NotFoundException {
+        return lotLogRepo.findByWorkOrderDetailId(workOrderDetailId)
+                .orElseThrow(() -> new NotFoundException("[데이터 오류] 해당 작업지시에 맞는 dummy lot 가 존재하지 않습니다."));
+    }
+
     private LotMaster getLotMasterOrThrow(Long id) throws NotFoundException {
         return lotMasterRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("[LotLogHelper] lotMaster does not exist. input id:" + id));

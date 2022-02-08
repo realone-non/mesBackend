@@ -58,6 +58,7 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
                 .select(
                         Projections.fields(
                                 PopWorkOrderStates.class,
+                                lotEquipmentConnect.childLot.id.as("lotMasterId"),
                                 equipment.equipmentName.as("equipmentName"),
                                 lotEquipmentConnect.processStatus.as("processStatus"),
                                 lotEquipmentConnect.modifiedDate.as("updateDateTime")
