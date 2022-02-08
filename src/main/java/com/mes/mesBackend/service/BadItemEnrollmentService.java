@@ -22,7 +22,7 @@ public interface BadItemEnrollmentService {
             String itemNoAndItemName
     ) throws NotFoundException;
     // 불량유형 정보 생성
-    BadItemEnrollmentResponse createBadItemEnrollment(Long workOrderId, Long badItemId, Long lotMasterId, int badItemAmount) throws NotFoundException, BadRequestException;
+    BadItemEnrollmentResponse createBadItemEnrollment(Long workOrderId, Long badItemId, int badItemAmount) throws NotFoundException, BadRequestException;
     // 불량유형 정보 전체 조회
     List<BadItemEnrollmentResponse> getBadItemEnrollments(Long workOrderId) throws NotFoundException;
     // 불량유형 정보 수정 (불량수량)

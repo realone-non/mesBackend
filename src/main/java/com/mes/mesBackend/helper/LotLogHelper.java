@@ -17,4 +17,6 @@ public interface LotLogHelper {
     Long getWorkOrderDetailByContractItemAndWorkProcess(Long contractId, Long workProcessId) throws NotFoundException;
     // workOrderDetail id, workProcess id 로 LotLog 찾음
     LotLog getLotLogByWorkOrderDetailIdAndWorkProcessIdOrThrow(Long workOrderDetailId, Long workProcessId) throws NotFoundException;
+    // workOrderDetailId 로 찾음
+    LotLog getLotLogByWorkOrderDetailOrThrow(Long workOrderDetailId) throws NotFoundException;
 }

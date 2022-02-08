@@ -17,6 +17,9 @@ import static com.mes.mesBackend.helper.Constants.*;
 @Schema(description = "pop-작업지시 상태값 조회")
 @JsonInclude(NON_NULL)
 public class PopWorkOrderStates {
+    @Schema(description = "lotMaster 고유아이디")
+    Long lotMasterId;
+
     @Schema(description = "설비 명")
     String equipmentName;
 

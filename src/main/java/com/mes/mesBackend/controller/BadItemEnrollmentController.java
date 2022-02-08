@@ -81,11 +81,10 @@ public class BadItemEnrollmentController {
     public ResponseEntity<BadItemEnrollmentResponse> createBadItemEnrollment(
             @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
             @RequestParam @Parameter(description = "불량 id") Long badItemId,
-            @RequestParam @Parameter(description = "lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "불량수량") int badItemAmount,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        BadItemEnrollmentResponse badItemEnrollmentResponse = badItemEnrollmentService.createBadItemEnrollment(workOrderId, badItemId, lotMasterId, badItemAmount);
+        BadItemEnrollmentResponse badItemEnrollmentResponse = badItemEnrollmentService.createBadItemEnrollment(workOrderId, badItemId, badItemAmount);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + badItemEnrollmentResponse.getBadItemId() + " from createBadItemEnrollment.");
         return new ResponseEntity<>(badItemEnrollmentResponse, OK);
