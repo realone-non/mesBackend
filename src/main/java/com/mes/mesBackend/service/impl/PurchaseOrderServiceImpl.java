@@ -172,10 +172,10 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                     "input purchaseOrderId: " + purchaseOrderId + ", input purchaseRequestId: " + purchaseRequest.getId());
 
         // 요청수량과 발주수량은 같아야함.
-        if (purchaseRequest.getRequestAmount() != purchaseOrderDetailRequest.getPurchaseAmount()) {
+        if (purchaseRequest.getRequestAmount() != purchaseOrderDetailRequest.getOrderAmount()) {
             throw new BadRequestException("요청수량과 발수수량이 같아야합니다. " +
                     "요청수량: " + purchaseRequest.getRequestAmount() + ", " +
-                    "입력 발주수량: " + purchaseOrderDetailRequest.getPurchaseAmount()
+                    "입력 발주수량: " + purchaseOrderDetailRequest.getOrderAmount()
             );
         }
         /*
@@ -191,7 +191,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         // 구매요청에 해당하는 구매발주를 집어넣고 구매요청의 orderState 의 상태값을 SCHEDULE -> ONGOING 으로 변경
         // SCHEDULE 로 변경
         purchaseRequest.putPurchaseOrderAndOrderStateChangedOngoing(purchaseOrder);
-        purchaseRequest.setOrderAmount(purchaseOrderDetailRequest.getPurchaseAmount());     // 발주수량 변경
+        purchaseRequest.setOrderAmount(purchaseOrderDetailRequest.getOrderAmount());     // 발주수량 변경
 
         if (clientIds.isEmpty()) {
             purchaseRequestRepo.save(purchaseRequest);
