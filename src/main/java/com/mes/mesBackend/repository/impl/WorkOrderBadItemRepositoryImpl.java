@@ -33,6 +33,7 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                             Projections.fields(
                                     BadItemEnrollmentResponse.class,
                                     workOrderBadItem.id.as("badItemId"),
+                                    workProcess.id.as("workProcessId"),
                                     workProcess.workProcessName.as("workProcessName"),
                                     badItem.badItemName.as("badItemName"),
                                     workOrderBadItem.badItemAmount.as("badItemAmount"),
@@ -59,6 +60,7 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                         Projections.fields(
                                 BadItemEnrollmentResponse.class,
                                 workOrderBadItem.id.as("badItemId"),
+                                workProcess.id.as("workProcessId"),
                                 workProcess.workProcessName.as("workProcessName"),
                                 badItem.badItemName.as("badItemName"),
                                 workOrderBadItem.badItemAmount.as("badItemAmount"),
