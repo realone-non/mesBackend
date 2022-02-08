@@ -3,8 +3,10 @@ package com.mes.mesBackend.service.impl;
 import com.mes.mesBackend.dto.response.BadItemEnrollmentResponse;
 import com.mes.mesBackend.dto.response.BadItemWorkOrderResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.LotLogHelper;
 import com.mes.mesBackend.repository.LotLogRepository;
 import com.mes.mesBackend.repository.LotMasterRepository;
 import com.mes.mesBackend.repository.WorkOrderBadItemRepository;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
+
 // 8-5. 불량 등록
 @Service
 @RequiredArgsConstructor
@@ -25,9 +29,9 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
     private final WorkOrderDetailRepository workOrderDetailRepo;
     private final LotLogRepository lotLogRepository;
     private final BadItemService badItemService;
-    private final LotMasterService lotMasterService;
     private final WorkOrderBadItemRepository workOrderBadItemRepo;
     private final LotMasterRepository lotMasterRepo;
+    private final LotLogHelper lotLogHelper;
 
     // 작업지시 정보 리스트 조회, 검색조건: 작업장 id, 작업라인 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목
     @Override
@@ -62,36 +66,31 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
     }
 
     // 불량유형 정보 생성
-    // TODO: 여기 수정해야됨
     @Override
     public BadItemEnrollmentResponse createBadItemEnrollment(
             Long workOrderId,
             Long badItemId,
-            Long lotMasterId,
             int badItemAmount
     ) throws NotFoundException, BadRequestException {
         WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderId);
         BadItem badItem = badItemService.getBadItemOrThrow(badItemId);
-        LotMaster lotMaster = lotMasterService.getLotMasterOrThrow(lotMasterId);
+        LotLog lotLog = lotLogHelper.getLotLogByWorkOrderDetailOrThrow(workOrderDetail.getId());
+        LotMaster lotMaster = lotLog.getLotMaster();
 
-        // 입력받은 badItemAmount 가 해당 lotMaster 의 생성수량보다 크면 안됨
-        throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(lotMaster.getBadItemAmount() + badItemAmount, lotMaster.getCreatedAmount());
+        // 입력받은 badItemAmount 가 해당 lotMaster 의 생성수량 - 불량수량 보다 크면 안됨
+        throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(lotMaster.getBadItemAmount() + badItemAmount, lotMaster.getCreatedAmount() - lotMaster.getBadItemAmount());
         // 입력받은 lotMaster 는 같은 불량유형이 존재하면 안됨.
-        throwIfBadItemIdInLotMaster(lotMasterId, badItemId);
+        throwIfBadItemIdInLotMaster(lotMaster.getId(), badItemId);
         // lotLog 에서 해당하는 작업지시에 입력받은 lotMaster 가 있는지 여부
-        throwIfLotMasterId(workOrderId, lotMasterId);
-
-        LotLog lotLog = lotLogRepository.findByWorkOrderDetailAndLotMaster(workOrderDetail, lotMaster)
-                .orElseThrow(() -> new NotFoundException("lotLog does not exist"));
+        throwIfLotMasterId(workOrderId, lotMaster.getId());
 
         // 입력받은 불량이 해당하는 작업공정의 불량유형이랑 일치하는지 여부
         throwIfBadItemIdAnyMatchWorkProcess(lotLog.getWorkProcess().getId(), badItemId);
 
         WorkOrderBadItem workOrderBadItem = new WorkOrderBadItem();
-        workOrderBadItem.add(lotLog, badItem, badItemAmount);
+        workOrderBadItem.create(badItem, workOrderDetail, lotMaster, badItemAmount, REAL_LOT);
 
         lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() + badItemAmount);   // 불량수량 변경
-        lotMaster.setStockAmount(lotMaster.getStockAmount() - badItemAmount);   // 재고수량 변경
         workOrderBadItemRepo.save(workOrderBadItem);
         lotMasterRepo.save(lotMaster);
 
@@ -112,39 +111,38 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
             Long badItemEnrollmentId,
             int badItemAmount
     ) throws NotFoundException, BadRequestException {
-//        getWorkOrderDetailOrThrow(workOrderId);
-//        WorkOrderBadItem findWorkOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
-//        LotMaster lotMaster = findWorkOrderBadItem.getLotLog().getLotMaster();
-//
-//        int beforeBadItemAmount = (lotMaster.getBadItemAmount() - findWorkOrderBadItem.getBadItemAmount());
-//        int beforeStockAmount = lotMaster.getStockAmount() + findWorkOrderBadItem.getBadItemAmount();
-//        // 입력받은 불량 수량이 lotMaster 의 생성수량보다 큰지 체크
-//        throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(beforeBadItemAmount + badItemAmount, lotMaster.getCreatedAmount());
-//
-//        findWorkOrderBadItem.setBadItemAmount(badItemAmount);
-//        lotMaster.setBadItemAmount(beforeBadItemAmount + badItemAmount);    // 불량수량 변경
-//        lotMaster.setStockAmount(beforeStockAmount - badItemAmount);  // 재고수량 변경
-//
-//        workOrderBadItemRepo.save(findWorkOrderBadItem);
-//        lotMasterRepo.save(lotMaster);
+        WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderId);
+        WorkOrderBadItem findWorkOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
+        LotLog lotLog = lotLogHelper.getLotLogByWorkOrderDetailOrThrow(workOrderDetail.getId());
+        LotMaster lotMaster = lotLog.getLotMaster();
 
-//        return getBadItemEnrollmentResponse(findWorkOrderBadItem.getId());
-        return null;
+        int beforeAmount = findWorkOrderBadItem.getBadItemAmount();
+        int beforeBadItemAmount = (lotMaster.getBadItemAmount() - findWorkOrderBadItem.getBadItemAmount());
+
+        // 입력받은 불량 수량이 lotMaster 의 생성수량보다 큰지 체크
+        throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(beforeBadItemAmount + badItemAmount, lotMaster.getCreatedAmount() - lotMaster.getBadItemAmount());
+
+        findWorkOrderBadItem.setBadItemAmount(badItemAmount);
+        lotMaster.setBadItemAmount((lotMaster.getBadItemAmount() - beforeAmount) + badItemAmount);    // 불량수량 변경
+
+        workOrderBadItemRepo.save(findWorkOrderBadItem);
+        lotMasterRepo.save(lotMaster);
+
+        return getBadItemEnrollmentResponse(findWorkOrderBadItem.getId());
     }
 
     // 불량유형 정보 삭제
     @Override
     public void deleteBadItemEnrollment(Long workOrderId, Long badItemEnrollmentId) throws NotFoundException {
-//        getWorkOrderDetailOrThrow(workOrderId);
-//        WorkOrderBadItem findWorkOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
-//        findWorkOrderBadItem.delete();
-//        int beforeBadItemAmount = findWorkOrderBadItem.getBadItemAmount();
-//
-//        LotMaster lotMaster = findWorkOrderBadItem.getLotLog().getLotMaster();
-//        lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() - beforeBadItemAmount); // 불량수량 변경
-//        lotMaster.setStockAmount(lotMaster.getStockAmount() + beforeBadItemAmount);     // 재고수량 변경
-//        workOrderBadItemRepo.save(findWorkOrderBadItem);
-//        lotMasterRepo.save(lotMaster);
+        WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderId);
+        WorkOrderBadItem findWorkOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
+        findWorkOrderBadItem.delete();
+        int beforeBadItemAmount = findWorkOrderBadItem.getBadItemAmount();
+
+        LotMaster lotMaster = findWorkOrderBadItem.getLotMaster();
+        lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() - beforeBadItemAmount); // 불량수량 변경
+        workOrderBadItemRepo.save(findWorkOrderBadItem);
+        lotMasterRepo.save(lotMaster);
     }
 
     // 불량유형 단일 조회 및 예외
@@ -183,7 +181,7 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
                 .orElseThrow(() -> new NotFoundException("workOrder does not exist. input id: " + id));
     }
 
-    // 입력받은 badItemAmount 가 해당 lotMaster 의 생성수량보다 크면 안됨
+    // 입력받은 badItemAmount 가 해당 lotMaster 의 생성수량 - 불량수량 보다 크면 안됨
     private void throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(int badItemAmount, int createdAmount) throws BadRequestException {
         if (badItemAmount > createdAmount) {
             throw new BadRequestException("badItemAmount cannot be greater than createdAmount of lotMaster. " +

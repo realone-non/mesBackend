@@ -52,10 +52,18 @@ public class WorkOrderBadItem extends BaseTimeEntity {
         setDeleteYn(true);
     }
 
-    public void add(LotLog lotLog, BadItem badItem, int badItemAmount) {
-//        setLotLog(lotLog);
+    public void create(
+            BadItem badItem,
+            WorkOrderDetail workOrderDetail,
+            LotMaster lotMaster,
+            int badItemAmount,
+            LotMasterDivision lotMasterDivision
+    ) {
         setBadItem(badItem);
+        setWorkOrderDetail(workOrderDetail);
+        setLotMaster(lotMaster);
         setBadItemAmount(badItemAmount);
+        setDivision(lotMasterDivision);
     }
 
     public void popCreate(
