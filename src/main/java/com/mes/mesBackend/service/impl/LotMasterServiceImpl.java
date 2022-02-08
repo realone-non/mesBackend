@@ -41,7 +41,6 @@ public class LotMasterServiceImpl implements LotMasterService {
     private final WorkProcessRepository workProcessRepository;
     private final LotLogHelper lotLogHelper;
 
-    // TODO: lotMaster 에 넣을 warehouse 로직 추가, 변경 해야함
 
     // LOT master 생성
     @Override

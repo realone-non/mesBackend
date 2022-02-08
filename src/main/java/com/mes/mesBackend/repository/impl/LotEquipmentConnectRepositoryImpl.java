@@ -20,8 +20,6 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
     final QLotEquipmentConnect lotEquipmentConnect = QLotEquipmentConnect.lotEquipmentConnect;
     final QLotMaster lotMaster = QLotMaster.lotMaster;
     final QEquipment equipment = QEquipment.equipment;
-    final QWorkOrderUserLog workOrderUserLog = QWorkOrderUserLog.workOrderUserLog;
-    final QUser user = QUser.user;
 
     // 오늘날짜, 같은 설비 기준으로 equipmentLot 조회
     @Override

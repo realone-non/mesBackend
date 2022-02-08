@@ -4,9 +4,9 @@ import com.mes.mesBackend.dto.response.BadItemEnrollmentResponse;
 import com.mes.mesBackend.dto.response.PopBadItemTypeResponse;
 import com.mes.mesBackend.dto.response.PopTestBadItemResponse;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.repository.custom.WorkOrderBadItemRepositoryCustom;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.EQUIPMENT_LOT;
-import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 
 @RequiredArgsConstructor
 public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositoryCustom {
@@ -144,5 +143,26 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                         workOrderBadItem.division.eq(EQUIPMENT_LOT)
                 )
                 .fetch();
+    }
+
+    // 불량항목 전체 조회
+    @Override
+    public List<BadItem> findBadItemByCondition(Long workProcessId) {
+        return jpaQueryFactory
+                .selectFrom(badItem)
+                .leftJoin(workProcess).on(workProcess.id.eq(badItem.workProcess.id))
+                .where(
+                        isWorkProcessIdEq(workProcessId),
+                        isBadItemDeleteYnFalse()
+                )
+                .fetch();
+    }
+
+    private BooleanExpression isWorkProcessIdEq(Long workProcessId) {
+        return workProcessId != null ? workProcess.id.eq(workProcessId) : null;
+    }
+
+    private BooleanExpression isBadItemDeleteYnFalse() {
+        return badItem.deleteYn.isFalse();
     }
 }

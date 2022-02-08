@@ -15,8 +15,8 @@ public interface BadItemService {
     BadItemResponse createBadItem(BadItemRequest badItemRequest) throws BadRequestException, NotFoundException;
     // 불량항목 단일 조회
     BadItemResponse getBadItem(Long id) throws NotFoundException;
-    // 불량항목 페이징 조회
-    List<BadItemResponse> getBadItems();
+    // 불량항목 전체 조회
+    List<BadItemResponse> getBadItems(Long workProcessId);
     // 불량항목 수정
     BadItemResponse updateBadItem(Long id, BadItemRequest badItemRequest) throws NotFoundException, BadRequestException;
     // 불량항목 삭제

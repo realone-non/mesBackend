@@ -8,6 +8,7 @@ import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.BadItemRepository;
+import com.mes.mesBackend.repository.WorkOrderBadItemRepository;
 import com.mes.mesBackend.repository.WorkProcessRepository;
 import com.mes.mesBackend.service.BadItemService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class BadItemServiceImpl implements BadItemService {
     private final BadItemRepository badItemRepository;
     private final ModelMapper mapper;
     private final WorkProcessRepository workProcessRepository;
+    private final WorkOrderBadItemRepository workOrderBadItemRepo;
 
     // 불량항목 생성
     @Override
@@ -47,10 +49,10 @@ public class BadItemServiceImpl implements BadItemService {
         return mapper.toResponse(badItem, BadItemResponse.class);
     }
 
-    // 불량항목 페이징 조회
+    // 불량항목 전체 조회
     @Override
-    public List<BadItemResponse> getBadItems() {
-        List<BadItem> badItems = badItemRepository.findAllByDeleteYnFalse();
+    public List<BadItemResponse> getBadItems(Long workProcessId) {
+        List<BadItem> badItems = workOrderBadItemRepo.findBadItemByCondition(workProcessId);
         return mapper.toListResponses(badItems, BadItemResponse.class);
     }
 
