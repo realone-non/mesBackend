@@ -123,7 +123,7 @@ public class PopController {
         return new ResponseEntity<>(NO_CONTENT);
     }
 
-    // 작업지시 상태 변경
+    // 작업완료 수량 입력
     @SecurityRequirement(name = AUTHORIZATION)
     @PostMapping("/work-orders/{work-order-id}")
     @ResponseBody

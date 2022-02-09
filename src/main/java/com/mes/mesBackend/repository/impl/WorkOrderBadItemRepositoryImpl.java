@@ -4,9 +4,9 @@ import com.mes.mesBackend.dto.response.BadItemEnrollmentResponse;
 import com.mes.mesBackend.dto.response.PopBadItemTypeResponse;
 import com.mes.mesBackend.dto.response.PopTestBadItemResponse;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.repository.custom.WorkOrderBadItemRepositoryCustom;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.EQUIPMENT_LOT;
-import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 
 @RequiredArgsConstructor
 public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositoryCustom {
@@ -25,7 +24,6 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
     final QLotMaster lotMaster = QLotMaster.lotMaster;
     final QBadItem badItem = QBadItem.badItem;
     final QWorkProcess workProcess = QWorkProcess.workProcess;
-    final QLotLog lotLog = QLotLog.lotLog;
 
     @Override
     public Optional<BadItemEnrollmentResponse> findWorkOrderEnrollmentResponseById(Long id) {
@@ -35,6 +33,7 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                             Projections.fields(
                                     BadItemEnrollmentResponse.class,
                                     workOrderBadItem.id.as("badItemId"),
+                                    workProcess.id.as("workProcessId"),
                                     workProcess.workProcessName.as("workProcessName"),
                                     badItem.badItemName.as("badItemName"),
                                     workOrderBadItem.badItemAmount.as("badItemAmount"),
@@ -42,10 +41,10 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                             )
                         )
                         .from(workOrderBadItem)
-//                        .leftJoin(lotLog).on(lotLog.id.eq(workOrderBadItem.lotLog.id))
+                        .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(workOrderBadItem.workOrderDetail.id))
+                        .leftJoin(lotMaster).on(lotMaster.id.eq(workOrderBadItem.lotMaster.id))
                         .leftJoin(badItem).on(badItem.id.eq(workOrderBadItem.badItem.id))
-                        .leftJoin(workProcess).on(workProcess.id.eq(badItem.workProcess.id))
-                        .leftJoin(lotMaster).on(lotMaster.id.eq(lotLog.lotMaster.id))
+                        .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.id))
                         .where(
                                 workOrderBadItem.id.eq(id),
                                 workOrderBadItem.deleteYn.isFalse()
@@ -61,6 +60,7 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                         Projections.fields(
                                 BadItemEnrollmentResponse.class,
                                 workOrderBadItem.id.as("badItemId"),
+                                workProcess.id.as("workProcessId"),
                                 workProcess.workProcessName.as("workProcessName"),
                                 badItem.badItemName.as("badItemName"),
                                 workOrderBadItem.badItemAmount.as("badItemAmount"),
@@ -68,11 +68,10 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                         )
                 )
                 .from(workOrderBadItem)
-//                .leftJoin(lotLog).on(lotLog.id.eq(workOrderBadItem.lotLog.id))
-                .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
+                .leftJoin(lotMaster).on(lotMaster.id.eq(workOrderBadItem.lotMaster.id))
+                .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(workOrderBadItem.workOrderDetail.id))
                 .leftJoin(badItem).on(badItem.id.eq(workOrderBadItem.badItem.id))
                 .leftJoin(workProcess).on(workProcess.id.eq(badItem.workProcess.id))
-                .leftJoin(lotMaster).on(lotMaster.id.eq(lotLog.lotMaster.id))
                 .where(
                         workOrderDetail.id.eq(workOrderId),
                         workOrderBadItem.deleteYn.isFalse()
@@ -146,5 +145,26 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                         workOrderBadItem.division.eq(EQUIPMENT_LOT)
                 )
                 .fetch();
+    }
+
+    // 불량항목 전체 조회
+    @Override
+    public List<BadItem> findBadItemByCondition(Long workProcessId) {
+        return jpaQueryFactory
+                .selectFrom(badItem)
+                .leftJoin(workProcess).on(workProcess.id.eq(badItem.workProcess.id))
+                .where(
+                        isWorkProcessIdEq(workProcessId),
+                        isBadItemDeleteYnFalse()
+                )
+                .fetch();
+    }
+
+    private BooleanExpression isWorkProcessIdEq(Long workProcessId) {
+        return workProcessId != null ? workProcess.id.eq(workProcessId) : null;
+    }
+
+    private BooleanExpression isBadItemDeleteYnFalse() {
+        return badItem.deleteYn.isFalse();
     }
 }

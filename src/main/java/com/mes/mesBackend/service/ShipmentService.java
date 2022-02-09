@@ -45,7 +45,7 @@ public interface ShipmentService {
     // 출하 LOT 정보 삭제
     void deleteShipmentLot(Long shipmentId, Long shipmentItemId, Long shipmentLotId) throws NotFoundException, BadRequestException;
     // 출하 LOT 정보 생성 시 LOT 정보 조회 API
-    List<LotMasterResponse.idAndLotNo> getShipmentLotMasters(Long contractItemId) throws NotFoundException;
+    List<LotMasterResponse.idAndLotNo> getShipmentLotMasters(Long contractItemId, int notShippedAmount) throws NotFoundException;
     // ==================================================== 4-7. 출하 현황 ====================================================
     // 출하현황 검색 리스트 조회, 검색조건: 거래처 id, 출하기간 fromDate~toDate, 화폐 id, 담당자 id, 품번|품명
     List<ShipmentStatusResponse> getShipmentStatuses(Long clientId, LocalDate fromDate, LocalDate toDate, Long currencyId, Long userId, String itemNoAndItemName);

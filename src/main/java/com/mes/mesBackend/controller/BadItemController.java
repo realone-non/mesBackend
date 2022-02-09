@@ -81,9 +81,10 @@ public class BadItemController {
     @ResponseBody
     @Operation(summary = "불량항목 전체 조회", description = "")
     public ResponseEntity<List<BadItemResponse>> getBadItems(
+            @RequestParam(required = false) @Parameter(description = "공정 id") Long workProcessId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<BadItemResponse> badItems = badItemService.getBadItems();
+        List<BadItemResponse> badItems = badItemService.getBadItems(workProcessId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getBadItems.");
         return new ResponseEntity<>(badItems, HttpStatus.OK);

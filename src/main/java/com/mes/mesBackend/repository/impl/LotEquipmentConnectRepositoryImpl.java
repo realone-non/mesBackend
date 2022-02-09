@@ -20,8 +20,6 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
     final QLotEquipmentConnect lotEquipmentConnect = QLotEquipmentConnect.lotEquipmentConnect;
     final QLotMaster lotMaster = QLotMaster.lotMaster;
     final QEquipment equipment = QEquipment.equipment;
-    final QWorkOrderUserLog workOrderUserLog = QWorkOrderUserLog.workOrderUserLog;
-    final QUser user = QUser.user;
 
     // 오늘날짜, 같은 설비 기준으로 equipmentLot 조회
     @Override
@@ -58,9 +56,11 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
                 .select(
                         Projections.fields(
                                 PopWorkOrderStates.class,
+                                lotEquipmentConnect.childLot.id.as("lotMasterId"),
                                 equipment.equipmentName.as("equipmentName"),
                                 lotEquipmentConnect.processStatus.as("processStatus"),
-                                lotEquipmentConnect.modifiedDate.as("updateDateTime")
+                                lotEquipmentConnect.modifiedDate.as("updateDateTime"),
+                                lotEquipmentConnect.childLot.createdAmount.as("createdAmount")
                         )
                 )
                 .from(lotEquipmentConnect)

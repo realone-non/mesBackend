@@ -15,7 +15,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProductionPlanServiceImpl implements ProductionPlanService {
-
     private final WorkOrderDetailRepository workOrderDetailRepo;
 
     // 생산계획 수립 전체 조회, 검색조건: 작업라인, 작업예정일

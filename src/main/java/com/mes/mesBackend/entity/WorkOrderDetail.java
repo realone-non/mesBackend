@@ -65,21 +65,11 @@ public class WorkOrderDetail extends BaseTimeEntity {
     @JoinColumn(name = "USER", columnDefinition = "bigint COMMENT '생산담당자'")
     private User user;                // 생산담당자
 
-    // TODO: db WORK_ORDER_DETAIL 의 UNIT 삭제해야됨.
-    // 단위 삭제(공정에 해당하는 반제품의 단위로 보여지게 변경)
-//    @ManyToOne(fetch = LAZY)
-//    @JoinColumn(name = "UNIT", columnDefinition = "bigint COMMENT '단위'")
-//    private Unit unit;
-
     @Column(name = "READY_TIME", columnDefinition = "int COMMENT '준비시간'", nullable = false)
     private int readyTime;                 // 준비시간
 
     @Column(name = "UHP", columnDefinition = "int COMMENT 'UPH'", nullable = false)
     private int uph;                        // UPH
-
-    // 삭제이유? 계산하면 되서 삭제
-//    @Column(name = "COST_TIME", nullable = false, columnDefinition = "int COMMENT '소요시간'")
-//    private int costTime;                  // 소요시간
 
     @Column(name = "EXPECTED_WORK_DATE", nullable = false, columnDefinition = "date COMMENT '작업예정일'")
     private LocalDate expectedWorkDate;         // 작업예정일

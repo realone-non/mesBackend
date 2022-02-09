@@ -2,7 +2,6 @@ package com.mes.mesBackend.entity;
 
 
 import com.mes.mesBackend.entity.enumeration.OrderState;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +13,7 @@ import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
 
 
 /*
@@ -40,7 +40,7 @@ import static javax.persistence.GenerationType.IDENTITY;
  * LOT정보: LOT번호,수주단위,출고수량,출하금액,출하금액(원화),VAT,검사번호        -> 미구현
  * */
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 @Entity(name = "SHIPMENTS")
 @Data
 public class Shipment extends BaseTimeEntity {

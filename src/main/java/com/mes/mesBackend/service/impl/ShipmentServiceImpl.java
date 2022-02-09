@@ -45,7 +45,11 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final WorkProcessRepository workProcessRepository;
 
     // ====================================================== 출하 ======================================================
+    // orderState 변경 api
+
+
     // 출하 생성
+    // TODO: 바코드 생성 BARYYMMDD001
     @Override
     public ShipmentResponse createShipment(ShipmentCreateRequest shipmentRequest) throws NotFoundException {
         Client client = clientService.getClientOrThrow(shipmentRequest.getClient());
@@ -238,9 +242,13 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public ShipmentLotInfoResponse createShipmentLot(Long shipmentId, Long shipmentItemId, Long lotMasterId) throws NotFoundException, BadRequestException {
         ShipmentItem shipmentItem = getShipmentItemOrThrow(shipmentId, shipmentItemId);
+        LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);
 
         // 출하의 상태가 COMPLETION 인지 체크
         throwIfShipmentStateCompletion(shipmentItem.getShipment().getOrderState());
+
+        // 해당 LOT 가 다른쪽에 출하 품목정보에 등록 되어있는지 체크
+
 
         // lotMaster: shipmentItem 의 item 에 해당되는 lotMaster 가져옴, 조건? 공정이 포장까지 완료된, stockAmount 가 1 이상
         List<Long> lotMasterIds = shipmentLotRepo.findLotMasterIdByItemIdAndWorkProcessShipment(shipmentItem.getContractItem().getItem().getId(), PACKAGING);
@@ -252,7 +260,6 @@ public class ShipmentServiceImpl implements ShipmentService {
             );
         }
 
-        LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);
 
         ShipmentLot shipmentLot = new ShipmentLot();
         shipmentLot.create(shipmentItem, lotMaster);
@@ -320,10 +327,11 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     // 출하 LOT 정보 생성 시 LOT 정보 조회 API
     // 출하 품목정보의 품목과 lotMaster 의 품목이랑 같으며 포장공정 끝나고 현재 재고가 0 이 아닌 lotMaster id
+    // 출하품목정보에 수주수량보다 lot 정보의 재고수량이 더 크면 X
     @Override
-    public List<LotMasterResponse.idAndLotNo> getShipmentLotMasters(Long contractItemId) throws NotFoundException {
+    public List<LotMasterResponse.idAndLotNo> getShipmentLotMasters(Long contractItemId, int notShippedAmount) throws NotFoundException {
         ContractItem contractItem = getContractItemOrThrow(contractItemId);
-        return lotMasterRepository.findLotMastersByShipmentLotCondition(contractItem.getItem().getId());
+        return lotMasterRepository.findLotMastersByShipmentLotCondition(contractItem.getItem().getId(), notShippedAmount);
     }
 
 
