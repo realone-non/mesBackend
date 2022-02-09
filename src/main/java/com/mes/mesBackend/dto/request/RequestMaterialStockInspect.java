@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Schema(description = "재고실사 등록")
 public class RequestMaterialStockInspect {
-    @Schema(description = "재고실사 고유아이디")
+    @Schema(description = "id")
     Long id;
 
     @Schema(description = "실사수량")
