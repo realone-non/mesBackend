@@ -82,12 +82,13 @@ public class OutSourcingController {
     )
     public ResponseEntity<List<OutsourcingProductionResponse>> getOutsourcingProductions(
             @RequestParam(required = false) @Parameter(description = "외주사 ID") Long clientId,
-            @RequestParam(required = false) @Parameter(description = "아이템 ID") Long itemId,
+            @RequestParam(required = false) @Parameter(description = "아이템 품번") String itemNo,
+            @RequestParam(required = false) @Parameter(description = "아이템 품명") String itemName,
             @RequestParam(required = false) @Parameter(description = "시작날짜") LocalDate startDate,
             @RequestParam(required = false) @Parameter(description = "종료날짜") LocalDate endDate,
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        List<OutsourcingProductionResponse> productions = outsourcingService.getOutsourcingProductions(clientId, itemId, startDate, endDate);
+        List<OutsourcingProductionResponse> productions = outsourcingService.getOutsourcingProductions(clientId, itemNo, itemName, startDate, endDate);
         cLogger = new MongoLogger(logger, "mongoTemplate");
         return new ResponseEntity<>(productions, HttpStatus.OK);
     }

@@ -21,6 +21,7 @@ public class ShipmentItemRepositoryImpl implements ShipmentItemRepositoryCustom 
     final QUnit unit = QUnit.unit;
     final QItem item = QItem.item;
     final QLotMaster lotMaster = QLotMaster.lotMaster;
+    final QClient client = QClient.client;
 
     // shipmentItem 에 해당되는 제일 처음 등록된 contract 조회
     @Override
@@ -122,6 +123,36 @@ public class ShipmentItemRepositoryImpl implements ShipmentItemRepositoryCustom 
                 )
                 .fetchFirst();
         return fetchOne != null;
+    }
+
+    // 출하 등록 가능 품목 조회
+    @Override
+    public List<ShipmentItemResponse> getPossibleShipmentItem(Long clientId){
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                ShipmentItemResponse.class,
+                                contract.id.as("contractId"),
+                                contract.contractNo.as("contractNo"),
+                                contractItem.id.as("contractItemId"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                item.standard.as("itemStandard"),
+                                unit.unitCodeName.as("contractUnit"),
+                                contractItem.amount.as("contractItemAmount"),
+                                item.inputUnitPrice.as("itemInputUnitPrice")
+                        )
+                )
+                .from(contractItem)
+                .innerJoin(item).on(item.id.eq(contractItem.item.id))
+                .innerJoin(unit).on(unit.id.eq(item.unit.id))
+                .innerJoin(contract).on(contract.id.eq(contractItem.contract.id))
+                .innerJoin(client).on(client.id.eq(contract.client.id))
+                .where(
+                        client.id.eq(clientId),
+                        contractItem.deleteYn.isFalse()
+                )
+                .fetch();
     }
 
     // shipment id eq

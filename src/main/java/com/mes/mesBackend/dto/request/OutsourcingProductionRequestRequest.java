@@ -19,7 +19,7 @@ import static com.mes.mesBackend.exception.Message.NOT_NULL;
 @Schema(description = "외주생산의뢰정보")
 public class OutsourcingProductionRequestRequest {
     @Schema(description = "BOM")
-    Long bomNo;
+    Long bomId;
 
     @Schema(description = "생산수량")
     int productionAmount;

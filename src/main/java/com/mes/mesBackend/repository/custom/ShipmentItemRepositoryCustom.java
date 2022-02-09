@@ -15,4 +15,7 @@ public interface ShipmentItemRepositoryCustom {
     List<ShipmentItemResponse> findShipmentResponsesByShipmentId(Long shipmentId);
     // 출하에 수주품목이 있는지
     boolean existsByContractItemInShipment(Long shipmentId, Long contractItemId);
+    // 출하 가능 품목 조회
+    List<ShipmentItemResponse> getPossibleShipmentItem(Long clientId);
+
 }

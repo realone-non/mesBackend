@@ -24,7 +24,7 @@ public class OutSourcingProductionRequestRepositoryImpl implements OutsourcingRe
     final QItem item = QItem.item;
     final QClient client = QClient.client;
 
-    public List<OutsourcingProductionResponse> findAllByCondition(Long clientId, Long itemId, LocalDate startDate, LocalDate endDate){
+    public List<OutsourcingProductionResponse> findAllByCondition(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -48,7 +48,8 @@ public class OutSourcingProductionRequestRepositoryImpl implements OutsourcingRe
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .where(
                         clientNull(clientId),
-                        itemNull(itemId),
+                        isItemNoContaining(itemNo),
+                        isItemNameContaining(itemName),
                         dateNull(startDate, endDate),
                         request.useYn.eq(true),
                         request.deleteYn.eq(false)
@@ -95,6 +96,16 @@ public class OutSourcingProductionRequestRepositoryImpl implements OutsourcingRe
 
     private BooleanExpression itemNull(Long itemId){
         return itemId != null ? item.id.eq(itemId) : null;
+    }
+
+    // 품번 검색
+    private BooleanExpression isItemNoContaining(String itemNo) {
+        return itemNo !=  null ? item.itemNo.contains(itemNo) : null;
+    }
+
+    // 품명 검색
+    private BooleanExpression isItemNameContaining(String itemName) {
+        return itemName != null ? item.itemName.contains(itemName) : null;
     }
 
     private  BooleanExpression dateNull(LocalDate startDate, LocalDate endDate){

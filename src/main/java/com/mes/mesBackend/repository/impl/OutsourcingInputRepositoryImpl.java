@@ -29,7 +29,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
     final QLotMaster lotMaster = QLotMaster.lotMaster;
 
     //외주 입고 정보 검색 조건:외주처, 품목, 입고기간
-    public List<OutsourcingInputResponse> findAllByCondition(Long clientId, Long itemId, LocalDate startDate, LocalDate endDate){
+    public List<OutsourcingInputResponse> findAllByCondition(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -55,7 +55,8 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .where(
                         clientNull(clientId),
-                        itemNull(itemId),
+                        isItemNoContaining(itemNo),
+                        isItemNameContaining(itemName),
                         dateNull(startDate, endDate),
                         input.useYn.eq(true),
                         input.deleteYn.eq(false)
@@ -100,7 +101,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
 
     //외주재고현황 전체 조회 검색 조건:외주처, 품목, 의뢰기간
     @Transactional(readOnly = true)
-    public List<OutsourcingStatusResponse> findStatusByCondition(Long clientId, Long itemId){
+    public List<OutsourcingStatusResponse> findStatusByCondition(Long clientId, String itemNo, String itemName){
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -120,7 +121,8 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .where(
                         clientNull(clientId),
-                        itemNull(itemId),
+                        isItemNoContaining(itemNo),
+                        isItemNameContaining(itemName),
                         lotMaster.useYn.eq(true),
                         lotMaster.deleteYn.eq(false),
                         lotMaster.enrollmentType.eq(EnrollmentType.OUTSOURCING_INPUT)
@@ -155,5 +157,15 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
 
     private  BooleanExpression dateNull(LocalDate startDate, LocalDate endDate){
         return startDate != null ? request.productionDate.between(startDate, endDate) : null;
+    }
+
+    // 품번 검색
+    private BooleanExpression isItemNoContaining(String itemNo) {
+        return itemNo !=  null ? item.itemNo.contains(itemNo) : null;
+    }
+
+    // 품명 검색
+    private BooleanExpression isItemNameContaining(String itemName) {
+        return itemName != null ? item.itemName.contains(itemName) : null;
     }
 }

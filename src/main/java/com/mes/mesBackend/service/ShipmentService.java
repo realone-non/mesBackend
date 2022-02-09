@@ -24,6 +24,8 @@ public interface ShipmentService {
     void deleteShipment(Long shipmentId) throws NotFoundException, BadRequestException;
 
     // =================================================== 출하 수주 품목 ====================================================
+    // 출하 가능 품목 리스트 조회
+    List<ShipmentItemResponse> getPossibleShipmentItem(Long shipmentId) throws NotFoundException;
     // 출하 품목정보 생성
     ShipmentItemResponse createShipmentItem(Long shipmentId, Long contractItemId, String note) throws NotFoundException, BadRequestException;
     // 출하 품목정보 단일 조회
