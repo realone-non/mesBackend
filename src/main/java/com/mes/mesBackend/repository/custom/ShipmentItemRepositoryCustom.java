@@ -17,5 +17,6 @@ public interface ShipmentItemRepositoryCustom {
     boolean existsByContractItemInShipment(Long shipmentId, Long contractItemId);
     // 출하 가능 품목 조회
     List<ShipmentItemResponse> getPossibleShipmentItem(Long clientId);
-
+    // shipmentLot 에 해당하는 lotMaster 가 있는지
+    boolean existsLotMasterByShipmentLot(Long lotMasterId);
 }

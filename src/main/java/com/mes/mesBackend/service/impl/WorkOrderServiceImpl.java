@@ -52,7 +52,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     }
 
     // 작업지시 생성
-    // TODO: 단위 삭제(공정에 해당하는 반제품의 단위로 보여줌)
     @Override
     public WorkOrderResponse createWorkOrder(Long produceOrderId, WorkOrderCreateRequest workOrderRequest) throws NotFoundException, BadRequestException {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
@@ -108,7 +107,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         List<WorkOrderResponse> workOrderDetails = workOrderDetailRepo.findWorkOrderResponseByProduceOrderIdAndDeleteYnFalse(produceOrder.getId());
 
         for (WorkOrderResponse response : workOrderDetails) {
-
             Item bomDetailItem = workOrderDetailRepo.findBomDetailByBomMasterItemIdAndWorkProcessId(response.getProduceOrderItemId(), response.getWorkProcessId())
                     .orElse(null);
             response.setCostTime();
