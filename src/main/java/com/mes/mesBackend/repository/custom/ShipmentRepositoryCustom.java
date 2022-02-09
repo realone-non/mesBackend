@@ -1,6 +1,9 @@
 package com.mes.mesBackend.repository.custom;
 
+import com.mes.mesBackend.dto.response.PopShipmentResponse;
 import com.mes.mesBackend.dto.response.ShipmentResponse;
+import com.mes.mesBackend.entity.Shipment;
+import com.mes.mesBackend.entity.ShipmentItem;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,4 +17,10 @@ public interface ShipmentRepositoryCustom {
     Optional<ShipmentResponse> findShipmentResponseById(Long id);
     // 출하에 등록된 품목정보
     boolean existsByShipmentItemInShipment(Long shipmentId);
+    // 출하정보 리스트 조회
+    List<PopShipmentResponse> findPopShipmentResponseByCondition(LocalDate fromDate, LocalDate toDate, String clientName, Boolean completionYn);
+    // 출하 lot 가 등록되어 있는 출하품목만 가져옴
+    List<ShipmentItem> findShipmentItemByShipmentId(Long shipmentId);
+    // 출하에 해당되는 출하 lot 정보의 모든 stockAmount
+    List<Integer> findShipmentLotStockAmountByShipmentId(Long shipmentId);
 }
