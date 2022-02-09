@@ -26,15 +26,15 @@ public class PopShipmentServiceImpl implements PopShipmentService {
         List<PopShipmentResponse> responses = shipmentRepo.findPopShipmentResponseByCondition(fromDate, toDate, clientName, completionYn);
 
         for (PopShipmentResponse res : responses) {
+            // 출하에 해당하는 출하 품목 list
             List<ShipmentItem> shipmentItems = shipmentRepo.findShipmentItemByShipmentId(res.getShipmentId());
-
             List<String> itemNos = shipmentItems.stream().map(m -> m.getContractItem().getItem().getItemNo()).collect(Collectors.toList());
             List<String> itemNames = shipmentItems.stream().map(m -> m.getContractItem().getItem().getItemName()).collect(Collectors.toList());
-            int stockAmount = shipmentRepo.findShipmentLotStockAmountByShipmentId(res.getShipmentId()).stream().mapToInt(Integer::intValue).sum();
+            int shipmentAmount = shipmentRepo.findShipmentLotShipmentAmountByShipmentId(res.getShipmentId()).stream().mapToInt(Integer::intValue).sum();
 
             res.setItemName(itemNames);
             res.setItemNo(itemNos);
-            res.setAmount(stockAmount);
+            res.setShipmentAmount(shipmentAmount);     // 출하 LOT 등록되어 있는 LotMaster 의 shipmentAmount sum
         }
         return responses;
     }

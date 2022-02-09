@@ -22,6 +22,7 @@ public class ShipmentItemRepositoryImpl implements ShipmentItemRepositoryCustom 
     final QItem item = QItem.item;
     final QLotMaster lotMaster = QLotMaster.lotMaster;
     final QClient client = QClient.client;
+    final QShipmentLot shipmentLot = QShipmentLot.shipmentLot;
 
     // shipmentItem 에 해당되는 제일 처음 등록된 contract 조회
     @Override
@@ -153,6 +154,22 @@ public class ShipmentItemRepositoryImpl implements ShipmentItemRepositoryCustom 
                         contractItem.deleteYn.isFalse()
                 )
                 .fetch();
+    }
+
+    // shipmentLot 에 해당하는 lotMaster 가 있는지
+    // 있으면 true
+    @Override
+    public boolean existsLotMasterByShipmentLot(Long lotMasterId) {
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(shipmentLot)
+                .where(
+                        shipmentLot.deleteYn.isFalse(),
+                        shipmentLot.lotMaster.id.eq(lotMasterId)
+                )
+                .fetchFirst();
+
+        return fetchOne != null;
     }
 
     // shipment id eq
