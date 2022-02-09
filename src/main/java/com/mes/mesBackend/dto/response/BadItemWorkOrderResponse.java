@@ -24,6 +24,9 @@ public class BadItemWorkOrderResponse {
     @Schema(description = "작지번호")
     String workOrderNo;
 
+    @Schema(description = "작업공정 고유아이디")
+    Long workProcessId;
+
     @Schema(description = "작업공정")
     String workProcessName;
 
@@ -54,7 +57,4 @@ public class BadItemWorkOrderResponse {
 
     @Schema(description = "생산수량")
     int productionAmount;
-
-    @JsonIgnore
-    Long workProcessId;
 }
