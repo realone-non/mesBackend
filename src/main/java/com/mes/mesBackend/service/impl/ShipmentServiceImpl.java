@@ -26,6 +26,7 @@ import static com.mes.mesBackend.entity.enumeration.ItemLogType.STOCK_AMOUNT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.SHIPMENT;
+import static com.mes.mesBackend.helper.Constants.NOW_YYMMDD;
 
 // 4-5. 출하등록
 @Service
@@ -43,21 +44,19 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final LotLogHelper lotLogHelper;
     private final AmountHelper amountHelper;
     private final WorkProcessRepository workProcessRepository;
+    private static final String BAR = "BAR";
+    private static final String FORMAT_3 = "%03d";
 
     // ====================================================== 출하 ======================================================
-    // orderState 변경 api
-
-
     // 출하 생성
-    // TODO: 바코드 생성 BARYYMMDD001
+    // 바코드번호 BARYYMMDD001
     @Override
     public ShipmentResponse createShipment(ShipmentCreateRequest shipmentRequest) throws NotFoundException {
         Client client = clientService.getClientOrThrow(shipmentRequest.getClient());
         Shipment shipment = mapper.toEntity(shipmentRequest, Shipment.class);
-
         String shipmentNo = numberAutomatic.createDateTimeNo();     // 출하번호 생성
-        shipment.create(client, shipmentNo);       // 지시상태 SCHEDULE
-
+        String barcodeNumber = createBarcodeNumber();               // 바코드 번호 생성
+        shipment.create(client, shipmentNo, barcodeNumber);       // 지시상태 SCHEDULE
         shipmentRepo.save(shipment);
         return getShipmentResponse(shipment.getId());
     }
@@ -145,14 +144,21 @@ public class ShipmentServiceImpl implements ShipmentService {
                 .orElseThrow(() -> new NotFoundException("shipment does not exist. input id: " + id));
     }
 
+    // 출하 barcodeNumber 생성 BARYYMMDD001
+    private String createBarcodeNumber() {
+        // 오늘 날짜로 생성 된 shipment 중 barcodeNumber 만 가져옴(내림차순 limit 1)
+        String beforeNo = shipmentRepo.findBarcodeNumberByToday(LocalDate.now()).orElse(null);
+        Integer seq = beforeNo != null ? Integer.parseInt(beforeNo.substring(beforeNo.length() - 3)) + 1 : 1;
+        return BAR + NOW_YYMMDD + String.format(FORMAT_3, seq);
+    }
+
     // =================================================== 출하 품목 ====================================================
 
     // 출하 가능한 품목 조회
     @Override
     public List<ShipmentItemResponse> getPossibleShipmentItem(Long shipmentId) throws NotFoundException {
         Shipment shipment = getShipmentOrThrow(shipmentId);
-        List<ShipmentItemResponse> responseList = shipmentItemRepo.getPossibleShipmentItem(shipment.getClient().getId());
-        return responseList;
+        return shipmentItemRepo.getPossibleShipmentItem(shipment.getClient().getId());
     }
 
     // 출하 품목정보 생성
@@ -246,9 +252,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         // 출하의 상태가 COMPLETION 인지 체크
         throwIfShipmentStateCompletion(shipmentItem.getShipment().getOrderState());
-
-        // 해당 LOT 가 다른쪽에 출하 품목정보에 등록 되어있는지 체크
-
+        // 입력받은 LOT 가 다른 shipmentLot 에 등록 되어있는지 체크
+        throwIfExistsLotMasterByShipmentLot(lotMasterId);
 
         // lotMaster: shipmentItem 의 item 에 해당되는 lotMaster 가져옴, 조건? 공정이 포장까지 완료된, stockAmount 가 1 이상
         List<Long> lotMasterIds = shipmentLotRepo.findLotMasterIdByItemIdAndWorkProcessShipment(shipmentItem.getContractItem().getItem().getId(), PACKAGING);
@@ -260,7 +265,6 @@ public class ShipmentServiceImpl implements ShipmentService {
             );
         }
 
-
         ShipmentLot shipmentLot = new ShipmentLot();
         shipmentLot.create(shipmentItem, lotMaster);
 
@@ -270,7 +274,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         lotMaster.setStockAmount(0);                                    // 재고수량 0으로 변경
         Long workProcessShipmentId = lotLogHelper.getWorkProcessByDivisionOrThrow(SHIPMENT);
         WorkProcess workProcessShipment = workProcessRepository.findByIdAndDeleteYnFalse(workProcessShipmentId)
-                .orElseThrow(() -> new NotFoundException("[ShipmentLot]workProcess does not exist. workProcessId: " + workProcessShipmentId));
+                .orElseThrow(() -> new NotFoundException("[ShipmentLot] workProcess does not exist. workProcessId: " + workProcessShipmentId));
         lotMaster.setWorkProcess(workProcessShipment);
 
         // lotLog insert
@@ -413,6 +417,13 @@ public class ShipmentServiceImpl implements ShipmentService {
         if (existsByShipmentItemInShipment) {
             throw new BadRequestException("등록된 출하 품목정보가 있으면 삭제할 수 없습니다. 품목정보 삭제 후 다시 시도 바랍니다.");
         }
+    }
+
+    // 해당 LOT 가 다른쪽에 출하 품목정보에 등록 되어있는지 체크
+    private void throwIfExistsLotMasterByShipmentLot(Long lotMasterId) throws BadRequestException {
+        boolean existsLotMasterByShipmentLot = shipmentItemRepo.existsLotMasterByShipmentLot(lotMasterId);
+        if (existsLotMasterByShipmentLot)
+            throw new BadRequestException("입력한 lotMaster 는 이미 다른 출하에 등록되어 있습니다. ");
     }
 
 // ==================================================== 4-7. 출하 현황 ====================================================

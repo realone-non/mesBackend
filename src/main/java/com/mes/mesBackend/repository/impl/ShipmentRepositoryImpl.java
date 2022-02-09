@@ -3,6 +3,7 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.PopShipmentResponse;
 import com.mes.mesBackend.dto.response.ShipmentResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.ShipmentRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -11,8 +12,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+
+import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
+import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
 
 // 4-5. 출하등록
 @RequiredArgsConstructor
@@ -109,7 +115,8 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
                                 shipment.id.as("shipmentId"),
                                 shipment.barcodeNumber.as("barcodeNumber"),
                                 shipment.client.clientName.as("clientName"),
-                                shipment.orderState.as("orderState")
+                                shipment.orderState.as("orderState"),
+                                shipment.shipmentDate.as("shipmentDate")
                         )
                 )
                 .from(shipmentLot)
@@ -119,6 +126,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
                 .where(
                         isShipmentDateBetween(fromDate, toDate),
                         isClientNameContain(clientName),
+                        isCompletionYn(completionYn),
                         shipmentLot.deleteYn.isFalse(),
                         shipmentItem.deleteYn.isFalse(),
                         shipment.deleteYn.isFalse()
@@ -144,11 +152,11 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
                 .fetch();
     }
 
-    // 출하에 해당되는 출하 lot 정보의 모든 stockAmount
+    // 출하에 해당되는 출하 lot 정보의 모든 shipmentAmount
     @Override
-    public List<Integer> findShipmentLotStockAmountByShipmentId(Long shipmentId) {
+    public List<Integer> findShipmentLotShipmentAmountByShipmentId(Long shipmentId) {
         return jpaQueryFactory
-                .select(lotMaster.stockAmount)
+                .select(lotMaster.shipmentAmount)
                 .from(shipmentLot)
                 .innerJoin(shipmentItem).on(shipmentItem.id.eq(shipmentLot.shipmentItem.id))
                 .innerJoin(shipment).on(shipment.id.eq(shipmentItem.shipment.id))
@@ -160,6 +168,22 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
                         shipment.deleteYn.isFalse()
                 )
                 .fetch();
+    }
+
+    // 오늘 날짜로 생성 된 shipment 중 barcodeNumber 만 가져옴(내림차순 limit 1)
+    @Override
+    public Optional<String> findBarcodeNumberByToday(LocalDate now) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(shipment.barcodeNumber)
+                        .from(shipment)
+                        .where(
+                                shipment.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0))
+                        )
+                        .orderBy(shipment.barcodeNumber.desc())
+                        .limit(1)
+                        .fetchOne()
+        );
     }
 
     // shipment id eq
@@ -192,7 +216,6 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
     }
     // 완료 여부 조회
     private BooleanExpression isCompletionYn(Boolean completionYn) {
-//        return completionYn != null ?
-        return null;
+        return completionYn != null ? completionYn ? shipment.orderState.eq(COMPLETION) : shipment.orderState.eq(SCHEDULE) : null;
     }
 }
