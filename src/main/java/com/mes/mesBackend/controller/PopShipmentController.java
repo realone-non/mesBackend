@@ -1,8 +1,6 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.PopShipmentResponse;
-import com.mes.mesBackend.dto.response.PopWorkOrderResponse;
-import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -28,7 +26,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
-@RequestMapping("/pop-shipments")
+@RequestMapping("/pop/shipments")
 @Tag(name = "pop-shipment", description = "[pop] 출하 API")
 @RestController
 @RequiredArgsConstructor
@@ -42,7 +40,7 @@ public class PopShipmentController {
     // 출하 정보 목록 조회
     @GetMapping
     @ResponseBody
-    @Operation(summary = "[미구현] (pop) 출하정보 목록", description = "검색조건: 검색시작날짜(fromDate) ~ 검색종료날짜(toDate), 거래처 명")
+    @Operation(summary = "(pop) 출하정보 목록", description = "검색조건: 검색시작날짜(fromDate) ~ 검색종료날짜(toDate), 거래처 명, 완료여부")
     public ResponseEntity<List<PopShipmentResponse>> getPopShipments(
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "출하일자 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "출하일자 toDate") LocalDate toDate,
@@ -60,7 +58,7 @@ public class PopShipmentController {
     // request: shipmentId
     @PutMapping("/{shipment-id}")
     @ResponseBody
-    @Operation(summary = "[미구현] (pop) 출하상태 완료 변경", description = "")
+    @Operation(summary = "(pop) 출하상태 완료 변경", description = "")
     public ResponseEntity updateShipmentStateCompletion(
             @PathVariable(value = "shipment-id") @Parameter(description = "출하 id") Long shipmentId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
