@@ -27,7 +27,7 @@ public class OutsourcingReturnRepositoryImpl implements OutsourcingReturnReposit
 
     //외주반품 전체 조회 검색 조건:외주처, 품목, 반품기간
     @Transactional(readOnly = true)
-    public List<OutsourcingReturnResponse> findAllByCondition(Long clientId, Long itemId, LocalDate startDate, LocalDate endDate){
+    public List<OutsourcingReturnResponse> findAllByCondition(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -57,7 +57,8 @@ public class OutsourcingReturnRepositoryImpl implements OutsourcingReturnReposit
                 .leftJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
                 .where(
                         clientNull(clientId),
-                        itemNull(itemId),
+                        isItemNoContaining(itemNo),
+                        isItemNameContaining(itemName),
                         dateNull(startDate, endDate),
                         outsourcingReturn.useYn.eq(true),
                         outsourcingReturn.deleteYn.eq(false)
@@ -112,6 +113,16 @@ public class OutsourcingReturnRepositoryImpl implements OutsourcingReturnReposit
 
     private BooleanExpression itemNull(Long itemId){
         return itemId != null ? item.id.eq(itemId) : null;
+    }
+
+    // 품번 검색
+    private BooleanExpression isItemNoContaining(String itemNo) {
+        return itemNo !=  null ? item.itemNo.contains(itemNo) : null;
+    }
+
+    // 품명 검색
+    private BooleanExpression isItemNameContaining(String itemName) {
+        return itemName != null ? item.itemName.contains(itemName) : null;
     }
 
     private  BooleanExpression dateNull(LocalDate startDate, LocalDate endDate) {

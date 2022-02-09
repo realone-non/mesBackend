@@ -50,15 +50,15 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     @Override
     public OutsourcingProductionResponse createOutsourcingProduction(OutsourcingProductionRequestRequest outsourcingProductionRequestRequest)  {
         OutSourcingProductionRequest request = modelMapper.toEntity(outsourcingProductionRequestRequest, OutSourcingProductionRequest.class);
-        request.setBomMaster(bomMasterRepository.getById(outsourcingProductionRequestRequest.getBomNo()));
+        request.setBomMaster(bomMasterRepository.getById(outsourcingProductionRequestRequest.getBomId()));
         request.setProductionDate(LocalDate.now());
         outsourcingProductionRepository.save(request);
         return modelMapper.toResponse(request, OutsourcingProductionResponse.class);
     }
 
     //외주생산의뢰 리스트조회
-    public List<OutsourcingProductionResponse> getOutsourcingProductions(Long clientId, Long itemNo, LocalDate startDate, LocalDate endDate){
-        return outsourcingProductionRepository.findAllByCondition(clientId, itemNo, startDate, endDate);
+    public List<OutsourcingProductionResponse> getOutsourcingProductions(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
+        return outsourcingProductionRepository.findAllByCondition(clientId, itemNo, itemName, startDate, endDate);
     }
 
     //외주생산의뢰 조회
@@ -73,7 +73,7 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     public OutsourcingProductionResponse modifyOutsourcingProduction(Long id, OutsourcingProductionRequestRequest outsourcingProduction){
         OutSourcingProductionRequest request = outsourcingProductionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found data"));
-        BomMaster bomMaster = bomMasterRepository.getById((outsourcingProduction.getBomNo()));
+        BomMaster bomMaster = bomMasterRepository.getById((outsourcingProduction.getBomId()));
         request.update(bomMaster, outsourcingProduction);
         outsourcingProductionRepository.save(request);
         return modelMapper.toResponse(request, OutsourcingProductionResponse.class);
@@ -135,8 +135,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     }
 
     //외주 입고정보 리스트조회
-    public List<OutsourcingInputResponse> getOutsourcingInputList(Long clientId, Long itemId, LocalDate startDate, LocalDate endDate){
-        return outsourcingInputRepository.findAllByCondition(clientId, itemId, startDate, endDate);
+    public List<OutsourcingInputResponse> getOutsourcingInputList(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
+        return outsourcingInputRepository.findAllByCondition(clientId, itemNo, itemName, startDate, endDate);
     }
 
     //외주 입고정보 조회
@@ -241,8 +241,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     }
 
     //외주 반품 리스트조회
-    public List<OutsourcingReturnResponse> getOutsourcingReturnList(Long clientId, Long itemId, LocalDate startDate, LocalDate endDate){
-        return outsourcingReturnRepository.findAllByCondition(clientId, itemId, startDate, endDate);
+    public List<OutsourcingReturnResponse> getOutsourcingReturnList(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
+        return outsourcingReturnRepository.findAllByCondition(clientId, itemNo, itemName, startDate, endDate);
     }
 
     //외주 반품 조회
@@ -278,7 +278,7 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     }
 
     //외주 현황 조회
-    public List<OutsourcingStatusResponse> getOutsourcingStatusList(Long clientId, Long itemId){
-        return outsourcingInputRepository.findStatusByCondition(clientId, itemId);
+    public List<OutsourcingStatusResponse> getOutsourcingStatusList(Long clientId, String itemNo, String itemName){
+        return outsourcingInputRepository.findStatusByCondition(clientId, itemNo, itemName);
     }
 }

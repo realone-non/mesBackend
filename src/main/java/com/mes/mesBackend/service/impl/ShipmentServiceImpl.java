@@ -142,6 +142,15 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     // =================================================== 출하 품목 ====================================================
+
+    // 출하 가능한 품목 조회
+    @Override
+    public List<ShipmentItemResponse> getPossibleShipmentItem(Long shipmentId) throws NotFoundException {
+        Shipment shipment = getShipmentOrThrow(shipmentId);
+        List<ShipmentItemResponse> responseList = shipmentItemRepo.getPossibleShipmentItem(shipment.getClient().getId());
+        return responseList;
+    }
+
     // 출하 품목정보 생성
     /*
     * 등록조건

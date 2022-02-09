@@ -154,6 +154,27 @@ public class ShipmentController {
     }
 
     // =================================================== 출하 품목 ====================================================
+
+    // 출하 가능 품복 정보 조회
+    @GetMapping("/{shipment-id}/possible-shipment-items")
+    @ResponseBody
+    @Operation(summary = "출하 가능 품목 전체조회", description = "")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+            }
+    )
+    public ResponseEntity<List<ShipmentItemResponse>> getPossibleShipmentItem(
+            @PathVariable(value = "shipment-id") @Parameter(description = "출하 id") Long shipmentId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        List<ShipmentItemResponse> shipmentItem = shipmentService.getPossibleShipmentItem(shipmentId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of shipmentId: " + shipmentId + " from getShipmentItem.");
+        return new ResponseEntity<>(shipmentItem, HttpStatus.OK);
+    }
+
     // 출하 품목정보 생성
     @Operation(
             summary = "출하 품목 생성",
@@ -201,6 +222,8 @@ public class ShipmentController {
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + shipmentItem + " from getShipmentItem.");
         return new ResponseEntity<>(shipmentItem, HttpStatus.OK);
     }
+
+
 
     // 출하 품목 정보 전체조회
     @GetMapping("/{shipment-id}/shipment-items")

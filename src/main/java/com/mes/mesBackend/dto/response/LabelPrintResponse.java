@@ -17,6 +17,9 @@ public class LabelPrintResponse {
     @Schema(description = "품명")
     String itemName;
 
+    @Schema(description = "바코드 번호")
+    String barcodeNumber;
+
     @Schema(description = "수량")
     int amount;
 }
