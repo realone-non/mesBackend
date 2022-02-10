@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.Contract;
-import com.mes.mesBackend.entity.enumeration.PayType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,7 +54,7 @@ public class ShipmentResponse {
     String clientManager;
 
     @Schema(description = "결제조건")
-    PayType payType;
+    String payType;
 
     @Schema(description = "부가세적용")
     boolean surtax;
@@ -83,7 +82,7 @@ public class ShipmentResponse {
             setCurrencyId(contract.getCurrency().getId());                          // 화폐 id
             setCurrency(contract.getCurrency().getCurrency());                     // 화폐
             setExchangeRate(contract.getCurrency().getExchangeRate());              // 환율
-            setPayType(contract.getPayCondition());                                // 결제조건
+            setPayType(contract.getPayType().getPayType());                                // 결제조건
             setSurtax(contract.isSurtax());                                        // 부가세적용
             setTransportCondition(contract.getTransportCondition());               // 운송조건
             setForwader(contract.getForwader());                                   // Forwader

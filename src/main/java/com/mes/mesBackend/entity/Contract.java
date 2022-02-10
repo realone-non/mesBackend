@@ -1,10 +1,10 @@
 package com.mes.mesBackend.entity;
 
-import com.mes.mesBackend.entity.enumeration.PayType;
 import com.mes.mesBackend.entity.enumeration.ProductionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.thymeleaf.util.LazyEscapingCharSequence;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -94,9 +94,9 @@ public class Contract extends BaseTimeEntity {
     @Column(name = "PAYMENT_YN", columnDefinition = "bit(1) COMMENT '결제완료'", nullable = false)
     private boolean paymentYn;          // 결제완료
 
-    @Enumerated(STRING)
-    @Column(name = "PAY_CONDITION", columnDefinition = "varchar(255) COMMENT '지불조건'", nullable = false)
-    private PayType payCondition;        // 지불조건
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "PAY_TYPE", columnDefinition = "bigint COMMENT '지불조건'", nullable = false)
+    private PayType payType;        // 지불조건
 
     @Column(name = "FORWADER", columnDefinition = "varchar(255) COMMENT 'Forwader'", nullable = false)
     private String forwader;                // Forwader
@@ -116,11 +116,12 @@ public class Contract extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
-    public void addJoin(Client client, User user, Currency currency, WareHouse outPutWareHouse) {
+    public void addJoin(Client client, User user, Currency currency, WareHouse outPutWareHouse, PayType payType) {
         setClient(client);
         setUser(user);
         setCurrency(currency);
         setOutputWareHouse(outPutWareHouse);
+        setPayType(payType);
     }
 
     public void update(
@@ -128,7 +129,8 @@ public class Contract extends BaseTimeEntity {
             Client newClient,
             User newUser,
             Currency newCurrency,
-            WareHouse newOutPutWareHouse
+            WareHouse newOutPutWareHouse,
+            PayType payType
     ) {
         setClient(newClient);
         setContractDate(newContract.contractDate);
@@ -142,7 +144,7 @@ public class Contract extends BaseTimeEntity {
         setPeriodDate(newContract.periodDate);
         setChangeReason(newContract.changeReason);
         setPaymentYn(newContract.paymentYn);
-        setPayCondition(newContract.payCondition);
+        setPayType(payType);
         setForwader(newContract.forwader);
         setTransportCondition(newContract.transportCondition);
         setShipmentService(newContract.shipmentService);

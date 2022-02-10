@@ -2,7 +2,6 @@ package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mes.mesBackend.entity.enumeration.PayType;
 import com.mes.mesBackend.entity.enumeration.ProductionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -64,8 +63,8 @@ public class ContractResponse {
     @Schema(description = "결제완료")
     boolean paymentYn;
 
-    @Schema(description = "지불조건 [현금: CASH]")
-    PayType payCondition;
+    @Schema(description = "결제조건")
+    PayTypeResponse payType;
 
     @Schema(description = "Forwader")
     String forwader;

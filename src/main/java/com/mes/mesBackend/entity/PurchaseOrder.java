@@ -82,8 +82,9 @@ public class PurchaseOrder extends BaseTimeEntity {
     @Column(name = "TRANSPORT_TYPE", columnDefinition = "varchar(255) COMMENT '운송유형'")
     private String transportType;           // 운송유형
 
-    @Column(name = "PAY_CONDITION", columnDefinition = "varchar(255) COMMENT '지불조건'")
-    private String payCondition;            // 지불조건
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "PAY_TYPE", columnDefinition = "bigint COMMENT '지불조건'")
+    private PayType payType;            // 지불조건
 
     @Column(name = "REQUESTED_SHIPPING", columnDefinition = "varchar(255) COMMENT 'Requested Shipping(w)'")
     private String requestedShipping;           // Requested Shipping(w)
@@ -97,18 +98,21 @@ public class PurchaseOrder extends BaseTimeEntity {
     public void mapping(
             User user,
             WareHouse wareHouse,
-            Currency currency
+            Currency currency,
+            PayType payType
     ) {
         setUser(user);
         setWareHouse(wareHouse);
         setCurrency(currency);
+        setPayType(payType);
     }
 
     public void update(
             PurchaseOrder newPurchaseOrder,
             User newUser,
             WareHouse newWareHouse,
-            Currency newCurrency
+            Currency newCurrency,
+            PayType newPayType
     ) {
         setPurchaseOrderDate(newPurchaseOrder.purchaseOrderDate);
         setUser(newUser);
@@ -119,7 +123,7 @@ public class PurchaseOrder extends BaseTimeEntity {
         setTransportCondition(newPurchaseOrder.transportCondition);
         setAddendum(newPurchaseOrder.addendum);
         setTransportType(newPurchaseOrder.transportType);
-        setPayCondition(newPurchaseOrder.payCondition);
+        setPayType(newPayType);
         setRequestedShipping(newPurchaseOrder.requestedShipping);
         setSpecialNote(newPurchaseOrder.specialNote);
     }

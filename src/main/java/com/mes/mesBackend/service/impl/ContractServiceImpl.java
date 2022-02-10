@@ -14,6 +14,7 @@ import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.ContractItemFileRepository;
 import com.mes.mesBackend.repository.ContractItemRepository;
 import com.mes.mesBackend.repository.ContractRepository;
+import com.mes.mesBackend.repository.PayTypeRepository;
 import com.mes.mesBackend.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class ContractServiceImpl implements ContractService {
     private final S3Uploader s3Uploader;
     private final ContractItemFileRepository contractItemFileRepo;
     private final NumberAutomatic numberAutomatic;
+    private final PayTypeRepository payTypeRepository;
     // ======================================== 수주 ===============================================
     // 수주 생성
     @Override
@@ -46,8 +48,9 @@ public class ContractServiceImpl implements ContractService {
         User user = userService.getUserOrThrow(contractRequest.getUser());
         Currency currency = currencyService.getCurrencyOrThrow(contractRequest.getCurrency());
         WareHouse outPutWareHouse = wareHouseService.getWareHouseOrThrow(contractRequest.getOutputWareHouse());
+        PayType payType = getPayTypeOrThrow(contractRequest.getPayType());
         Contract contract = mapper.toEntity(contractRequest, Contract.class);
-        contract.addJoin(client, user, currency, outPutWareHouse);
+        contract.addJoin(client, user, currency, outPutWareHouse, payType);
         contract.setContractNo(numberAutomatic.createDateTimeNo());
         contractRepo.save(contract);
         return mapper.toResponse(contract, ContractResponse.class);
@@ -74,9 +77,10 @@ public class ContractServiceImpl implements ContractService {
         User newUser = userService.getUserOrThrow(contractRequest.getUser());
         Currency newCurrency = currencyService.getCurrencyOrThrow(contractRequest.getCurrency());
         WareHouse newOutPutWareHouse = wareHouseService.getWareHouseOrThrow(contractRequest.getOutputWareHouse());
+        PayType newPayType = getPayTypeOrThrow(contractRequest.getPayType());
         Contract newContract = mapper.toEntity(contractRequest, Contract.class);
         Contract findContract = getContractOrThrow(contractId);
-        findContract.update(newContract, newClient, newUser, newCurrency, newOutPutWareHouse);
+        findContract.update(newContract, newClient, newUser, newCurrency, newOutPutWareHouse, newPayType);
         contractRepo.save(findContract);
         return mapper.toResponse(findContract, ContractResponse.class);
     }
@@ -195,5 +199,11 @@ public class ContractServiceImpl implements ContractService {
         ContractItemFile contractItemFile = contractItemFileRepo.findByIdAndContractItemAndDeleteYnFalse(contractItemFileId, contractItem);
         contractItemFile.delete();
         contractItemFileRepo.save(contractItemFile);
+    }
+
+    // 결제조건 단일 조회 및 예외
+    private PayType getPayTypeOrThrow(Long id) throws NotFoundException {
+        return payTypeRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("payType does not exist. input id: " + id));
     }
 }
