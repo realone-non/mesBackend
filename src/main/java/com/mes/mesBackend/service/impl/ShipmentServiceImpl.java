@@ -319,9 +319,9 @@ public class ShipmentServiceImpl implements ShipmentService {
         lotMaster.setShipmentAmount(0);                 // 출하수량 -> 0
 
         // lotLog insert
-        Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(PACKAGING);          // 작업공정 division 으로 공정 id 찾음
-        Long workOrderDetailId = lotLogHelper.getWorkOrderDetailByContractItemAndWorkProcess(findShipmentItem.getContractItem().getId(), workProcessId);// 수주품목, 작업공정으로 해당 작업지시 정보 가져옴
-        lotLogHelper.createLotLog(findShipmentLot.getLotMaster().getId(), workOrderDetailId, workProcessId);
+//        Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(PACKAGING);          // 작업공정 division 으로 공정 id 찾음
+//        Long workOrderDetailId = lotLogHelper.getWorkOrderDetailByContractItemAndWorkProcess(findShipmentItem.getContractItem().getId(), workProcessId);// 수주품목, 작업공정으로 해당 작업지시 정보 가져옴
+//        lotLogHelper.createLotLog(findShipmentLot.getLotMaster().getId(), workOrderDetailId, workProcessId);
         // amountHelper insert
         amountHelper.amountUpdate(findShipmentItem.getContractItem().getItem().getId(), lotMaster.getWareHouse().getId(), null, STOCK_AMOUNT, shipmentAmount, false);
 
