@@ -268,14 +268,13 @@ public class ShipmentServiceImpl implements ShipmentService {
         ShipmentLot shipmentLot = new ShipmentLot();
         shipmentLot.create(shipmentItem, lotMaster);
 
+        Long workProcessShipmentId = lotLogHelper.getWorkProcessByDivisionOrThrow(SHIPMENT);
+        WorkProcess workProcess = getWorkProcessOrThrow(workProcessShipmentId);
         // stockAmount  0, stockAmount 만큼 ShipmentAmount 가 바뀜
         int stockAmountLotMaster = lotMaster.getStockAmount();       // lotMaster 재고수량
         lotMaster.setShipmentAmount(stockAmountLotMaster);        // 출하수량 변경(재고수량)
         lotMaster.setStockAmount(0);                                    // 재고수량 0으로 변경
-        Long workProcessShipmentId = lotLogHelper.getWorkProcessByDivisionOrThrow(SHIPMENT);
-        WorkProcess workProcessShipment = workProcessRepository.findByIdAndDeleteYnFalse(workProcessShipmentId)
-                .orElseThrow(() -> new NotFoundException("[ShipmentLot] workProcess does not exist. workProcessId: " + workProcessShipmentId));
-        lotMaster.setWorkProcess(workProcessShipment);
+        lotMaster.setWorkProcess(workProcess);                      // 작업공정을 shipment 로 변경
 
         // lotLog insert
         Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(PACKAGING);
@@ -314,14 +313,14 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         // shipmentLot 삭제
         findShipmentLot.delete();
+
+        Long packagingWorkProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(PACKAGING);
+        WorkProcess packagingWorkProcess = getWorkProcessOrThrow(packagingWorkProcessId);
         // lotMaster 재고수량, 출하수량 변경
         lotMaster.setStockAmount(shipmentAmount);       // 재고수량 -> lotMaster 의 shipmentAmount
         lotMaster.setShipmentAmount(0);                 // 출하수량 -> 0
+        lotMaster.setWorkProcess(packagingWorkProcess); // 작업공정 -> 포장으로 변경
 
-        // lotLog insert
-//        Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(PACKAGING);          // 작업공정 division 으로 공정 id 찾음
-//        Long workOrderDetailId = lotLogHelper.getWorkOrderDetailByContractItemAndWorkProcess(findShipmentItem.getContractItem().getId(), workProcessId);// 수주품목, 작업공정으로 해당 작업지시 정보 가져옴
-//        lotLogHelper.createLotLog(findShipmentLot.getLotMaster().getId(), workOrderDetailId, workProcessId);
         // amountHelper insert
         amountHelper.amountUpdate(findShipmentItem.getContractItem().getItem().getId(), lotMaster.getWareHouse().getId(), null, STOCK_AMOUNT, shipmentAmount, false);
 
@@ -424,6 +423,11 @@ public class ShipmentServiceImpl implements ShipmentService {
         boolean existsLotMasterByShipmentLot = shipmentItemRepo.existsLotMasterByShipmentLot(lotMasterId);
         if (existsLotMasterByShipmentLot)
             throw new BadRequestException("입력한 lotMaster 는 이미 다른 출하에 등록되어 있습니다. ");
+    }
+
+    private WorkProcess getWorkProcessOrThrow(Long id) throws NotFoundException {
+        return workProcessRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("workProcess does not exist. input id: " + id));
     }
 
 // ==================================================== 4-7. 출하 현황 ====================================================
