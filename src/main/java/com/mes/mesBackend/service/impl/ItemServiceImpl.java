@@ -58,11 +58,10 @@ public class ItemServiceImpl implements ItemService {
         LotType lotType = lotTypeService.getLotTypeOrThrow(itemRequest.getLotType());
         Client manufacturer = clientService.getClientOrThrow(itemRequest.getManufacturer());
         TestCriteria testCriteria = itemRequest.getTestCriteria() != null ? testCriteriaService.getTestCriteriaOrThrow(itemRequest.getTestCriteria()) : null;
-        TestProcess testProcess = itemRequest.getTestProcess() != null ? testProcessService.getTestProcessOrThrow(itemRequest.getTestProcess()) : null;
 
         Item item = mapper.toEntity(itemRequest, Item.class);
 
-        item.mapping(itemAccount, itemGroup, itemForm, useType, routing, unit, lotType, manufacturer, testCriteria, testProcess, itemAccountCode);
+        item.mapping(itemAccount, itemGroup, itemForm, useType, routing, unit, lotType, manufacturer, testCriteria, itemAccountCode);
 
         itemRepository.save(item);
         return mapper.toResponse(item, ItemResponse.class);
@@ -136,11 +135,10 @@ public class ItemServiceImpl implements ItemService {
         LotType newLotType = lotTypeService.getLotTypeOrThrow(itemRequest.getLotType());
         Client newManufacturer = clientService.getClientOrThrow(itemRequest.getManufacturer());
         TestCriteria newTestCriteria = itemRequest.getTestCriteria() != null ? testCriteriaService.getTestCriteriaOrThrow(itemRequest.getTestCriteria()) : null;
-        TestProcess newTestProcess = itemRequest.getTestProcess() != null ? testProcessService.getTestProcessOrThrow(itemRequest.getTestProcess()) : null;
 
         Item newItem = mapper.toEntity(itemRequest, Item.class);
 
-        findItem.update(newItem, newItemAccount, newItemGroup, newItemForm, newUseType, newRouting, newUnit, newLotType, newManufacturer, newTestCriteria, newTestProcess, newItemAccountCode);
+        findItem.update(newItem, newItemAccount, newItemGroup, newItemForm, newUseType, newRouting, newUnit, newLotType, newManufacturer, newTestCriteria, newItemAccountCode);
         itemRepository.save(findItem);
         return mapper.toResponse(findItem, ItemResponse.class);
     }

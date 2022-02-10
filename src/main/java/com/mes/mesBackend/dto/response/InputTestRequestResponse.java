@@ -13,8 +13,7 @@ import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
-import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
-import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM;
+import static com.mes.mesBackend.helper.Constants.*;
 
 @Getter
 @Setter
@@ -60,8 +59,8 @@ public class InputTestRequestResponse {
     @Schema(description = "품목형태")
     String itemForm;        // 품목형태
 
-    @Schema(description = "검사방법")
-    String testProcess;
+//    @Schema(description = "검사방법")
+//    String testProcess;
 
     @Schema(description = "검사기준")
     String testCriteria;
@@ -76,7 +75,7 @@ public class InputTestRequestResponse {
     Boolean coc;
 
     @Schema(description = "요청일시")
-    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime requestDate;
 
     @Schema(description = "요청유형")
@@ -92,7 +91,7 @@ public class InputTestRequestResponse {
     TestType testType;
 
     @Schema(description = "검사완료요청일")
-    @JsonFormat(pattern = YYYY_MM_DD, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate testCompletionRequestDate;
 
     @Schema(description = "지시번호")

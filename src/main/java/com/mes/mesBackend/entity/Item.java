@@ -1,6 +1,8 @@
 package com.mes.mesBackend.entity;
 
 import com.mes.mesBackend.entity.enumeration.DevelopStatus;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
+import com.mes.mesBackend.entity.enumeration.TestCategory;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.service.ItemAccountCodeService;
 import com.querydsl.core.annotations.QueryInit;
@@ -11,42 +13,14 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
 
-// 품목등록
-/*
-* 품목등록
-* 검색: 품목그룹(체크박스),품목계정(체크),품번(텍스트),품명(텍스트),검색어(텍스트)
-* 품번 (AA01-AF2-E001DB)
-* 품명 (EMI FILTER)
-* 규격 (AF2-E001DB)
-* 품목계정 (제품,반재료,부재료)     -> ItemAccount
-* 품목그룹 (필터,계측기,기타)       -> ItemGroup
-* 품목형태 (부자재,기구,부품)       -> ItemForm
-* 용도유형 (방산제,계측기)         -> UseType
-* 라우팅 (필터생산,필터개발)        -> Routing
-* 재고단위 (개,그램,봉지)          ->  Unit
-* UPH (1)
-* 유효일수 (365)
-* LOT유형 (파렛트)               -> LotType
-* 수입검사 (자동검사,수동검사)      -> ItemCheckCategory
-* 출하검사 (자동검사,수동검사)       -> ItemCheckCategory
-* 폐기품 LOT관리 (예,아니오)
-* 개발상태 (개발중,개발완료)         -> DevelopStatus
-* 재고관리 (예,아니오)
-* 입고단가 (금액 숫자)
-* 저장위치 (A10,A3-1b)          -> 미구현
-* 거래처 품번 (A-MB2-C010A-2,계측기 EA-2100)            -> Client
-* 제조사품번 (A-MB2-C010A-2,Switch-Power;ALPS SDDF-3 250V 5A)
-* 제조사 (EMCIS,성지전자)
-* 검사기준 (품목확인)           -> TestCriteria
-* 검사방법 (샘플,전수)          -> TestProcess
-* 사용
-* 검색어 (대원기전,'전해 NXL 바인텔레콤 NC2-A013A 1500uF ±20% / 50V,NXL50VB1500M7.5TP18X31.5)
-* 시효성자재 (예,아니오)
-* */
+// 3-2-1. 품목등록
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 @Entity(name = "ITEMS")
 @Data
 @Table(indexes = {
@@ -56,7 +30,7 @@ import static javax.persistence.FetchType.LAZY;
 public class Item extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '품목 고유아이디'")
     private Long id;
 
@@ -111,18 +85,20 @@ public class Item extends BaseTimeEntity {
     @JoinColumn(name = "LOT_TYPES_ID", nullable = false, columnDefinition = "bigint COMMENT 'LOT유형'")
     private LotType lotType;    // LOT유형
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "INPUT_TEST", nullable = false,columnDefinition = "varchar(255) COMMENT '수입검사'")
-    private TestType inputTest = TestType.NO_TEST;      // 수입검사
+    // TODO: 삭제
+//    @Enumerated(STRING)
+//    @Column(name = "INPUT_TEST", nullable = false,columnDefinition = "varchar(255) COMMENT '수입검사'")
+//    private TestType inputTest = TestType.NO_TEST;      // 수입검사
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "OUTPUT_TEST",nullable = false, columnDefinition = "varchar(255) COMMENT '출하검사'")
-    private TestType outputTest = TestType.NO_TEST;     // 출하검사
+    // TODO: 삭제
+//    @Enumerated(STRING)
+//    @Column(name = "OUTPUT_TEST",nullable = false, columnDefinition = "varchar(255) COMMENT '출하검사'")
+//    private TestType outputTest = TestType.NO_TEST;     // 출하검사
 
     @Column(name = "WASTE_PRODUCT_LOT", nullable = false, columnDefinition = "bit(1) COMMENT '폐기품 LOT 관리'")
     private boolean wasteProductLot;        // 폐기품 Lot 관리
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(STRING)
     @Column(name = "DEVELOP_STATUS", nullable = false, columnDefinition = "varchar(255) COMMENT '개발상태'")
     private DevelopStatus developStatus = DevelopStatus.BEFORE;  // 개발상태
 
@@ -151,10 +127,11 @@ public class Item extends BaseTimeEntity {
     @JoinColumn(name = "TEST_CRITERIA", columnDefinition = "bigint COMMENT '검사기준'")
     private TestCriteria testCriteria;      // 검사기준
 
+    // TODO: 삭제
     // 다대일 단방향
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "TEST_PROCESS", columnDefinition = "bigint COMMENT '검사방법'")
-    private TestProcess testProcess;        // 검사방법
+//    @ManyToOne(fetch = LAZY)
+//    @JoinColumn(name = "TEST_PROCESS", columnDefinition = "bigint COMMENT '검사방법'")
+//    private TestProcess testProcess;        // 검사방법
 
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn;                      // 사용
@@ -172,6 +149,18 @@ public class Item extends BaseTimeEntity {
     @JoinColumn(name = "ITEM_ACCOUNT_CODE", columnDefinition = "bigint COMMENT '품목계정코드'")
     private ItemAccountCode itemAccountCode;
 
+    @Enumerated(STRING)
+    @Column(name = "TEST_CATEGORY", columnDefinition = "varchar(255) COMMENT '검사종류'")
+    private TestCategory testCategory;      // 검사종류: ex) 수입검사, 공정검사, 출하검사
+
+    @Enumerated(STRING)
+    @Column(name = "TEST_TYPE", columnDefinition = "varchar(255) COMMENT '검사유형'")
+    private TestType testType;              // 검사유형: ex) 자동검사, 수동검사, 검사없음
+
+    @Enumerated(STRING)
+    @Column(name = "INSPECTION_TYPE", columnDefinition = "varchar(255) COMMENT '검사방법'")
+    private InspectionType inspectionType;  // 검사방법: ex) Sampling, 전수
+
     public void mapping(
             ItemAccount itemAccount,
             ItemGroup itemGroup,
@@ -182,7 +171,6 @@ public class Item extends BaseTimeEntity {
             LotType lotType,
             Client  manufacturer,
             TestCriteria testCriteria,
-            TestProcess testProcess,
             ItemAccountCode itemAccountCode
     ) {
         setItemAccount(itemAccount);
@@ -194,7 +182,6 @@ public class Item extends BaseTimeEntity {
         setLotType(lotType);
         setManufacturer(manufacturer);
         setTestCriteria(testCriteria);
-        setTestProcess(testProcess);
         setItemAccountCode(itemAccountCode);
     }
 
@@ -209,7 +196,6 @@ public class Item extends BaseTimeEntity {
             LotType newLotType,
             Client newClient,
             TestCriteria newTestCriteria,
-            TestProcess newTestProcess,
             ItemAccountCode newItemAccountCode
     ) {
         setItemNo(newItem.itemNo);
@@ -224,8 +210,6 @@ public class Item extends BaseTimeEntity {
         setUhp(newItem.uhp);
         setValidDay(newItem.validDay);
         setLotType(newLotType);
-        setInputTest(newItem.inputTest);
-        setOutputTest(newItem.outputTest);
         setWasteProductLot(newItem.wasteProductLot);
         setDevelopStatus(newItem.developStatus);
         setStockControl(newItem.stockControl);
@@ -235,11 +219,13 @@ public class Item extends BaseTimeEntity {
         setManufacturerPartNo(newItem.manufacturerPartNo);
         setManufacturer(newClient);
         setTestCriteria(newTestCriteria);
-        setTestProcess(newTestProcess);
         setUseYn(newItem.useYn);
         setSearchWord(newItem.searchWord);
         setAgingMaterialYn(newItem.agingMaterialYn);
         setItemAccountCode(newItemAccountCode);
+        setTestCategory(newItem.testCategory);
+        setTestType(newItem.testType);
+        setInspectionType(newItem.inspectionType);
     }
 
     public void delete() {

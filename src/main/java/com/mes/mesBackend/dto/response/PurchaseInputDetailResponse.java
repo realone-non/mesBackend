@@ -34,7 +34,7 @@ public class PurchaseInputDetailResponse {
     double vat;
 
     @Schema(description = "검사의뢰유형")
-    TestType testType;
+    TestType testType;      // item.testType
 
     @Schema(description = "제조일자")
     LocalDate manufactureDate;
@@ -46,7 +46,7 @@ public class PurchaseInputDetailResponse {
     String testCriteria;
 
     @Schema(description = "검사방법")
-    String testProcess;
+    String testProcess;     // item.inspectionType
 
     @Schema(description = "긴급여부")
     boolean urgentYn;
