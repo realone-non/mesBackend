@@ -100,7 +100,7 @@ public class LabelPrintController {
     }
 
     // 출하 정보 목록 조회
-    @GetMapping
+    @GetMapping("/shipments")
     @ResponseBody
     @Operation(summary = "출하정보 목록", description = "검색조건: 검색시작날짜(fromDate) ~ 검색종료날짜(toDate), 거래처 명, 완료여부")
     public ResponseEntity<List<PopShipmentResponse>> getPopShipments(
