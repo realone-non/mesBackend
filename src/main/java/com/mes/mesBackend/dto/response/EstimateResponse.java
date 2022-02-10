@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
+import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 @Getter
 @Setter
@@ -29,10 +31,10 @@ public class EstimateResponse {
     UserResponse.idAndKorName user;
 
     @Schema(description = "견적일자")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate estimateDate;
 
-    @Schema(description = "화폐 id")
+    @Schema(description = "화폐")
     CurrencyResponse currency;
 
     @Schema(description = "납기")
@@ -41,8 +43,8 @@ public class EstimateResponse {
     @Schema(description = "유효기간")
     int validity;
 
-    @Schema(description = "지불조건")
-    String payCondition;
+    @Schema(description = "지불조건(결제조건)")
+    PayTypeResponse payType;
 
     @Schema(description = "부가세")
     String surtax;

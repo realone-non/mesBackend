@@ -44,9 +44,10 @@ public class EstimateRequest {
     @NotNull(message = NOT_NULL)
     int validity;
 
-    @Schema(description = "지불조건")
-    @NotBlank(message = NOT_EMPTY)
-    String payCondition;
+    @Schema(description = "지불조건(결제조건) 고유아이디")
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
+    Long payType;
 
     @Schema(description = "부가세")
     @NotBlank(message = NOT_EMPTY)

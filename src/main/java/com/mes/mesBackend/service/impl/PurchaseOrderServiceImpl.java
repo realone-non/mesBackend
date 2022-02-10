@@ -11,6 +11,7 @@ import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.NumberAutomatic;
 import com.mes.mesBackend.mapper.ModelMapper;
+import com.mes.mesBackend.repository.PayTypeRepository;
 import com.mes.mesBackend.repository.PurchaseInputRepository;
 import com.mes.mesBackend.repository.PurchaseOrderRepository;
 import com.mes.mesBackend.repository.PurchaseRequestRepository;
@@ -37,6 +38,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     private final PurchaseRequestService purchaseRequestService;
     private final PurchaseRequestRepository purchaseRequestRepo;
     private final PurchaseInputRepository purchaseInputRepo;
+    private final PayTypeRepository payTypeRepo;
 
     // 구매발주 생성
     @Override
@@ -44,9 +46,10 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         User user = userService.getUserOrThrow(purchaseOrderRequest.getUser());
         WareHouse wareHouse = wareHouseService.getWareHouseOrThrow(purchaseOrderRequest.getWareHouse());
         Currency currency = currencyService.getCurrencyOrThrow(purchaseOrderRequest.getCurrency());
+        PayType payType = purchaseOrderRequest.getPayType() != null ? getPayTypeOrThrow(purchaseOrderRequest.getPayType()) : null;
 
         PurchaseOrder purchaseOrder = mapper.toEntity(purchaseOrderRequest, PurchaseOrder.class);
-        purchaseOrder.mapping(user, wareHouse, currency);
+        purchaseOrder.mapping(user, wareHouse, currency, payType);
 
         // 발주번호 생성
         String purchaseOrderNo = numberAutomatic.createDateTimeNo();
@@ -127,10 +130,11 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         User newUser = userService.getUserOrThrow(newPurchaseOrderRequest.getUser());
         WareHouse newWareHouse = wareHouseService.getWareHouseOrThrow(newPurchaseOrderRequest.getWareHouse());
         Currency newCurrency = currencyService.getCurrencyOrThrow(newPurchaseOrderRequest.getCurrency());
+        PayType newPayType = newPurchaseOrderRequest.getPayType() != null ? getPayTypeOrThrow(newPurchaseOrderRequest.getPayType()) : null;
 
         PurchaseOrder newPurchaseOrder = mapper.toEntity(newPurchaseOrderRequest, PurchaseOrder.class);
 
-        findPurchaseOrder.update(newPurchaseOrder, newUser, newWareHouse, newCurrency);
+        findPurchaseOrder.update(newPurchaseOrder, newUser, newWareHouse, newCurrency, newPayType);
         purchaseOrderRepo.save(findPurchaseOrder);
 
         return getPurchaseOrderResponseOrThrow(findPurchaseOrder.getId());
@@ -277,6 +281,12 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         return purchaseRequestRepo.findByIdAndPurchaseOrderAndDeleteYnFalse(purchaseRequest.getId(), purchaseOrder)
                 .orElseThrow(() -> new BadRequestException("해당 구매발주에 해당하는 구매발주상세 정보가 없습니다. input purchaseOrderId: " + purchaseOrderId
                         + ", input purchaseRequestId: " + purchaseOrderDetailId));
+    }
+
+    // 결제조건 단일 조회 및 예외
+    private PayType getPayTypeOrThrow(Long id) throws NotFoundException {
+        return payTypeRepo.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("payType does not exist. input id: " + id));
     }
 
     // ================================================================ 9-3. 구매발주현황조회 ================================================================

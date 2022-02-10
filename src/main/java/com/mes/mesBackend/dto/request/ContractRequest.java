@@ -1,6 +1,5 @@
 package com.mes.mesBackend.dto.request;
 
-import com.mes.mesBackend.entity.enumeration.PayType;
 import com.mes.mesBackend.entity.enumeration.ProductionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -71,9 +70,9 @@ public class ContractRequest {
     @NotNull(message = NOT_NULL)
     boolean paymentYn;
 
-    @Schema(description = "지불조건 [현금: CASH]")
+    @Schema(description = "결제조건 id")
     @NotNull(message = NOT_NULL)
-    PayType payCondition;
+    Long payType;
 
     @Schema(description = "Forwader")
     @NotBlank(message = NOT_EMPTY)
