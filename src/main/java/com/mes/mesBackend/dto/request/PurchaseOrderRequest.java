@@ -49,8 +49,9 @@ public class PurchaseOrderRequest {
     @Schema(description = "운송유형")
     String transportType;
 
-    @Schema(description = "지불조건")
-    String payCondition;
+    @Schema(description = "지불조건(결제조건) id")
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    Long payType;
 
     @Schema(description = "Requested Shipping(w)")
     String requestedShipping;

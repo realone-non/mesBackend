@@ -12,6 +12,7 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.EstimateItemDetailRepository;
 import com.mes.mesBackend.repository.EstimateRepository;
+import com.mes.mesBackend.repository.PayTypeRepository;
 import com.mes.mesBackend.repository.PiRepository;
 import com.mes.mesBackend.service.*;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class EstimateServiceImpl implements EstimateService {
     private final ItemService itemService;
     private final PiRepository piRepository;
     private final UserService userService;
+    private final PayTypeRepository payTypeRepo;
 
     // 견적 생성
     @Override
@@ -42,9 +44,10 @@ public class EstimateServiceImpl implements EstimateService {
         Client client = clientService.getClientOrThrow(estimateRequest.getClient());
         Currency currency = currencyService.getCurrencyOrThrow(estimateRequest.getCurrency());
         User user = userService.getUserOrThrow(estimateRequest.getUser());
+        PayType payType = getPayTypeOrThrow(estimateRequest.getPayType());
         Estimate estimate = mapper.toEntity(estimateRequest, Estimate.class);
         String estimateNo = createEstimateNo();
-        estimate.addMapping(client, currency, estimateNo, user);
+        estimate.addMapping(client, currency, estimateNo, user, payType);
         estimateRepository.save(estimate);
         return mapper.toResponse(estimate, EstimateResponse.class);
     }
@@ -89,8 +92,9 @@ public class EstimateServiceImpl implements EstimateService {
         Client newClient = clientService.getClientOrThrow(estimateRequest.getClient());
         Currency newCurrency = currencyService.getCurrencyOrThrow(estimateRequest.getCurrency());
         User newUser = userService.getUserOrThrow(estimateRequest.getUser());
+        PayType newPayType = getPayTypeOrThrow(estimateRequest.getPayType());
         Estimate newEstimate = mapper.toEntity(estimateRequest, Estimate.class);
-        findEstimate.update(newClient, newCurrency, newEstimate, newUser);
+        findEstimate.update(newClient, newCurrency, newEstimate, newUser, newPayType);
         estimateRepository.save(findEstimate);
         return mapper.toResponse(findEstimate, EstimateResponse.class);
     }
@@ -243,5 +247,11 @@ public class EstimateServiceImpl implements EstimateService {
         if (!pis.isEmpty()) {
             throw new BadRequestException("exists by invoiceNo.");
         }
+    }
+
+    // 결제조건 단일 조회 및 예외
+    private PayType getPayTypeOrThrow(Long id) throws NotFoundException {
+        return payTypeRepo.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("payType does not exist. input id: " + id));
     }
 }

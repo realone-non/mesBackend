@@ -27,6 +27,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
     final QUser user = QUser.user;
     final QWareHouse wareHouse = QWareHouse.wareHouse;
     final QCurrency currency = QCurrency.currency1;
+    final QPayType payType = QPayType.payType1;
 
 
     // 구매발주 단일조회
@@ -56,7 +57,8 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                         purchaseOrder.transportCondition.as("transportCondition"),
                                         purchaseOrder.addendum.as("addendum"),
                                         purchaseOrder.transportType.as("transportType"),
-                                        purchaseOrder.payCondition.as("payCondition"),
+                                        payType.id.as("payTypeId"),
+                                        payType.payType.as("payType"),
                                         purchaseOrder.requestedShipping.as("requestedShipping"),
                                         purchaseOrder.specialNote.as("specialNote")
                                 )
@@ -67,6 +69,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                         .leftJoin(user).on(user.id.eq(purchaseOrder.user.id))
                         .leftJoin(wareHouse).on(wareHouse.id.eq(purchaseOrder.wareHouse.id))
                         .leftJoin(currency).on(currency.id.eq(purchaseOrder.currency.id))
+                        .leftJoin(payType).on(payType.id.eq(purchaseOrder.payType.id))
                         .where(
                                 isDeleteYnFalse(),
                                 purchaseOrder.id.eq(id)
@@ -107,7 +110,8 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 purchaseOrder.transportCondition.as("transportCondition"),
                                 purchaseOrder.addendum.as("addendum"),
                                 purchaseOrder.transportType.as("transportType"),
-                                purchaseOrder.payCondition.as("payCondition"),
+                                payType.id.as("payTypeId"),
+                                payType.payType.as("payType"),
                                 purchaseOrder.requestedShipping.as("requestedShipping"),
                                 purchaseOrder.specialNote.as("specialNote")
                         )
@@ -118,6 +122,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                 .leftJoin(user).on(user.id.eq(purchaseOrder.user.id))
                 .leftJoin(wareHouse).on(wareHouse.id.eq(purchaseOrder.wareHouse.id))
                 .leftJoin(currency).on(currency.id.eq(purchaseOrder.currency.id))
+                .leftJoin(payType).on(payType.id.eq(purchaseOrder.payType.id))
                 .where(
                         isCurrencyEq(currencyId),
                         isUserEq(userId),

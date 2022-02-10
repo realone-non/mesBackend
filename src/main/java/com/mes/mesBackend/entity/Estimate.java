@@ -66,8 +66,9 @@ public class Estimate extends BaseTimeEntity {
     @Column(name = "VALIDITY", nullable = false, columnDefinition = "int COMMENT '유효기간'")
     private int validity;               // 유효기간
 
-    @Column(name = "PAY_CONDITION", columnDefinition = "varchar(255) COMMENT '지불조건'", nullable = false)
-    private String payCondition;        // 지불조건
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "PAY_TYPE", columnDefinition = "bigint COMMENT '지불조건'", nullable = false)
+    private PayType payType;        // 지불조건
 
     @Column(name = "SURTAX", columnDefinition = "varchar(255) COMMENT '부가세'", nullable = false)
     private String surtax;              // 부가세
@@ -91,21 +92,22 @@ public class Estimate extends BaseTimeEntity {
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;
 
-    public void addMapping(Client client, Currency currency, String estimateNo, User user) {
+    public void addMapping(Client client, Currency currency, String estimateNo, User user, PayType payType) {
         setClient(client);
         setCurrency(currency);
         // 견적번호 생성
         setEstimateNo(estimateNo);
         setUser(user);
+        setPayType(payType);
     }
 
-    public void update(Client newClient, Currency newCurrency, Estimate newEstimate, User newUser) {
+    public void update(Client newClient, Currency newCurrency, Estimate newEstimate, User newUser, PayType newPayType) {
         setClient(newClient);
         setEstimateDate(newEstimate.estimateDate);
         setCurrency(newCurrency);
         setPeriod(newEstimate.period);
         setValidity(newEstimate.validity);
-        setPayCondition(newEstimate.payCondition);
+        setPayType(newPayType);
         setSurtax(newEstimate.surtax);
         setTransportCondition(newEstimate.transportCondition);
         setForwader(newEstimate.forwader);

@@ -74,8 +74,10 @@ public class PurchaseOrderResponse {
     @Schema(description = "운송유형")
     String transportType;
 
-    @Schema(description = "지불조건")
-    String payCondition;
+    @Schema(description = "지불조건 (결제조건 고유아이디)")
+    Long payTypeId;
+    @Schema(description = "지불조건 (결제조건)")
+    String payType;
 
     @Schema(description = "Requested Shipping(w)")
     String requestedShipping;
