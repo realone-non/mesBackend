@@ -111,7 +111,7 @@ public class LabelPrintController {
     ) {
         List<PopShipmentResponse> responses = popShipmentService.getPopShipments(fromDate, toDate, clientName, completionYn);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info("ShipmentList viewed the list of from getPopShipments.");
+        cLogger.info("ShipmentList viewed the list of from getPopShipments!");
         return new ResponseEntity<>(responses, OK);
     }
 }
