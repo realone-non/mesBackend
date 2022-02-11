@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
 
 @Component
 @Slf4j
@@ -32,9 +33,12 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException, ServletException {
-        // 유효한 자격증명을 제공하지 않고 접근 할때 401
-        String token = request.getHeader(HEADER).substring(7);
         try {
+            if (request.getHeader(HEADER) == null) {
+                throw new CustomJwtException("JWT token is null or empty.");
+            }
+            String token = request.getHeader(HEADER).substring(7);
+            // 유효한 자격증명을 제공하지 않고 접근 할때 401
             jwtTokenProvider.validateToken(token, "accessToken");
         } catch (CustomJwtException e) {
             resolver.resolveException(request, response, null, e);

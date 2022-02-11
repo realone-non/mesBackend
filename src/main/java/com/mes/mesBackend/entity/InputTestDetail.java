@@ -19,7 +19,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Data
 public class InputTestDetail extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "ID", columnDefinition = "bigint COMMENT '수입검사상세 고유아이디'")
+    @Column(name = "ID", columnDefinition = "bigint COMMENT '검사정보 고유아이디'")
     private Long id;
 
     // 검사일시
