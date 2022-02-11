@@ -6,6 +6,7 @@ import com.mes.mesBackend.dto.response.InputTestRequestResponse;
 import com.mes.mesBackend.entity.InputTestRequest;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -41,7 +42,6 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     // 외주수입검사의뢰 생성
     /*
     * lotMaster.checkRequestAmount 검사요청수량 변경
-    * 검사유형: 추후 non 상의
     * 예외: 입고된 갯수만큼만 요청수량을 등록 할 수 있음.
     * */
     @Override
@@ -96,9 +96,9 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
             Long warehouseId,
             Long lotTypeId,
             String itemNoAndName,
-            TestType testType,
+            InspectionType inspectionType,
             Long itemGroupId,
-            TestType requestType,
+            TestType testType,
             LocalDate fromDate,
             LocalDate toDate,
             InputTestDivision inputTestDivision
@@ -107,9 +107,9 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
                     warehouseId,
                     lotTypeId,
                     itemNoAndName,
-                    testType,
+                    inspectionType,
                     itemGroupId,
-                    requestType,
+                    testType,
                     fromDate,
                     toDate,
                     inputTestDivision

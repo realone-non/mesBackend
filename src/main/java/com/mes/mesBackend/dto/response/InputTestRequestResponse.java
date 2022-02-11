@@ -3,6 +3,7 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -62,6 +63,9 @@ public class InputTestRequestResponse {
 //    @Schema(description = "검사방법")
 //    String testProcess;
 
+    @Schema(description = "검사방법")
+    InspectionType inspectionType;  // inputTestRequest.inspectionType
+
     @Schema(description = "검사기준")
     String testCriteria;
 
@@ -79,7 +83,7 @@ public class InputTestRequestResponse {
     LocalDateTime requestDate;
 
     @Schema(description = "요청유형")
-    TestType requestType;
+    TestType testType;   // item.testType
 
     @Schema(description = "요청수량")
     int requestAmount;
@@ -87,8 +91,8 @@ public class InputTestRequestResponse {
     @Schema(description = "검사수량")
     int testAmount;
 
-    @Schema(description = "검사요청")
-    TestType testType;
+//    @Schema(description = "검사요청")
+//    TestType testType;
 
     @Schema(description = "검사완료요청일")
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
@@ -112,7 +116,7 @@ public class InputTestRequestResponse {
         } else if (inputTestDivision.equals(PRODUCT)) {
             setOutsourcingInputNo(null);
             setPurchaseInputNo(null);
-            setTestProcess(null);
+//            setTestProcess(null);
             setTestCriteria(null);
             setCoc(null);
             setTestReportYn(null);

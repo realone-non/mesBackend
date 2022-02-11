@@ -3,6 +3,7 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.InputTestRequestCreateRequest;
 import com.mes.mesBackend.dto.request.InputTestRequestUpdateRequest;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.PART;
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -78,15 +80,15 @@ public class PartInputTestRequestController {
             @RequestParam(required = false) @Parameter(description = "창고 id") Long warehouseId,
             @RequestParam(required = false) @Parameter(description = "LOT 유형 id") Long lotTypeId,
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
-            @RequestParam(required = false) @Parameter(description = "검사유형(변경예정)") TestType testType, // TODO
+            @RequestParam(required = false) @Parameter(description = "검사방법") InspectionType inspectionType,
             @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
-            @RequestParam(required = false) @Parameter(description = "요청유형") TestType requestType,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "의뢰기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "의뢰기간 toDate") LocalDate toDate,
+            @RequestParam(required = false) @Parameter(description = "검사유형") TestType testType,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "의뢰기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "의뢰기간 toDate") LocalDate toDate,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<InputTestRequestResponse> inputTestRequests = inputTestRequestService.getInputTestRequests(
-                warehouseId, lotTypeId, itemNoAndName, testType, itemGroupId, requestType, fromDate, toDate, PART);
+                warehouseId, lotTypeId, itemNoAndName, inspectionType, itemGroupId, testType, fromDate, toDate, PART);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPartInputTestRequests.");
         return new ResponseEntity<>(inputTestRequests, OK);
