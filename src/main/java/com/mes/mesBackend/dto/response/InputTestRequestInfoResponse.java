@@ -15,8 +15,7 @@ import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
-import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
-import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM;
+import static com.mes.mesBackend.helper.Constants.*;
 
 // 14-2. 검사등록
 // 15-2. 검사등록
@@ -29,7 +28,7 @@ public class InputTestRequestInfoResponse {
     Long id;
 
     @Schema(description = "요청일시")
-    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime requestDate;
 
     @JsonIgnore

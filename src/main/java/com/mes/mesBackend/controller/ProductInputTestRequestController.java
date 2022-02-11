@@ -83,7 +83,7 @@ public class ProductInputTestRequestController {
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
             @RequestParam(required = false) @Parameter(description = "검사방법") InspectionType inspectionType,
             @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
-            @RequestParam(required = false) @Parameter(description = "요청유형") TestType testType,
+            @RequestParam(required = false) @Parameter(description = "검사유형") TestType testType,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "의뢰기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "의뢰기간 toDate") LocalDate toDate,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
