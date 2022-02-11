@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 @Component
 @Slf4j
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
@@ -25,7 +27,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Autowired @Qualifier("handlerExceptionResolver")
     HandlerExceptionResolver resolver;
 
-    private static final String HEADER = "Authorization";
+    private static final String HEADER = AUTHORIZATION;
 
     @Override
     public void commence(

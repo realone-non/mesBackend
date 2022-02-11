@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +27,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 // 17-1. 설비점검 실적 등록
 @Tag(name = "equipment-check", description = "17-1. 설비점검 실적 등록 API")
@@ -52,14 +54,14 @@ public class EquipmentCheckController {
     )
     public ResponseEntity<List<EquipmentCheckResponse>> getEquipmentChecks(
             @RequestParam(required = false) @Parameter(description = "설비유형(작업라인 id)") Long workLineId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 toDate") LocalDate toDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업기간 toDate") LocalDate toDate,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<EquipmentCheckResponse> equipmentChecks = equipmentCheckService.getEquipmentChecks(workLineId, fromDate, toDate);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getEquipmentChecks.");
-        return new ResponseEntity<>(equipmentChecks, HttpStatus.OK);
+        return new ResponseEntity<>(equipmentChecks, OK);
     }
     
     // 설비 단일 조회
@@ -79,7 +81,7 @@ public class EquipmentCheckController {
         EquipmentCheckResponse equipmentCheck = equipmentCheckService.getEquipmentCheckResponse(equipmentId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + equipmentCheck.getId() + " from getEquipmentCheck.");
-        return new ResponseEntity<>(equipmentCheck, HttpStatus.OK);
+        return new ResponseEntity<>(equipmentCheck, OK);
     }
 
     // ================================================ 설비점검 실적 상세 정보 ================================================
@@ -96,11 +98,11 @@ public class EquipmentCheckController {
             @PathVariable(value = "equipment-id") @Parameter(description = "설비 id") Long equipmentId,
             @RequestBody @Valid EquipmentCheckDetailRequest equipmentCheckDetailRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws BadRequestException, NotFoundException {
+    ) throws NotFoundException {
         EquipmentCheckDetailResponse equipmentCheckDetail = equipmentCheckService.createEquipmentCheckDetail(equipmentId, equipmentCheckDetailRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + equipmentCheckDetail.getId() + " from createEquipmentCheckDetail.");
-        return new ResponseEntity<>(equipmentCheckDetail, HttpStatus.OK);
+        return new ResponseEntity<>(equipmentCheckDetail, OK);
     }
     
     // 상세정보 전체 조회
@@ -114,7 +116,7 @@ public class EquipmentCheckController {
         List<EquipmentCheckDetailResponse> equipmentCheckDetails = equipmentCheckService.getEquipmentCheckDetails(equipmentId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getEquipmentCheckDetails.");
-        return new ResponseEntity<>(equipmentCheckDetails, HttpStatus.OK);
+        return new ResponseEntity<>(equipmentCheckDetails, OK);
     }
     
     // 상세정보 단일 조회
@@ -135,7 +137,7 @@ public class EquipmentCheckController {
         EquipmentCheckDetailResponse equipmentCheckDetail = equipmentCheckService.getEquipmentCheckDetailResponseOrThrow(equipmentId, equipmentCheckDetailId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + equipmentCheckDetail.getId() + " from getEquipmentCheckDetail.");
-        return new ResponseEntity<>(equipmentCheckDetail, HttpStatus.OK);
+        return new ResponseEntity<>(equipmentCheckDetail, OK);
     }
     
     // 상세정보 수정
@@ -154,11 +156,11 @@ public class EquipmentCheckController {
             @PathVariable(value = "equipment-check-detail-id") @Parameter(description = "설비상세 id") Long equipmentCheckDetailId,
             @RequestBody @Valid EquipmentCheckDetailRequest equipmentCheckDetailRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException, BadRequestException {
+    ) throws NotFoundException {
         EquipmentCheckDetailResponse equipmentCheckDetail = equipmentCheckService.updateEquipmentCheckDetail(equipmentId, equipmentCheckDetailId, equipmentCheckDetailRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + equipmentCheckDetail.getId() + " from updateEquipmentCheckDetail.");
-        return new ResponseEntity<>(equipmentCheckDetail, HttpStatus.OK);
+        return new ResponseEntity<>(equipmentCheckDetail, OK);
     }
     
     // 상제정보 삭제
@@ -171,7 +173,7 @@ public class EquipmentCheckController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteEquipmentCheckDetail(
+    public ResponseEntity deleteEquipmentCheckDetail(
             @PathVariable(value = "equipment-id") @Parameter(description = "설비 id") Long equipmentId,
             @PathVariable(value = "equipment-check-detail-id") @Parameter(description = "설비상세 id") Long equipmentCheckDetailId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
@@ -179,6 +181,6 @@ public class EquipmentCheckController {
         equipmentCheckService.deleteEquipmentCheckDetail(equipmentId, equipmentCheckDetailId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + equipmentCheckDetailId + " from deleteEquipmentCheckDetail.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 }

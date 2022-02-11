@@ -13,18 +13,22 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
+
 // 17-3. 설비 수리내역 조회
 @Tag(name = "equipment-repair-history", description = "17-3. 설비 수리내역 조회 API")
 @RequestMapping("/equipment-repair-histories")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @RequiredArgsConstructor
 public class EquipmentRepairHistoryController {
     private final EquipmentBreakdownService equipmentBreakdownService;
@@ -40,13 +44,13 @@ public class EquipmentRepairHistoryController {
             @RequestParam(required = false) @Parameter(description = "작업장 id") Long workCenterId,
             @RequestParam(required = false) @Parameter(description = "설비유형(작업라인 id)") Long workLineId,
             @RequestParam(required = false) @Parameter(description = "수리항목(수리코드 id)") Long repairCodeId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 toDate") LocalDate toDate,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업기간 toDate") LocalDate toDate,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<EquipmentRepairHistoryResponse> repairHistoryResponses = equipmentBreakdownService.getEquipmentRepairHistories(workCenterId, workLineId, repairCodeId, fromDate, toDate);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getEquipmentRepairHistories.");
-        return new ResponseEntity<>(repairHistoryResponses, HttpStatus.OK);
+        return new ResponseEntity<>(repairHistoryResponses, OK);
     }
 }

@@ -16,29 +16,27 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 @Tag(name = "ware-house", description = "창고 API")
 @RequestMapping(value = "/ware-houses")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class WareHouseController {
-
-    @Autowired
-    WareHouseService wareHouseService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(WareHouseController.class);
+    private final WareHouseService wareHouseService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(WareHouseController.class);
     private CustomLogger cLogger;
-
 
     // 창고 생성
     @PostMapping
@@ -53,12 +51,12 @@ public class WareHouseController {
     )
     public ResponseEntity<WareHouseResponse> createWareHouse(
             @RequestBody @Valid WareHouseRequest wareHouseRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WareHouseResponse wareHouse = wareHouseService.createWareHouse(wareHouseRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + wareHouse.getId() + " from createWareHouse.");
-        return new ResponseEntity<>(wareHouse, HttpStatus.OK);
+        return new ResponseEntity<>(wareHouse, OK);
     }
 
     // 창고 단일 조회
@@ -73,12 +71,12 @@ public class WareHouseController {
     )
     public ResponseEntity<WareHouseResponse> getWareHouse(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WareHouseResponse wareHouse = wareHouseService.getWareHouse(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + wareHouse.getId() + " from getWareHouse.");
-        return new ResponseEntity<>(wareHouse, HttpStatus.OK);
+        return new ResponseEntity<>(wareHouse, OK);
     }
 
     // 창고 리스트 조회
@@ -86,12 +84,12 @@ public class WareHouseController {
     @ResponseBody
     @Operation(summary = "창고 리스트 조회")
     public ResponseEntity<List<WareHouseResponse>> getWareHouses(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<WareHouseResponse> wareHouses = wareHouseService.getWareHouses();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWareHouses.");
-        return new ResponseEntity<>(wareHouses, HttpStatus.OK);
+        return new ResponseEntity<>(wareHouses, OK);
     }
 
     // 창고 수정
@@ -108,12 +106,12 @@ public class WareHouseController {
     public ResponseEntity<WareHouseResponse> updateWareHouse(
             @PathVariable Long id,
             @RequestBody @Valid WareHouseRequest wareHouseRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WareHouseResponse wareHouse = wareHouseService.updateWareHouse(id, wareHouseRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + wareHouse.getId() + " from updateWareHouse.");
-        return new ResponseEntity<>(wareHouse, HttpStatus.OK);
+        return new ResponseEntity<>(wareHouse, OK);
     }
 
     // 창고 삭제
@@ -126,14 +124,14 @@ public class WareHouseController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteWareHouse(
+    public ResponseEntity deleteWareHouse(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         wareHouseService.deleteWareHouse(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteWareHouse.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 창고 페이징 조회
@@ -162,6 +160,6 @@ public class WareHouseController {
 //    public ResponseEntity<Page<WareHouseResponse>> getWareHouses(
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(wareHouseService.getWareHouses(pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(wareHouseService.getWareHouses(pageable), OK);
 //    }
 }

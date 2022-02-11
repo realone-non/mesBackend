@@ -2,7 +2,6 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
-import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
@@ -24,6 +23,7 @@ import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.OUT_SOURCING;
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -49,8 +49,8 @@ public class OutsourcingInputTestPerformanceController {
             summary = "검사실적조회",
             description = "검색조건: 검사기간 fromDate~toDate, 품명|품번, 거래처 id, 입고번호(구매입고 id)")
     public ResponseEntity<List<InputTestPerformanceResponse>> getOutsourcingInputTestPerformances(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "검사기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "검사기간 toDate") LocalDate toDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "검사기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "검사기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
             @RequestParam(required = false) @Parameter(description = "거래처 id") Long clientId,
             @RequestParam(required = false) @Parameter(description = "입고번호 (outsourcingInputId)") Long inputId,

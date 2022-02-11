@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,13 +26,17 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 // 9-6. 구매입고 반품 등록
 @Tag(name = "purchase-input-return", description = "9-6. 구매입고 반품 등록 API")
 @RequestMapping("/purchase-input-returns")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @RequiredArgsConstructor
 public class PurchaseInputReturnController {
     private final PurchaseInputReturnService purchaseInputReturnService;
@@ -54,12 +57,12 @@ public class PurchaseInputReturnController {
     )
     public ResponseEntity<PurchaseInputReturnResponse> createPurchaseInputReturn(
             @RequestBody @Valid PurchaseInputReturnCreateRequest purchaseInputReturnRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         PurchaseInputReturnResponse purchaseInputReturnResponse = purchaseInputReturnService.createPurchaseInputReturn(purchaseInputReturnRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + purchaseInputReturnResponse.getId() + " from createPurchaseInputReturn.");
-        return new ResponseEntity<>(purchaseInputReturnResponse, HttpStatus.OK);
+        return new ResponseEntity<>(purchaseInputReturnResponse, OK);
     }
 
     // 구매입고반품 리스트 검색 조회, 검색조건: 거래처 id, 품명|품목, 반품기간 fromDate~toDate
@@ -69,14 +72,14 @@ public class PurchaseInputReturnController {
     public ResponseEntity<List<PurchaseInputReturnResponse>> getPurchaseInputReturns(
             @RequestParam(required = false) @Parameter(description = "거래처 id") Long clientId,
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoOrItemName,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "반품기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "반품기간 toDate") LocalDate toDate,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "반품기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "반품기간 toDate") LocalDate toDate,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<PurchaseInputReturnResponse> purchaseInputReturnResponses = purchaseInputReturnService.getPurchaseInputReturns(clientId, itemNoOrItemName, fromDate, toDate);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPurchaseInputReturns.");
-        return new ResponseEntity<>(purchaseInputReturnResponses, HttpStatus.OK);
+        return new ResponseEntity<>(purchaseInputReturnResponses, OK);
     }
 
     // 구매입고반품 단일조회
@@ -91,12 +94,12 @@ public class PurchaseInputReturnController {
     )
     public ResponseEntity<PurchaseInputReturnResponse> getPurchaseInputReturn(
             @PathVariable(value = "id") @Parameter(description = "구매입고반품 id") Long purchaseInputReturnId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         PurchaseInputReturnResponse purchaseInputReturnResponse = purchaseInputReturnService.getPurchaseInputReturnResponse(purchaseInputReturnId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + purchaseInputReturnResponse.getId() + " from getPurchaseInputReturn.");
-        return new ResponseEntity<>(purchaseInputReturnResponse, HttpStatus.OK);
+        return new ResponseEntity<>(purchaseInputReturnResponse, OK);
     }
 
     // 구매입고반품 수정
@@ -113,12 +116,12 @@ public class PurchaseInputReturnController {
     public ResponseEntity<PurchaseInputReturnResponse> updatePurchaseInputReturn(
             @PathVariable(value = "id") @Parameter(description = "구매입고반품 id") Long purchaseInputReturnId,
             @RequestBody @Valid PurchaseInputReturnUpdateRequest purchaseInputReturnUpdateRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         PurchaseInputReturnResponse purchaseInputReturnResponse = purchaseInputReturnService.updatePurchaseInputReturn(purchaseInputReturnId, purchaseInputReturnUpdateRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + purchaseInputReturnResponse.getId() + " from updatePurchaseInputReturn.");
-        return new ResponseEntity<>(purchaseInputReturnResponse, HttpStatus.OK);
+        return new ResponseEntity<>(purchaseInputReturnResponse, OK);
     }
 
     // 구매입고반품 삭제
@@ -133,10 +136,10 @@ public class PurchaseInputReturnController {
     )
     public ResponseEntity deletePurchaseInputReturn(
             @PathVariable(value = "id") @Parameter(description = "구매입고반품 id") Long purchaseInputReturnId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         purchaseInputReturnService.deletePurchaseInputReturn(purchaseInputReturnId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + purchaseInputReturnId + " from deletePurchaseInputReturn.");
         return new ResponseEntity(NO_CONTENT);
     }

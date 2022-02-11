@@ -20,16 +20,21 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
+
 // 9-4. 구매현황 조회
 @RequestMapping(value = "/purchase-status-checks")
 @Tag(name = "purchase-status-check", description = "구매현황 조회 API")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @RequiredArgsConstructor
 public class PurchaseStatusCheckController {
     private final PurchaseInputService purchaseInputService;
     private final LogService logService;
-    private Logger logger = LoggerFactory.getLogger(PurchaseStatusCheckController.class);
+    private final Logger logger = LoggerFactory.getLogger(PurchaseStatusCheckController.class);
     private CustomLogger cLogger;
 
     // 구매현황 리스트 조회
@@ -43,13 +48,13 @@ public class PurchaseStatusCheckController {
     public ResponseEntity<List<PurchaseStatusCheckResponse>> getPurchaseStatusChecks(
             @RequestParam(required = false) @Parameter(description = "거래처 id") Long clientId,
             @RequestParam(required = false) @Parameter(description = "품명|품목") String itemNoAndItemName,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "입고기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "입고기간 toDate") LocalDate toDate,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "입고기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "입고기간 toDate") LocalDate toDate,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<PurchaseStatusCheckResponse> purchaseStatusChecks = purchaseInputService.getPurchaseStatusChecks(clientId, itemNoAndItemName, fromDate, toDate);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPurchaseStatusChecks.");
-        return new ResponseEntity<>(purchaseStatusChecks, HttpStatus.OK);
+        return new ResponseEntity<>(purchaseStatusChecks, OK);
     }
 }

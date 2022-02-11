@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +19,7 @@ import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
 
 // 7-1. LOT 마스터 조회
 @RequestMapping(value = "/lot-logs")
@@ -51,6 +51,6 @@ public class LotLogController {
                 lotLogService.getLotLogs(workProcessId, workOrderId, lotMasterId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getLotLogs.");
-        return new ResponseEntity<>(lotLogResponses, HttpStatus.OK);
+        return new ResponseEntity<>(lotLogResponses, OK);
     }
 }

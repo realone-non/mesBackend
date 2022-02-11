@@ -4,7 +4,6 @@ import com.mes.mesBackend.dto.request.InputTestDetailRequest;
 import com.mes.mesBackend.dto.response.InputTestDetailResponse;
 import com.mes.mesBackend.dto.response.InputTestRequestInfoResponse;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
-import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
@@ -146,7 +145,7 @@ public class OutsourcingInputTestEnrollmentController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteOutsourcingInputTestEnrollment(
+    public ResponseEntity deleteOutsourcingInputTestEnrollment(
             @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
             @PathVariable(value = "input-test-detail-id") @Parameter(description = "검사정보 id") Long inputTestDetailId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
@@ -177,7 +176,7 @@ public class OutsourcingInputTestEnrollmentController {
 //        InputTestDetailResponse inputTestDetail = inputTestDetailService.createTestReportFileToInputTestDetail(inputTestRequestId, inputTestDetailId, testReportFile, OUT_SOURCING);
 //        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
 //        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + inputTestDetail.getId() + " from createTestReportFileToOutsourcingInputTestEnrollment.");
-//        return new ResponseEntity<>(inputTestDetail, HttpStatus.OK);
+//        return new ResponseEntity<>(inputTestDetail, OK);
 //    }
 //
 //    // COC 파일 추가
@@ -200,7 +199,7 @@ public class OutsourcingInputTestEnrollmentController {
 //        InputTestDetailResponse inputTestDetail = inputTestDetailService.createCocFileToInputTestDetail(inputTestRequestId, inputTestDetailId, cocFile, OUT_SOURCING);
 //        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
 //        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + inputTestDetail.getId() + " from createCocFileToOutsourcingInputTestEnrollment.");
-//        return new ResponseEntity<>(inputTestDetail, HttpStatus.OK);
+//        return new ResponseEntity<>(inputTestDetail, OK);
 //    }
 //
 //    // 파일 삭제
@@ -213,7 +212,7 @@ public class OutsourcingInputTestEnrollmentController {
 //                    @ApiResponse(responseCode = "404", description = "not found resource")
 //            }
 //    )
-//    public ResponseEntity<Void> deleteTestReportFileToOutsourcingInputTestEnrollment(
+//    public ResponseEntity deleteTestReportFileToOutsourcingInputTestEnrollment(
 //            @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
 //            @PathVariable(value = "input-test-detail-id") @Parameter(description = "검사정보 id") Long inputTestDetailId,
 //            @RequestParam(required = false) @Parameter(description = "검사성적서 파일") boolean testReportDeleteYn,

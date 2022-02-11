@@ -16,29 +16,27 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 @Tag(name = "work-place", description = "사업장 API")
 @RequestMapping(value = "/work-places")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class WorkPlaceController {
-
-    @Autowired
-    WorkPlaceService workPlaceService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(WorkPlaceController.class);
+    private final WorkPlaceService workPlaceService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(WorkPlaceController.class);
     private CustomLogger cLogger;
-
 
     // 사업장 생성
     @PostMapping
@@ -53,12 +51,12 @@ public class WorkPlaceController {
     )
     public ResponseEntity<WorkPlaceResponse> createWorkPlace(
             @RequestBody @Valid WorkPlaceRequest workPlaceRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkPlaceResponse workPlace = workPlaceService.createWorkPlace(workPlaceRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workPlace.getId() + " from createWorkPlace.");
-        return new ResponseEntity<>(workPlace, HttpStatus.OK);
+        return new ResponseEntity<>(workPlace, OK);
     }
 
     // 사업장 단일 조회
@@ -73,12 +71,12 @@ public class WorkPlaceController {
     )
     public ResponseEntity<WorkPlaceResponse> getWorkPlace(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkPlaceResponse workPlace = workPlaceService.getWorkPlace(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + workPlace.getId() + " from getWorkPlace.");
-        return new ResponseEntity<>(workPlace, HttpStatus.OK);
+        return new ResponseEntity<>(workPlace, OK);
     }
 
     // 사업장 전체 조회
@@ -86,12 +84,12 @@ public class WorkPlaceController {
     @ResponseBody
     @Operation(summary = "사업장 전체 조회")
     public ResponseEntity<List<WorkPlaceResponse>> getWorkPlaces(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<WorkPlaceResponse> workPlaces = workPlaceService.getWorkPlaces();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkPlaces.");
-        return new ResponseEntity<>(workPlaces, HttpStatus.OK);
+        return new ResponseEntity<>(workPlaces, OK);
     }
 
     // 사업장 수정
@@ -108,12 +106,12 @@ public class WorkPlaceController {
     public ResponseEntity<WorkPlaceResponse> updateWorkPlace(
             @PathVariable Long id,
             @RequestBody @Valid WorkPlaceRequest workPlaceRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkPlaceResponse workPlace = workPlaceService.updateWorkPlace(id, workPlaceRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + workPlace.getId() + " from updateWorkPlace.");
-        return new ResponseEntity<>(workPlace, HttpStatus.OK);
+        return new ResponseEntity<>(workPlace, OK);
     }
 
     @DeleteMapping("/{id}")
@@ -127,12 +125,12 @@ public class WorkPlaceController {
     )
     public ResponseEntity deleteWorkPlace(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         workPlaceService.deleteWorkPlace(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteWorkPlace.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 사업장 페이징 조회
@@ -161,7 +159,6 @@ public class WorkPlaceController {
 //    public ResponseEntity<Page<WorkPlaceResponse>> getWorkPlaces(
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(workPlaceService.getWorkPlaces(pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(workPlaceService.getWorkPlaces(pageable), OK);
 //    }
-
 }

@@ -7,7 +7,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.helper.S3Uploader;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,11 +16,12 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@Component
-public class S3UploaderImpl implements S3Uploader {
+import static com.mes.mesBackend.helper.Constants.YYYYMMDD_HHMMSS_SSS;
 
-    @Autowired
-    AmazonS3 amazonS3;
+@Component
+@RequiredArgsConstructor
+public class S3UploaderImpl implements S3Uploader {
+    private final AmazonS3 amazonS3;
 
     @Value("${cloud.aws.bucketName}")
     private String bucketName;
@@ -59,7 +60,7 @@ public class S3UploaderImpl implements S3Uploader {
     }
 
     private String datePath() {
-        String dateTimeFormat = "yyyyMMdd_HHmmss_SSS";
+        String dateTimeFormat = YYYYMMDD_HHMMSS_SSS;
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormat));
     }
 }

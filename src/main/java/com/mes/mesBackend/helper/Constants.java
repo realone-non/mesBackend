@@ -15,4 +15,5 @@ public class Constants {
     public static final String PRODUCT_ITEM_ACCOUNT = "완제품";
     public static final String MONGO_TEMPLATE = "mongoTemplate";
     public static final String NOW_YYMMDD = LocalDate.now().format(DateTimeFormatter.ofPattern(YYMMDD));
+    public static final String YYYYMMDD_HHMMSS_SSS = "yyyyMMdd_HHmmss_SSS";
 }

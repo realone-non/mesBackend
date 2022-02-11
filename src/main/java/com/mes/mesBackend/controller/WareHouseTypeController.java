@@ -16,26 +16,26 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 @Tag(name = "ware-house-type", description = "창고유형 API")
 @RequestMapping(value = "/ware-house-types")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class WareHouseTypeController {
-    @Autowired
-    WareHouseTypeService wareHouseTypeService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(WareHouseTypeController.class);
+    private final WareHouseTypeService wareHouseTypeService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(WareHouseTypeController.class);
     private CustomLogger cLogger;
 
     // 창고유형 생성
@@ -51,12 +51,12 @@ public class WareHouseTypeController {
     )
     public ResponseEntity<WareHouseTypeResponse> createWareHouseType(
             @RequestBody @Valid WareHouseTypeRequest wareHouseTypeRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         WareHouseTypeResponse wareHouseType = wareHouseTypeService.createWareHouseType(wareHouseTypeRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + wareHouseType.getId() + " from createWareHouseType.");
-        return new ResponseEntity<>(wareHouseType, HttpStatus.OK);
+        return new ResponseEntity<>(wareHouseType, OK);
     }
 
     // 창고유형 단일 조회
@@ -71,12 +71,12 @@ public class WareHouseTypeController {
     )
     public ResponseEntity<WareHouseTypeResponse> getWareHouseType(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WareHouseTypeResponse wareHouseType = wareHouseTypeService.getWareHouseType(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + wareHouseType.getId() + " from getWareHouseType.");
-        return new ResponseEntity<>(wareHouseType, HttpStatus.OK);
+        return new ResponseEntity<>(wareHouseType, OK);
     }
 
     // 창고유형 전체 조회
@@ -84,12 +84,12 @@ public class WareHouseTypeController {
     @ResponseBody
     @Operation(summary = "창고유형 전체 조회")
     public ResponseEntity<List<WareHouseTypeResponse>> getWareHouseTypes(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<WareHouseTypeResponse> wareHouseTypes = wareHouseTypeService.getWareHouseTypes();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWareHouseTypes.");
-        return new ResponseEntity<>(wareHouseTypes, HttpStatus.OK);
+        return new ResponseEntity<>(wareHouseTypes, OK);
     }
 
     // 창고유형 수정
@@ -106,12 +106,12 @@ public class WareHouseTypeController {
     public ResponseEntity<WareHouseTypeResponse> updateWareHouseType(
             @PathVariable Long id,
             @RequestBody @Valid WareHouseTypeRequest wareHouseTypeRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WareHouseTypeResponse houseType = wareHouseTypeService.updateWareHouseType(id, wareHouseTypeRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + houseType.getId() + " from updateWareHouseType.");
-        return new ResponseEntity<>(houseType, HttpStatus.OK);
+        return new ResponseEntity<>(houseType, OK);
     }
 
     // 창고유형 삭제
@@ -124,14 +124,14 @@ public class WareHouseTypeController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteWareHouseType(
+    public ResponseEntity deleteWareHouseType(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         wareHouseTypeService.deleteWareHouseType(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteWareHouseType.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 창고유형 페이징 조회
@@ -160,6 +160,6 @@ public class WareHouseTypeController {
 //    public ResponseEntity<Page<WareHouseTypeResponse>> getWareHouseTypes(
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(wareHouseTypeService.getWareHouseTypes(pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(wareHouseTypeService.getWareHouseTypes(pageable), OK);
 //    }
 }

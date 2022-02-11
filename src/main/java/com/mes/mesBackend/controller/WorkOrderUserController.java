@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,11 +25,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
+
 // 8-2. 작업자 투입 수정
 @RequestMapping("/work-order-users")
 @Tag(name = "work-order-user", description = "8-2. 작업자 투입 수정 API")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @RequiredArgsConstructor
 public class WorkOrderUserController {
     private final WorkOrderUserService workOrderUserService;
@@ -50,15 +54,15 @@ public class WorkOrderUserController {
             @RequestParam(required = false) @Parameter(description = "제조오더번호") String produceOrderNo,
             @RequestParam(required = false) @Parameter(description = "품목계정 id") Long itemAccountId,
             @RequestParam(required = false) @Parameter(description = "지시상태 [완료: COMPLETION, 진행중: ONGOING, 예정: SCHEDULE, 취소: CANCEL]") OrderState orderState,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "작업기간 toDate") LocalDate toDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "수주번호") String contractNo,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<WorkOrderUserResponse> workOrderUsers = workOrderUserService.getWorkOrderUsers(workLineId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkOrderUsers.");
-        return new ResponseEntity<>(workOrderUsers, HttpStatus.OK);
+        return new ResponseEntity<>(workOrderUsers, OK);
     }
 
     // 작업자 투입 단일 조회
@@ -73,12 +77,12 @@ public class WorkOrderUserController {
     )
     public ResponseEntity<WorkOrderUserResponse> getWorkOrderUser(
             @PathVariable(value = "work-order-id") @Parameter(description = "작업지시 id") Long workOrderId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkOrderUserResponse workOrderUser = workOrderUserService.getWorkOrderUserResponseOrThrow(workOrderId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + workOrderUser.getId() + " from getWorkOrderUser.");
-        return new ResponseEntity<>(workOrderUser, HttpStatus.OK);
+        return new ResponseEntity<>(workOrderUser, OK);
     }
 
     // 작업자 투입 수정
@@ -97,11 +101,11 @@ public class WorkOrderUserController {
             @RequestParam(required = false) @Parameter(description = "작업자 id") Long userId,
             @RequestParam(required = false) @Parameter(description = "시작일시 / yyyy-MM-dd HH:mm") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime startDate,
             @RequestParam(required = false) @Parameter(description = "종료일시 / yyyy-MM-dd HH:mm") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") LocalDateTime endDate,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         WorkOrderUserResponse workOrderUser = workOrderUserService.updateWorkOrderUser(workOrderId, userId, startDate, endDate);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is update the " + workOrderUser.getId() + " from updateWorkOrderUser.");
-        return new ResponseEntity<>(workOrderUser, HttpStatus.OK);
+        return new ResponseEntity<>(workOrderUser, OK);
     }
 }

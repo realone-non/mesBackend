@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.request;
 
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -105,7 +106,7 @@ public class ClientRequest {
     String transitMethod;
 
     @Schema(description = "검사방법")
-    String testMethod;
+    InspectionType inspectionType;
 
     @Schema(description = "검색어")
     String searchWord;

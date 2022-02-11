@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +26,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 // 4-6. 출하반품 등록
 @RequestMapping(value = "/shipment-returns")
@@ -59,7 +61,7 @@ public class ShipmentReturnController {
         ShipmentReturnResponse shipmentReturn = shipmentReturnService.createShipmentReturn(shipmentReturnRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + shipmentReturn.getId() + " from createShipmentReturn.");
-        return new ResponseEntity<>(shipmentReturn, HttpStatus.OK);
+        return new ResponseEntity<>(shipmentReturn, OK);
     }
 
     // 출하반품 리스트 검색 조회, 검색조건: 거래처 id, 품번|품명, 반품기간 fromDate~toDate
@@ -69,14 +71,14 @@ public class ShipmentReturnController {
     public ResponseEntity<List<ShipmentReturnResponse>> getShipmentReturns(
             @RequestParam(required = false) @Parameter(description = "거래처 id") Long clientId,
             @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoAndItemName,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "반품기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "반품기간 toDate") LocalDate toDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "반품기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "반품기간 toDate") LocalDate toDate,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<ShipmentReturnResponse> shipmentReturns = shipmentReturnService.getShipmentReturns(clientId, itemNoAndItemName, fromDate, toDate);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getShipmentReturns.");
-        return new ResponseEntity<>(shipmentReturns, HttpStatus.OK);
+        return new ResponseEntity<>(shipmentReturns, OK);
     }
 
     // 출하반품 수정
@@ -98,7 +100,7 @@ public class ShipmentReturnController {
         ShipmentReturnResponse shipmentReturn = shipmentReturnService.updateShipmentReturn(id, shipmentReturnRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + shipmentReturn.getId() + " from updateShipmentReturn.");
-        return new ResponseEntity<>(shipmentReturn, HttpStatus.OK);
+        return new ResponseEntity<>(shipmentReturn, OK);
     }
 
     // 출하반품 삭제
@@ -111,13 +113,13 @@ public class ShipmentReturnController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteShipmentReturn(
+    public ResponseEntity deleteShipmentReturn(
             @PathVariable @Parameter(description = "출하 반품 id") Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         shipmentReturnService.deleteShipmentReturn(id);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteShipmentReturn.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 }
