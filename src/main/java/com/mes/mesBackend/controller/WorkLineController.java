@@ -16,27 +16,27 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 // 3-3-3. 작업라인 등록
 @Tag(name = "work-line", description = "작업라인 API")
 @RequestMapping("/work-lines")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class WorkLineController {
-    @Autowired
-    WorkLineService workLineService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(WorkLineController.class);
+    private final WorkLineService workLineService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(WorkLineController.class);
     private CustomLogger cLogger;
 
     // 작업라인 생성
@@ -52,12 +52,12 @@ public class WorkLineController {
     )
     public ResponseEntity<WorkLineResponse> createWorkLine(
             @RequestBody @Valid WorkLineRequest workLineRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkLineResponse workLine = workLineService.createWorkLine(workLineRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workLine.getId() + " from createWorkLine.");
-        return new ResponseEntity<>(workLine, HttpStatus.OK);
+        return new ResponseEntity<>(workLine, OK);
     }
 
     // 작업라인 단일 조회
@@ -72,12 +72,12 @@ public class WorkLineController {
     )
     public ResponseEntity<WorkLineResponse> getWorkLine(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkLineResponse workLine = workLineService.getWorkLine(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + workLine.getId() + " from getWorkLine.");
-        return new ResponseEntity<>(workLine, HttpStatus.OK);
+        return new ResponseEntity<>(workLine, OK);
     }
 
     // 작업라인 전체 조회
@@ -85,12 +85,12 @@ public class WorkLineController {
     @ResponseBody()
     @Operation(summary = "작업라인 전체 조회")
     public ResponseEntity<List<WorkLineResponse>> getWorkLines(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<WorkLineResponse> workLines = workLineService.getWorkLines();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkLines.");
-        return new ResponseEntity<>(workLines, HttpStatus.OK);
+        return new ResponseEntity<>(workLines, OK);
     }
 
     // 작업라인 수정
@@ -107,12 +107,12 @@ public class WorkLineController {
     public ResponseEntity<WorkLineResponse> updateWorkLine(
             @PathVariable Long id,
             @RequestBody @Valid WorkLineRequest workLineRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkLineResponse workLine = workLineService.updateWorkLine(id, workLineRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + workLine.getId() + " from updateWorkLine.");
-        return new ResponseEntity<>(workLine, HttpStatus.OK);
+        return new ResponseEntity<>(workLine, OK);
     }
 
     // 작업라인 삭제
@@ -125,14 +125,14 @@ public class WorkLineController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteWorkLine(
+    public ResponseEntity deleteWorkLine(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         workLineService.deleteWorkLine(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteWorkLine.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 작업라인 페이징 조회
@@ -161,6 +161,6 @@ public class WorkLineController {
 //    public ResponseEntity<Page<WorkLineResponse>> getWorkLines(
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(workLineService.getWorkLines(pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(workLineService.getWorkLines(pageable), OK);
 //    }
 }

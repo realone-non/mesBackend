@@ -11,7 +11,7 @@ public class NotFoundException extends Exception {
 
     public NotFoundException(String message) {
         super(message);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.error(message);
     }
 }

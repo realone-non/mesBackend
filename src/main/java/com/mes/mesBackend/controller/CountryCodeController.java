@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -125,7 +124,7 @@ public class CountryCodeController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteCountryCode(
+    public ResponseEntity deleteCountryCode(
             @PathVariable Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {

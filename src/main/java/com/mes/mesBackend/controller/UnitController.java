@@ -17,27 +17,26 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 @Tag(name = "unit", description = "단위 API")
 @RequestMapping(value = "/units")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class UnitController {
-
-    @Autowired
-    UnitService unitService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(UnitController.class);
+    private final UnitService unitService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(UnitController.class);
     private CustomLogger cLogger;
 
     // 단위 생성
@@ -53,12 +52,12 @@ public class UnitController {
     )
     public ResponseEntity<UnitResponse> createUnit(
             @RequestBody @Valid UnitRequest unitRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         UnitResponse unit = unitService.createUnit(unitRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + unit.getId() + " from createUnit.");
-        return new ResponseEntity<>(unit, HttpStatus.OK);
+        return new ResponseEntity<>(unit, OK);
     }
 
     // 단위 단일 조회
@@ -73,12 +72,12 @@ public class UnitController {
     )
     public ResponseEntity<UnitResponse> getUnit(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         UnitResponse unit = unitService.getUnit(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + unit.getId() + " from getUnit.");
-        return new ResponseEntity<>(unit, HttpStatus.OK);
+        return new ResponseEntity<>(unit, OK);
     }
 
     // 단위 전체 조회
@@ -86,12 +85,12 @@ public class UnitController {
     @ResponseBody
     @Operation(summary = "단위 전체 조회")
     public ResponseEntity<List<UnitResponse>> getUnits(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<UnitResponse> units = unitService.getUnits();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getUnits.");
-        return new ResponseEntity<>(units, HttpStatus.OK);
+        return new ResponseEntity<>(units, OK);
     }
 
     // 단위 수정
@@ -108,12 +107,12 @@ public class UnitController {
     public ResponseEntity<UnitResponse> updateUnit(
             @PathVariable(value = "id") Long id,
             @RequestBody @Valid UnitRequest unitRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         UnitResponse unit = unitService.updateUnit(id, unitRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + unit.getId() + " from updateUnit.");
-        return new ResponseEntity<>(unit, HttpStatus.OK);
+        return new ResponseEntity<>(unit, OK);
     }
 
     // 단위 삭제
@@ -126,14 +125,14 @@ public class UnitController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteUnit(
+    public ResponseEntity deleteUnit(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         unitService.deleteUnit(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteUnit.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 단위 페이징 조회
@@ -162,6 +161,6 @@ public class UnitController {
 //    public ResponseEntity<Page<UnitResponse>> getUnits(
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(unitService.getUnits(pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(unitService.getUnits(pageable), OK);
 //    }
 }

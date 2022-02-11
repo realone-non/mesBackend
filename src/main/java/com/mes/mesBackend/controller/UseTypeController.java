@@ -24,19 +24,21 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 // 용도유형
 @Tag(name = "use-type", description = "용도유형 API")
 @RequestMapping(value = "/use-types")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class UseTypeController {
-    @Autowired
-    UseTypeService useTypeService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(UseTypeController.class);
+    private final UseTypeService useTypeService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(UseTypeController.class);
     private CustomLogger cLogger;
 
 
@@ -53,12 +55,12 @@ public class UseTypeController {
     )
     public ResponseEntity<UseTypeResponse> createUseType(
             @RequestBody @Valid UseTypeRequest useTypeRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         UseTypeResponse useType = useTypeService.createUseType(useTypeRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + useType.getId() + " from createUseType.");
-        return new ResponseEntity<>(useType, HttpStatus.OK);
+        return new ResponseEntity<>(useType, OK);
     }
 
     // 용도유형 단일 조회
@@ -73,12 +75,12 @@ public class UseTypeController {
     )
     public ResponseEntity<UseTypeResponse> getUseType(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         UseTypeResponse useType = useTypeService.getUseType(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + useType.getId() + " from getUseType.");
-        return new ResponseEntity<>(useType, HttpStatus.OK);
+        return new ResponseEntity<>(useType, OK);
     }
 
     // 용도유형 리스트 조회
@@ -86,12 +88,12 @@ public class UseTypeController {
     @ResponseBody
     @Operation(summary = "용도유형 리스트 조회")
     public ResponseEntity<List<UseTypeResponse>> getUseTypes(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<UseTypeResponse> useTypes = useTypeService.getUseTypes();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getUseTypes.");
-        return new ResponseEntity<>(useTypes, HttpStatus.OK);
+        return new ResponseEntity<>(useTypes, OK);
     }
 
     // 용도유형 수정
@@ -108,12 +110,12 @@ public class UseTypeController {
     public ResponseEntity<UseTypeResponse> updateUseType(
             @PathVariable Long id,
             @RequestBody @Valid UseTypeRequest useTypeRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         UseTypeResponse useType = useTypeService.updateUseType(id, useTypeRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + useType.getId() + " from updateUseType.");
-        return new ResponseEntity<>(useType, HttpStatus.OK);
+        return new ResponseEntity<>(useType, OK);
     }
 
     // 용도유형 삭제
@@ -128,11 +130,11 @@ public class UseTypeController {
     )
     public ResponseEntity deleteUseType(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         useTypeService.deleteUseType(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteUseType.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 }

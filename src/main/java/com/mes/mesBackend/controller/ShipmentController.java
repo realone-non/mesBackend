@@ -31,7 +31,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 // 4-5. 출하 등록
 @RequestMapping(value = "/shipments")
@@ -63,7 +66,7 @@ public class ShipmentController {
         ShipmentResponse shipment = shipmentService.createShipment(shipmentCreateRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + shipment.getId() + " from createShipment.");
-        return new ResponseEntity<>(shipment, HttpStatus.OK);
+        return new ResponseEntity<>(shipment, OK);
     }
     // 출하 단일 조회
     @GetMapping("/{shipment-id}")
@@ -82,7 +85,7 @@ public class ShipmentController {
         ShipmentResponse shipment = shipmentService.getShipmentResponse(shipmentId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + shipment.getId() + " from getShipment.");
-        return new ResponseEntity<>(shipment, HttpStatus.OK);
+        return new ResponseEntity<>(shipment, OK);
     }
 
     // 출하 리스트 조회 검색조건 : 거래처 명, 출하기간, 화폐 id, 담당자 명
@@ -91,8 +94,8 @@ public class ShipmentController {
     @Operation(summary = "출하 리스트 조회", description = "검색조건 : 거래처 명, 출하기간, 화폐 id, 담당자 명")
     public ResponseEntity<List<ShipmentResponse>> getShipments(
             @RequestParam(required = false) @Parameter(description = "거래처 id") Long clientId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "출하기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "출하기간 toDate") LocalDate toDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "출하기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "출하기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "화폐 id") Long currencyId,
             @RequestParam(required = false) @Parameter(description = "담당자 id") Long userId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
@@ -100,7 +103,7 @@ public class ShipmentController {
         List<ShipmentResponse> shipments = shipmentService.getShipments(clientId, fromDate, toDate, currencyId, userId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getShipments.");
-        return new ResponseEntity<>(shipments, HttpStatus.OK);
+        return new ResponseEntity<>(shipments, OK);
     }
     // 출하 수정
     @PatchMapping("/{shipment-id}")
@@ -126,7 +129,7 @@ public class ShipmentController {
         ShipmentResponse shipment = shipmentService.updateShipment(shipmentId, shipmentUpdateRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + shipment.getId() + " from updateShipment.");
-        return new ResponseEntity<>(shipment, HttpStatus.OK);
+        return new ResponseEntity<>(shipment, OK);
     }
     // 출하 삭제
     @DeleteMapping("/{shipment-id}")
@@ -143,14 +146,14 @@ public class ShipmentController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteShipment(
+    public ResponseEntity deleteShipment(
             @PathVariable(value = "shipment-id") @Parameter(description = "출하 id") Long shipmentId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         shipmentService.deleteShipment(shipmentId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + shipmentId + " from deleteShipment.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // =================================================== 출하 품목 ====================================================
@@ -172,7 +175,7 @@ public class ShipmentController {
         List<ShipmentItemResponse> shipmentItem = shipmentService.getPossibleShipmentItem(shipmentId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of shipmentId: " + shipmentId + " from getShipmentItem.");
-        return new ResponseEntity<>(shipmentItem, HttpStatus.OK);
+        return new ResponseEntity<>(shipmentItem, OK);
     }
 
     // 출하 품목정보 생성
@@ -200,7 +203,7 @@ public class ShipmentController {
         ShipmentItemResponse shipmentItem = shipmentService.createShipmentItem(shipmentId, contractItemId, note);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + shipmentItem + " from createShipmentItem.");
-        return new ResponseEntity<>(shipmentItem, HttpStatus.OK);
+        return new ResponseEntity<>(shipmentItem, OK);
     }
     // 출하 품목정보 단일 조회
     @GetMapping("/{shipment-id}/shipment-items/{shipment-item-id}")
@@ -220,7 +223,7 @@ public class ShipmentController {
         ShipmentItemResponse shipmentItem = shipmentService.getShipmentItemResponse(shipmentId, shipmentItemId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + shipmentItem + " from getShipmentItem.");
-        return new ResponseEntity<>(shipmentItem, HttpStatus.OK);
+        return new ResponseEntity<>(shipmentItem, OK);
     }
 
 
@@ -242,7 +245,7 @@ public class ShipmentController {
         List<ShipmentItemResponse> shipmentItem = shipmentService.getShipmentItem(shipmentId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of shipmentId: " + shipmentId + " from getShipmentItem.");
-        return new ResponseEntity<>(shipmentItem, HttpStatus.OK);
+        return new ResponseEntity<>(shipmentItem, OK);
     }
 
     // 출하 품목정보 수정
@@ -272,7 +275,7 @@ public class ShipmentController {
         ShipmentItemResponse shipmentItem = shipmentService.updateShipmentItem(shipmentId, shipmentItemId, contractItemId, note);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + shipmentItem + " from updateShipmentItem.");
-        return new ResponseEntity<>(shipmentItem, HttpStatus.OK);
+        return new ResponseEntity<>(shipmentItem, OK);
     }
 
     // 출하 품목정보 삭제
@@ -290,7 +293,7 @@ public class ShipmentController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteShipmentItem(
+    public ResponseEntity deleteShipmentItem(
             @PathVariable(value = "shipment-id") @Parameter(description = "출하 id") Long shipmentId,
             @PathVariable(value = "shipment-item-id") @Parameter(description = "출하 품목 id") Long shipmentItemId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
@@ -298,7 +301,7 @@ public class ShipmentController {
         shipmentService.deleteShipmentItem(shipmentId, shipmentItemId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + shipmentId + " from deleteShipmentItem.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
 
@@ -326,7 +329,7 @@ public class ShipmentController {
         ShipmentLotInfoResponse shipmentLot = shipmentService.createShipmentLot(shipmentId, shipmentItemId, lotMasterId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + shipmentLot + " from createShipmentLot.");
-        return new ResponseEntity<>(shipmentLot, HttpStatus.OK);
+        return new ResponseEntity<>(shipmentLot, OK);
     }
 
     // LOT 정보 전체 조회
@@ -347,7 +350,7 @@ public class ShipmentController {
         List<ShipmentLotInfoResponse> shipmentLots = shipmentService.getShipmentLots(shipmentId, shipmentItemId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of shipmentId: " + shipmentItemId + " from getShipmentLots.");
-        return new ResponseEntity<>(shipmentLots, HttpStatus.OK);
+        return new ResponseEntity<>(shipmentLots, OK);
     }
 
     // 출하 LOT 정보 삭제
@@ -363,7 +366,7 @@ public class ShipmentController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteShipmentLot(
+    public ResponseEntity deleteShipmentLot(
             @PathVariable(value = "shipment-id") @Parameter(description = "출하 id") Long shipmentId,
             @PathVariable(value = "shipment-item-id") @Parameter(description = "출하 품목 id") Long shipmentItemId,
             @PathVariable(value = "shipment-lot-id") @Parameter(description = "출하 lot 정보 id") Long shipmentLotId,
@@ -372,7 +375,7 @@ public class ShipmentController {
         shipmentService.deleteShipmentLot(shipmentId, shipmentItemId, shipmentLotId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + shipmentLotId + " from deleteShipmentLot.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 출하 LOT 정보 생성 시 LOT 정보 조회 API
@@ -397,7 +400,7 @@ public class ShipmentController {
         List<LotMasterResponse.idAndLotNo> lotMasters = shipmentService.getShipmentLotMasters(contractItemId, notShippedAmount);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getShipmentLotMasters.");
-        return new ResponseEntity<>(lotMasters, HttpStatus.OK);
+        return new ResponseEntity<>(lotMasters, OK);
     }
 
     // ==================================================== Invoice ====================================================

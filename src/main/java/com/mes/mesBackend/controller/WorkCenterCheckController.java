@@ -18,28 +18,27 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 // 3-3-4. 작업장별 점검 항목 등록
 @Tag(name = "work-center-check", description = "작업장별 점검 항목 API")
 @RequestMapping("/work-center-checks")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class WorkCenterCheckController {
-
-    @Autowired
-    WorkCenterCheckService workCenterCheckService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(WorkCenterCheckController.class);
+    private final WorkCenterCheckService workCenterCheckService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(WorkCenterCheckController.class);
     private CustomLogger cLogger;
 
     // 작업장별 점검유형 생성
@@ -56,12 +55,12 @@ public class WorkCenterCheckController {
     public ResponseEntity<WorkCenterCheckResponse> createWorkCenterCheck(
             @RequestParam Long workCenterId,
             @RequestParam Long checkTypeId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkCenterCheckResponse workCenterCheck = workCenterCheckService.createWorkCenterCheck(workCenterId, checkTypeId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workCenterCheck.getId() + " from createWorkCenterCheck.");
-        return new ResponseEntity<>(workCenterCheck, HttpStatus.OK);
+        return new ResponseEntity<>(workCenterCheck, OK);
     }
 
     // 작업장별 점검유형 단일 조회
@@ -76,12 +75,12 @@ public class WorkCenterCheckController {
     )
     public ResponseEntity<WorkCenterCheckResponse> getWorkCenterCheck(
             @PathVariable(value = "work-center-check-id") Long workCenterCheckId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkCenterCheckResponse workCenterCheck = workCenterCheckService.getWorkCenterCheck(workCenterCheckId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + workCenterCheck.getId() + " from getWorkCenterCheck.");
-        return new ResponseEntity<>(workCenterCheck, HttpStatus.OK);
+        return new ResponseEntity<>(workCenterCheck, OK);
     }
 
     // 작업장별 점검유형 전체 조회/ 검색: 작업장, 점검유형
@@ -91,13 +90,13 @@ public class WorkCenterCheckController {
     public ResponseEntity<List<WorkCenterCheckResponse>> getWorkCenterChecks(
             @RequestParam(required = false) @Parameter(description = "작업장 id") Long workCenterId,
             @RequestParam(required = false) @Parameter(description = "점검유형 id") Long checkTypeId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<WorkCenterCheckResponse> workCenterChecks = workCenterCheckService.getWorkCenterChecks(workCenterId, checkTypeId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of workCenterId: " + workCenterId
                 + ", checkTypeId: " + checkTypeId + " from getWorkCenterChecks.");
-        return new ResponseEntity<>(workCenterChecks, HttpStatus.OK);
+        return new ResponseEntity<>(workCenterChecks, OK);
     }
 
     // 작업장별 점검유형 수정
@@ -117,12 +116,12 @@ public class WorkCenterCheckController {
             @PathVariable(value = "work-center-check-id") Long workCenterCheckId,
             @RequestParam Long workCenterId,
             @RequestParam Long checkTypeId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkCenterCheckResponse workCenterCheck = workCenterCheckService.updateWorkCenterCheck(workCenterCheckId, workCenterId, checkTypeId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + workCenterCheck.getId() + " from updateWorkCenterCheck.");
-        return new ResponseEntity<>(workCenterCheck, HttpStatus.OK);
+        return new ResponseEntity<>(workCenterCheck, OK);
     }
 
     // 작업장별 점검유형 삭제
@@ -137,12 +136,12 @@ public class WorkCenterCheckController {
     )
     public ResponseEntity deleteWorkCenterCheck(
             @PathVariable(value = "work-center-check-id") Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         workCenterCheckService.deleteWorkCenterCheck(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteWorkCenterCheck.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 작업장별 점검유형 세부 생성
@@ -159,13 +158,13 @@ public class WorkCenterCheckController {
     public ResponseEntity<WorkCenterCheckDetailResponse> createWorkCenterCheckDetail(
             @PathVariable(value = "work-center-check-id") Long workCenterCheckId,
             @RequestBody @Valid WorkCenterCheckDetailRequest workCenterCheckDetailRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         WorkCenterCheckDetailResponse workCenterCheckDetail = workCenterCheckService.createWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workCenterCheckDetail.getId()
                 + " from createWorkCenterCheckDetail.");
-        return new ResponseEntity<>(workCenterCheckDetail, HttpStatus.OK);
+        return new ResponseEntity<>(workCenterCheckDetail, OK);
     }
 
 //    // 작업장별 점검유형 세부 단일 조회 api
@@ -176,7 +175,7 @@ public class WorkCenterCheckController {
 //            @PathVariable(value = "work-center-check-id") Long workCenterCheckId,
 //            @PathVariable(value = "work-center-check-detail-id") Long workCenterCheckDetailId
 //    ) throws NotFoundException {
-//        return new ResponseEntity<>(workCenterCheckService.getWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailId), HttpStatus.OK);
+//        return new ResponseEntity<>(workCenterCheckService.getWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailId), OK);
 //    }
 
     // 작업장별 점검유형 세부 리스트 조회
@@ -191,13 +190,13 @@ public class WorkCenterCheckController {
     )
     public ResponseEntity<List<WorkCenterCheckDetailResponse>> getWorkCenterCheckDetails(
             @PathVariable(value = "work-center-check-id") Long workCenterCheckId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<WorkCenterCheckDetailResponse> workCenterCheckDetails = workCenterCheckService.getWorkCenterCheckDetails(workCenterCheckId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of workCenterCheckId: " +
                 workCenterCheckId + " from getWorkCenterCheckDetails.");
-        return new ResponseEntity<>(workCenterCheckDetails, HttpStatus.OK);
+        return new ResponseEntity<>(workCenterCheckDetails, OK);
     }
 
     // 작업장별 점검유형 세부 수정
@@ -215,12 +214,12 @@ public class WorkCenterCheckController {
             @PathVariable(value = "work-center-check-id") Long workCenterCheckId,
             @PathVariable(value = "work-center-check-detail-id") Long workCenterCheckDetailId,
             @RequestBody @Valid WorkCenterCheckDetailRequest workCenterCheckDetailRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkCenterCheckDetailResponse workCenterCheckDetail = workCenterCheckService.updateWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailId, workCenterCheckDetailRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + workCenterCheckDetail.getId() + " from updateWorkCenterCheckDetail.");
-        return new ResponseEntity<>(workCenterCheckDetail, HttpStatus.OK);
+        return new ResponseEntity<>(workCenterCheckDetail, OK);
     }
 
     // 작업장별 점검유형 세부 삭제
@@ -236,12 +235,12 @@ public class WorkCenterCheckController {
     public ResponseEntity deleteWorkCenterCheckDetail(
             @PathVariable(value = "work-center-check-id") Long workCenterCheckId,
             @PathVariable(value = "work-center-check-detail-id") Long workCenterCheckDetailId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         workCenterCheckService.deleteWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + workCenterCheckDetailId + " from deleteWorkCenterCheckDetail.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 작업장별 점검유형 페이징 조회/ 검색: 작업장, 점검유형
@@ -272,6 +271,6 @@ public class WorkCenterCheckController {
 //            @RequestParam(required = false) @Parameter(description = "점검유형 id") Long checkTypeId,
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) throws NotFoundException {
-//        return new ResponseEntity<>(workCenterCheckService.getWorkCenterChecks(workCenterId, checkTypeId, pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(workCenterCheckService.getWorkCenterChecks(workCenterId, checkTypeId, pageable), OK);
 //    }
 }

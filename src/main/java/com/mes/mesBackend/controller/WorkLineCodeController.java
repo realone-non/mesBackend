@@ -14,28 +14,30 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 // 3-3-3. 작업라인 코드 등록
 @Tag(name = "work-line-code", description = "작업라인 코드 API")
 @RequestMapping("/work-line-codes")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
+@RequiredArgsConstructor
 public class WorkLineCodeController {
-    @Autowired
-    WorkLineService workLineCodeService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(WorkLineCodeController.class);
+    private final WorkLineService workLineCodeService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(WorkLineCodeController.class);
     private CustomLogger cLogger;
 
     // 라인코드 생성
@@ -50,12 +52,12 @@ public class WorkLineCodeController {
     )
     public ResponseEntity<CodeResponse> createWorkLineCode(
             @RequestBody @Valid CodeRequest codeRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         CodeResponse workLineCode = workLineCodeService.createWorkLineCode(codeRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workLineCode.getId() + " from createWorkLineCode.");
-        return new ResponseEntity<>(workLineCode, HttpStatus.OK);
+        return new ResponseEntity<>(workLineCode, OK);
     }
 
     // 라인코드 단일 조회
@@ -70,12 +72,12 @@ public class WorkLineCodeController {
     )
     public ResponseEntity<CodeResponse> getWorkLineCode(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         CodeResponse workLineCode = workLineCodeService.getWorkLineCode(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + workLineCode.getId() + " from getWorkLineCode.");
-        return new ResponseEntity<>(workLineCode, HttpStatus.OK);
+        return new ResponseEntity<>(workLineCode, OK);
     }
 
     // 라인코드 리스트 조회
@@ -83,12 +85,12 @@ public class WorkLineCodeController {
     @ResponseBody()
     @Operation(summary = "라인코드 리스트 조회")
     public ResponseEntity<List<CodeResponse>> getWorkLineCodes(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<CodeResponse> workLineCodes = workLineCodeService.getWorkLineCodes();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkLineCodes.");
-        return new ResponseEntity<>(workLineCodes, HttpStatus.OK);
+        return new ResponseEntity<>(workLineCodes, OK);
     }
 
     // 라인코드 삭제
@@ -104,12 +106,12 @@ public class WorkLineCodeController {
     )
     public ResponseEntity deleteWorkLineCode(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         workLineCodeService.deleteWorkLineCode(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteWorkLineCode.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
     
 }

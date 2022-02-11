@@ -126,7 +126,7 @@ public class ClientTypeController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteClientType(
+    public ResponseEntity deleteClientType(
             @PathVariable Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {

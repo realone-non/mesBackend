@@ -72,7 +72,7 @@ public class PopPurchaseInputController {
     // 구매요청에 대한 구매입고(request: 수량) POST
     @Operation(summary = "(pop) 구매입고", description = "구매입고")
     @PostMapping("/{id}/input-infos")
-    public ResponseEntity<Void> createPurchaseInput(
+    public ResponseEntity createPurchaseInput(
             @PathVariable(value = "id") @Parameter(description = "구매요청 id") Long purchaseRequestId,
             @RequestParam @Parameter (description = "입고수량") int inputAmount,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader

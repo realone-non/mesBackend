@@ -25,7 +25,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Autowired @Qualifier("handlerExceptionResolver")
     HandlerExceptionResolver resolver;
 
-    private static final String HEADER = "Authorization";
+    private static final String HEADER = AUTHORIZATION;
 
     @Override
     public void commence(

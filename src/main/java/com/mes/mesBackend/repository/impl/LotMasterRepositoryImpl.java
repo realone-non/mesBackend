@@ -150,9 +150,9 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         )
                 )
                 .from(lotMaster)
-                .innerJoin(item).on(item.id.eq(lotMaster.item.id))
-                .innerJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
-                .innerJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
+                .leftJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
                 .leftJoin(itemGroup).on(itemGroup.id.eq(item.itemGroup.id))
                 .where(
                         isItemGroupEq(itemGroupId),

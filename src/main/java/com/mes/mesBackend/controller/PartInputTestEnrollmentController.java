@@ -166,7 +166,7 @@ public class PartInputTestEnrollmentController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteInputTestDetail(
+    public ResponseEntity deleteInputTestDetail(
             @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
             @PathVariable(value = "input-test-detail-id") @Parameter(description = "검사정보 id") Long inputTestDetailId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
@@ -233,7 +233,7 @@ public class PartInputTestEnrollmentController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteTestReportFileToInputTestDetail(
+    public ResponseEntity deleteTestReportFileToInputTestDetail(
             @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
             @PathVariable(value = "input-test-detail-id") @Parameter(description = "검사정보 id") Long inputTestDetailId,
             @RequestParam(required = false) @Parameter(description = "검사성적서 파일") boolean testReportDeleteYn,

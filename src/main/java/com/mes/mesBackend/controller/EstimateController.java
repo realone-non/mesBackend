@@ -18,11 +18,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,17 +29,21 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 
-@Tag(name = "estimate", description = "견적 API")
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
+@Tag(name = "estimate", description = "4-1. 견적 등록 API")
 @RequestMapping("/estimates")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
+@RequiredArgsConstructor
 public class EstimateController {
-    @Autowired
-    EstimateService estimateService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(EstimateController.class);
+    private final EstimateService estimateService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(EstimateController.class);
     private CustomLogger cLogger;
 
     // 견적 생성
@@ -56,12 +59,12 @@ public class EstimateController {
     )
     public ResponseEntity<EstimateResponse> createEstimate(
             @RequestBody @Valid EstimateRequest estimateRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         EstimateResponse estimate = estimateService.createEstimate(estimateRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the " + estimate.getId() + " from createEstimate.");
-        return new ResponseEntity<>(estimate, HttpStatus.OK);
+        return new ResponseEntity<>(estimate, OK);
     }
 
     // 견적 단일 조회
@@ -76,12 +79,12 @@ public class EstimateController {
     )
     public ResponseEntity<EstimateResponse> getEstimate(
             @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         EstimateResponse estimate = estimateService.getEstimate(estimateId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + estimate.getId() + " from getEstimate.");
-        return new ResponseEntity<>(estimate, HttpStatus.OK);
+        return new ResponseEntity<>(estimate, OK);
     }
 
     // 견적 전체 조회 검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 거래처 담당자
@@ -90,16 +93,16 @@ public class EstimateController {
     @ResponseBody
     public ResponseEntity<List<EstimateResponse>> getEstimates(
             @RequestParam(required = false) @Parameter(description = "거래처") String clientName,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "견적기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "견적기간 toDate") LocalDate toDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "견적기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "견적기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "화폐 id") Long currencyId,
             @RequestParam(required = false) @Parameter(description = "거래처 담당자 명") String chargeName,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<EstimateResponse> estimates = estimateService.getEstimates(clientName, fromDate, toDate, currencyId, chargeName);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of currencyId: " + currencyId + " from getEstimates.");
-        return new ResponseEntity<>(estimates, HttpStatus.OK);
+        return new ResponseEntity<>(estimates, OK);
     }
 
     // 견적 수정
@@ -116,12 +119,12 @@ public class EstimateController {
     public ResponseEntity<EstimateResponse> updateEstimate(
             @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
             @RequestBody @Valid EstimateRequest estimateRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         EstimateResponse estimate = estimateService.updateEstimate(estimateId, estimateRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + estimate.getId() + " from updateEstimate.");
-        return new ResponseEntity<>(estimate, HttpStatus.OK);
+        return new ResponseEntity<>(estimate, OK);
     }
 
     // 견적 삭제
@@ -136,12 +139,12 @@ public class EstimateController {
     )
     public ResponseEntity deleteEstimate(
             @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         estimateService.deleteEstimate(estimateId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + estimateId + " from deleteEstimate.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 견적 페이징 조회 검색조건: 거래처, 견적기간(startDate~endDate), 화폐, 담당자
@@ -169,13 +172,13 @@ public class EstimateController {
 //    )
 //    public ResponseEntity<Page<EstimateResponse>> getEstimates(
 //            @RequestParam(required = false) @Parameter(description = "거래처") String clientName,
-//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "견적기간 fromDate") LocalDate fromDate,
-//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "견적기간 toDate") LocalDate toDate,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "견적기간 fromDate") LocalDate fromDate,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "견적기간 toDate") LocalDate toDate,
 //            @RequestParam(required = false) @Parameter(description = "화폐 id") Long currencyId,
 //            @RequestParam(required = false) @Parameter(description = "담당자 명") String chargeName,
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(estimateService.getEstimates(clientName, fromDate, toDate, currencyId, chargeName, pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(estimateService.getEstimates(clientName, fromDate, toDate, currencyId, chargeName, pageable), OK);
 //    }
 
     // ===================================== 견적 품목 정보 ======================================
@@ -193,12 +196,12 @@ public class EstimateController {
     public ResponseEntity<EstimateItemResponse> createEstimateItem(
             @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
             @RequestBody @Valid EstimateItemRequest estimateItemRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         EstimateItemResponse estimateItem = estimateService.createEstimateItem(estimateId, estimateItemRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + estimateItem.getId() + " from createEstimateItem.");
-        return new ResponseEntity<>(estimateItem, HttpStatus.OK);
+        return new ResponseEntity<>(estimateItem, OK);
     }
 
     @Operation(summary = "견적 품목정보 단일 조회")
@@ -214,12 +217,12 @@ public class EstimateController {
     public ResponseEntity<EstimateItemResponse> getEstimateItem(
             @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
             @PathVariable(value = "estimate-item-id") @Parameter(description = "견적 품목 id") Long estimateItemId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         EstimateItemResponse estimateItem = estimateService.getEstimateItem(estimateId, estimateItemId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + estimateItem.getId() + " from getEstimateItem.");
-        return new ResponseEntity<>(estimateItem, HttpStatus.OK);
+        return new ResponseEntity<>(estimateItem, OK);
     }
 
 
@@ -235,12 +238,12 @@ public class EstimateController {
     )
     public ResponseEntity<List<EstimateItemResponse>> getEstimateItems(
             @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<EstimateItemResponse> estimateItems = estimateService.getEstimateItems(estimateId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getEstimateItems.");
-        return new ResponseEntity<>(estimateItems, HttpStatus.OK);
+        return new ResponseEntity<>(estimateItems, OK);
     }
 
     @Operation(summary = "견적 품목정보 수정")
@@ -257,12 +260,12 @@ public class EstimateController {
             @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
             @PathVariable(value = "estimate-item-id") @Parameter(description = "견적 품목 id") Long estimateItemId,
             @RequestBody @Valid EstimateItemRequest estimateItemRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         EstimateItemResponse estimateItem = estimateService.updateEstimateItem(estimateId, estimateItemId, estimateItemRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + estimateItem.getId() + " from updateEstimateItem.");
-        return new ResponseEntity<>(estimateItem, HttpStatus.OK);
+        return new ResponseEntity<>(estimateItem, OK);
     }
 
     @Operation(summary = "견적 품목정보 삭제")
@@ -278,12 +281,12 @@ public class EstimateController {
     public ResponseEntity deleteEstimateItem(
             @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
             @PathVariable(value = "estimate-item-id") @Parameter(description = "견적 품목 id") Long estimateItemId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         estimateService.deleteEstimateItem(estimateId, estimateItemId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + estimateItemId + " from deleteEstimateItem.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
 // ===================================== 견적 P/I ======================================
@@ -306,12 +309,12 @@ public class EstimateController {
     public ResponseEntity<EstimatePiResponse> createEstimatePi(
             @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
             @RequestBody @Valid EstimatePiRequest estimatePiRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         EstimatePiResponse estimatePi = estimateService.createEstimatePi(estimateId, estimatePiRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + estimatePi.getId() + " from createEstimatePi.");
-        return new ResponseEntity<>(estimatePi, HttpStatus.OK);
+        return new ResponseEntity<>(estimatePi, OK);
     }
 
     @Operation(summary = "견적 P/I 조회")
@@ -326,12 +329,12 @@ public class EstimateController {
     )
     public ResponseEntity<EstimatePiResponse> getEstimatePi(
             @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         EstimatePiResponse estimatePi = estimateService.getEstimatePi(estimateId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + estimatePi.getId() + " from getEstimatePi.");
-        return new ResponseEntity<>(estimatePi, HttpStatus.OK);
+        return new ResponseEntity<>(estimatePi, OK);
     }
 
     @Operation(summary = "견적 P/I 수정")
@@ -348,12 +351,12 @@ public class EstimateController {
             @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
             @PathVariable(value = "pi-id") @Parameter(description = "견적 P/I id") Long estimatePiId,
             @RequestBody @Valid EstimatePiRequest estimatePiRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         EstimatePiResponse estimatePi = estimateService.updateEstimatePi(estimateId, estimatePiId, estimatePiRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + estimatePi.getId() + " from updateEstimatePi.");
-        return new ResponseEntity<>(estimatePi, HttpStatus.OK);
+        return new ResponseEntity<>(estimatePi, OK);
     }
 
     @Operation(summary = "견적 P/I 삭제")
@@ -369,11 +372,11 @@ public class EstimateController {
     public ResponseEntity<EstimatePiResponse> deleteEstimatePi(
             @PathVariable(value = "estimate-id") @Parameter(description = "견적 id") Long estimateId,
             @PathVariable(value = "pi-id") @Parameter(description = "견적 P/I id") Long estimatePiId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         estimateService.deleteEstimatePi(estimateId, estimatePiId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + estimatePiId + " from deleteEstimatePi.");
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(NO_CONTENT);
     }
 }

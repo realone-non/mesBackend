@@ -16,18 +16,22 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 // 3-5-3. 계측기 등록
 @Tag(name = "measure", description = "계측기 API")
 @RequestMapping("/measures")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @RequiredArgsConstructor
 public class MeasureController {
     private final MeasureService measureService;
@@ -48,12 +52,12 @@ public class MeasureController {
     )
     public ResponseEntity<MeasureResponse> createMeasure(
             @RequestBody @Valid MeasureRequest measureRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         MeasureResponse measure = measureService.createMeasure(measureRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + measure.getId() + " from createMeasure.");
-        return new ResponseEntity<>(measure, HttpStatus.OK);
+        return new ResponseEntity<>(measure, OK);
     }
 
     // 계측기 단일 조회
@@ -68,12 +72,12 @@ public class MeasureController {
     )
     public ResponseEntity<MeasureResponse> getMeasure(
             @PathVariable @Parameter(description = "계측기 id") Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         MeasureResponse measure = measureService.getMeasure(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + measure.getId() + " from getMeasure.");
-        return new ResponseEntity<>(measure, HttpStatus.OK);
+        return new ResponseEntity<>(measure, OK);
     }
 
     // 계측기 전체 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
@@ -83,12 +87,12 @@ public class MeasureController {
     public ResponseEntity<List<MeasureResponse>> getMeasures(
             @RequestParam(required = false) @Parameter(description = "GAUGE유형 id") Long gaugeId,
             @RequestParam(required = false) @Parameter(description = "월") Long month,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<MeasureResponse> measures = measureService.getMeasures(gaugeId, month);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of gaugeId: " + gaugeId + " from getMeasures.");
-        return new ResponseEntity<>(measures, HttpStatus.OK);
+        return new ResponseEntity<>(measures, OK);
     }
 
     // 계측기 수정
@@ -105,12 +109,12 @@ public class MeasureController {
     public ResponseEntity<MeasureResponse> updateMeasure(
             @PathVariable @Parameter(description = "계측기 id") Long id,
             @RequestBody @Valid MeasureRequest measureRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         MeasureResponse measure = measureService.updateMeasure(id, measureRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + measure.getId() + " from updateMeasure.");
-        return new ResponseEntity<>(measure, HttpStatus.OK);
+        return new ResponseEntity<>(measure, OK);
     }
 
     // 계측기 삭제
@@ -125,12 +129,12 @@ public class MeasureController {
     )
     public ResponseEntity deleteMeasure(
             @PathVariable @Parameter(description = "계측기 id") Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         measureService.deleteMeasure(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteMeasure.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 계측기 페이징 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
@@ -161,6 +165,6 @@ public class MeasureController {
 //            @RequestParam(required = false) @Parameter(description = "월") Long month,
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(measureService.getMeasures(gaugeId, month, pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(measureService.getMeasures(gaugeId, month, pageable), OK);
 //    }
 }

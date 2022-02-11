@@ -1,16 +1,12 @@
 package com.mes.mesBackend.helper.impl;
 
 import com.mes.mesBackend.entity.ProduceOrder;
-import com.mes.mesBackend.entity.ProductionPerformance;
 import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.WorkOrderStateHelper;
-import com.mes.mesBackend.repository.LotMasterRepository;
 import com.mes.mesBackend.repository.ProduceOrderRepository;
-import com.mes.mesBackend.repository.ProductionPerformanceRepository;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
-import jdk.internal.joptsimple.HelpFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +18,6 @@ import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 public class WorkOrderStateHelperImpl implements WorkOrderStateHelper {
     private final WorkOrderDetailRepository workOrderDetailRepo;
     private final ProduceOrderRepository produceOrderRepo;
-    private final ProductionPerformanceRepository productionPerformanceRepo;
 
     // 작업지시 orderState 변경
     /*
@@ -75,18 +70,5 @@ public class WorkOrderStateHelperImpl implements WorkOrderStateHelper {
     private ProduceOrder getProduceOrderOrThrow(Long id) throws NotFoundException {
         return produceOrderRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("[workOrderStateHelperError] produceOrder does not exist. produceOrderId: " + id));
-    }
-
-    // 생산실적 단일 조회 및 생성
-    @Override
-    public ProductionPerformance getProductionPerformanceOrCreate(WorkOrderDetail workOrderDetail) {
-        ProductionPerformance productionPerformance = productionPerformanceRepo.findByProduceOrderId(workOrderDetail.getProduceOrder().getId())
-                .orElseGet(ProductionPerformance::new);
-        // 작업지시에 해당하는 생산실적이 없고, 작업지시의 상태값이 완료 일때 새로 생성
-        if (productionPerformance.getId() == null && workOrderDetail.getOrderState().equals(COMPLETION)) {
-            productionPerformance.setWorkOrderDetail(workOrderDetail);
-            productionPerformanceRepo.save(productionPerformance);
-        }
-        return productionPerformance;
     }
 }

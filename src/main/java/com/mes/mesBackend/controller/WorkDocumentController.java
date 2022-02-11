@@ -14,10 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,19 +28,18 @@ import java.util.List;
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @Tag(name = "work-document", description = "작업표준서 API")
 @RequestMapping("/work-documents")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
+@RequiredArgsConstructor
 public class WorkDocumentController {
-    @Autowired
-    WorkDocumentService workDocumentService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(WorkDocumentController.class);
+    private final WorkDocumentService workDocumentService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(WorkDocumentController.class);
     private CustomLogger cLogger;
 
     // 작업표준서 생성
@@ -57,12 +55,12 @@ public class WorkDocumentController {
     )
     public ResponseEntity<WorkDocumentResponse> createWorkDocument(
             @RequestBody @Valid WorkDocumentRequest workDocumentRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkDocumentResponse workDocument = workDocumentService.createWorkDocument(workDocumentRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workDocument.getId() + " from createWorkDocument.");
-        return new ResponseEntity<>(workDocument, HttpStatus.OK);
+        return new ResponseEntity<>(workDocument, OK);
     }
 
     // 작업표준서 단일 조회
@@ -77,12 +75,12 @@ public class WorkDocumentController {
     )
     public ResponseEntity<WorkDocumentResponse> getWorkDocument(
             @PathVariable @Parameter(description = "작업표준서 id") Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkDocumentResponse workDocument = workDocumentService.getWorkDocument(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + workDocument.getId() + " from getWorkDocument.");
-        return new ResponseEntity<>(workDocument, HttpStatus.OK);
+        return new ResponseEntity<>(workDocument, OK);
     }
 
     // 작업표준서 전체 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
@@ -94,13 +92,13 @@ public class WorkDocumentController {
             @RequestParam(required = false) @Parameter(description = "품목계정 id") Long itemAccountId,
             @RequestParam(required = false) @Parameter(description = "품번") String itemNo,
             @RequestParam(required = false) @Parameter(description = "품명") String itemName,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<WorkDocumentResponse> workDocuments = workDocumentService.getWorkDocuments(itemGroupId, itemAccountId, itemNo, itemName);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of itemGroupId: " + itemGroupId +
                 ", itemAccountId: " + itemAccountId + " from getWorkDocuments.");
-        return new ResponseEntity<>(workDocuments, HttpStatus.OK);
+        return new ResponseEntity<>(workDocuments, OK);
     }
 
     // 작업표준서 수정
@@ -117,12 +115,12 @@ public class WorkDocumentController {
     public ResponseEntity<WorkDocumentResponse> updateWorkDocument(
             @PathVariable @Parameter(description = "작업표준서 id") Long id,
             @RequestBody @Valid WorkDocumentRequest workDocumentRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkDocumentResponse workDocument = workDocumentService.updateWorkDocument(id, workDocumentRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + workDocument.getId() + " from updateWorkDocument.");
-        return new ResponseEntity<>(workDocument, HttpStatus.OK);
+        return new ResponseEntity<>(workDocument, OK);
     }
 
     // 작업표준서 삭제
@@ -137,12 +135,12 @@ public class WorkDocumentController {
     )
     public ResponseEntity deleteWorkDocument(
             @PathVariable @Parameter(description = "작업표준서 id") Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         workDocumentService.deleteWorkDocument(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteWorkDocument.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 작업표준서 파일 추가
@@ -159,12 +157,12 @@ public class WorkDocumentController {
     public ResponseEntity<WorkDocumentResponse> createFileToWorkDocument(
             @PathVariable Long id,
             @RequestPart MultipartFile file,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException, IOException {
         WorkDocumentResponse fileToWorkDocument = workDocumentService.createFileToWorkDocument(id, file);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + fileToWorkDocument.getId() + " from createFileToWorkDocument.");
-        return new ResponseEntity<>(fileToWorkDocument, HttpStatus.OK);
+        return new ResponseEntity<>(fileToWorkDocument, OK);
     }
 
     @DeleteMapping("/{id}/files")
@@ -215,6 +213,6 @@ public class WorkDocumentController {
 //            @RequestParam(required = false) @Parameter(description = "품명") String itemName,
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(workDocumentService.getWorkDocuments(itemGroupId, itemAccountId, itemNo, itemName, pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(workDocumentService.getWorkDocuments(itemGroupId, itemAccountId, itemNo, itemName, pageable), OK);
 //    }
 }

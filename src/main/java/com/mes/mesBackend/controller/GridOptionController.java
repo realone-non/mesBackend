@@ -28,7 +28,7 @@ import java.util.List;
 @RequestMapping("/users/{user-id}/headers")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class GridOptionController {
 
     @Autowired
@@ -55,12 +55,12 @@ public class GridOptionController {
             @PathVariable(value = "header-id") Long headerId,
             @PathVariable(value = "user-id") Long userId,
             @RequestBody GridOptionRequest gridOptionRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         GridOptionResponse gridOption = gridOptionService.createGridOption(headerId, gridOptionRequest, userId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + headerId + " from createGridOption.");
-        return new ResponseEntity<>(gridOption, HttpStatus.OK);
+        return new ResponseEntity<>(gridOption, OK);
     }
 
     @GetMapping
@@ -75,11 +75,11 @@ public class GridOptionController {
     public ResponseEntity<List<HeaderResponse>> getHeaderGridOptions(
             @PathVariable(value = "user-id") Long userId,
             @RequestParam(value = "controller-name") String controllerName,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<HeaderResponse> headerGridOptions = gridOptionService.getHeaderGridOptions(userId, controllerName);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of controllerName: " + controllerName + " from getHeaderGridOptions.");
-        return new ResponseEntity<>(headerGridOptions, HttpStatus.OK);
+        return new ResponseEntity<>(headerGridOptions, OK);
     }
 }

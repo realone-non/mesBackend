@@ -24,19 +24,20 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 @Tag(name = "header", description = "헤더 API")
 @RequestMapping("/headers")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class HeaderController {
-
-    @Autowired
-    HeaderService headerService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(HeaderController.class);
+    private final HeaderService headerService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(HeaderController.class);
     private CustomLogger cLogger;
 
     // 헤더조회
@@ -51,12 +52,12 @@ public class HeaderController {
     )
     public ResponseEntity<List<HeaderResponse>> getHeaders(
             @PathVariable(value = "controller-name") String controllerName,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<HeaderResponse> headers = headerService.getHeaders(controllerName);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the controllerName: " + controllerName + " from getHeaders.");
-        return new ResponseEntity<>(headers, HttpStatus.OK);
+        return new ResponseEntity<>(headers, OK);
     }
 
     // 헤더생성
@@ -72,12 +73,12 @@ public class HeaderController {
     )
     public ResponseEntity<HeaderResponse> createHeader(
             @RequestBody @Valid HeaderRequest headerRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         HeaderResponse header = headerService.createHeader(headerRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the header: " + headerRequest.getHeader()  + " from createHeader.");
-        return new ResponseEntity<>(header, HttpStatus.OK);
+        return new ResponseEntity<>(header, OK);
     }
 
     @PatchMapping("/{id}")
@@ -93,12 +94,12 @@ public class HeaderController {
     public ResponseEntity<HeaderResponse> updateHeader(
             @PathVariable Long id,
             @RequestBody @Valid HeaderRequest headerRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         HeaderResponse header = headerService.updateHeader(id, headerRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + header.getId() + " from updateHeader.");
-        return new ResponseEntity<>(header, HttpStatus.OK);
+        return new ResponseEntity<>(header, OK);
     }
 
     @DeleteMapping("/{id}")
@@ -112,11 +113,11 @@ public class HeaderController {
     )
     public ResponseEntity deleteHeader(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         headerService.deleteHeader(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteHeader.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 }

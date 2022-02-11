@@ -20,16 +20,20 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
+
 // 7-1. LOT 마스터 조회
 @RequestMapping(value = "/lot-masters")
 @Tag(name = "lot-master", description = "LOT 마스터 조회 API")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @RequiredArgsConstructor
 public class LotMasterController {
     private final LotMasterService lotMasterService;
     private final LogService logService;
-    private Logger logger = LoggerFactory.getLogger(LotMasterController.class);
+    private final Logger logger = LoggerFactory.getLogger(LotMasterController.class);
     private CustomLogger cLogger;
 
 
@@ -51,13 +55,13 @@ public class LotMasterController {
             @RequestParam(required = false) @Parameter(description = "재고유무") Boolean stockYn,
             @RequestParam(required = false) @Parameter(description = "LOT 유형 id") Long lotTypeId,
             @RequestParam(required = false) @Parameter(description = "검사중 여부") Boolean testingYn,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<LotMasterResponse> lotMasters =
                 lotMasterService.getLotMasters(itemGroupId, lotNo, itemNoAndItemName, wareHouseId, enrollmentType, stockYn, lotTypeId, testingYn);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getLotMasters.");
-        return new ResponseEntity<>(lotMasters, HttpStatus.OK);
+        return new ResponseEntity<>(lotMasters, OK);
     }
 
     //테스트용 당일 재고 생성
@@ -66,11 +70,11 @@ public class LotMasterController {
     @Operation(
             summary = "테스트용 당일 재고 생성"
     )
-    public ResponseEntity<Void> getStocks(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+    public ResponseEntity getStocks(
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         lotMasterService.getItemStock();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getLotMasters.");
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

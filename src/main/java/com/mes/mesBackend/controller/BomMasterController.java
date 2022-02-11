@@ -30,8 +30,8 @@ import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.NO_CONTENT;
+import static org.springframework.http.OK;
 
 
 // 3-2-3. Bom 등록
@@ -266,6 +266,6 @@ public class BomMasterController {
 //            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoAndItemName,
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(bomMasterService.getBomMasters(itemAccountId, itemGroupId, itemNoAndItemName, pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(bomMasterService.getBomMasters(itemAccountId, itemGroupId, itemNoAndItemName, pageable), OK);
 //    }
 }

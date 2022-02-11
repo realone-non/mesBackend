@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -47,7 +48,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 public class ContractController {
     private final ContractService contractService;
     private final LogService logService;
-    private Logger logger = LoggerFactory.getLogger(ContractController.class);
+    private final Logger logger = LoggerFactory.getLogger(ContractController.class);
     private CustomLogger cLogger;
 
     // ======================================== 수주 ===============================================
@@ -98,8 +99,8 @@ public class ContractController {
     public ResponseEntity<List<ContractResponse>> getContracts(
             @RequestParam(required = false) @Parameter(description = "거래처 명") String clientName,
             @RequestParam(required = false) @Parameter(description = "담당자 명") String userName,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "수주기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "수주기간 toDate") LocalDate toDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "수주기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "수주기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "화폐 id") Long currencyId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {

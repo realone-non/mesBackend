@@ -24,11 +24,16 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 // 3-5-1. 설비등록
 @Tag(name = "equipment", description = "설비 API")
 @RequestMapping("/equipments")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @RequiredArgsConstructor
 public class EquipmentController {
     private final EquipmentService equipmentService;
@@ -50,12 +55,12 @@ public class EquipmentController {
     )
     public ResponseEntity<EquipmentResponse> createEquipment(
             @RequestBody @Valid EquipmentRequest equipmentRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         EquipmentResponse equipment = equipmentService.createEquipment(equipmentRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + equipment.getId() + " from createEquipment.");
-        return new ResponseEntity<>(equipment, HttpStatus.OK);
+        return new ResponseEntity<>(equipment, OK);
     }
 
     // 설비 단일 조회
@@ -70,12 +75,12 @@ public class EquipmentController {
     )
     public ResponseEntity<EquipmentResponse> getEquipment(
             @PathVariable @Parameter(description = "설비 id") Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         EquipmentResponse equipment = equipmentService.getEquipment(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + equipment.getId() + " from getEquipment.");
-        return new ResponseEntity<>(equipment, HttpStatus.OK);
+        return new ResponseEntity<>(equipment, OK);
     }
 
     // 설비 전체 조회 검색조건: 설비명
@@ -83,12 +88,12 @@ public class EquipmentController {
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<EquipmentResponse>> getEquipments(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<EquipmentResponse> equipments = equipmentService.getEquipments();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getEquipments.");
-        return new ResponseEntity<>(equipments, HttpStatus.OK);
+        return new ResponseEntity<>(equipments, OK);
     }
 
     // 설비 수정
@@ -105,12 +110,12 @@ public class EquipmentController {
     public ResponseEntity<EquipmentResponse> updateEquipment(
             @PathVariable @Parameter(description = "설비 id") Long id,
             @RequestBody @Valid EquipmentRequest equipmentRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         EquipmentResponse equipment = equipmentService.updateEquipment(id, equipmentRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + equipment.getId() + " from updateEquipment.");
-        return new ResponseEntity<>(equipment, HttpStatus.OK);
+        return new ResponseEntity<>(equipment, OK);
     }
 
     // 설비 삭제
@@ -125,12 +130,12 @@ public class EquipmentController {
     )
     public ResponseEntity deleteEquipment(
             @PathVariable @Parameter(description = "설비 id") Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         equipmentService.deleteEquipment(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteEquipment.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
 //    // 설비 페이징 조회 검색조건: 설비명
@@ -159,6 +164,6 @@ public class EquipmentController {
 //    public ResponseEntity<Page<EquipmentResponse>> getEquipments(
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(equipmentService.getEquipments(pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(equipmentService.getEquipments(pageable), OK);
 //    }
 }

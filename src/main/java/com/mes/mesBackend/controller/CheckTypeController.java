@@ -24,21 +24,20 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.OK;
+
 // 점검유형 (일, 월, 분기 등등)
 @Tag(name = "check-type", description = "점검유형 API")
 @RequestMapping("/check-types")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class CheckTypeController {
-
-    @Autowired
-    CheckTypeService checkTypeService;
-
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(CheckTypeController.class);
+    private final CheckTypeService checkTypeService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(CheckTypeController.class);
     private CustomLogger cLogger;
 
     // 점검유형 생성
@@ -54,12 +53,12 @@ public class CheckTypeController {
     )
     public ResponseEntity<CheckTypeResponse> createCheckType(
             @RequestBody @Valid CheckTypeRequest checkTypeRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         CheckTypeResponse checkType = checkTypeService.createCheckType(checkTypeRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + checkType.getId() + " from createCheckType.");
-        return new ResponseEntity<>(checkType, HttpStatus.OK);
+        return new ResponseEntity<>(checkType, OK);
     }
 
     // 점검유형 단일조회
@@ -74,12 +73,12 @@ public class CheckTypeController {
     )
     public ResponseEntity<CheckTypeResponse> getCheckType(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         CheckTypeResponse checkType = checkTypeService.getCheckType(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + checkType.getId() + " from getCheckType.");
-        return new ResponseEntity<>(checkType, HttpStatus.OK);
+        return new ResponseEntity<>(checkType, OK);
     }
 
     // 점검유형 전체 조회
@@ -87,12 +86,12 @@ public class CheckTypeController {
     @ResponseBody()
     @Operation(summary = "점검유형 전체 조회")
     public ResponseEntity<List<CheckTypeResponse>> getCheckTypes(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<CheckTypeResponse> checkTypes = checkTypeService.getCheckTypes();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getCheckTypes.");
-        return new ResponseEntity<>(checkTypes, HttpStatus.OK);
+        return new ResponseEntity<>(checkTypes, OK);
     }
 
     // 점검유형 수정 api
@@ -109,12 +108,12 @@ public class CheckTypeController {
     public ResponseEntity<CheckTypeResponse> updateCheckType(
             @PathVariable Long id,
             @RequestBody @Valid CheckTypeRequest checkTypeRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         CheckTypeResponse checkType = checkTypeService.updateCheckType(id, checkTypeRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + checkType.getId() + " from updateCheckType.");
-        return new ResponseEntity<>(checkType, HttpStatus.OK);
+        return new ResponseEntity<>(checkType, OK);
     }
 
     // 점검유형 삭제 api
@@ -129,11 +128,11 @@ public class CheckTypeController {
     )
     public ResponseEntity deleteCheckType(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         checkTypeService.deleteCheckType(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteCheckType.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 }
