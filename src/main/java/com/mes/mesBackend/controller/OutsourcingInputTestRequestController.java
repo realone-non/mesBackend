@@ -48,7 +48,7 @@ public class OutsourcingInputTestRequestController {
     private CustomLogger cLogger;
 
     // 외주수입검사의뢰 생성
-    @Operation(summary = "외주수입검사의뢰 생성", description = "* testType 추후 변경 예정")
+    @Operation(summary = "외주수입검사의뢰 생성", description = "")
     @PostMapping
     @ApiResponses(
             value = {

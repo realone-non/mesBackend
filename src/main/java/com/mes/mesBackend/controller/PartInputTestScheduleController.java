@@ -3,6 +3,7 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
 import com.mes.mesBackend.dto.response.InputTestScheduleResponse;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -48,7 +49,7 @@ public class PartInputTestScheduleController {
             description = "검색조건: 검사창고 id, 검사유형, 품명|품번, 거래처, 검사요청기간 fromDate~toDate")
     public ResponseEntity<List<InputTestScheduleResponse>> getPartInputTestSchedules(
             @RequestParam(required = false) @Parameter(description = "검사창고 id") Long wareHouseId,
-            @RequestParam(required = false) @Parameter(description = "검사유형") TestType testType,
+            @RequestParam(required = false) @Parameter(description = "검사유형") InspectionType inspectionType,
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
             @RequestParam(required = false) @Parameter(description = "거래처 id") Long clientId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "검사요청기간 fromDate") LocalDate fromDate,
@@ -56,7 +57,7 @@ public class PartInputTestScheduleController {
             @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<InputTestScheduleResponse> inputTestScheduleResponses = inputTestPerformanceService.getInputTestSchedules(
-                wareHouseId, testType, itemNoAndName, clientId, fromDate, toDate, PART
+                wareHouseId, inspectionType, itemNoAndName, clientId, fromDate, toDate, PART
         );
         cLogger = new MongoLogger(logger, "mongoTemplate");
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPartInputTestSchedules.");

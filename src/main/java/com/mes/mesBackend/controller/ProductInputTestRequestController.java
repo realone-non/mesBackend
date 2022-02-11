@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +30,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.PRODUCT;
-import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -51,7 +50,7 @@ public class ProductInputTestRequestController {
     private CustomLogger cLogger;
 
     // 검사의뢰 생성
-    @Operation(summary = "검사의뢰 생성", description = "* testType 추후 변경 예정, 완제품인 lot id 만 등록가능")
+    @Operation(summary = "검사의뢰 생성", description = "")
     @PostMapping
     @ApiResponses(
             value = {

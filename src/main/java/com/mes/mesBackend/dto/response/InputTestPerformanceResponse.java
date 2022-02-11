@@ -3,6 +3,7 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -14,8 +15,7 @@ import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
-import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
-import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM;
+import static com.mes.mesBackend.helper.Constants.*;
 
 // 14-3. 검사실적조회
 // 15-3. 검사실적조회
@@ -28,11 +28,11 @@ public class InputTestPerformanceResponse {
     Long inputTestDetailId;
 
     @Schema(description = "요청일시")
-    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime requestDate;
 
     @Schema(description = "검사일시")
-    @JsonFormat(pattern = YYYY_MM_DD, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate testDate;
 
     @Schema(description = "품번")
@@ -64,9 +64,6 @@ public class InputTestPerformanceResponse {
 
 //    @Schema(description = "고객사")
 //    String clientName;
-
-    @Schema(description = "검사방법")
-    String testProcess;
 
     @Schema(description = "검사기준")
     String testCriteria;
@@ -101,11 +98,14 @@ public class InputTestPerformanceResponse {
     @Schema(description = "LOT 유형")
     String lotType;
 
-    @Schema(description = "검사유형")
-    TestType testType;
-
     @Schema(description = "입고창고")
     String wareHouseName;
+
+    @Schema(description = "검사유형")
+    TestType testType;   // item.testType
+
+    @Schema(description = "검사방법")
+    InspectionType inspectionType;  // inputTestRequest.inspectionType
 
     public InputTestPerformanceResponse division(InputTestDivision inputTestDivision) {
         if (inputTestDivision.equals(PART)) {
@@ -125,7 +125,7 @@ public class InputTestPerformanceResponse {
             setOutsourcingOrderNo(null);
             setPurchaseOrderNo(null);
             setItemManufacturerPartNo(null);
-            setTestProcess(null);
+            setInspectionType(null);
             setTestCriteria(null);
             setTestReportFileUrl(null);
             setCocFileUrl(null);
