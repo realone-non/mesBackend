@@ -410,7 +410,7 @@ public class PopController {
     @DeleteMapping("/enrollment-lots")
     @ResponseBody
     @Operation(summary = "(pop) 분할 lot 삭제", description = "")
-    public ResponseEntity<PopLotMasterResponse> deletePopLotMasters(
+    public ResponseEntity deletePopLotMasters(
             @RequestParam @Parameter(description = "분할 lotMaster id") Long lotMasterId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
