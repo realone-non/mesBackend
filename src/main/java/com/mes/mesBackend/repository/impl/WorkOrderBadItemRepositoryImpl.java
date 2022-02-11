@@ -132,7 +132,7 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                 .select(
                         Projections.fields(
                                 PopTestBadItemResponse.class,
-                                workOrderBadItem.id.as("badItemId"),
+                                workOrderBadItem.id.as("enrollmentBadItemId"),
                                 workOrderBadItem.badItem.id.as("badItemTypeId"),
                                 workOrderBadItem.badItem.badItemName.as("badItemTypeName"),
                                 workOrderBadItem.badItemAmount.as("badItemAmount")
