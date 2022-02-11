@@ -1,6 +1,9 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
+import com.mes.mesBackend.entity.enumeration.TestCategory;
+import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,12 +57,6 @@ public class ItemResponse {
     @Schema(description = "LOT유형")
     LotTypeResponse lotType;    // LOT유형
 
-    @Schema(description = "수입검사")
-    String inputTest;               // 수입검사
-
-    @Schema(description = "출하검사")
-    String outputTest;              // 출하검사
-
     @Schema(description = "폐기품 Lot 관리")
     boolean wasteProductLot;        // 폐기품 Lot 관리
 
@@ -87,9 +84,6 @@ public class ItemResponse {
     @Schema(description = "검사기준")
     TestCriteriaResponse testCriteria;      // 검사기준
 
-    @Schema(description = "검사방법")
-    TestProcessResponse testProcess;        // 검사방법
-
     @Schema(description = "사용여부")
     boolean useYn;                      // 사용
 
@@ -98,6 +92,15 @@ public class ItemResponse {
 
     @Schema(description = "시효성자재")
     boolean agingMaterialYn;      // 시효성자재
+
+    @Schema(description = "검사종류")
+    TestCategory testCategory;
+
+    @Schema(description = "검사유형")
+    TestType testType;
+
+    @Schema(description = "검사방법")
+    InspectionType inspectionType;
 
     @Getter
     @Setter
