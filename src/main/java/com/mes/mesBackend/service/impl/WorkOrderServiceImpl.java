@@ -33,7 +33,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private final ProduceOrderService produceOrderService;
     private final ModelMapper mapper;
     private final NumberAutomatic numberAutomatic;
-    private final TestProcessService testProcessService;
     private final WorkOrderStateHelper workOrderStateHelper;
 
     // 제조오더 정보 리스트 조회
@@ -58,7 +57,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(workOrderRequest.getWorkProcess());
         WorkLine workLine = workLineService.getWorkLineOrThrow(workOrderRequest.getWorkLine());
         User user = workOrderRequest.getUser() != null ? userService.getUserOrThrow(workOrderRequest.getUser()) : null;
-        TestProcess testProcess = testProcessService.getTestProcessOrThrow(workOrderRequest.getTestProcess());
 
         // orderAmount 가 0 이면 제조오더 정보의(productOrder) 수주품목수량(contractItem.amount) 으로 저장
         // orderAmount: 사용자가 입력한 지시수량
@@ -76,7 +74,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         WorkOrderDetail workOrderDetail = mapper.toEntity(workOrderRequest, WorkOrderDetail.class);
         String workOrderNo = numberAutomatic.createDateTimeNo();
 
-        workOrderDetail.add(workProcess, workLine, user, testProcess, produceOrder);
+        workOrderDetail.add(workProcess, workLine, user, produceOrder);
         workOrderDetail.setOrderNo(workOrderNo);
         workOrderDetail.setOrderAmount(orderAmount);
         workOrderDetailRepo.save(workOrderDetail);
@@ -95,7 +93,11 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                 .orElse(null);
 
         workOrderResponse.setCostTime();        // 소요시간
-        if (bomDetailItem != null) workOrderResponse.setUnitCodeName(bomDetailItem.getUnit().getUnitCode());
+        if (bomDetailItem != null) {
+            workOrderResponse.setUnitCodeName(bomDetailItem.getUnit().getUnitCode());       // 공정에 해당하는 반제품 품목 단위
+            workOrderResponse.setTestCategory(bomDetailItem.getTestCategory());             // 공정에 해당하는 반제품 품목 검사종류
+            workOrderResponse.setTestType(bomDetailItem.getTestType());                     // 공정에 해당하는 반제품 품목 검사유형
+        }
 
         return workOrderResponse;
     }
@@ -110,7 +112,11 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             Item bomDetailItem = workOrderDetailRepo.findBomDetailByBomMasterItemIdAndWorkProcessId(response.getProduceOrderItemId(), response.getWorkProcessId())
                     .orElse(null);
             response.setCostTime();
-            if (bomDetailItem != null) response.setUnitCodeName(bomDetailItem.getUnit().getUnitCode());
+            if (bomDetailItem != null) {
+                response.setUnitCodeName(bomDetailItem.getUnit().getUnitCode());       // 공정에 해당하는 반제품 품목 단위
+                response.setTestCategory(bomDetailItem.getTestCategory());             // 공정에 해당하는 반제품 품목 검사종류
+                response.setTestType(bomDetailItem.getTestType());                     // 공정에 해당하는 반제품 품목 검사유형
+            }
         }
         return workOrderDetails;
     }
@@ -133,7 +139,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         WorkLine newWorkLine = workLineService.getWorkLineOrThrow(newWorkOrderRequest.getWorkLine());
         User newUser = newWorkOrderRequest.getUser() != null ? userService.getUserOrThrow(newWorkOrderRequest.getUser()) : null;
-        TestProcess testProcess = testProcessService.getTestProcessOrThrow(newWorkOrderRequest.getTestProcess());
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
 
         // orderAmount 가 0 이면 제조오더 정보의(productOrder) 수주품목수량(contractItem.amount) 으로 저장
@@ -149,7 +154,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         newWorkOrderRequest.setOrderAmount(orderAmount);
         WorkOrderDetail newWorkOrderDetail = mapper.toEntity(newWorkOrderRequest, WorkOrderDetail.class);
-        findWorkOrderDetail.update(newWorkOrderDetail, newWorkLine, newUser, testProcess);
+        findWorkOrderDetail.update(newWorkOrderDetail, newWorkLine, newUser);
         workOrderDetailRepo.save(findWorkOrderDetail);
         workOrderStateHelper.updateOrderState(findWorkOrderDetail.getId(), findWorkOrderDetail.getOrderState());
 

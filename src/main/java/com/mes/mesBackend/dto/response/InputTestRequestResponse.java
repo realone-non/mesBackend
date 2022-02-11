@@ -3,6 +3,7 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -13,8 +14,7 @@ import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
-import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
-import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM;
+import static com.mes.mesBackend.helper.Constants.*;
 
 @Getter
 @Setter
@@ -60,8 +60,11 @@ public class InputTestRequestResponse {
     @Schema(description = "품목형태")
     String itemForm;        // 품목형태
 
+//    @Schema(description = "검사방법")
+//    String testProcess;
+
     @Schema(description = "검사방법")
-    String testProcess;
+    InspectionType inspectionType;  // inputTestRequest.inspectionType
 
     @Schema(description = "검사기준")
     String testCriteria;
@@ -76,11 +79,11 @@ public class InputTestRequestResponse {
     Boolean coc;
 
     @Schema(description = "요청일시")
-    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime requestDate;
 
     @Schema(description = "요청유형")
-    TestType requestType;
+    TestType testType;   // item.testType
 
     @Schema(description = "요청수량")
     int requestAmount;
@@ -88,11 +91,11 @@ public class InputTestRequestResponse {
     @Schema(description = "검사수량")
     int testAmount;
 
-    @Schema(description = "검사요청")
-    TestType testType;
+//    @Schema(description = "검사요청")
+//    TestType testType;
 
     @Schema(description = "검사완료요청일")
-    @JsonFormat(pattern = YYYY_MM_DD, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate testCompletionRequestDate;
 
     @Schema(description = "지시번호")
@@ -113,7 +116,7 @@ public class InputTestRequestResponse {
         } else if (inputTestDivision.equals(PRODUCT)) {
             setOutsourcingInputNo(null);
             setPurchaseInputNo(null);
-            setTestProcess(null);
+//            setTestProcess(null);
             setTestCriteria(null);
             setCoc(null);
             setTestReportYn(null);

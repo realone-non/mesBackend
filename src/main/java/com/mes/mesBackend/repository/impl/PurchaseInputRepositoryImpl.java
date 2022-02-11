@@ -31,7 +31,6 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
     final QWareHouse wareHouse = QWareHouse.wareHouse;
     final QCurrency currency = QCurrency.currency1;
     final QTestCriteria testCriteria = QTestCriteria.testCriteria1;
-    final QTestProcess testProcess = QTestProcess.testProcess1;
 
     // 구매입고 리스트 조회, 검색조건: 입고기간 fromDate~toDate, 입고창고, 거래처, 품명|품번
     @Override
@@ -99,11 +98,11 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                                         purchaseInput.inputAmount.as("inputAmount"),
                                         item.inputUnitPrice.multiply(purchaseInput.inputAmount).as("inputPrice"),
                                         (item.inputUnitPrice.multiply(purchaseInput.inputAmount).doubleValue()).multiply(0.1).as("vat"),
-                                        item.inputTest.as("testType"),
+                                        item.testType.as("testType"),   // 검사유형 ex) 수입검사
                                         purchaseInput.manufactureDate.as("manufactureDate"),
                                         purchaseInput.validDate.as("validDate"),
                                         testCriteria.testCriteria.as("testCriteria"),
-                                        testProcess.testProcess.as("testProcess"),
+                                        item.inspectionType.as("inspectionType"),   // 검사방법 ex) 샘플링
                                         purchaseInput.urgentYn.as("urgentYn"),
                                         purchaseInput.testReportYn.as("testReportYn"),
                                         purchaseInput.coc.as("coc")
@@ -114,7 +113,6 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                         .innerJoin(lotMaster).on(lotMaster.purchaseInput.id.eq(purchaseInput.id))
                         .innerJoin(item).on(item.id.eq(purchaseRequest.item.id))
                         .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
-                        .leftJoin(testProcess).on(testProcess.id.eq(item.testProcess.id))
                         .where(
                                 isPurchaseInputIdEq(purchaseInputId),
                                 isPurchaseRequestIdEq(purchaseRequestId),
@@ -171,11 +169,11 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                                 purchaseInput.inputAmount.as("inputAmount"),
                                 item.inputUnitPrice.multiply(purchaseInput.inputAmount).as("inputPrice"),
                                 (item.inputUnitPrice.multiply(purchaseInput.inputAmount).doubleValue()).multiply(0.1).as("vat"),
-                                item.inputTest.as("testType"),
+                                item.testType.as("testType"),   // 검사유형 ex) 수입검사
                                 purchaseInput.manufactureDate.as("manufactureDate"),
                                 purchaseInput.validDate.as("validDate"),
                                 testCriteria.testCriteria.as("testCriteria"),
-                                testProcess.testProcess.as("testProcess"),
+                                item.inspectionType.as("inspectionType"),   // 검사방법 ex) 샘플링
                                 purchaseInput.urgentYn.as("urgentYn"),
                                 purchaseInput.testReportYn.as("testReportYn"),
                                 purchaseInput.coc.as("coc")
@@ -186,7 +184,6 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                 .innerJoin(lotMaster).on(lotMaster.purchaseInput.id.eq(purchaseInput.id))
                 .innerJoin(item).on(item.id.eq(purchaseRequest.item.id))
                 .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
-                .leftJoin(testProcess).on(testProcess.id.eq(item.testProcess.id))
                 .where(
                         isPurchaseRequestIdEq(purchaseRequestId),
                         isPurchaseInputDeleteYnFalse(),

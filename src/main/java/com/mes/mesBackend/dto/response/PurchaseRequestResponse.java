@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 @Getter
@@ -44,7 +45,7 @@ public class PurchaseRequestResponse {
     @Schema(description = "구매단위")
     String itemUnitCodeName;
 
-    @JsonFormat(pattern = YYYY_MM_DD, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     @Schema(description = "요청일자")
     LocalDate requestDate;
 
@@ -54,12 +55,12 @@ public class PurchaseRequestResponse {
     @Schema(description = "발주수량")
     int orderAmount;
 
-    @JsonFormat(pattern = YYYY_MM_DD, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     @Schema(description = "구매납기일자")
     LocalDate purchasePeriodDate;
 
-    @Schema(description = "수입검사유형")
-    TestType inputTest = TestType.NO_TEST;
+    @Schema(description = "검사유형")
+    TestType testType;  // item.testType
 
     @Schema(description = "제조사")
     String itemManufacturerName;
@@ -70,7 +71,7 @@ public class PurchaseRequestResponse {
     @Schema(description = "모델 품번")
     String modelItemNo;
 
-    @JsonFormat(pattern = YYYY_MM_DD, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     @Schema(description = "납기일자")
     LocalDate periodDate;
 }

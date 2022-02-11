@@ -5,6 +5,7 @@ import com.mes.mesBackend.dto.request.InputTestRequestUpdateRequest;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
 import com.mes.mesBackend.entity.InputTestRequest;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -27,9 +28,9 @@ public interface InputTestRequestService {
             Long warehouseId,
             Long lotTypeId,
             String itemNoAndName,
-            TestType testType,
+            InspectionType inspectionType,
             Long itemGroupId,
-            TestType requestType,
+            TestType testType,
             LocalDate fromDate,
             LocalDate toDate,
             InputTestDivision inputTestDivision

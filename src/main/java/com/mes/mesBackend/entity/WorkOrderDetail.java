@@ -81,14 +81,6 @@ public class WorkOrderDetail extends BaseTimeEntity {
     @Column(name = "ORDER_STATE",nullable = false, columnDefinition = "varchar(255) COMMENT '지시상태'")
     private OrderState orderState;              // 지시상태
 
-    @Enumerated(STRING)
-    @Column(name = "TEST_TYPE", nullable = false, columnDefinition = "varchar(255) COMMENT '검사의뢰'")
-    private TestType testType;              // 검사의뢰
-
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "TEST_PROCESS", columnDefinition = "bigint COMMENT '검사유형'", nullable = false)
-    private TestProcess testProcess;        // 검사유형
-
     @Column(name = "LAST_PROCESS_YN", nullable = false, columnDefinition = "bit(1) COMMENT '최종공정'")
     private boolean lastProcessYn;          // 최종공정
 
@@ -128,13 +120,11 @@ public class WorkOrderDetail extends BaseTimeEntity {
             WorkProcess workProcess,
             WorkLine workLine,
             User user,
-            TestProcess testProcess,
             ProduceOrder produceOrder
     ) {
         setWorkProcess(workProcess);
         setWorkLine(workLine);
         setUser(user);
-        setTestProcess(testProcess);
         setProduceOrder(produceOrder);
         setOrderState(SCHEDULE);
     }
@@ -142,8 +132,7 @@ public class WorkOrderDetail extends BaseTimeEntity {
     public void update(
             WorkOrderDetail newWorkOrderDetail,
             WorkLine newWorkLine,
-            User newUser,
-            TestProcess newTestProcess
+            User newUser
     ) {
         setWorkLine(newWorkLine);
         setOrderAmount(newWorkOrderDetail.orderAmount);
@@ -153,13 +142,10 @@ public class WorkOrderDetail extends BaseTimeEntity {
         setExpectedWorkDate(newWorkOrderDetail.expectedWorkDate);
         setExpectedWorkTime(newWorkOrderDetail.expectedWorkTime);
         setOrderState(newWorkOrderDetail.orderState);
-        setTestType(newWorkOrderDetail.testType);
-        setTestProcess(newWorkOrderDetail.testProcess);
         setLastProcessYn(newWorkOrderDetail.lastProcessYn);
         setProductionAmount(newWorkOrderDetail.productionAmount);
         setInputUser(newWorkOrderDetail.inputUser);
         setNote(newWorkOrderDetail.note);
-        setTestProcess(newTestProcess);
     }
 
     public void delete() {

@@ -1,8 +1,11 @@
 package com.mes.mesBackend.entity;
 
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import lombok.*;
 
 import javax.persistence.*;
+
+import static javax.persistence.EnumType.STRING;
 
 /*
  * 거래처등록
@@ -134,8 +137,9 @@ public class Client extends BaseTimeEntity {
     @Column(name = "TRANSIT_METHOD", columnDefinition = "varchar(255) COMMENT '운송방법'")
     private String transitMethod;   // 운송방법
 
-    @Column(name = "TEST_METHOD", columnDefinition = "varchar(255) COMMENT '검사방법'")
-    private String testMethod;      // 검사방법
+    @Enumerated(STRING)
+    @Column(name = "INSPECTION_TYPE", columnDefinition = "varchar(255) COMMENT '검사방법'")
+    private InspectionType inspectionType;      // 검사방법
 
     @Column(name = "PHONE_NUMBER", columnDefinition = "varchar(255) COMMENT '휴대폰번호'")
     private String phoneNumber;     // 휴대폰번호
@@ -182,7 +186,7 @@ public class Client extends BaseTimeEntity {
         setPaymentMethod(newClient.paymentMethod);
         setPaymentDate(newClient.paymentDate);
         setTransitMethod(newClient.transitMethod);
-        setTestMethod(newClient.testMethod);
+        setInspectionType(inspectionType);
         setSearchWord(newClient.searchWord);
         setUseYn(newClient.useYn);
     }

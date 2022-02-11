@@ -3,7 +3,7 @@ package com.mes.mesBackend.service.impl;
 import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
 import com.mes.mesBackend.dto.response.InputTestScheduleResponse;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
-import com.mes.mesBackend.entity.enumeration.TestType;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.repository.InputTestDetailRepository;
 import com.mes.mesBackend.service.InputTestPerformanceService;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +31,11 @@ public class InputTestPerformanceServiceImpl implements InputTestPerformanceServ
             Long clientId,
             Long purchaseInputNo,
             InputTestDivision inputTestDivision,
-            TestType testType,
+            InspectionType inspectionType,
             Long wareHouseId
     ) {
         return inputTestDetailRepo.findInputTestPerformanceResponseByCondition(
-                fromDate, toDate, itemNoAndName, clientId, purchaseInputNo, inputTestDivision, testType, wareHouseId)
+                fromDate, toDate, itemNoAndName, clientId, purchaseInputNo, inputTestDivision, inspectionType, wareHouseId)
                 .stream().map(res -> res.division(inputTestDivision)).collect(Collectors.toList());
     }
 
@@ -44,7 +44,7 @@ public class InputTestPerformanceServiceImpl implements InputTestPerformanceServ
     @Override
     public List<InputTestScheduleResponse> getInputTestSchedules(
             Long wareHouseId,
-            TestType testType,
+            InspectionType inspectionType,
             String itemNoAndName,
             Long clientId,
             LocalDate fromDate,
@@ -53,7 +53,7 @@ public class InputTestPerformanceServiceImpl implements InputTestPerformanceServ
     ) {
         return inputTestDetailRepo.findInputTestScheduleResponsesByCondition(
                 wareHouseId,
-                testType,
+                inspectionType,
                 itemNoAndName,
                 clientId,
                 fromDate,

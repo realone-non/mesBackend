@@ -1,6 +1,8 @@
 package com.mes.mesBackend.dto.request;
 
 import com.mes.mesBackend.entity.enumeration.DevelopStatus;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
+import com.mes.mesBackend.entity.enumeration.TestCategory;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -73,14 +75,6 @@ public class ItemRequest {
     @NotNull(message = NOT_NULL)
     Long lotType;
 
-    @Schema(description = "수입검사")
-    @NotNull(message = NOT_NULL)
-    TestType inputTest = TestType.NO_TEST;
-
-    @Schema(description = "출하검사")
-    @NotNull(message = NOT_NULL)
-    TestType outputTest = TestType.NO_TEST;
-
     @Schema(description = "폐기품 Lot 관리")
     @NotNull(message = NOT_NULL)
     boolean wasteProductLot;
@@ -117,10 +111,6 @@ public class ItemRequest {
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long testCriteria;
 
-    @Schema(description = "검사방법 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    Long testProcess;
-
     @Schema(description = "사용여부")
     @NotNull(message = NOT_NULL)
     boolean useYn;
@@ -130,4 +120,16 @@ public class ItemRequest {
 
     @Schema(description = "시효성자재")
     boolean agingMaterialYn;
+
+    @Schema(description = "검사종류 [수입검사: INPUT_TEST, 공정검사: PROCESS_TEST, 출하검사: OUTPUT_TEST]")
+    @NotNull(message = NOT_NULL)
+    TestCategory testCategory;      // 검사종류: ex) 수입검사, 공정검사, 출하검사
+
+    @Schema(description = "검사유형 [자동검사: AUTOMATIC_TEST, 수동검사: MANUAL_TEST, 검사없음: NO_TEST]")
+    @NotNull(message = NOT_NULL)
+    TestType testType;              // 검사유형: ex) 자동검사, 수동검사, 검사없음
+
+    @Schema(description = "검사방법 [Sampling: SAMPLING, 전수: FULL_INSPECTION]")
+    @NotNull(message = NOT_NULL)
+    InspectionType inspectionType;  // 검사방법: ex) Sampling, 전수
 }
