@@ -41,5 +41,4 @@ public class InputTestRequestCreateRequest {
     // 없애기로 2022.02.10 팀장님이 없애라고 하심
 //    @Schema(description = "검사유형")
 //    TestType testType;
-
 }
