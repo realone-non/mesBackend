@@ -1,6 +1,5 @@
 package com.mes.mesBackend.dto.request;
 
-import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,11 +33,6 @@ public class WorkOrderCreateRequest {
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long user;
 
-//    @Schema(description = "단위 id")
-//    @Min(value = ONE_VALUE, message = NOT_ZERO)
-//    @NotNull(message = NOT_NULL)
-//    Long unit;
-
     @Schema(description = "준비시간")
     @NotNull(message = NOT_NULL)
     int readyTime = 0;
@@ -56,14 +50,14 @@ public class WorkOrderCreateRequest {
     @NotBlank(message = NOT_EMPTY)
     String expectedWorkTime;
 
-    @Schema(description = "검사의뢰")
-    @NotNull(message = NOT_NULL)
-    TestType testType;
+//    @Schema(description = "검사의뢰")
+//    @NotNull(message = NOT_NULL)
+//    TestType testType;
 
-    @Schema(description = "검사유형")
-    @NotNull(message = NOT_NULL)
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    Long testProcess;
+//    @Schema(description = "검사유형")
+//    @NotNull(message = NOT_NULL)
+//    @Min(value = ONE_VALUE, message = NOT_ZERO)
+//    Long testProcess;
 
     @Schema(description = "최종공정")
     @NotNull(message = NOT_NULL)

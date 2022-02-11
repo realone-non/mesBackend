@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.request.InputTestDetailRequest;
 import com.mes.mesBackend.dto.response.InputTestDetailResponse;
 import com.mes.mesBackend.dto.response.InputTestRequestInfoResponse;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -30,7 +31,7 @@ public interface InputTestDetailService {
             LocalDate toDate,
             Long manufactureId,
             InputTestDivision inputTestDivision,
-            TestType testType
+            InspectionType inspectionType
     ) throws NotFoundException;
     // 검사정보 생성
     InputTestDetailResponse createInputTestDetail(Long inputTestRequestId, InputTestDetailRequest inputTestDetailRequest, InputTestDivision inputTestDivision) throws NotFoundException, BadRequestException;

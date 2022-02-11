@@ -3,6 +3,7 @@ package com.mes.mesBackend.repository.custom;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
 import com.mes.mesBackend.entity.InputTestRequest;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 
 import java.time.LocalDate;
@@ -19,9 +20,9 @@ public interface InputTestRequestRepositoryCustom {
             Long warehouseId,
             Long lotTypeId,
             String itemNoAndName,
-            TestType testType,
+            InspectionType inspectionType,
             Long itemGroupId,
-            TestType requestType,
+            TestType testType,
             LocalDate fromDate,
             LocalDate toDate,
             InputTestDivision inputTestDivision

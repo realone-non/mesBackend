@@ -3,6 +3,7 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.entity.enumeration.TestCategory;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -67,14 +68,14 @@ public class WorkOrderResponse {
     @Schema(description = "지시상태 [완료: COMPLETION, 진행중: ONGOING, 예정: SCHEDULE, 취소: CANCEL]")
     OrderState orderState;
 
-    @Schema(description = "검사의뢰")
-    TestType testType;
+//    @Schema(description = "검사의뢰")
+//    TestType testType;
 
-    @Schema(description = "검사유형 고유아이디")
-    Long testProcessId;
+//    @Schema(description = "검사유형 고유아이디")
+//    Long testProcessId;
 
-    @Schema(description = "검사방법")
-    String testProcess;
+//    @Schema(description = "검사방법")
+//    String testProcess;
 
     @Schema(description = "최종공정")
     boolean lastProcessYn;
@@ -87,6 +88,12 @@ public class WorkOrderResponse {
 
     @Schema(description = "비고")
     String note;
+
+    @Schema(description = "검사종류")
+    TestCategory testCategory;
+
+    @Schema(description = "검사유형")
+    TestType testType;
 
     @JsonIgnore
     LocalDateTime startDateTime;

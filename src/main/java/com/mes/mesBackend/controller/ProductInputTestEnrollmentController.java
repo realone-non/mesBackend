@@ -3,7 +3,7 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.InputTestDetailRequest;
 import com.mes.mesBackend.dto.response.InputTestDetailResponse;
 import com.mes.mesBackend.dto.response.InputTestRequestInfoResponse;
-import com.mes.mesBackend.entity.enumeration.TestType;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,13 +29,17 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.PRODUCT;
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 // 16-2. 검사 등록
 @RequestMapping(value = "/product-input-test-enrollments")
 @Tag(name = "product-input-test-enrollment", description = "16-2. 검사등록 API")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @Slf4j
 @RequiredArgsConstructor
 public class ProductInputTestEnrollmentController {
@@ -60,16 +63,16 @@ public class ProductInputTestEnrollmentController {
             @RequestParam(required = false) @Parameter(description = "입고번호 (purchaseInputId)", hidden = true) Long purchaseInputNo,
             @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
             @RequestParam(required = false) @Parameter(description = "LOT 유형 id") Long lotTypeId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "요청기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "요청기간 toDate") LocalDate toDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "요청기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "요청기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "제조사 id(clientId)", hidden = true) Long manufactureId,
-            @RequestParam(required = false) @Parameter(description = "검사유형") TestType testType,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestParam(required = false) @Parameter(description = "검사방법") InspectionType inspectionType,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        List<InputTestRequestInfoResponse> inputTestInfos = inputTestDetailService.getInputTestRequestInfo(warehouseId, itemNoAndName, completionYn, purchaseInputNo, itemGroupId, lotTypeId, fromDate, toDate, manufactureId, PRODUCT, testType);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        List<InputTestRequestInfoResponse> inputTestInfos = inputTestDetailService.getInputTestRequestInfo(warehouseId, itemNoAndName, completionYn, purchaseInputNo, itemGroupId, lotTypeId, fromDate, toDate, manufactureId, PRODUCT, inspectionType);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProductInputTestRequestInfo.");
-        return new ResponseEntity<>(inputTestInfos, HttpStatus.OK);
+        return new ResponseEntity<>(inputTestInfos, OK);
     }
 
     // 검사정보 생성
@@ -85,12 +88,12 @@ public class ProductInputTestEnrollmentController {
     public ResponseEntity<InputTestDetailResponse> createProductInputTestDetail(
             @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
             @RequestBody @Valid InputTestDetailRequest inputTestDetailRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         InputTestDetailResponse inputTestDetail = inputTestDetailService.createInputTestDetail(inputTestRequestId, inputTestDetailRequest, PRODUCT);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + inputTestDetail.getId() + " from createProductInputTestDetail.");
-        return new ResponseEntity<>(inputTestDetail, HttpStatus.OK);
+        return new ResponseEntity<>(inputTestDetail, OK);
     }
 
     // 검사정보 단일조회
@@ -106,12 +109,12 @@ public class ProductInputTestEnrollmentController {
     public ResponseEntity<InputTestDetailResponse> getProductInputTestDetail(
             @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
             @PathVariable(value = "input-test-detail-id") @Parameter(description = "검사정보 id") Long inputTestDetailId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         InputTestDetailResponse inputTestDetail = inputTestDetailService.getInputTestDetail(inputTestRequestId, inputTestDetailId, PRODUCT);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + inputTestDetail.getId() + " from getProductInputTestDetail.");
-        return new ResponseEntity<>(inputTestDetail, HttpStatus.OK);
+        return new ResponseEntity<>(inputTestDetail, OK);
     }
 
     // 검사정보 전체조회
@@ -120,12 +123,12 @@ public class ProductInputTestEnrollmentController {
     @Operation(summary = "검사정보 전체조회", description = "")
     public ResponseEntity<List<InputTestDetailResponse>> getProductInputTestDetails(
             @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<InputTestDetailResponse> inputTestDetails = inputTestDetailService.getInputTestDetails(inputTestRequestId, PRODUCT);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProductInputTestDetails.");
-        return new ResponseEntity<>(inputTestDetails, HttpStatus.OK);
+        return new ResponseEntity<>(inputTestDetails, OK);
     }
 
     // 검사정보 수정
@@ -143,12 +146,12 @@ public class ProductInputTestEnrollmentController {
             @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
             @PathVariable(value = "input-test-detail-id") @Parameter(description = "검사정보 id") Long inputTestDetailId,
             @RequestBody @Valid InputTestDetailRequest inputTestDetailRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         InputTestDetailResponse inputTestDetail = inputTestDetailService.updateInputTestDetail(inputTestRequestId, inputTestDetailId, inputTestDetailRequest, PRODUCT);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + inputTestDetail.getId() + " from updateProductInputTestDetail.");
-        return new ResponseEntity<>(inputTestDetail, HttpStatus.OK);
+        return new ResponseEntity<>(inputTestDetail, OK);
     }
 
     // 검사정보 삭제
@@ -164,10 +167,10 @@ public class ProductInputTestEnrollmentController {
     public ResponseEntity<Void> deleteProductInputTestDetail(
             @PathVariable(value = "input-test-request-id") @Parameter(description = "검사의뢰 id") Long inputTestRequestId,
             @PathVariable(value = "input-test-detail-id") @Parameter(description = "검사정보 id") Long inputTestDetailId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         inputTestDetailService.deleteInputTestDetail(inputTestRequestId, inputTestDetailId, PRODUCT);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + inputTestDetailId + " from deleteProductInputTestDetail.");
         return new ResponseEntity(NO_CONTENT);
     }

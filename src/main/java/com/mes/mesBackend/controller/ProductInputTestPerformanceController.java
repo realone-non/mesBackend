@@ -1,6 +1,7 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -23,12 +24,15 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.PRODUCT;
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
 
 // 16-4. 검사 현황 조회
 @RequestMapping(value = "/product-input-test-performances")
 @Tag(name = "product-input-test-performance", description = "16-4. 검사 현황 조회 API")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @Slf4j
 @RequiredArgsConstructor
 public class ProductInputTestPerformanceController {
@@ -50,13 +54,13 @@ public class ProductInputTestPerformanceController {
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
             @RequestParam(required = false) @Parameter(description = "거래처 id") Long clientId,
             @RequestParam(required = false) @Parameter(description = "입고번호 (purchaseInputId)", hidden = true) Long purchaseInputNo,
-            @RequestParam(required = false) @Parameter(description = "검사유형") TestType testType,
+            @RequestParam(required = false) @Parameter(description = "검사방법") InspectionType inspectionType,
             @RequestParam(required = false) @Parameter(description = "입고창고") Long wareHouseId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<InputTestPerformanceResponse> inputTestPerformanceResponses = inputTestPerformanceService.getInputTestPerformances(fromDate, toDate, itemNoAndName, clientId, purchaseInputNo, PRODUCT, testType, wareHouseId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        List<InputTestPerformanceResponse> inputTestPerformanceResponses = inputTestPerformanceService.getInputTestPerformances(fromDate, toDate, itemNoAndName, clientId, purchaseInputNo, PRODUCT, inspectionType, wareHouseId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProductInputTestPerformances.");
-        return new ResponseEntity<>(inputTestPerformanceResponses, HttpStatus.OK);
+        return new ResponseEntity<>(inputTestPerformanceResponses, OK);
     }
 }

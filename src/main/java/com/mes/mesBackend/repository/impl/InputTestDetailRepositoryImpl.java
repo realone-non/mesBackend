@@ -6,6 +6,7 @@ import com.mes.mesBackend.dto.response.InputTestRequestInfoResponse;
 import com.mes.mesBackend.dto.response.InputTestScheduleResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.repository.custom.InputTestDetailRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -60,7 +61,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
             LocalDate toDate,
             Long manufactureId,
             InputTestDivision inputTestDivision,
-            TestType testType
+            InspectionType inspectionType
     ) {
 
         return jpaQueryFactory
@@ -82,18 +83,16 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
 //                                client.clientName.as("clientName"), // 고객사
                                 client.clientName.as("manufacturerName"), // 제조사
                                 itemForm.form.as("itemForm"),
-                                testProcess.testProcess.as("testProcess"),
                                 testCriteria.testCriteria.as("testCriteria"),
                                 wareHouse.wareHouseName.as("warehouse"),
-//                                lotMaster.checkAmount.as("testAmount"),
-//                                lotMaster.stockAmount.as("stockAmount"),
                                 inputTestRequest.requestAmount.as("requestAmount"),
-                                inputTestRequest.testType.as("testType"),
                                 purchaseInput.urgentYn.as("urgentYn"),
                                 purchaseInput.testReportYn.as("testReportYn"),
                                 purchaseInput.coc.as("coc"),
                                 lotMaster.enrollmentType.as("enrollmentType"),
-                                inputTestRequest.testCompletionRequestDate.as("testCompletionRequestDate")
+                                inputTestRequest.testCompletionRequestDate.as("testCompletionRequestDate"),
+                                item.testType.as("testType"),
+                                inputTestRequest.inspectionType.as("inspectionType")
                         )
                 )
                 .from(inputTestRequest)
@@ -103,7 +102,6 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
                 .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))
-                .leftJoin(testProcess).on(testProcess.id.eq(item.testProcess.id))
                 .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
                 .leftJoin(purchaseRequest).on(purchaseRequest.id.eq(purchaseInput.purchaseRequest.id))
                 .leftJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
@@ -120,7 +118,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                         isManufactureEq(manufactureId),
                         isInputTestRequestDeleteYnFalse(),
                         isInputTestDivision(inputTestDivision),
-                        isTestTypeEq(testType)
+                        isInspectionTypeEq(inspectionType)
                 )
                 .fetch();
     }
@@ -258,7 +256,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
             Long clientId,
             Long purchaseInputNo,
             InputTestDivision inputTestDivision,
-            TestType testType,
+            InspectionType inspectionType,
             Long wareHouseId
     ) {
         return jpaQueryFactory
@@ -278,7 +276,6 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                                 item.manufacturerPartNo.as("itemManufacturerPartNo"),    // 제조사품번
                                 client.clientName.as("manufacturerName"), // 제조사
 //                                client.clientName.as("clientName"), // 고객사
-                                testProcess.testProcess.as("testProcess"),
                                 testCriteria.testCriteria.as("testCriteria"),
                                 inputTestDetail.testAmount.as("testAmount"),
                                 inputTestDetail.fairQualityAmount.as("fairQualityAmount"),
@@ -290,8 +287,9 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                                 inputTestDetail.cocFileUrl.as("cocFileUrl"),
                                 inputTestDetail.note.as("note"),
                                 lotMaster.lotType.lotType.as("lotType"),
-                                inputTestRequest.testType.as("testType"),
-                                wareHouse.wareHouseName.as("wareHouseName")
+                                wareHouse.wareHouseName.as("wareHouseName"),
+                                item.testType.as("testType"),
+                                inputTestRequest.inspectionType.as("inspectionType")
                         )
                 )
                 .from(inputTestDetail)
@@ -303,7 +301,6 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                 .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
                 .leftJoin(purchaseRequest).on(purchaseRequest.id.eq(purchaseInput.purchaseRequest.id))
                 .leftJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
-                .leftJoin(testProcess).on(testProcess.id.eq(item.testProcess.id))
                 .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .leftJoin(user).on(user.id.eq(inputTestDetail.user.id))
@@ -317,7 +314,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                         isInputTestRequestDeleteYnFalse(),
                         isInputTestDivision(inputTestDivision),
                         isInputIdEq(purchaseInputNo, inputTestDivision),
-                        isTestTypeEq(testType),
+                        isInspectionTypeEq(inspectionType),
                         isWareHouseEq(wareHouseId)
                 )
                 .fetch();
@@ -342,7 +339,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     @Override
     public List<InputTestScheduleResponse> findInputTestScheduleResponsesByCondition(
             Long wareHouseId,
-            TestType testType,
+            InspectionType inspectionType,
             String itemNoAndName,
             Long clientId,
             LocalDate fromDate,
@@ -355,17 +352,17 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                                 InputTestScheduleResponse.class,
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
-                                inputTestRequest.testType.as("testType"),
                                 lotType.lotType.as("lotType"),
                                 lotMaster.lotNo.as("lotNo"),
                                 inputTestRequest.createdDate.as("requestDate"),
                                 inputTestRequest.requestAmount.as("requestAmount"),
-                                inputTestRequest.requestType.as("testRequestType"),
                                 purchaseRequest.periodDate.as("purchaseInputPeriodDate"),   // purchaseInput
                                 outSourcingProductionRequest.periodDate.as("outsourcingPeriodDate"),  // outsourcing
                                 wareHouse.wareHouseName.as("wareHouseName"),
                                 client.clientName.as("clientName"),
-                                inputTestRequest.id.as("inputTestRequestId")
+                                inputTestRequest.id.as("inputTestRequestId"),
+                                item.testType.as("testType"),
+                                inputTestRequest.inspectionType.as("inspectionType")
                         )
                 )
                 .from(inputTestRequest)
@@ -381,7 +378,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .where(
                         isWareHouseEq(wareHouseId),
-                        isTestTypeEq(testType),
+                        isInspectionTypeEq(inspectionType),
                         isItemNoAndItemNameContain(itemNoAndName),
                         isClientIdEq(clientId),
                         isRequestDateBetween(fromDate, toDate),
@@ -393,8 +390,8 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     }
 
     // 검색조건: 검사창고 id, 검사유형, 품명|품번, 거래처, 검사기간 fromDate~toDate
-    private BooleanExpression isTestTypeEq(TestType testType) {
-        return testType != null ? inputTestRequest.testType.eq(testType) : null;
+    private BooleanExpression isInspectionTypeEq(InspectionType inspectionType) {
+        return inspectionType != null ? inputTestRequest.inspectionType.eq(inspectionType) : null;
     }
     // 거래처
     private BooleanExpression isClientIdEq(Long clientId) {

@@ -20,7 +20,6 @@ import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
 
 @RequiredArgsConstructor
 public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryCustom {
-
     private final JPAQueryFactory jpaQueryFactory;
     final QProduceOrder produceOrder = QProduceOrder.produceOrder;
     final QBomItemDetail bomItemDetail = QBomItemDetail.bomItemDetail;
@@ -70,7 +69,7 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                                 purchaseRequest.requestAmount.as("requestAmount"),
                                 purchaseRequest.orderAmount.as("orderAmount"),
                                 purchaseRequest.periodDate.as("purchasePeriodDate"),
-                                item.inputTest.as("inputTest"),
+                                item.testType.as("testType"),
                                 item.manufacturer.clientName.as("itemManufacturerName"),
                                 purchaseRequest.note.as("note"),
                                 contractItem.item.itemNo.as("modelItemNo"),
@@ -120,7 +119,7 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                                 purchaseRequest.requestAmount.as("requestAmount"),
                                 purchaseRequest.orderAmount.as("orderAmount"),
                                 purchaseRequest.periodDate.as("purchasePeriodDate"),
-                                item.inputTest.as("inputTest"),
+                                item.testType.as("testType"),
                                 item.manufacturer.clientName.as("itemManufacturerName"),
                                 purchaseRequest.note.as("note"),
                                 contractItem.item.itemNo.as("modelItemNo"),
