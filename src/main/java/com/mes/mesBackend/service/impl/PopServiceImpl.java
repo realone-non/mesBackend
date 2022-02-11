@@ -281,7 +281,7 @@ public class PopServiceImpl implements PopService {
             response.setBomDetailUnitCodeName(bomDetailItem.getUnit().getUnitCode());
 
             // 소진량
-            List<LotConnect> lotConnects = lotConnectRepo.findLotConnectsByItemIdOfChildLotMasterEqAndDivisionExhaust(bomDetailItem.getId());
+            List<LotConnect> lotConnects = lotConnectRepo.findLotConnectsByItemIdOfChildLotMasterEqAndDivisionExhaust(bomDetailItem.getId(), lotMasterId);
             for (LotConnect lotConnect : lotConnects) {
                 if (bomDetailItem.getId().equals(lotConnect.getChildLot().getItem().getId())) {
                     int allAmount = lotConnects.stream().mapToInt(LotConnect::getAmount).sum();

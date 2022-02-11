@@ -8,6 +8,7 @@ import com.mes.mesBackend.dto.response.PurchaseStatusCheckResponse;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.PurchaseInput;
 import com.mes.mesBackend.entity.PurchaseRequest;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
@@ -24,6 +25,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.OrderState.*;
+
 // 9-5. 구매입고 등록
 @Service
 @RequiredArgsConstructor
@@ -36,7 +39,6 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
     private final PurchaseRequestRepository purchaseRequestRepos;
 
     // 구매입고 리스트 조회, 검색조건: 입고기간 fromDate~toDate, 입고창고, 거래처, 품명|품번
-    // 미구현: 입고기간 조회, 입고수량쪽
     @Override
     public List<PurchaseInputResponse> getPurchaseInputs(
             LocalDate fromDate,
@@ -146,26 +148,43 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
 
         // 구매요청에 입고일시 생성
         PurchaseRequest purchaseRequest = purchaseRequestService.getPurchaseRequestOrThrow(purchaseRequestId);
+        OrderState orderState = changePurchaseRequestOrderState(purchaseRequestId);
+        purchaseRequest.setOrdersState(orderState);     // 상태값 변경
         putInputDateToPurchaseRequest(purchaseRequest);
 
         return getPurchaseInputDetailResponse(purchaseRequestId, purchaseInputId);
     }
 
     // 구매입고 LOT 삭제
-    // TODO: 삭제되었을때 purchaseOrder 상태값 안바뀜
     @Override
     public void deletePurchaseInputDetail(Long purchaseRequestId, Long purchaseInputId) throws NotFoundException {
         // 구매입고 삭제
         PurchaseInput purchaseInput = getPurchaseInputOrThrow(purchaseRequestId, purchaseInputId);
         purchaseInput.delete();
+
         // 구매입고 등록 시 생성되었던 lotMaster 삭제
         LotMaster lotMaster = getLotMasterOrThrow(purchaseInput);
         lotMaster.delete();
+
         purchaseInputRepo.save(purchaseInput);
         lotMasterRepo.save(lotMaster);
+
         // 구매요청에 입고 일시 생성
         PurchaseRequest purchaseRequest = purchaseRequestService.getPurchaseRequestOrThrow(purchaseRequestId);
+        OrderState orderState = changePurchaseRequestOrderState(purchaseRequestId);
+        purchaseRequest.setOrdersState(orderState);     // 상태값 변경
         putInputDateToPurchaseRequest(purchaseRequest);
+    }
+
+    // 구매요청에 상태값
+    private OrderState changePurchaseRequestOrderState(Long purchaseRequestId) throws NotFoundException {
+        PurchaseRequest purchaseRequest = purchaseRequestService.getPurchaseRequestOrThrow(purchaseRequestId);
+        int inputAmount = purchaseInputRepo.findInputAmountByPurchaseRequestId(purchaseRequestId)
+                .stream().mapToInt(Integer::intValue).sum();
+
+        if (inputAmount == 0) return SCHEDULE;
+        else if (inputAmount >= purchaseRequest.getRequestAmount()) return COMPLETION;
+        else return ONGOING;
     }
 
     // 구매입고 LOT 단일 조회 및 예외

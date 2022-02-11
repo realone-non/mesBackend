@@ -3,6 +3,7 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.repository.custom.InputTestRequestRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -29,13 +30,10 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     final QClient client = QClient.client;
     final QWareHouse wareHouse = QWareHouse.wareHouse;
     final QItemForm itemForm = QItemForm.itemForm;
-    final QTestProcess testProcess = QTestProcess.testProcess1;
     final QTestCriteria testCriteria = QTestCriteria.testCriteria1;
     final QPurchaseInput purchaseInput = QPurchaseInput.purchaseInput;
     final QOutSourcingInput outSourcingInput = QOutSourcingInput.outSourcingInput;
     final QOutSourcingProductionRequest outSourcingProductionRequest = QOutSourcingProductionRequest.outSourcingProductionRequest;
-    final QProductionPerformance productionPerformance = QProductionPerformance.productionPerformance;
-    final QWorkOrderDetail workOrderDetail = QWorkOrderDetail.workOrderDetail;
 
 
     // 검사의뢰등록 response 단일 조회 및 예외
@@ -60,15 +58,14 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
 //                                      client.clientName.as("clientName"),         // 고객사: 제조사와 동일
                                         wareHouse.wareHouseName.as("warehouse"),
                                         itemForm.form.as("itemForm"),
-                                        testProcess.testProcess.as("testProcess"),
+                                        inputTestRequest.inspectionType.as("inspectionType"),
+                                        item.testType.as("testType"),
                                         testCriteria.testCriteria.as("testCriteria"),
                                         purchaseInput.urgentYn.as("urgentYn"),
                                         purchaseInput.testReportYn.as("testReportYn"),
                                         purchaseInput.coc.as("coc"),
                                         inputTestRequest.createdDate.as("requestDate"),
-                                        inputTestRequest.requestType.as("requestType"),
                                         inputTestRequest.requestAmount.as("requestAmount"),
-                                        inputTestRequest.testType.as("testType"),
                                         inputTestRequest.testCompletionRequestDate.as("testCompletionRequestDate")
                                 )
                         )
@@ -80,7 +77,6 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                         .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
                         .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))
-                        .leftJoin(testProcess).on(testProcess.id.eq(item.testProcess.id))
                         .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
                         .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
                         .leftJoin(outSourcingProductionRequest).on(outSourcingProductionRequest.id.eq(outSourcingInput.productionRequest.id))
@@ -101,9 +97,9 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
             Long warehouseId,
             Long lotTypeId,
             String itemNoAndName,
-            TestType testType,
+            InspectionType inspectionType,
             Long itemGroupId,
-            TestType requestType,
+            TestType testType,
             LocalDate fromDate,
             LocalDate toDate,
             InputTestDivision inputTestDivision
@@ -125,16 +121,15 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
 //                                client.clientName.as("clientName"),         // 고객사: 제조사와 동일
                                 wareHouse.wareHouseName.as("warehouse"),
                                 itemForm.form.as("itemForm"),
-                                testProcess.testProcess.as("testProcess"),
                                 testCriteria.testCriteria.as("testCriteria"),
-                                purchaseInput.urgentYn.as("urgentYn"),
-                                purchaseInput.testReportYn.as("testReportYn"),
+                                purchaseInput.urgentYn.as("urgentY"),
+                                purchaseInput.testReportYn.as("tesntReportYn"),
                                 purchaseInput.coc.as("coc"),
                                 inputTestRequest.createdDate.as("requestDate"),
-                                inputTestRequest.requestType.as("requestType"),
                                 inputTestRequest.requestAmount.as("requestAmount"),
-                                inputTestRequest.testType.as("testType"),
-                                inputTestRequest.testCompletionRequestDate.as("testCompletionRequestDate")
+                                inputTestRequest.testCompletionRequestDate.as("testCompletionRequestDate"),
+                                inputTestRequest.inspectionType.as("inspectionType"),
+                                item.testType.as("testType")
                         )
                 )
                 .from(inputTestRequest)
@@ -145,7 +140,6 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
                 .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))
-                .leftJoin(testProcess).on(testProcess.id.eq(item.testProcess.id))
                 .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
                 .leftJoin(outSourcingProductionRequest).on(outSourcingProductionRequest.id.eq(outSourcingInput.productionRequest.id))
                 .where(
@@ -153,11 +147,11 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         isLotTypeEq(lotTypeId),
                         isItemNoAndItemNameContain(itemNoAndName),
                         isItemGroupEq(itemGroupId),
-                        isTestTypeEq(testType),
-                        isRequestTestTypeEq(requestType),
                         isRequestDateBetween(fromDate, toDate),
                         isInputTestRequestDeleteYnFalse(),
-                        isInputTestRequestDivision(inputTestDivision)
+                        isInputTestRequestDivision(inputTestDivision),
+                        isInspectionTypeEq(inspectionType),
+                        isTestTypeEq(testType)
                 )
                 .fetch();
     }
@@ -251,20 +245,9 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     private BooleanExpression isItemNoAndItemNameContain(String itemNoAndName) {
         return itemNoAndName != null ? item.itemNo.contains(itemNoAndName).or(item.itemName.contains(itemNoAndName)) : null;
     }
-
-    // 검사유형 ?????
-    // 검사유형인지 요청유형인지 헷갈려서 일단 요청유형으로 함
-    private BooleanExpression isTestTypeEq(TestType testType) {
-        return testType != null ? inputTestRequest.testType.eq(testType) : null;
-    }
-
     // 품목그룹
     private BooleanExpression isItemGroupEq(Long itemGroupId) {
         return itemGroupId != null ? item.itemGroup.id.eq(itemGroupId) : null;
-    }
-    // 요청유형
-    private BooleanExpression isRequestTestTypeEq(TestType requestType) {
-        return requestType != null ? inputTestRequest.requestType.eq(requestType) : null;
     }
     // 의뢰기간
     private BooleanExpression isRequestDateBetween(LocalDate fromDate, LocalDate toDate) {
@@ -273,6 +256,14 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     // 삭제여부
     private BooleanExpression isInputTestRequestDeleteYnFalse() {
         return inputTestRequest.deleteYn.isFalse();
+    }
+    // 검사방법
+    private BooleanExpression isInspectionTypeEq(InspectionType inspectionType) {
+        return inspectionType != null ? inputTestRequest.inspectionType.eq(inspectionType) : null;
+    }
+    // 검사유형
+    private BooleanExpression isTestTypeEq(TestType testType) {
+        return testType != null ? item.testType.eq(testType) : null;
     }
 
     // 14-1. 부품수입검사 요청 조회 PART

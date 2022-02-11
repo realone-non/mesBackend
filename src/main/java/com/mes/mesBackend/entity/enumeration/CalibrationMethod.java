@@ -4,7 +4,7 @@ package com.mes.mesBackend.entity.enumeration;
 /*
 * IN_HOUSE: 사내R&R
 * OUT_COMPANY: 사외
-* [IN_HOUSE: 사내R&R, OUT_COMPANY: 사외]
+* [IN_COMPANY: 사내R&R, OUT_COMPANY: 사외]
 * */
 public enum CalibrationMethod {
     IN_COMPANY, OUT_COMPANY

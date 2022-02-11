@@ -8,7 +8,7 @@ import com.mes.mesBackend.entity.InputTestRequest;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
-import com.mes.mesBackend.entity.enumeration.TestType;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.AmountHelper;
@@ -65,10 +65,10 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
             LocalDate toDate,
             Long manufactureId,
             InputTestDivision inputTestDivision,
-            TestType testType
+            InspectionType inspectionType
     ) throws NotFoundException {
         List<InputTestRequestInfoResponse> responses = inputTestDetailRepo.findInputTestRequestInfoResponseByCondition(
-                warehouseId, itemNoAndName, completionYn, purchaseInputNo, itemGroupId, lotTypeId, fromDate, toDate, manufactureId, inputTestDivision, testType
+                warehouseId, itemNoAndName, completionYn, purchaseInputNo, itemGroupId, lotTypeId, fromDate, toDate, manufactureId, inputTestDivision, inspectionType
         );
         for (InputTestRequestInfoResponse response : responses) {
             int testAmount = inputTestDetailRepo.findTestAmountByInputTestRequestId(response.getId()).stream().mapToInt(Integer::intValue).sum();

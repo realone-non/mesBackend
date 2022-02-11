@@ -51,15 +51,6 @@ public class WorkOrderUpdateRequest {
     @NotNull(message = NOT_NULL)
     OrderState orderState = OrderState.SCHEDULE;
 
-    @Schema(description = "검사의뢰")
-    @NotNull(message = NOT_NULL)
-    TestType testType;
-
-    @Schema(description = "검사유형")
-    @NotNull(message = NOT_NULL)
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    Long testProcess;
-
     @Schema(description = "최종공정")
     @NotNull(message = NOT_NULL)
     boolean lastProcessYn;

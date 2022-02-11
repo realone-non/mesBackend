@@ -66,8 +66,8 @@ public class PurchaseOrderDetailResponse {
     @Schema(description = "비고")
     String note;
 
-    @Schema(description = "수입검사유형")
-    TestType inputTestType;
+    @Schema(description = "검사유형")
+    TestType testType;
 
     @Schema(description = "제조사")
     String manufacturerName;

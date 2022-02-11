@@ -195,9 +195,9 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 purchaseRequest.cancelAmount.as("cancelAmount"),    // 미구현
                                 purchaseRequest.periodDate.as("orderPeriodDate"),
                                 purchaseRequest.note.as("note"),
-                                item.inputTest.as("inputTestType"),
                                 client.clientName.as("manufacturerName"),
-                                purchaseRequest.ordersState.as("orderState")
+                                purchaseRequest.ordersState.as("orderState"),
+                                item.testType.as("testType")
                         )
                 )
                 .from(purchaseRequest)
@@ -236,9 +236,9 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 purchaseRequest.cancelAmount.as("cancelAmount"),
                                 purchaseRequest.periodDate.as("orderPeriodDate"),
                                 purchaseRequest.note.as("note"),
-                                item.inputTest.as("inputTestType"),
                                 client.clientName.as("manufacturerName"),
-                                purchaseRequest.ordersState.as("orderState")
+                                purchaseRequest.ordersState.as("orderState"),
+                                item.testType.as("testType")
                         )
                 )
                 .from(purchaseRequest)

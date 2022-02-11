@@ -43,13 +43,12 @@ public class EquipmentCheckController {
     private CustomLogger cLogger;
 
     // 설비 리스트 조회
-    // 검색조건: 설비유형, 점검유형(보류), 작업기간(디테일 정보 생성날짜 기준) fromDate~toDate
-    // TODO(점검유형 보류)
+    // 검색조건: 설비유형, 작업기간(디테일 정보 생성날짜 기준) fromDate~toDate
     @GetMapping
     @ResponseBody
     @Operation(
             summary = "설비정보 전체 조회",
-            description = "검색조건: 설비유형, 점검유형(보류), 작업기간 fromDate~toDate"
+            description = "검색조건: 설비유형,, 작업기간 fromDate~toDate"
     )
     public ResponseEntity<List<EquipmentCheckResponse>> getEquipmentChecks(
             @RequestParam(required = false) @Parameter(description = "설비유형(작업라인 id)") Long workLineId,

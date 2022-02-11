@@ -1,7 +1,7 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
-import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,18 +23,22 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.OUT_SOURCING;
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
+
 
 // 15-3. 검사실적 조회
 @RequestMapping(value = "/outsourcing-input-test-performances")
 @Tag(name = "outsourcing-input-test-performance", description = "15-3. 검사실적 조회 API")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @Slf4j
 @RequiredArgsConstructor
 public class OutsourcingInputTestPerformanceController {
     private final InputTestPerformanceService inputTestPerformanceService;
     private final LogService logService;
-    private final Logger logger = LoggerFactory.getLogger(PartInputTestPerformanceController.class);
+    private final Logger logger = LoggerFactory.getLogger(OutsourcingInputTestPerformanceController.class);
     private CustomLogger cLogger;
 
     // 검사실적조회
@@ -51,13 +54,13 @@ public class OutsourcingInputTestPerformanceController {
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
             @RequestParam(required = false) @Parameter(description = "거래처 id") Long clientId,
             @RequestParam(required = false) @Parameter(description = "입고번호 (outsourcingInputId)") Long inputId,
-            @RequestParam(required = false) @Parameter(description = "검사유형", hidden = true) TestType testType,
+            @RequestParam(required = false) @Parameter(description = "검사방법", hidden = true) InspectionType inspectionType,
             @RequestParam(required = false) @Parameter(description = "검사창고", hidden = true) Long wareHouseId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<InputTestPerformanceResponse> inputTestPerformanceResponses = inputTestPerformanceService.getInputTestPerformances(fromDate, toDate, itemNoAndName, clientId, inputId, OUT_SOURCING, testType, wareHouseId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        List<InputTestPerformanceResponse> inputTestPerformanceResponses = inputTestPerformanceService.getInputTestPerformances(fromDate, toDate, itemNoAndName, clientId, inputId, OUT_SOURCING, inspectionType, wareHouseId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getOutsourcingInputTestPerformances.");
-        return new ResponseEntity<>(inputTestPerformanceResponses, HttpStatus.OK);
+        return new ResponseEntity<>(inputTestPerformanceResponses, OK);
     }
 }

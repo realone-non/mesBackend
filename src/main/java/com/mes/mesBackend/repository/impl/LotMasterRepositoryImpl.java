@@ -287,6 +287,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotMaster.id.as("id"),
                                 lotMaster.lotNo.as("lotNo"),
                                 lotMaster.item.id.as("itemId"),
+                                lotMaster.item.itemNo.as("itemNo"),
+                                lotMaster.item.itemName.as("itemName"),
                                 lotMaster.workProcess.id.as("workProcessId"),
                                 lotMaster.workProcess.workProcessDivision.as("workProcessDivision"),
                                 lotMaster.stockAmount.as("stockAmount")

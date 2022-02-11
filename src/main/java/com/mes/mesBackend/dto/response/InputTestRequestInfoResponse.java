@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -15,8 +16,7 @@ import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
-import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
-import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM;
+import static com.mes.mesBackend.helper.Constants.*;
 
 // 14-2. 검사등록
 // 15-2. 검사등록
@@ -29,7 +29,7 @@ public class InputTestRequestInfoResponse {
     Long id;
 
     @Schema(description = "요청일시")
-    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime requestDate;
 
     @JsonIgnore
@@ -74,9 +74,6 @@ public class InputTestRequestInfoResponse {
     @Schema(description = "품목형태")
     String itemForm;
 
-    @Schema(description = "검사방법")
-    String testProcess;
-
     @Schema(description = "검사기준")
     String testCriteria;
 
@@ -92,9 +89,6 @@ public class InputTestRequestInfoResponse {
     @Schema(description = "요청수량")
     int requestAmount;
 
-    @Schema(description = "검사유형")
-    TestType testType;      // 다시 검토
-
     @Schema(description = "긴급여부")
     Boolean urgentYn;
 
@@ -105,11 +99,17 @@ public class InputTestRequestInfoResponse {
     Boolean coc;
 
     @Schema(description = "검사완료요청일")
-    @JsonFormat(pattern = YYYY_MM_DD, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate testCompletionRequestDate;
 
     @Schema(description = "지시번호")
     String workOrderNo;
+
+    @Schema(description = "요청유형")
+    TestType testType;   // item.testType
+
+    @Schema(description = "검사방법")
+    InspectionType inspectionType;  // inputTestRequest.inspectionType
 
     public InputTestRequestInfoResponse division(InputTestDivision inputTestDivision) {
         if (inputTestDivision.equals(PART)) {
@@ -132,13 +132,12 @@ public class InputTestRequestInfoResponse {
             setPurchaseInputNo(null);
             setPurchaseOrderNo(null);
             setItemManufacturerPartNo(null);
-            setTestProcess(null);
-            setTestProcess(null);
-            setTestType(null);
             setLotMasterId(null);
             setUrgentYn(null);
             setTestReportYn(null);
             setCoc(null);
+            setTestType(null);
+            setInspectionType(null);
         }
         return this;
     }

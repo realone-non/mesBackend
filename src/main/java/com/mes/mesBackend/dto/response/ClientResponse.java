@@ -1,6 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,7 +41,7 @@ public class ClientResponse {
     String paymentMethod;   // 대금결제방법
     String paymentDate;     // 결제일자
     String transitMethod;   // 운송방법
-    String testMethod;      // 검사방법
+    InspectionType inspectionType;      // 검사방법
     String phoneNumber;     // 휴대폰번호
     String searchWord;      // 검색어
     boolean useYn;  // 사용여부

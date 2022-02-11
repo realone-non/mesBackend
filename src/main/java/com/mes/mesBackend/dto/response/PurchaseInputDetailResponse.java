@@ -1,6 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -33,8 +34,8 @@ public class PurchaseInputDetailResponse {
     @Schema(description = "부가세")
     double vat;
 
-    @Schema(description = "검사의뢰유형")
-    TestType testType;
+    @Schema(description = "검사유형")
+    TestType testType;      // item.testType
 
     @Schema(description = "제조일자")
     LocalDate manufactureDate;
@@ -46,7 +47,7 @@ public class PurchaseInputDetailResponse {
     String testCriteria;
 
     @Schema(description = "검사방법")
-    String testProcess;
+    InspectionType inspectionType;     // item.inspectionType
 
     @Schema(description = "긴급여부")
     boolean urgentYn;

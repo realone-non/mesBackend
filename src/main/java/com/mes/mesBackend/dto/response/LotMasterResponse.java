@@ -115,6 +115,12 @@ public class LotMasterResponse {
         @Schema(description = "품목 고유아이디")
         Long itemId;
 
+        @Schema(description = "품번")
+        String itemNo;
+
+        @Schema(description = "품명")
+        String itemName;
+
         @Schema(description = "공정 고유아이디")
         Long workProcessId;
 
