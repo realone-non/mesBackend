@@ -120,7 +120,7 @@ public class PopController {
         popService.updatePopWorkOrderState(lotMasterId, processStatus);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from updatePopWorkOrderState.");
-        return new ResponseEntity<>(NO_CONTENT);
+        return new ResponseEntity<>(OK);
     }
 
     // 작업완료 수량 입력
@@ -418,6 +418,6 @@ public class PopController {
         popService.deletePopLotMasters(lotMasterId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is viewed the list of from deletePopLotMasters.");
-        return new ResponseEntity(OK);
+        return new ResponseEntity(NO_CONTENT);
     }
 }
