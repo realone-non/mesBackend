@@ -27,7 +27,7 @@ public interface InputTestDetailRepositoryCustom {
             LocalDate toDate,
             Long manufactureId,
             InputTestDivision inputTestDivision,
-            TestType testType
+            InspectionType inspectionType
     );
     // 검사상세정보 단일조회
     Optional<InputTestDetailResponse> findDetailByInputTestRequestIdAndInputTestDetailIdAndDeleteYnFalse(Long inputTestRequestId, Long inputTestDetailId, InputTestDivision inputTestDivision);

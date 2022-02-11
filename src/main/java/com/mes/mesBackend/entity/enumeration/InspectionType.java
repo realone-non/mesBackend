@@ -1,6 +1,6 @@
 package com.mes.mesBackend.entity.enumeration;
 
-// 검사유형
+// 검사방법
 public enum InspectionType {
     /*
     검사유형

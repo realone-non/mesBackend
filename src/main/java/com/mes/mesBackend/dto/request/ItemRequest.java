@@ -75,16 +75,6 @@ public class ItemRequest {
     @NotNull(message = NOT_NULL)
     Long lotType;
 
-    // TODO: 삭제
-    @Schema(description = "수입검사")
-    @NotNull(message = NOT_NULL)
-    TestType inputTest = TestType.NO_TEST;
-
-    // TODO: 삭제
-    @Schema(description = "출하검사")
-    @NotNull(message = NOT_NULL)
-    TestType outputTest = TestType.NO_TEST;
-
     @Schema(description = "폐기품 Lot 관리")
     @NotNull(message = NOT_NULL)
     boolean wasteProductLot;
@@ -120,11 +110,6 @@ public class ItemRequest {
     @Schema(description = "검사기준 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long testCriteria;
-
-    // TODO: 삭제
-//    @Schema(description = "검사방법 id")
-//    @Min(value = ONE_VALUE, message = NOT_ZERO)
-//    Long testProcess;
 
     @Schema(description = "사용여부")
     @NotNull(message = NOT_NULL)

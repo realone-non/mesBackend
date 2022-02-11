@@ -4,7 +4,6 @@ import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
 import com.mes.mesBackend.dto.response.InputTestScheduleResponse;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
-import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.repository.InputTestDetailRepository;
 import com.mes.mesBackend.service.InputTestPerformanceService;
 import lombok.RequiredArgsConstructor;

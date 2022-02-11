@@ -85,16 +85,6 @@ public class Item extends BaseTimeEntity {
     @JoinColumn(name = "LOT_TYPES_ID", nullable = false, columnDefinition = "bigint COMMENT 'LOT유형'")
     private LotType lotType;    // LOT유형
 
-    // TODO: 삭제
-//    @Enumerated(STRING)
-//    @Column(name = "INPUT_TEST", nullable = false,columnDefinition = "varchar(255) COMMENT '수입검사'")
-//    private TestType inputTest = TestType.NO_TEST;      // 수입검사
-
-    // TODO: 삭제
-//    @Enumerated(STRING)
-//    @Column(name = "OUTPUT_TEST",nullable = false, columnDefinition = "varchar(255) COMMENT '출하검사'")
-//    private TestType outputTest = TestType.NO_TEST;     // 출하검사
-
     @Column(name = "WASTE_PRODUCT_LOT", nullable = false, columnDefinition = "bit(1) COMMENT '폐기품 LOT 관리'")
     private boolean wasteProductLot;        // 폐기품 Lot 관리
 
@@ -126,12 +116,6 @@ public class Item extends BaseTimeEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "TEST_CRITERIA", columnDefinition = "bigint COMMENT '검사기준'")
     private TestCriteria testCriteria;      // 검사기준
-
-    // TODO: 삭제
-    // 다대일 단방향
-//    @ManyToOne(fetch = LAZY)
-//    @JoinColumn(name = "TEST_PROCESS", columnDefinition = "bigint COMMENT '검사방법'")
-//    private TestProcess testProcess;        // 검사방법
 
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn;                      // 사용

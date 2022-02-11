@@ -40,7 +40,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 public class ClientController {
     private final ClientService clientService;
     private final LogService logService;
-    private Logger logger = LoggerFactory.getLogger(ClientController.class);
+    private final Logger logger = LoggerFactory.getLogger(ClientController.class);
     private CustomLogger cLogger;
 
     // 거래처 생성

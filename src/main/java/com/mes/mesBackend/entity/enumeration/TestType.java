@@ -1,6 +1,6 @@
 package com.mes.mesBackend.entity.enumeration;
 
-// 검사 방법
+// 검사유형
 public enum TestType {
     AUTOMATIC_TEST , MANUAL_TEST, NO_TEST
 

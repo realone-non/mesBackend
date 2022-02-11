@@ -1,10 +1,7 @@
 package com.mes.mesBackend.controller;
 
-import com.mes.mesBackend.dto.response.InputTestPerformanceResponse;
 import com.mes.mesBackend.dto.response.InputTestScheduleResponse;
-import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
-import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
@@ -26,12 +23,16 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.PART;
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
 
 // 14-4. 검사대기 현황
 @RequestMapping(value = "/part-input-test-schedules")
 @Tag(name = "part-input-test-schedule", description = "14-4. 검사대기 현황 API")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @Slf4j
 @RequiredArgsConstructor
 public class PartInputTestScheduleController {
@@ -52,15 +53,15 @@ public class PartInputTestScheduleController {
             @RequestParam(required = false) @Parameter(description = "검사유형") InspectionType inspectionType,
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
             @RequestParam(required = false) @Parameter(description = "거래처 id") Long clientId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "검사요청기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "검사요청기간 toDate") LocalDate toDate,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "검사요청기간 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "검사요청기간 toDate") LocalDate toDate,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<InputTestScheduleResponse> inputTestScheduleResponses = inputTestPerformanceService.getInputTestSchedules(
                 wareHouseId, inspectionType, itemNoAndName, clientId, fromDate, toDate, PART
         );
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPartInputTestSchedules.");
-        return new ResponseEntity<>(inputTestScheduleResponses, HttpStatus.OK);
+        return new ResponseEntity<>(inputTestScheduleResponses, OK);
     }
 }

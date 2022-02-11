@@ -37,22 +37,12 @@ public class InputTestRequest extends BaseTimeEntity {
     @JoinColumn(name = "LOT_MASTER", columnDefinition = "bigint COMMENT 'LOT_MASTER'")
     private LotMaster lotMaster;
 
-    // TODO; db 삭제
-//    @Enumerated(STRING)
-//    @Column(name = "REQUEST_TYPE", columnDefinition = "varchar(255) COMMENT '요청유형'")
-//    private TestType requestType = NO_TEST;    // 요청유형
-
     @Column(name = "REQUEST_AMOUNT", columnDefinition = "int COMMENT '요청수량'")
     private int requestAmount;                      // 요청수량
 
     @Enumerated(STRING)
     @Column(name = "INPUT_TEST_STATE", columnDefinition = "varchar(255) COMMENT '수입검사 상태값'")
     private InputTestState inputTestState = SCHEDULE;      // 수입검사의뢰 상태값
-
-    // TODO; db 삭제
-//    @Enumerated(STRING)
-//    @Column(name = "TEST_TYPE", columnDefinition = "varchar(255) COMMENT '검사유형'")
-//    private TestType testType = NO_TEST;   // 검사유형 수정해야됨
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
@@ -79,9 +69,8 @@ public class InputTestRequest extends BaseTimeEntity {
     }
 
     public void update(InputTestRequest newInputTestRequest, InputTestDivision inputTestDivision) {
-//        setRequestType(newInputTestRequest.requestType);
+        setInspectionType(newInputTestRequest.inspectionType);
         setRequestAmount(newInputTestRequest.requestAmount);
-//        setTestType(newInputTestRequest.testType);
         if (inputTestDivision.equals(PRODUCT)) {
             setTestCompletionRequestDate(newInputTestRequest.testCompletionRequestDate);
         }

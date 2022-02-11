@@ -214,9 +214,6 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.expectedWorkDate.as("expectedWorkDate"),
                                 workOrderDetail.expectedWorkTime.as("expectedWorkTime"),
                                 workOrderDetail.orderState.as("orderState"),
-                                workOrderDetail.testType.as("testType"),
-                                testProcess.id.as("testProcessId"),
-                                testProcess.testProcess.as("testProcess"),
                                 workOrderDetail.lastProcessYn.as("lastProcessYn"),
                                 workOrderDetail.productionAmount.as("productionAmount"),
                                 workOrderDetail.inputUser.as("inputUser"),
@@ -230,7 +227,6 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
                 .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
                 .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
-                .leftJoin(testProcess).on(testProcess.id.eq(workOrderDetail.testProcess.id))
                 .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
                 .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
                 .leftJoin(item).on(item.id.eq(contractItem.item.id))
@@ -266,9 +262,6 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                         workOrderDetail.expectedWorkDate.as("expectedWorkDate"),
                                         workOrderDetail.expectedWorkTime.as("expectedWorkTime"),
                                         workOrderDetail.orderState.as("orderState"),
-                                        workOrderDetail.testType.as("testType"),
-                                        testProcess.id.as("testProcessId"),
-                                        testProcess.testProcess.as("testProcess"),
                                         workOrderDetail.lastProcessYn.as("lastProcessYn"),
                                         workOrderDetail.productionAmount.as("productionAmount"),
                                         workOrderDetail.inputUser.as("inputUser"),
@@ -282,7 +275,6 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
                         .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
                         .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
-                        .leftJoin(testProcess).on(testProcess.id.eq(workOrderDetail.testProcess.id))
                         .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
                         .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
                         .leftJoin(item).on(item.id.eq(contractItem.item.id))

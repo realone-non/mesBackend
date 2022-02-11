@@ -54,7 +54,7 @@ public class OutsourcingInputTestPerformanceController {
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
             @RequestParam(required = false) @Parameter(description = "거래처 id") Long clientId,
             @RequestParam(required = false) @Parameter(description = "입고번호 (outsourcingInputId)") Long inputId,
-            @RequestParam(required = false) @Parameter(description = "검사유형", hidden = true) InspectionType inspectionType,
+            @RequestParam(required = false) @Parameter(description = "검사방법", hidden = true) InspectionType inspectionType,
             @RequestParam(required = false) @Parameter(description = "검사창고", hidden = true) Long wareHouseId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {

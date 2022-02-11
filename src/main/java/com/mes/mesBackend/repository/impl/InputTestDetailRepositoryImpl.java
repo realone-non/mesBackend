@@ -61,7 +61,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
             LocalDate toDate,
             Long manufactureId,
             InputTestDivision inputTestDivision,
-            TestType testType
+            InspectionType inspectionType
     ) {
 
         return jpaQueryFactory
@@ -118,7 +118,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                         isManufactureEq(manufactureId),
                         isInputTestRequestDeleteYnFalse(),
                         isInputTestDivision(inputTestDivision),
-                        isInspectionTypeEq(testType)
+                        isInspectionTypeEq(inspectionType)
                 )
                 .fetch();
     }
