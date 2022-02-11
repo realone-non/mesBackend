@@ -27,7 +27,7 @@ public interface PurchaseInputRepositoryCustom {
     Long findItemIdByPurchaseInputId(Long purchaseInputId);
 
     // 구매요청에 해당하는 구매발주상세의 입고수량을 전부 조회
-    List<Integer> findInputAmountByPurchaseRequestId(Long purchaseOrderId);
+    List<Integer> findInputAmountByPurchaseRequestId(Long purchaseRequestId);
 
     // 구매입고 정보에 해당하는 구매입고 LOT 전체 조회
     List<PurchaseInputDetailResponse> findPurchaseInputDetailByPurchaseRequestId(Long purchaseRequestId);

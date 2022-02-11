@@ -177,5 +177,4 @@ public class EquipmentCheckDetailRepositoryImpl implements EquipmentCheckDetailR
     private BooleanExpression isEquipmentCheckDetailDeleteYnFalse() {
         return equipmentCheckDetail.deleteYn.isFalse();
     }
-    // TODO(점검유형 보류)
 }
