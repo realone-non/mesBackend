@@ -58,10 +58,11 @@ public class InputTestRequest extends BaseTimeEntity {
     @Column(name = "INSPECTION_TYPE", columnDefinition = "varchar(255) COMMENT '검사방법'")
     private InspectionType inspectionType;  // 검사방법: ex) Sampling, 전수
 
-    public void createInputTestRequest(LotMaster lotMaster, InputTestDivision inputTestDivision, LocalDate testCompletionRequestDate) {
+    public void createInputTestRequest(LotMaster lotMaster, InputTestDivision inputTestDivision, LocalDate testCompletionRequestDate, InspectionType inspectionType) {
         setLotMaster(lotMaster);
         setInputTestState(SCHEDULE);
         setInputTestDivision(inputTestDivision);
+        setInspectionType(inspectionType);
         if (inputTestDivision.equals(PRODUCT)) {
             setTestCompletionRequestDate(testCompletionRequestDate);
         } else

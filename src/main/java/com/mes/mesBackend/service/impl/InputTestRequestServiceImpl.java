@@ -64,10 +64,12 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
 
         // 입력받은 요청수량이 lot 의 재고수량보다 많은지 체크
         throwIfRequestAmountGreaterThanInputAmount(inputTestRequestRequest.getLotId(), lotMaster.getCheckRequestAmount() + requestAmount);
+        // 검사방법 (입력받으면 입력받은 검사방법으로 하고, 입력받지 않으면 품목의 검사방법으로 함)
+        InspectionType inspectionType = inputTestRequestRequest.getInspectionType() == null ? lotMaster.getItem().getInspectionType() : inputTestRequestRequest.getInspectionType();
 
         int beforeCheckRequestAmount = lotMaster.getCheckRequestAmount();
         InputTestRequest inputTest = modelMapper.toEntity(inputTestRequestRequest, InputTestRequest.class);
-        inputTest.createInputTestRequest(lotMaster, inputTestDivision, inputTestRequestRequest.getTestCompletionRequestDate());
+        inputTest.createInputTestRequest(lotMaster, inputTestDivision, inputTestRequestRequest.getTestCompletionRequestDate(), inspectionType);
         inputTestRequestRepo.save(inputTest);       // lotMaster, 요청유형, 요청수량, 검사유형, 상태값 생성
 
         lotMaster.setCheckRequestAmount(beforeCheckRequestAmount + requestAmount);
