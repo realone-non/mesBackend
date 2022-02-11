@@ -17,14 +17,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 
 // 3-3-1. 작업장 코드 등록
@@ -32,14 +34,10 @@ import java.util.List;
 @RequestMapping("/work-center-codes")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class WorkCenterCodeController {
-
-    @Autowired
-    WorkCenterService workCenterService;
-    @Autowired
-    LogService logService;
-
+    private final WorkCenterService workCenterService;
+    private final LogService logService;
     private Logger logger = LoggerFactory.getLogger(WorkCenterCodeController.class);
     private CustomLogger cLogger;
 
@@ -55,12 +53,12 @@ public class WorkCenterCodeController {
     )
     public ResponseEntity<CodeResponse> createWorkCenterCode(
             @RequestBody @Valid CodeRequest codeRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         CodeResponse workCenterCode = workCenterService.createWorkCenterCode(codeRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workCenterCode.getId() + " from createWorkCenterCode.");
-        return new ResponseEntity<>(workCenterCode, HttpStatus.OK);
+        return new ResponseEntity<>(workCenterCode, OK);
     }
 
     // 코드 단일 조회
@@ -75,12 +73,12 @@ public class WorkCenterCodeController {
     )
     public ResponseEntity<CodeResponse> getWorkCenterCode(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         CodeResponse workCenterCode = workCenterService.getWorkCenterCode(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + workCenterCode.getId() + " from getWorkCenterCode.");
-        return new ResponseEntity<>(workCenterCode, HttpStatus.OK);
+        return new ResponseEntity<>(workCenterCode, OK);
     }
 
     // 코드 전체 조회
@@ -88,12 +86,12 @@ public class WorkCenterCodeController {
     @ResponseBody()
     @Operation(summary = "작업장 코드 전체 조회")
     public ResponseEntity<List<CodeResponse>> getWorkCenterCodes(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<CodeResponse> workCenterCodes = workCenterService.getWorkCenterCodes();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkCenterCodes.");
-        return new ResponseEntity<>(workCenterCodes, HttpStatus.OK);
+        return new ResponseEntity<>(workCenterCodes, OK);
     }
 
     // 코드 삭제
@@ -108,11 +106,11 @@ public class WorkCenterCodeController {
     )
     public ResponseEntity deleteWorkCenterCode(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         workCenterService.deleteWorkCenterCode(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteWorkCenterCode.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 }

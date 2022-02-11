@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +25,8 @@ import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 // 3-4-1. 불량항목 등록
 @RequestMapping(value = "/bad-items")
@@ -55,7 +56,7 @@ public class BadItemController {
         BadItemResponse badItem = badItemService.createBadItem(badItemRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + badItem.getId() + " from createBadItem.");
-        return new ResponseEntity<>(badItem, HttpStatus.OK);
+        return new ResponseEntity<>(badItem, OK);
     }
 
     @GetMapping("/{id}")
@@ -74,7 +75,7 @@ public class BadItemController {
         BadItemResponse badItem = badItemService.getBadItem(id);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + badItem.getId() + " from getBadItem.");
-        return new ResponseEntity<>(badItem, HttpStatus.OK);
+        return new ResponseEntity<>(badItem, OK);
     }
 
     @GetMapping
@@ -87,7 +88,7 @@ public class BadItemController {
         List<BadItemResponse> badItems = badItemService.getBadItems(workProcessId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getBadItems.");
-        return new ResponseEntity<>(badItems, HttpStatus.OK);
+        return new ResponseEntity<>(badItems, OK);
     }
 
 
@@ -109,7 +110,7 @@ public class BadItemController {
         BadItemResponse badItem = badItemService.updateBadItem(id, badItemRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + badItem.getId() + " from updateBadItem.");
-        return new ResponseEntity<>(badItem, HttpStatus.OK);
+        return new ResponseEntity<>(badItem, OK);
     }
 
     @DeleteMapping("/{id}")
@@ -128,7 +129,7 @@ public class BadItemController {
         badItemService.deleteBadItem(id);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteBadItem.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     //    @GetMapping
@@ -156,6 +157,6 @@ public class BadItemController {
 //    public ResponseEntity<Page<BadItemResponse>> getBadItems(
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(badItemService.getBadItems(pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(badItemService.getBadItems(pageable), OK);
 //    }
 }

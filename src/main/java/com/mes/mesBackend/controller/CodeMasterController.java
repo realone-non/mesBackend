@@ -34,7 +34,7 @@
 //    @ResponseBody
 //    @ApiOperation(value = "코드마스터 생성")
 //    public ResponseEntity<CodeMasterResponse> createCodeMaster(@RequestBody CodeMasterRequest codeMasterRequest){
-//        return new ResponseEntity<>(codeMasterService.createCodeMaster(codeMasterRequest), HttpStatus.OK);
+//        return new ResponseEntity<>(codeMasterService.createCodeMaster(codeMasterRequest), OK);
 //    }
 //
 //    // 코드마스터 페이징 조회
@@ -46,7 +46,7 @@
 //            @RequestParam(required = false) String codeName,
 //            @PageableDefault Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(codeMasterService.getCodeMasters(mainCode, codeName, pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(codeMasterService.getCodeMasters(mainCode, codeName, pageable), OK);
 //    }
 //
 //    // 부코드 마스터 조회
@@ -54,7 +54,7 @@
 //    @ResponseBody
 //    @ApiOperation(value = "부코드마스터 조회",notes = "해당 주코드에 해당하는 부코드 전체 조회")
 //    public ResponseEntity<List<SubCodeMasterResponse>> getSubCodeMasters(@PathVariable Long id) throws NotFoundException {
-//        return new ResponseEntity<>(codeMasterService.getSubCodeMasters(id), HttpStatus.OK);
+//        return new ResponseEntity<>(codeMasterService.getSubCodeMasters(id), OK);
 //    }
 //
 //    // 코드마스터 수정
@@ -65,7 +65,7 @@
 //            @PathVariable Long id,
 //            @RequestBody CodeMasterUpdateRequest codeMasterUpdateRequest
 //    ) throws NotFoundException {
-//        return new ResponseEntity<>(codeMasterService.updateCodeMaster(id, codeMasterUpdateRequest), HttpStatus.OK);
+//        return new ResponseEntity<>(codeMasterService.updateCodeMaster(id, codeMasterUpdateRequest), OK);
 //    }
 //
 //    // 부코드마스터 수정
@@ -76,7 +76,7 @@
 //            @PathVariable Long id,
 //            @RequestBody SubCodeMasterRequest subCodeMasterRequest
 //    ) {
-//        return new ResponseEntity<>(codeMasterService.updateSubCodeMaster(id, subCodeMasterRequest), HttpStatus.OK);
+//        return new ResponseEntity<>(codeMasterService.updateSubCodeMaster(id, subCodeMasterRequest), OK);
 //    }
 //
 //    // 부코드마스터 삭제
@@ -85,7 +85,7 @@
 //    @ApiOperation(value = "부코드마스터 삭제")
 //    public ResponseEntity deleteSubCodeMaster(@PathVariable Long id) {
 //        codeMasterService.deleteSubCodeMaster(id);
-//        return new ResponseEntity(HttpStatus.NO_CONTENT);
+//        return new ResponseEntity(NO_CONTENT);
 //    }
 //
 //    // 코드마스터 삭제
@@ -94,7 +94,7 @@
 //    @ApiOperation(value = "코드마스터 삭제")
 //    public ResponseEntity deleteCodeMaster(@PathVariable Long id) throws NotFoundException {
 //        codeMasterService.deleteCodeMaster(id);
-//        return new ResponseEntity(HttpStatus.NO_CONTENT);
+//        return new ResponseEntity(NO_CONTENT);
 //    }
 //
 //    // 부코드 생성
@@ -105,7 +105,7 @@
 //            @PathVariable(value = "id") Long codeMasterId,
 //            @RequestBody SubCodeMasterRequest subCodeMasterRequest
 //    ) throws NotFoundException {
-//        return new ResponseEntity<>(codeMasterService.createSubCodeMaster(codeMasterId, subCodeMasterRequest), HttpStatus.OK);
+//        return new ResponseEntity<>(codeMasterService.createSubCodeMaster(codeMasterId, subCodeMasterRequest), OK);
 //    }
 //
 //    // 부코드 단일 조회
@@ -113,6 +113,6 @@
 //    @ResponseBody
 //    @ApiOperation(value = "코드마스터 단일 조회")
 //    public ResponseEntity<CodeMasterResponse> getCodeMaster(@PathVariable Long id) throws NotFoundException {
-//        return new ResponseEntity<>(codeMasterService.getCodeMaster(id), HttpStatus.OK);
+//        return new ResponseEntity<>(codeMasterService.getCodeMaster(id), OK);
 //    }
 //}

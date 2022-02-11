@@ -6,6 +6,7 @@ import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.PopRecycleResponse;
 import com.mes.mesBackend.dto.response.RecycleResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.RECYCLE;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 
 @Service
 public class PopRecycleServiceImpl implements PopRecycleService {
@@ -65,7 +67,7 @@ public class PopRecycleServiceImpl implements PopRecycleService {
         lotRequest.setRecycleAmount(createAmount);
         lotRequest.setEnrollmentType(RECYCLE);
         lotRequest.setWareHouse(wareHouse);
-//        lotRequest.setDummyYn(false); TODO: 수정해야됨
+        lotRequest.setLotMasterDivision(REAL_LOT);
         lotRequest.setItem(item);
         lotRequest.setWorkProcessDivision(workProcess.getWorkProcessDivision());
 

@@ -17,30 +17,28 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 // 3-2-2. 그룹코드 등록
 @Tag(name = "item-group-code", description = "그룹코드 API")
 @RequestMapping("/item-group-codes")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class ItemGroupCodeController {
-    @Autowired
-    ItemGroupService itemGroupCodeService;
-
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(ItemGroupCodeController.class);
+    private final ItemGroupService itemGroupCodeService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(ItemGroupCodeController.class);
     private CustomLogger cLogger;
-
 
     // 그룹코드 생성
     @PostMapping
@@ -55,12 +53,12 @@ public class ItemGroupCodeController {
     )
     public ResponseEntity<CodeResponse> createItemGroupCode(
             @RequestBody @Valid CodeRequest codeRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         CodeResponse itemGroupCode = itemGroupCodeService.createItemGroupCode(codeRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + itemGroupCode.getId() + " from createItemGroupCode.");
-        return new ResponseEntity<>(itemGroupCode, HttpStatus.OK);
+        return new ResponseEntity<>(itemGroupCode, OK);
     }
 
     // 그룹코드 단일 조회
@@ -75,12 +73,12 @@ public class ItemGroupCodeController {
     )
     public ResponseEntity<CodeResponse> getItemGroupCode(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         CodeResponse itemGroupCode = itemGroupCodeService.getItemGroupCode(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + itemGroupCode.getId() + " from getItemGroupCode.");
-        return new ResponseEntity<>(itemGroupCode, HttpStatus.OK);
+        return new ResponseEntity<>(itemGroupCode, OK);
     }
 
     // 그룹코드 리스트 조회
@@ -88,12 +86,12 @@ public class ItemGroupCodeController {
     @ResponseBody()
     @Operation(summary = "그룹코드 리스트 조회")
     public ResponseEntity<List<CodeResponse>> getItemGroupCodes(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<CodeResponse> itemGroupCodes = itemGroupCodeService.getItemGroupCodes();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getItemGroupCodes.");
-        return new ResponseEntity<>(itemGroupCodes, HttpStatus.OK);
+        return new ResponseEntity<>(itemGroupCodes, OK);
     }
 
     // 그룹코드 삭제
@@ -108,11 +106,11 @@ public class ItemGroupCodeController {
     )
     public ResponseEntity deleteItemGroupCode(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         itemGroupCodeService.deleteItemGroupCode(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteItemGroupCode.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 }

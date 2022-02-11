@@ -23,11 +23,16 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 // 수리코드
 @Tag(name = "repair-code", description = "수리코드 API")
 @RequestMapping("/repair-codes")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @RequiredArgsConstructor
 public class RepairCodeController {
 
@@ -48,12 +53,12 @@ public class RepairCodeController {
     )
     public ResponseEntity<RepairCodeResponse> createRepairCode(
             @RequestBody @Valid RepairCodeRequest repairCodeRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         RepairCodeResponse repairCode = repairCodeService.createRepairCode(repairCodeRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + repairCode.getId() + " from createRepairCode.");
-        return new ResponseEntity<>(repairCode, HttpStatus.OK);
+        return new ResponseEntity<>(repairCode, OK);
     }
 
     // 수리코드 단일 조회
@@ -68,12 +73,12 @@ public class RepairCodeController {
     )
     public ResponseEntity<RepairCodeResponse> getRepairCode(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         RepairCodeResponse repairCode = repairCodeService.getRepairCode(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + repairCode.getId() + " from getRepairCode.");
-        return new ResponseEntity<>(repairCode, HttpStatus.OK);
+        return new ResponseEntity<>(repairCode, OK);
     }
 
     // 수리코드 전체 조회
@@ -81,12 +86,12 @@ public class RepairCodeController {
     @ResponseBody
     @Operation(summary = "수리코드 전체 조회")
     public ResponseEntity<List<RepairCodeResponse>> getRepairCodes(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<RepairCodeResponse> repairCodes = repairCodeService.getRepairCodes();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getRepairCodes.");
-        return new ResponseEntity<>(repairCodes, HttpStatus.OK);
+        return new ResponseEntity<>(repairCodes, OK);
     }
 
     // 수리코드 수정
@@ -102,12 +107,12 @@ public class RepairCodeController {
     public ResponseEntity<RepairCodeResponse> updateRepairCode(
             @PathVariable Long id,
             @RequestBody @Valid RepairCodeRequest repairCodeRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         RepairCodeResponse repairCode = repairCodeService.updateRepairCode(id, repairCodeRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + repairCode.getId() + " from updateRepairCode.");
-        return new ResponseEntity<>(repairCode, HttpStatus.OK);
+        return new ResponseEntity<>(repairCode, OK);
     }
 
     // 수리코드 삭제
@@ -122,11 +127,11 @@ public class RepairCodeController {
     )
     public ResponseEntity deleteRepairCode(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         repairCodeService.deleteRepairCode(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteRepairCode.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 }

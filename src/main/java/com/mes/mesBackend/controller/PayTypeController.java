@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +26,8 @@ import java.util.List;
 import static com.mes.mesBackend.exception.Message.NOT_EMPTY;
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 @RequestMapping(value = "/pay-types")
 @Tag(name = "pay-type", description = "결제조건 API")
@@ -54,7 +55,7 @@ public class PayTypeController {
         PayTypeResponse payType = payTypeService.createPayType(payTypeRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + payType.getId() + " from createPayType.");
-        return new ResponseEntity<>(payType, HttpStatus.OK);
+        return new ResponseEntity<>(payType, OK);
     }
 
     @GetMapping("/{id}")
@@ -73,7 +74,7 @@ public class PayTypeController {
         PayTypeResponse payType = payTypeService.getPayType(id);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + payType.getId() + " from getPayType.");
-        return new ResponseEntity<>(payType, HttpStatus.OK);
+        return new ResponseEntity<>(payType, OK);
     }
 
     @GetMapping
@@ -85,7 +86,7 @@ public class PayTypeController {
         List<PayTypeResponse> payTypes = payTypeService.getPayTypes();
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPayTypes.");
-        return new ResponseEntity<>(payTypes, HttpStatus.OK);
+        return new ResponseEntity<>(payTypes, OK);
     }
 
 
@@ -107,7 +108,7 @@ public class PayTypeController {
         PayTypeResponse payType = payTypeService.updatePayType(id, payTypeRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + payType.getId() + " from updatePayType.");
-        return new ResponseEntity<>(payType, HttpStatus.OK);
+        return new ResponseEntity<>(payType, OK);
     }
 
     @DeleteMapping("/{id}")
@@ -126,6 +127,6 @@ public class PayTypeController {
         payTypeService.deletePayType(id);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deletePayType.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 }

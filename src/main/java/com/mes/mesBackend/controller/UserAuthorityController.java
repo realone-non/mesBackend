@@ -18,16 +18,20 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
+
 // 18-2. 권한등록
 @RequestMapping(value = "/user-authorities")
 @Tag(name = "user-authority", description = "18-2. 권한등록 API")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @RequiredArgsConstructor
 public class UserAuthorityController {
     private final UserAuthorityService userAuthorityService;
     private final LogService logService;
-    private Logger logger = LoggerFactory.getLogger(UserAuthorityController.class);
+    private final Logger logger = LoggerFactory.getLogger(UserAuthorityController.class);
     private CustomLogger cLogger;
 
     // 사용자 리스트 검색 조회
@@ -41,13 +45,11 @@ public class UserAuthorityController {
     public ResponseEntity<List<UserAuthorityResponse>> getUserAuthorities(
             @RequestParam(required = false) @Parameter(description = "사용자 ID(userCode)") String userCode,
             @RequestParam(required = false) @Parameter(description = "담당자 id") String userName,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<UserAuthorityResponse> userAuthorityResponses = userAuthorityService.getUserAuthorities(userCode, userName);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getUserAuthorities.");
-        return new ResponseEntity<>(userAuthorityResponses, HttpStatus.OK);
+        return new ResponseEntity<>(userAuthorityResponses, OK);
     }
-
-    // 다른기능들은 as 기간에 구현 예정
 }

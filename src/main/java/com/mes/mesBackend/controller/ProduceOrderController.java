@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,15 +27,20 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 // 6-1. 제조오더 등록
 @RequestMapping(value = "/produce-orders")
 @Tag(name = "produce-order", description = "제조오더 API")
 @RestController
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 @Slf4j
 @RequiredArgsConstructor
 public class ProduceOrderController {
-
     private final ProduceOrderService produceOrderService;
     private final LogService logService;
     private final Logger logger = LoggerFactory.getLogger(ProduceOrderController.class);
@@ -54,12 +58,12 @@ public class ProduceOrderController {
     )
     public ResponseEntity<ProduceOrderResponse> createProduceOrder(
             @RequestBody @Valid ProduceOrderRequest produceOrderRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         ProduceOrderResponse produceOrder = produceOrderService.createProduceOrder(produceOrderRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + produceOrder.getId() + " from createProduceOrder.");
-        return new ResponseEntity<>(produceOrder, HttpStatus.OK);
+        return new ResponseEntity<>(produceOrder, OK);
     }
 
     // 제조 오더 단일 조회
@@ -74,12 +78,12 @@ public class ProduceOrderController {
     )
     public ResponseEntity<ProduceOrderResponse> getProduceOrder(
             @PathVariable(value = "produce-order-id") @Parameter(description = "제조 오더 id") Long produceOrderId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         ProduceOrderResponse produceOrder = produceOrderService.getProduceOrder(produceOrderId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + produceOrder.getId() + " from getProduceOrder.");
-        return new ResponseEntity<>(produceOrder, HttpStatus.OK);
+        return new ResponseEntity<>(produceOrder, OK);
     }
 
     // 제조 오더 리스트 조회, 검색조건 : 품목그룹 id, 품명|품번, 지시상태, 제조오더번호, 수주번호, 착수예정일 fromDate~toDate, 자재납기일자(보류)
@@ -95,14 +99,14 @@ public class ProduceOrderController {
             @RequestParam(required = false) @Parameter(description = "지시상태 [완료: COMPLETION, 진행중: ONGOING, 예정: SCHEDULE, 취소: CANCEL]") OrderState orderState,
             @RequestParam(required = false) @Parameter(description = "제조오더번호") String produceOrderNo,
             @RequestParam(required = false) @Parameter(description = "수주번호") String contractNo,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "착수예정일 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Parameter(description = "착수예정일 toDate") LocalDate toDate,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "착수예정일 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "착수예정일 toDate") LocalDate toDate,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<ProduceOrderResponse> produceOrders = produceOrderService.getProduceOrders(itemGroupId, itemNoAndName, orderState, produceOrderNo, contractNo, fromDate, toDate);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProduceOrders.");
-        return new ResponseEntity<>(produceOrders, HttpStatus.OK);
+        return new ResponseEntity<>(produceOrders, OK);
     }
 
     // 제조 오더 수정
@@ -119,12 +123,12 @@ public class ProduceOrderController {
     public ResponseEntity<ProduceOrderResponse> updateProduceOrder(
             @PathVariable(value = "produce-order-id") @Parameter(description = "제조 오더 id") Long produceOrderId,
             @RequestBody @Valid ProduceOrderRequest produceOrderRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         ProduceOrderResponse produceOrder = produceOrderService.updateProduceOrder(produceOrderId, produceOrderRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + produceOrder.getId() + " from updateProduceOrder.");
-        return new ResponseEntity<>(produceOrder, HttpStatus.OK);
+        return new ResponseEntity<>(produceOrder, OK);
     }
 
     // 제조 오더 삭제
@@ -137,14 +141,14 @@ public class ProduceOrderController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteProduceOrder(
+    public ResponseEntity deleteProduceOrder(
             @PathVariable(value = "produce-order-id") @Parameter(description = "제조 오더 id") Long produceOrderId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         produceOrderService.deleteProduceOrder(produceOrderId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + produceOrderId + " from deleteProduceOrder.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 제조 오더 디테일 리스트 조회
@@ -153,11 +157,11 @@ public class ProduceOrderController {
     @Operation(summary = "제조 오더 디테일 리스트 조회")
     public ResponseEntity<List<ProduceOrderDetailResponse>> getProduceOrderDetails(
             @PathVariable(value = "produce-order-id") @Parameter(description = "제조 오더 id") Long produceOrderId,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<ProduceOrderDetailResponse> produceOrderDetails = produceOrderService.getProduceOrderDetails(produceOrderId);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProduceOrderDetails.");
-        return new ResponseEntity<>(produceOrderDetails, HttpStatus.OK);
+        return new ResponseEntity<>(produceOrderDetails, OK);
     }
 }

@@ -27,11 +27,11 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 // 3-2-1. 품목 등록
 @Tag(name = "item", description = "품목 API")
@@ -42,7 +42,7 @@ import static org.springframework.http.HttpStatus.OK;
 public class ItemController {
     private final ItemService itemService;
     private final LogService logService;
-    private Logger logger = LoggerFactory.getLogger(ItemController.class);
+    private final Logger logger = LoggerFactory.getLogger(ItemController.class);
     private CustomLogger cLogger;
 
     // 품목 생성
@@ -137,7 +137,7 @@ public class ItemController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteItem(
+    public ResponseEntity deleteItem(
             @PathVariable(value = "item-id") Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
@@ -282,6 +282,6 @@ public class ItemController {
 //            @RequestParam(required = false) @Parameter(description = "검색어") String searchWord,
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(itemService.getItems(itemGroupId, itemAccountId, itemNo, itemName, searchWord, pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(itemService.getItems(itemGroupId, itemAccountId, itemNo, itemName, searchWord, pageable), OK);
 //    }
 }

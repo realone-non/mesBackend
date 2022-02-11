@@ -16,8 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,25 +23,26 @@ import javax.validation.Valid;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 @Tag(name = "user", description = "직원(작업자) API")
 @RequestMapping(value = "/users")
 @RestController
 @RequiredArgsConstructor
 public class UserController {
-
-    @Autowired
-    UserService userService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(UserController.class);
+    private final UserService userService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(UserController.class);
     private CustomLogger cLogger;
 
     // 직원(작업자) 단일 조회
     @GetMapping("/{id}")
     @ResponseBody
     @Operation(summary = "직원(작업자) 단일 조회")
-    @SecurityRequirement(name = "Authorization")
+    @SecurityRequirement(name = AUTHORIZATION)
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -53,37 +52,37 @@ public class UserController {
     )
     public ResponseEntity<UserResponse> getUser(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         UserResponse user = userService.getUser(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + user.getId() + " from getUser.");
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(user, OK);
     }
 
     // 직원(작업자) 전체 조회 검색조건: 부서, 사번, 이름
     @GetMapping
     @ResponseBody()
     @Operation(summary = "직원(작업자) 전체 조회", description = "검색조건: 부서, 사번, 이름")
-    @SecurityRequirement(name = "Authorization")
+    @SecurityRequirement(name = AUTHORIZATION)
     @ApiResponse(responseCode = "401", description = "un authorized")
     public ResponseEntity<List<UserResponse>> getUsers(
             @RequestParam(required = false) @Parameter(description = "부서 id") Long departmentId,
             @RequestParam(required = false) @Parameter(description = "사번") String userCode,
             @RequestParam(required = false) @Parameter(description = "이름") String korName,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<UserResponse> users = userService.getUsers(departmentId, userCode, korName);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of departmentId: " + departmentId + " from getUsers.");
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        return new ResponseEntity<>(users, OK);
     }
 
     // 직원(작업자) 수정
     @PatchMapping("/{id}")
     @ResponseBody()
     @Operation(summary = "직원(작업자) 수정")
-    @SecurityRequirement(name = "Authorization")
+    @SecurityRequirement(name = AUTHORIZATION)
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -95,18 +94,18 @@ public class UserController {
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
             @RequestBody @Valid UserUpdateRequest userRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, NoSuchAlgorithmException {
         UserResponse user = userService.updateUser(id, userRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + user.getId() + " from updateUser.");
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(user, OK);
     }
 
     @DeleteMapping("/{id}")
     @ResponseBody()
     @Operation(summary = "직원(작업자) 삭제")
-    @SecurityRequirement(name = "Authorization")
+    @SecurityRequirement(name = AUTHORIZATION)
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "204", description = "no content"),
@@ -116,12 +115,12 @@ public class UserController {
     )
     public ResponseEntity deleteUser(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         userService.deleteUser(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteUser.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 직원(작업자) 페이징 조회
@@ -150,6 +149,6 @@ public class UserController {
 //    public ResponseEntity<Page<UserResponse>> getUsers(
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(userService.getUsers(pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(userService.getUsers(pageable), OK);
 //    }
 }

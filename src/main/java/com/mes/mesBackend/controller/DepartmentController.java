@@ -16,28 +16,27 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 // 부서등록
-@Tag(name = "department", description = "부서 API")
+@Tag(name = "department", description = "3-1-4. 부서 API")
 @RequestMapping(value = "/departments")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class DepartmentController {
-
-    @Autowired 
-    DepartmentService departmentService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(DepartmentController.class);
+    private final DepartmentService departmentService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(DepartmentController.class);
     private CustomLogger cLogger;
 
     // 부서 생성
@@ -53,12 +52,12 @@ public class DepartmentController {
     )
     public ResponseEntity<DepartmentResponse> createDepartment(
             @RequestBody @Valid DepartmentRequest departmentRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         DepartmentResponse department = departmentService.createDepartment(departmentRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + department.getId() + " from createDepartment.");
-        return new ResponseEntity<>(department, HttpStatus.OK);
+        return new ResponseEntity<>(department, OK);
     }
 
     // 부서 단일 조회
@@ -73,12 +72,12 @@ public class DepartmentController {
     )
     public ResponseEntity<DepartmentResponse> getDepartment(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         DepartmentResponse department = departmentService.getDepartment(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + department.getId() + " from getDepartment.");
-        return new ResponseEntity<>(department, HttpStatus.OK);
+        return new ResponseEntity<>(department, OK);
     }
 
     // 부서 전체 조회
@@ -86,12 +85,12 @@ public class DepartmentController {
     @ResponseBody
     @Operation(summary = "부서 전체 조회")
     public ResponseEntity<List<DepartmentResponse>> getDepartments(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<DepartmentResponse> departments = departmentService.getDepartments();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getDepartments.");
-        return new ResponseEntity<>(departments, HttpStatus.OK);
+        return new ResponseEntity<>(departments, OK);
     }
 
     // 부서 수정
@@ -108,12 +107,12 @@ public class DepartmentController {
     public ResponseEntity<DepartmentResponse> updateDepartment(
             @PathVariable Long id,
             @RequestBody @Valid DepartmentRequest departmentRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         DepartmentResponse department = departmentService.updateDepartment(id, departmentRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + department.getId() + " from updateDepartment.");
-        return new ResponseEntity<>(department, HttpStatus.OK);
+        return new ResponseEntity<>(department, OK);
     }
 
     // 부서 삭제
@@ -126,14 +125,14 @@ public class DepartmentController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteDepartment(
+    public ResponseEntity deleteDepartment(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         departmentService.deleteDepartment(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteDepartment.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
 //    @GetMapping
@@ -161,6 +160,6 @@ public class DepartmentController {
 //    public ResponseEntity<Page<DepartmentResponse>> getDepartments(
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(departmentService.getDepartments(pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(departmentService.getDepartments(pageable), OK);
 //    }
 }

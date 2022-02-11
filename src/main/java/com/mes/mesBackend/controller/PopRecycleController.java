@@ -28,11 +28,15 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
+
 @RequestMapping("/pop/recycles")
 @Tag(name = "pop-recycle", description = "[pop] 8. 재사용")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+@SecurityRequirement(name = AUTHORIZATION)
 public class PopRecycleController {
     private final PopRecycleService popRecycleService;
     private final RecycleService recycleService;
@@ -46,12 +50,12 @@ public class PopRecycleController {
     @Operation(summary = "(pop) 재사용 목록 조회", description = "검색 조건: 공정타입")
     public ResponseEntity<List<PopRecycleResponse>> getUseRecycles(
             @RequestParam @Parameter(description = "공정 구분값") WorkProcessDivision workProcessDivision ,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
        List<PopRecycleResponse> responseList = popRecycleService.getRecycles(workProcessDivision);
-       cLogger = new MongoLogger(logger, "mongoTemplate");
+       cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getUseRecycles");
-       return new ResponseEntity<>(responseList, HttpStatus.OK);
+       return new ResponseEntity<>(responseList, OK);
     }
 
     // 재사용 유형 리스트 조회
@@ -62,12 +66,12 @@ public class PopRecycleController {
     )
     public ResponseEntity<List<RecycleResponse>> getRecycles(
             @RequestParam(required = false) @Parameter(description = "공정 구분값") WorkProcessDivision workProcessDivision,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<RecycleResponse> responseList = recycleService.getRecycles(workProcessDivision);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getRecycles.");
-        return new ResponseEntity<>(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(responseList, OK);
     }
 
     //재사용 등록
@@ -78,11 +82,11 @@ public class PopRecycleController {
     )
     public ResponseEntity<PopRecycleResponse> createUseRecycle(
             @RequestBody @Valid PopRecycleRequest request,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException{
         PopRecycleResponse response = popRecycleService.createUseRecycle(request);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + response.getId());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, OK);
     }
 }

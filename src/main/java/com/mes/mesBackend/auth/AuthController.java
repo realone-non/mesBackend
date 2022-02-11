@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.security.NoSuchAlgorithmException;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpStatus.OK;
+
 
 @Tag(name = "auth", description = "인증 API")
 @RequestMapping(value = "/auth")
@@ -51,9 +54,9 @@ public class AuthController {
             @RequestBody @Valid UserCreateRequest userRequest
     ) throws NotFoundException, NoSuchAlgorithmException, BadRequestException {
         UserResponse user = userService.createUser(userRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info("created user. userId: " + user.getId() + ", input username: " + userRequest.getUserCode() + ", korName: " + userRequest.getKorName() + ". from createUser");
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(user, OK);
     }
 
     @PostMapping(value = "/signin")
@@ -70,9 +73,9 @@ public class AuthController {
             @RequestBody @Valid UserLogin userLogin
     ) throws NotFoundException, BadRequestException {
         TokenResponse login = userService.getLogin(userLogin);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info("login user. userCode: " + userLogin.getUserCode() + ". from getLoginInfo");
-        return new ResponseEntity<>(login, HttpStatus.OK);
+        return new ResponseEntity<>(login, OK);
     }
 
     @PatchMapping("/reissue")
@@ -87,8 +90,8 @@ public class AuthController {
     )
     public ResponseEntity<TokenResponse> updateRefreshToken(@RequestBody TokenRequest tokenRequestDto) throws CustomJwtException {
         TokenResponse reissue = userService.reissue(tokenRequestDto);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromToken(tokenRequestDto.accessToken) + " is token reissue. from updateRefreshToken.");
-        return new ResponseEntity<>(reissue, HttpStatus.OK);
+        return new ResponseEntity<>(reissue, OK);
     }
 }

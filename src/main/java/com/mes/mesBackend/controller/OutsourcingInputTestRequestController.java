@@ -146,7 +146,7 @@ public class OutsourcingInputTestRequestController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteOutsourcingInputTestRequest(
+    public ResponseEntity deleteOutsourcingInputTestRequest(
             @PathVariable(value = "id") @Parameter(description = "외주수입검사의뢰 id") Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {

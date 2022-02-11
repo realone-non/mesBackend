@@ -15,18 +15,15 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-public class WebSecurityConfig extends
-        WebSecurityConfigurerAdapter
-{
-
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
@@ -45,11 +42,17 @@ public class WebSecurityConfig extends
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration config = new CorsConfiguration();
 //                        config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-                        config.setAllowedOrigins(Arrays.asList("http://localhost:3000","http://dev-mes-grid.s3-website.ap-northeast-2.amazonaws.com", "http://prod-mes-grid.s3-website.ap-northeast-2.amazonaws.com"));
+                        config.setAllowedOrigins(
+                                Arrays.asList(
+                                        "http://localhost:3000",
+                                        "http://dev-mes-grid.s3-website.ap-northeast-2.amazonaws.com",
+                                        "http://prod-mes-grid.s3-website.ap-northeast-2.amazonaws.com"
+                                )
+                        );
                         config.setAllowedMethods(Collections.singletonList("*"));
                         config.setAllowCredentials(true);
                         config.setAllowedHeaders(Collections.singletonList("*"));
-                        config.setExposedHeaders(Arrays.asList("Authorization"));
+                        config.setExposedHeaders(Arrays.asList(AUTHORIZATION));
                         config.setMaxAge(3600L);
                         return config;
                     }

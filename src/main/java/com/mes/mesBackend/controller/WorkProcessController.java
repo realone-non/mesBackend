@@ -16,28 +16,27 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
 // 3-3-2. 작업 공정 등록
 @Tag(name = "work-process", description = "작업 공정 API")
 @RequestMapping("/work-processes")
 @RestController
 @RequiredArgsConstructor
-@SecurityRequirement(name = "Authorization")
+@SecurityRequirement(name = AUTHORIZATION)
 public class WorkProcessController {
-
-    @Autowired
-    WorkProcessService workProcessService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(WorkProcessController.class);
+    private final WorkProcessService workProcessService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(WorkProcessController.class);
     private CustomLogger cLogger;
 
     // 작업공정 생성
@@ -53,12 +52,12 @@ public class WorkProcessController {
     )
     public ResponseEntity<WorkProcessResponse> createWorkProcess(
             @RequestBody @Valid WorkProcessRequest workProcessRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkProcessResponse workProcess = workProcessService.createWorkProcess(workProcessRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workProcess.getId() + " from createWorkProcess.");
-        return new ResponseEntity<>(workProcess, HttpStatus.OK);
+        return new ResponseEntity<>(workProcess, OK);
     }
 
     // 작업공정 단일 조회
@@ -73,12 +72,12 @@ public class WorkProcessController {
     )
     public ResponseEntity<WorkProcessResponse> getWorkProcess(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkProcessResponse workProcess = workProcessService.getWorkProcess(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + workProcess.getId() + " from getWorkProcess.");
-        return new ResponseEntity<>(workProcess, HttpStatus.OK);
+        return new ResponseEntity<>(workProcess, OK);
     }
 
     // 작업공정 전체 조회
@@ -86,12 +85,12 @@ public class WorkProcessController {
     @ResponseBody
     @Operation(summary = "작업공정 전체 조회")
     public ResponseEntity<List<WorkProcessResponse>> getWorkProcesses(
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<WorkProcessResponse> workProcesses = workProcessService.getWorkProcesses();
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkProcesses.");
-        return new ResponseEntity<>(workProcesses, HttpStatus.OK);
+        return new ResponseEntity<>(workProcesses, OK);
     }
 
     // 작업공정 수정
@@ -108,12 +107,12 @@ public class WorkProcessController {
     public ResponseEntity<WorkProcessResponse> updateWorkProcess(
             @PathVariable Long id,
             @RequestBody @Valid WorkProcessRequest workProcessRequest,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         WorkProcessResponse workProcess = workProcessService.updateWorkProcess(id, workProcessRequest);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + workProcess.getId() + " from updateWorkProcess.");
-        return new ResponseEntity<>(workProcess, HttpStatus.OK);
+        return new ResponseEntity<>(workProcess, OK);
     }
 
     // 작업공정 삭제
@@ -126,14 +125,14 @@ public class WorkProcessController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteWorkProcess(
+    public ResponseEntity deleteWorkProcess(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false) @Parameter(hidden = true) String tokenHeader
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         workProcessService.deleteWorkProcess(id);
-        cLogger = new MongoLogger(logger, "mongoTemplate");
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteWorkProcess.");
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity(NO_CONTENT);
     }
 
     // 작업공정 페이징 조회
@@ -162,6 +161,6 @@ public class WorkProcessController {
 //    public ResponseEntity<Page<WorkProcessResponse>> getWorkProcesses(
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(workProcessService.getWorkProcesses(pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(workProcessService.getWorkProcesses(pageable), OK);
 //    }
 }

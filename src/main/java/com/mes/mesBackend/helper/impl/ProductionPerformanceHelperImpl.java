@@ -79,14 +79,4 @@ public class ProductionPerformanceHelperImpl implements ProductionPerformanceHel
         return workOrderDetailRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("[ProductionPerformanceHelper] workOrderDetail does not exist. input id: " + id));
     }
-//
-//    private WorkProcess getWorkProcessOrThrow(Long id) throws NotFoundException {
-//        return workProcessRepo.findByIdAndDeleteYnFalse(id)
-//                .orElseThrow(() -> new NotFoundException("[ProductionPerformanceHelper] workProcess does not exist. input id: " + id));
-//    }
-//
-//    private Long getWorkProcessByDivisionOrThrow(WorkProcessDivision workProcessDivision) throws NotFoundException {
-//        return workProcessRepo.findIdByWorkProcessDivisionAndDeleteYnFalse(SHIPMENT)
-//                .orElseThrow(() -> new NotFoundException("[ProductionPerformanceHelper] 해당하는 workProcessDivision 에 대한 workProcess 가 없음."));
-//    }
 }

@@ -43,6 +43,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     @Autowired
     WareHouseRepository wareHouseRepository;
     @Autowired
+    LotTypeRepository lotTypeRepository;
+    @Autowired
     AmountHelper amountHelper;
 
 
@@ -207,8 +209,14 @@ public class OutsourcingServiceImpl implements OutsourcingService {
 
     //외주 입고 LOT정보 수정
     public OutsourcingInputLOTResponse modifyOutsourcingInputLOT(Long inputId, Long id, OutsourcingInputLOTRequest request) throws NotFoundException {
+        OutSourcingInput input = outsourcingInputRepository.findByIdAndDeleteYnFalse(inputId).orElseThrow(()-> new NotFoundException("inputInfo not in db:" + id));
         LotMaster lotInfo = lotMasterRepository.findByIdAndDeleteYnFalse(id).orElseThrow(()-> new NotFoundException("lotinfo not in db:" + id));
+        LotType lotType = lotTypeRepository.findByIdAndDeleteYnFalse(request.getLotType()).orElseThrow(()-> new NotFoundException("lottype not in db:" + id));
+        input.setInputAmount(request.getInputAmount());
+        input.setTestRequestType(request.getTestRequestType());
         lotInfo.setInputAmount(request.getInputAmount());
+        lotInfo.setCreatedAmount(request.getInputAmount());
+        lotInfo.setLotType(lotType);
         lotMasterRepository.save(lotInfo);
         return modelMapper.toResponse(lotInfo, OutsourcingInputLOTResponse.class);
     }

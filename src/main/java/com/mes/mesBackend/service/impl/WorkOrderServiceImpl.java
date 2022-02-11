@@ -125,8 +125,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     /*
     * 작업공정 수정 불가
     * */
-
-    // TODO : 생산수량 변경 X, 이 쪽 다시 수정해야함
     @Override
     public WorkOrderResponse updateWorkOrder(
             Long produceOrderId,

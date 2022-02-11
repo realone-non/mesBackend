@@ -37,7 +37,7 @@ import static org.springframework.http.HttpStatus.OK;
 public class ItemAccountController {
     private final ItemAccountService itemAccountService;
     private final LogService logService;
-    private Logger logger = LoggerFactory.getLogger(ItemAccountController.class);
+    private final Logger logger = LoggerFactory.getLogger(ItemAccountController.class);
     private CustomLogger cLogger;
 
     // 품목계정 생성

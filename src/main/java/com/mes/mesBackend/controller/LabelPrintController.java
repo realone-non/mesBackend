@@ -1,5 +1,9 @@
 package com.mes.mesBackend.controller;
 
+
+import com.mes.mesBackend.dto.response.LabelPrintResponse;
+import com.mes.mesBackend.dto.response.PopEquipmentResponse;
+import com.mes.mesBackend.dto.response.WorkProcessResponse;
 import com.amazonaws.Response;
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -15,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +38,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping(value = "/label-prints")
 @Tag(name = "label-print", description = "라벨 프린트용 API")
 @RestController
+@RequiredArgsConstructor
 public class LabelPrintController {
     @Autowired
     LogService logService;
@@ -44,7 +50,6 @@ public class LabelPrintController {
     EquipmentService equipmentService;
     @Autowired
     PopShipmentService popShipmentService;
-
     private Logger logger = LoggerFactory.getLogger(LabelPrintController.class);
     private CustomLogger cLogger;
 
@@ -60,7 +65,7 @@ public class LabelPrintController {
     public ResponseEntity<List<LabelPrintResponse>> getPrints(
             @PathVariable(value = "work-process-id") @Parameter(description = "공정 id") Long workProcessId,
             @PathVariable(value = "equipment-id") @Parameter(description = "설비 id") Long equipmentId
-    ) throws NotFoundException{
+    ) {
         List<LabelPrintResponse> responseList = lotMasterService.getPrints(workProcessId, equipmentId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info("Possible print list view from LabelPrintController getPrints");

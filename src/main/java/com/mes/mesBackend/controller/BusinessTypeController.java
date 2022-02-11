@@ -118,7 +118,7 @@ public class BusinessTypeController {
                     @ApiResponse(responseCode = "404", description = "not found resource")
             }
     )
-    public ResponseEntity<Void> deleteBusinessType(
+    public ResponseEntity deleteBusinessType(
             @PathVariable(value = "id") Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String header
     ) throws NotFoundException {
@@ -153,6 +153,6 @@ public class BusinessTypeController {
 //    public ResponseEntity<Page<BusinessTypeResponse>> getBusinessTypes(
 //            @PageableDefault @Parameter(hidden = true) Pageable pageable
 //    ) {
-//        return new ResponseEntity<>(businessTypeService.getBusinessTypes(pageable), HttpStatus.OK);
+//        return new ResponseEntity<>(businessTypeService.getBusinessTypes(pageable), OK);
 //    }
 }
