@@ -5,6 +5,8 @@ import com.mes.mesBackend.logger.MongoLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+
 public class CustomJwtException extends Exception {
     private Logger logger = LoggerFactory.getLogger(CustomJwtException.class);
     private CustomLogger cLogger;

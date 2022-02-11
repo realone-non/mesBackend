@@ -24,8 +24,8 @@ import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.NO_CONTENT;
-import static org.springframework.http.OK;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 
 @RequestMapping(value = "/business-types")

@@ -24,19 +24,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.OK;
+
 @Tag(name = "grid-option", description = "그리드 옵션 API")
 @RequestMapping("/users/{user-id}/headers")
 @RestController
 @RequiredArgsConstructor
 @SecurityRequirement(name = AUTHORIZATION)
 public class GridOptionController {
-
-    @Autowired
-    GridOptionService gridOptionService;
-    @Autowired
-    LogService logService;
-
-    private Logger logger = LoggerFactory.getLogger(GridOptionController.class);
+    private final GridOptionService gridOptionService;
+    private final LogService logService;
+    private final Logger logger = LoggerFactory.getLogger(GridOptionController.class);
     private CustomLogger cLogger;
 
 
