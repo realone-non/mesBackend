@@ -6,6 +6,7 @@ import com.mes.mesBackend.entity.BusinessType;
 import com.mes.mesBackend.entity.Client;
 import com.mes.mesBackend.entity.ClientType;
 import com.mes.mesBackend.entity.CountryCode;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.impl.S3UploaderImpl;
@@ -21,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+
+import static com.mes.mesBackend.entity.enumeration.InspectionType.NONE;
 
 @Service
 public class ClientServiceImpl implements ClientService {
@@ -53,8 +56,10 @@ public class ClientServiceImpl implements ClientService {
         BusinessType businessType = clientRequest.getBusinessType() != null ? businessTypeService.getBusinessTypeOrThrow(clientRequest.getBusinessType()) : null;
         CountryCode countryCode = clientRequest.getCountryCode() != null ? countryCodeService.getCountryCodeOrThrow(clientRequest.getCountryCode()) : null;
         ClientType clientType = clientTypeService.getClientTypeOrThrow(clientRequest.getClientType());
-
         Client client = modelMapper.toEntity(clientRequest, Client.class);
+
+        if(clientRequest.getInspectionType().equals(NONE)) client.setInspectionType(null);
+
         client.addJoin(businessType, countryCode, clientType);
         clientRepository.save(client);
         return modelMapper.toResponse(client, ClientResponse.class);
