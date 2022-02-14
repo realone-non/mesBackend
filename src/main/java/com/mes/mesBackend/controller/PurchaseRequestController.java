@@ -140,7 +140,7 @@ public class PurchaseRequestController {
     public ResponseEntity deletePurchaseRequest(
             @PathVariable(value = "id") Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         purchaseRequestService.deletePurchaseRequest(id);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deletePurchaseRequest.");
