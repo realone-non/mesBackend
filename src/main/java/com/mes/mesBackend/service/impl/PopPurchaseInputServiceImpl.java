@@ -13,6 +13,7 @@ import com.mes.mesBackend.repository.PurchaseOrderRepository;
 import com.mes.mesBackend.repository.PurchaseRequestRepository;
 import com.mes.mesBackend.service.LotMasterService;
 import com.mes.mesBackend.service.PopPurchaseInputService;
+import com.mongodb.MongoNamespace;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -104,6 +105,7 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
         int allInputAmount = purchaseInputAmount + inputAmount;   // 현재 입고된 수량 + 입력된 입고수량
 
         // orderState 변경: 구매요청의 발주수량 만큼 모두 입고 완료 햇을때 구매요청의 지시상태값을 완료(COMPLETION) 으로 변경한다.
+        purchaseRequest.setOrdersState(ONGOING);    // 입고되면 ONGOING 으로
         if (allInputAmount >= purchaseRequest.getOrderAmount()) purchaseRequest.putOrderStateChangedCompletion();
 
         PurchaseInput purchaseInput = new PurchaseInput();
@@ -140,7 +142,6 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
                 .orElseThrow(() -> new NotFoundException("purchaseRequest does not exist. input purchaseRequest id: " + id));
     }
 
-
     // 구매요청에 입고일시 생성
     // 구매요청에 해당하는 구매입고 중 제일 최근에 등록된 날짜
     private void putInputDateToPurchaseRequest(PurchaseRequest purchaseRequest) {
@@ -149,5 +150,4 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
         purchaseRequest.setInputDate(inputDate);
         purchaseRequestRepo.save(purchaseRequest);
     }
-
 }
