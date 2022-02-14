@@ -16,7 +16,6 @@ import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.LotMasterRepository;
 import com.mes.mesBackend.repository.PurchaseInputRepository;
 import com.mes.mesBackend.repository.PurchaseRequestRepository;
-import com.mes.mesBackend.service.LotMasterService;
 import com.mes.mesBackend.service.PurchaseInputService;
 import com.mes.mesBackend.service.PurchaseRequestService;
 import lombok.RequiredArgsConstructor;
