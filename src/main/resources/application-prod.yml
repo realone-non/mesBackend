@@ -21,7 +21,7 @@ spring:
         show_sql: true
         format_sql: true
         jdbc:
-          batch_size: 1000
+          batch_size: 9999
 
   # mongoDB
   data:
