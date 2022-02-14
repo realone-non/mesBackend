@@ -1,0 +1,27 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo Build started on `date`
+      - chmod +x ./gradlew
+      - ./gradlew build
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo $(basename ./build/libs/*.jar)
+      - pwd
+      - cp ./build/libs/*.jar ./mesBackend.jar
+
+cache:
+  paths:
+    - '/root/.gradle/caches/**/*'
+
+artifacts:
+  files:
+    - 'mesBackend.jar'
+    - Procfile
+  discard-paths: yes
+
+
+
