@@ -1,9 +1,9 @@
 spring:
   profiles:
-    active: :prod
+    active: : local
   # mySql
   datasource:
-    url: jdbc:mysql://non.cv2ps1sa1sm9.ap-northeast-2.rds.amazonaws.com/NON
+    url: jdbc:mysql://mes-dev.cyyxmbrc9eeg.ap-northeast-2.rds.amazonaws.com:3306/mes-dev
 #    serverTimezone=UTC&characterEncoding=UTF-8
     username: admin
     password: SilverStar01!#
