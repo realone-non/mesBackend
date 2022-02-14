@@ -19,9 +19,6 @@ public class OutsourcingInputLOTRequest {
     @NotNull(message = NOT_NULL)
     Long lotType;
 
-    @Schema(description = "LOT번호")
-    String lotNo;
-
     @Schema(description = "입고수량")
     int inputAmount;
 
