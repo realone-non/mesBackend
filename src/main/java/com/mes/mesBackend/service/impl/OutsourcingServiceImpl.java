@@ -8,10 +8,12 @@ import com.mes.mesBackend.entity.enumeration.ItemLogType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.AmountHelper;
+import com.mes.mesBackend.helper.LotHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.LotMasterService;
 import com.mes.mesBackend.service.OutsourcingService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,32 +22,21 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class OutsourcingServiceImpl implements OutsourcingService {
-
-    @Autowired
-    ModelMapper modelMapper;
-    @Autowired
-    OutSourcingProductionRequestRepository outsourcingProductionRepository;
-    @Autowired
-    OutSourcingProductionRawMaterialOutputInfoRepository outsourcingMaterialRepository;
-    @Autowired
-    OutsourcingInputRepository outsourcingInputRepository;
-    @Autowired
-    OutsourcingReturnRepository outsourcingReturnRepository;
-    @Autowired
-    BomMasterRepository bomMasterRepository;
-    @Autowired
-    BomItemDetailRepository bomItemDetailRepository;
-    @Autowired
-    LotMasterService lotMasterService;
-    @Autowired
-    LotMasterRepository lotMasterRepository;
-    @Autowired
-    WareHouseRepository wareHouseRepository;
-    @Autowired
-    LotTypeRepository lotTypeRepository;
-    @Autowired
-    AmountHelper amountHelper;
+    private final ModelMapper modelMapper;
+    private final OutSourcingProductionRequestRepository outsourcingProductionRepository;
+    private final OutSourcingProductionRawMaterialOutputInfoRepository outsourcingMaterialRepository;
+    private final OutsourcingInputRepository outsourcingInputRepository;
+    private final OutsourcingReturnRepository outsourcingReturnRepository;
+    private final BomMasterRepository bomMasterRepository;
+    private final BomItemDetailRepository bomItemDetailRepository;
+    private final LotMasterService lotMasterService;
+    private final LotMasterRepository lotMasterRepository;
+    private final WareHouseRepository wareHouseRepository;
+    private final LotTypeRepository lotTypeRepository;
+    private final AmountHelper amountHelper;
+    private final LotHelper lotHelper;
 
 
     //외주생산의뢰 등록
@@ -178,7 +169,7 @@ public class OutsourcingServiceImpl implements OutsourcingService {
                 request.getLotType()
         );
 
-        String lotNo = lotMasterService.createLotMaster(lotMasterRequest).getLotNo();
+        String lotNo = lotHelper.createLotMaster(lotMasterRequest).getLotNo();
 
         LotMaster lotMaster = lotMasterRepository.findByLotNoAndUseYnTrue(lotNo);
 

@@ -86,6 +86,7 @@ public class LotMasterRequest {
         setCreatedAmount(stockAmount);
         setLotTypeId(lotType);
         setLotMasterDivision(REAL_LOT);
+        setWorkProcessDivision(MATERIAL_INPUT);
     }
 
     public void putPopWorkOrder(

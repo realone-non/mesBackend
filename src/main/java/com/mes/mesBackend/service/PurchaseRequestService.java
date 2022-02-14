@@ -19,7 +19,7 @@ public interface PurchaseRequestService {
     // 구매요청 수정
     PurchaseRequestResponse updatePurchaseRequest(Long id, PurchaseRequestRequest purchaseRequestRequest) throws NotFoundException, BadRequestException;
     // 구매요청 삭제
-    void deletePurchaseRequest(Long id) throws NotFoundException;
+    void deletePurchaseRequest(Long id) throws NotFoundException, BadRequestException;
     // 구매요청 단일 조회 및 예외
     PurchaseRequest getPurchaseRequestOrThrow(Long id) throws NotFoundException;
 }

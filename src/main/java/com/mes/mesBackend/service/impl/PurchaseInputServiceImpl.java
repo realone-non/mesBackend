@@ -8,9 +8,7 @@ import com.mes.mesBackend.dto.response.PurchaseStatusCheckResponse;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.PurchaseInput;
 import com.mes.mesBackend.entity.PurchaseRequest;
-import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.OrderState;
-import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.LotHelper;
@@ -18,7 +16,6 @@ import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.LotMasterRepository;
 import com.mes.mesBackend.repository.PurchaseInputRepository;
 import com.mes.mesBackend.repository.PurchaseRequestRepository;
-import com.mes.mesBackend.service.LotMasterService;
 import com.mes.mesBackend.service.PurchaseInputService;
 import com.mes.mesBackend.service.PurchaseRequestService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +25,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 
 // 9-5. 구매입고 등록
@@ -38,7 +34,6 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
     private final PurchaseInputRepository purchaseInputRepo;
     private final ModelMapper mapper;
     private final PurchaseRequestService purchaseRequestService;
-    private final LotMasterService lotMasterService;
     private final LotMasterRepository lotMasterRepo;
     private final PurchaseRequestRepository purchaseRequestRepos;
     private final LotHelper lotHelper;
