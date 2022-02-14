@@ -29,7 +29,7 @@ spring:
       authentication-database: admin
       port: 27017
       database: NON
-      host: ec2-52-78-41-194.ap-northeast-2.compute.amazonaws.com
+      host: ec2-3-35-140-192.ap-northeast-2.compute.amazonaws.com
 
   # log
   logging:
