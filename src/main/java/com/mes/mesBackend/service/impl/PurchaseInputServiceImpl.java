@@ -8,9 +8,12 @@ import com.mes.mesBackend.dto.response.PurchaseStatusCheckResponse;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.PurchaseInput;
 import com.mes.mesBackend.entity.PurchaseRequest;
+import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.LotHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.LotMasterRepository;
 import com.mes.mesBackend.repository.PurchaseInputRepository;
@@ -25,6 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 
 // 9-5. 구매입고 등록
@@ -37,6 +41,7 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
     private final LotMasterService lotMasterService;
     private final LotMasterRepository lotMasterRepo;
     private final PurchaseRequestRepository purchaseRequestRepos;
+    private final LotHelper lotHelper;
 
     // 구매입고 리스트 조회, 검색조건: 입고기간 fromDate~toDate, 입고창고, 거래처, 품명|품번
     @Override
@@ -100,7 +105,9 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
                 purchaseInputRequest.getLotType(),
                 purchaseInputRequest.isProcessYn()
         );
-        String lotMaster = lotMasterService.createLotMaster(lotMasterRequest).getLotNo();      // lotMaster 생성
+
+        String lotMaster = lotHelper.createLotMaster(lotMasterRequest).getLotNo();
+//        lotMasterService.createLotMaster(lotMasterRequest).getLotNo();      // lotMaster 생성
 
         if (lotMaster == null) {
             purchaseInputRepo.deleteById(purchaseInput.getId());

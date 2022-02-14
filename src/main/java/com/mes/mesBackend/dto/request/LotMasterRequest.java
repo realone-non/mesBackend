@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL_INPUT;
 
 @Getter
 @Setter
@@ -66,6 +67,8 @@ public class LotMasterRequest {
         setCreatedAmount(createdAmount);
         setLotTypeId(lotType);
         setProcessYn(processYn);
+        setWorkProcessDivision(MATERIAL_INPUT);
+        setLotMasterDivision(REAL_LOT);
     }
 
     public void putOutsourcingInput(
@@ -82,6 +85,7 @@ public class LotMasterRequest {
         setCreatedAmount(stockAmount);
         setCreatedAmount(stockAmount);
         setLotTypeId(lotType);
+        setLotMasterDivision(REAL_LOT);
     }
 
     public void putPopWorkOrder(
