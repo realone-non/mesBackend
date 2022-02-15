@@ -1,4 +1,9 @@
 spring:
+  profiles:
+    group:
+      dev: dev
+      prod: prod
+
   # mySql
   datasource:
     url: jdbc:mysql://mes-dev.cyyxmbrc9eeg.ap-northeast-2.rds.amazonaws.com:3306/mes-dev

@@ -5,6 +5,7 @@ import com.mes.mesBackend.dto.response.PurchaseRequestResponse;
 import com.mes.mesBackend.entity.Item;
 import com.mes.mesBackend.entity.ProduceOrder;
 import com.mes.mesBackend.entity.PurchaseRequest;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
@@ -63,22 +64,6 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         return getPurchaseRequestResponseOrThrow(save.getId());
     }
 
-    // 입력받은 itemId 가 findItemIds 에 해당되는지 체크 후 맞다면 item 반환
-    private Item getItemAndCheckItemId(Long itemId, List<Long> findItemIds) throws BadRequestException, NotFoundException {
-        boolean checkItemId = findItemIds.stream().noneMatch(id -> id.equals(itemId));
-        if(checkItemId) {
-            throw new BadRequestException("입력된 item 이 해당하는 bomDetail 에 등록 되지 않은 item 입니다. 등록된 itemIds: " + findItemIds + ", input itemId: " + itemId);
-        }
-        return itemService.getItemOrThrow(itemId);
-    }
-
-    // 구매요청 단일조회
-    @Override
-    public PurchaseRequestResponse getPurchaseRequestResponseOrThrow(Long id) throws NotFoundException {
-        return purchaseRequestRepo.findByIdAndOrderStateSchedule(id)
-                .orElseThrow(() -> new NotFoundException("purchaseRequest does not exist. input purchaseRequest id : " + id));
-    }
-
     // 구매요청 리스트 조회, 검색조건: 요청기간, 제조오더번호, 품목그룹, 품번|품명, 제조사 품번, 완료포함(check)
     @Override
     public List<PurchaseRequestResponse> getPurchaseRequests(
@@ -98,6 +83,11 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
     public PurchaseRequestResponse updatePurchaseRequest(Long id, PurchaseRequestRequest newPurchaseRequestRequest) throws NotFoundException, BadRequestException {
         PurchaseRequest findPurchaseRequest = getPurchaseRequestOrThrow(id);
         ProduceOrder newProduceOrder = produceOrderService.getProduceOrderOrThrow(newPurchaseRequestRequest.getProduceOrder());
+
+        // 구매발주에 등록 된 구매요청은 수정 불가능
+        throwIfPurchaseRequestInPurchaseOrder(findPurchaseRequest);
+        // 구매요청이 ONGOING, COMPLETION 이면 수정 불가능
+        throwIfPurchaseRequestOrderStateNotSchedule(findPurchaseRequest.getOrdersState());
 
         // 총 구매요청수량이 수주수량을 초과하면 예외
         throwIfPurchaseRequestAmountGreaterThanContractItemAmount(
@@ -119,8 +109,12 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
 
     // 구매요청 삭제
     @Override
-    public void deletePurchaseRequest(Long id) throws NotFoundException {
+    public void deletePurchaseRequest(Long id) throws NotFoundException, BadRequestException {
         PurchaseRequest purchaseRequest = getPurchaseRequestOrThrow(id);
+        // 구매발주에 등록 된 구매요청은 수정 불가능
+        throwIfPurchaseRequestInPurchaseOrder(purchaseRequest);
+        // 구매요청이 ONGOING, COMPLETION 이면 삭제 불가능
+        throwIfPurchaseRequestOrderStateNotSchedule(purchaseRequest.getOrdersState());
         purchaseRequest.delete();
         purchaseRequestRepo.save(purchaseRequest);
     }
@@ -142,5 +136,32 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
                     "total requestAmount: " + orderAmountSum + ", " +
                     "contractItemAmount: " + contractItemAmount);
         }
+    }
+
+    // 구매발주에 등록 된 구매요청은 수정이나 삭제 불가능
+    private void throwIfPurchaseRequestInPurchaseOrder(PurchaseRequest purchaseRequest) throws BadRequestException {
+        if (purchaseRequest.getPurchaseOrder() != null)
+            throw new BadRequestException("발주에 등록 된 구매요청은 수정, 삭제가 불가합니다. 발주에서 구매요청 삭제 후 다시 시도해 주세요.");
+    }
+
+    // 구매요청의 orderState 가 ONGOING, COMPLETION 이면 수정이나 삭제 불가능
+    private void throwIfPurchaseRequestOrderStateNotSchedule(OrderState orderState) throws BadRequestException {
+        if (!orderState.equals(SCHEDULE)) throw new BadRequestException("진행중이거나 완료 된 구매요청은 수정이나 삭제를 할 수 없습니다. (예정인 구매요청만 수정, 삭제 할 수 있음)");
+    }
+
+    // 입력받은 itemId 가 findItemIds 에 해당되는지 체크 후 맞다면 item 반환
+    private Item getItemAndCheckItemId(Long itemId, List<Long> findItemIds) throws BadRequestException, NotFoundException {
+        boolean checkItemId = findItemIds.stream().noneMatch(id -> id.equals(itemId));
+        if(checkItemId) {
+            throw new BadRequestException("입력된 item 이 해당하는 bomDetail 에 등록 되지 않은 item 입니다. 등록된 itemIds: " + findItemIds + ", input itemId: " + itemId);
+        }
+        return itemService.getItemOrThrow(itemId);
+    }
+
+    // 구매요청 단일조회
+    @Override
+    public PurchaseRequestResponse getPurchaseRequestResponseOrThrow(Long id) throws NotFoundException {
+        return purchaseRequestRepo.findByIdAndOrderStateSchedule(id)
+                .orElseThrow(() -> new NotFoundException("purchaseRequest does not exist. input purchaseRequest id : " + id));
     }
 }

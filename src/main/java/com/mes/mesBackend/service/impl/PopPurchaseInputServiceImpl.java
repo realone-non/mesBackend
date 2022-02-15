@@ -5,6 +5,7 @@ import com.mes.mesBackend.dto.response.PopPurchaseOrderResponse;
 import com.mes.mesBackend.dto.response.PopPurchaseRequestResponse;
 import com.mes.mesBackend.entity.PurchaseInput;
 import com.mes.mesBackend.entity.PurchaseRequest;
+import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PURCHASE_INPUT;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL_INPUT;
 
@@ -126,6 +128,7 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
         lotMasterRequest.setStockAmount(inputAmount);       // lotMaster 재고수량
         lotMasterRequest.setWareHouse(purchaseInput.getPurchaseRequest().getPurchaseOrder().getWareHouse());        // 구매발주의 입고창고
         lotMasterRequest.setWorkProcessDivision(MATERIAL_INPUT);
+        lotMasterRequest.setLotMasterDivision(REAL_LOT);
 
         String lotMaster = lotMasterService.createLotMaster(lotMasterRequest).getLotNo();  // lotMaster 생성
 
