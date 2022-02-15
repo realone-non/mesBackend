@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.entity.enumeration.InspectionType.NONE;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 @Getter
