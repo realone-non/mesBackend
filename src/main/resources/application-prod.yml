@@ -4,7 +4,7 @@ spring:
       on-profile: prod
   # mySql
   datasource:
-    url: jdbc:mysql://non.cv2ps1sa1sm9.ap-northeast-2.rds.amazonaws.com/NON
+    url: jdbc:mysql://non.cv2ps1sa1sm9.ap-northeast-2.rds.amazonaws.com/non
 #    serverTimezone=UTC&characterEncoding=UTF-8
     username: admin
     password: SilverStar01!#
@@ -93,8 +93,8 @@ springdoc:
   swagger-ui:
     disable-swagger-default-url: true
     path: /
-    operations-sorter: method    # ui 정렬
-    tags-sorter: method
+    operations-sorter: alpha    # ui 정렬
+    tags-sorter: alpha
   api-docs:
     path: /api-docs
 
