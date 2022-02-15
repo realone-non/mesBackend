@@ -1,4 +1,9 @@
 spring:
+  profiles:
+    group:
+      dev: dev
+      prod: prod
+
   # mySql
   datasource:
     url: jdbc:mysql://mes-dev.cyyxmbrc9eeg.ap-northeast-2.rds.amazonaws.com:3306/mes-dev
@@ -90,8 +95,8 @@ springdoc:
   swagger-ui:
     disable-swagger-default-url: true
     path: /
-    operations-sorter: alpha    # ui 정렬
-    tags-sorter: alpha
+    operations-sorter: method    # ui 정렬
+    tags-sorter: method
   api-docs:
     path: /api-docs
 

@@ -1,6 +1,7 @@
 spring:
-  profiles:
-    active: :prod
+  config:
+    activate:
+      on-profile: prod
   # mySql
   datasource:
     url: jdbc:mysql://non.cv2ps1sa1sm9.ap-northeast-2.rds.amazonaws.com/NON
