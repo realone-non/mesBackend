@@ -66,11 +66,11 @@ spring:
 cloud:
   aws:
     credentials:
-      accessKey: AKIAQFOAKXS7ACQ2KTMD
-      secretKey: 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
+      accessKey: AKIAX57N42SFQYJJQMMH
+      secretKey: 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
     region:
       static: ap-northeast-2
-    bucketName: mes-develop
+    bucketName: non-s3
     stack:
       auto: false
 logging:
@@ -94,7 +94,7 @@ springdoc:
     disable-swagger-default-url: true
     path: /
     operations-sorter: method    # ui 정렬
-    tags-sorter: alpha
+    tags-sorter: method
   api-docs:
     path: /api-docs
 
