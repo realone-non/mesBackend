@@ -1,19 +1,16 @@
 package com.mes.mesBackend.entity;
 
-import javassist.Loader;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.AUTO;
 
 // 직원(작업자)
 @AllArgsConstructor
@@ -23,7 +20,7 @@ import static javax.persistence.FetchType.LAZY;
 public class User extends BaseTimeEntity implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = AUTO)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '직원 고유아이디'")
     private Long id;
 
@@ -41,14 +38,14 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     // 다대일 단방향
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "DEPARTMENTS_ID", nullable = false, columnDefinition = "bigint COMMENT '부서'")
+    @JoinColumn(name = "DEPARTMENTS_ID", columnDefinition = "bigint COMMENT '부서'")
     private Department department;  // 부서
 
     @Column(name = "POSITION", nullable = false, columnDefinition = "varchar(255) COMMENT '직위'")
     private String position;    // 직위
 
-    @Column(name = "JOP", nullable = false, columnDefinition = "varchar(255) COMMENT '직무'")
-    private String jop;         // 직무
+    @Column(name = "JOb", nullable = false, columnDefinition = "varchar(255) COMMENT '직무'")
+    private String job;         // 직무
 
     @Column(name = "TEL_NUMBER", columnDefinition = "varchar(255) COMMENT '연락처'")
     private String telNumber;   // 연락처
@@ -84,7 +81,7 @@ public class User extends BaseTimeEntity implements UserDetails {
         setKorName(newUser.korName);
         setDepartment(newDepartment);
         setPosition(newUser.position);
-        setJop(newUser.jop);
+        setJob(newUser.job);
         setTelNumber(newUser.telNumber);
         setEngName(newUser.engName);
         setMail(newUser.mail);

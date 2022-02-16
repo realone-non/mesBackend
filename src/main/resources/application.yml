@@ -1,6 +1,7 @@
 spring:
   # mySql
   datasource:
+    #url: jdbc:mysql://non.cv2ps1sa1sm9.ap-northeast-2.rds.amazonaws.com:3306/non
     url: jdbc:mysql://mes-dev.cyyxmbrc9eeg.ap-northeast-2.rds.amazonaws.com:3306/mes-dev
 #    serverTimezone=UTC&characterEncoding=UTF-8
     username: admin
@@ -10,7 +11,7 @@ spring:
   # jpa
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl

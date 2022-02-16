@@ -26,7 +26,6 @@ public class UserCreateRequest {
 
     @Schema(description = "부서 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
     Long department;  // 부서
 
     @Schema(description = "직위")
@@ -35,7 +34,7 @@ public class UserCreateRequest {
 
     @Schema(description = "직무")
     @NotBlank(message = NOT_EMPTY)
-    String jop;         // 직무
+    String job;         // 직무
 
     @Schema(description = "연락처")
     String telNumber;   // 연락처
