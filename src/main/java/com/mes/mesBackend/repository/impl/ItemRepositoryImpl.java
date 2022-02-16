@@ -55,7 +55,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                         item.itemAccount.account.eq(rawMaterial).or(item.itemAccount.account.eq(subMaterial)),
                         item.deleteYn.eq(false),
                         isItemGroupEq(itemGroupId),
-                        isItemNameContaining(itemNoAndName),
+                        isItemNoOrItemNameToItemNoOrItemName(itemNoAndName),
                         isItemNoContaining(itemNoAndName)
                 )
                 .fetch();
@@ -79,6 +79,12 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     // 품명 검색
     private BooleanExpression isItemNameContaining(String itemName) {
         return itemName != null ? item.itemName.contains(itemName) : null;
+    }
+
+    // 품목|품명으로 검색
+    private BooleanExpression isItemNoOrItemNameToItemNoOrItemName(String itemNoOrItemName) {
+        return itemNoOrItemName != null ? item.itemNo.contains(itemNoOrItemName)
+                .or(item.itemName.contains(itemNoOrItemName)) : null;
     }
 
     // 검색어 검색

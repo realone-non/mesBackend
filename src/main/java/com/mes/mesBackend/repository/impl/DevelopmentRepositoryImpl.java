@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.response.DevelopmentResponse;
 import com.mes.mesBackend.dto.response.DevelopmentStateReponse;
 import com.mes.mesBackend.entity.QDevelopment;
 import com.mes.mesBackend.entity.QDevelopmentState;
+import com.mes.mesBackend.entity.QItem;
 import com.mes.mesBackend.entity.QUser;
 import com.mes.mesBackend.entity.enumeration.DevelopmentChildrenStatusType;
 import com.mes.mesBackend.entity.enumeration.DevelopmentStatusType;
@@ -31,8 +32,7 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
             Long userId,
             LocalDate fromDate,
             LocalDate toDate,
-            String itemNo,
-            String itemName,
+            String itemNoOrItemName,
             DevelopmentStatusType statusType,
             DevelopmentChildrenStatusType childrenStatusType
             ){
@@ -59,8 +59,7 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                 .where(
                         isUserIdEq(userId),
                         dateNull(fromDate, toDate),
-                        itemNoContaining(itemNo),
-                        itemNameContaining(itemName),
+                        isItemNoOrItemNameToItemNoOrItemName(itemNoOrItemName),
                         statusEq(statusType),
                         childrenStatusEq(childrenStatusType)
                 )
@@ -182,6 +181,12 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
     //품명 검색
     private BooleanExpression itemNameContaining(String itemName){
         return itemName != null ? development.itemName.contains(itemName) : null;
+    }
+
+    // 품목|품명으로 검색
+    private BooleanExpression isItemNoOrItemNameToItemNoOrItemName(String itemNoOrItemName) {
+        return itemNoOrItemName != null ? development.itemNo.contains(itemNoOrItemName)
+                .or(development.itemName.contains(itemNoOrItemName)) : null;
     }
 
     //진행상태(상위)
