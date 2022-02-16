@@ -55,6 +55,7 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                             )
                 .from(development)
                 .innerJoin(user).on(user.id.eq(development.user.id))
+                .innerJoin(developmentState).on(developmentState.development.id.eq(development.id))
                 .where(
                         isUserIdEq(userId),
                         dateNull(fromDate, toDate),
