@@ -23,8 +23,7 @@ public interface DevelopmentService {
             LocalDate fromDate,
             LocalDate toDate,
             Long userId,
-            String itemNo,
-            String itemName,
+            String itemNoOrItemName,
             DevelopmentStatusType status,
             DevelopmentChildrenStatusType childrenStatus);
 

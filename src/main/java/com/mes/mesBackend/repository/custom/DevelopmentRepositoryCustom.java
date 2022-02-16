@@ -14,8 +14,7 @@ public interface DevelopmentRepositoryCustom {
             Long userId,
             LocalDate fromDate,
             LocalDate toDate,
-            String itemNo,
-            String itemName,
+            String itemNoOrItemName,
             DevelopmentStatusType status,
             DevelopmentChildrenStatusType childrenStatus);
 

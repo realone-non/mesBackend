@@ -86,8 +86,7 @@ public class DevelopmentController {
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "시작날짜") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "종료날짜") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "사용자 ID") Long userId,
-            @RequestParam(required = false) @Parameter(description = "품번") String itemNo,
-            @RequestParam(required = false) @Parameter(description = "품명") String itemName,
+            @RequestParam(required = false) @Parameter(description = "품번") String itemNoOrItemName,
             @RequestParam(required = false) @Parameter(description = "개발상태(상위) [COMPLETE_REPORT: 완료보고, ETC: 기타, (정의안된 나머지는 그대로]") DevelopmentStatusType status,
             @RequestParam(required = false)
             @Parameter(description =
@@ -96,7 +95,7 @@ public class DevelopmentController {
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<DevelopmentResponse> responseList = developmentService.getDevelopments(
-                fromDate, toDate, userId, itemNo, itemName, status, childrenStatus
+                fromDate, toDate, userId, itemNoOrItemName, status, childrenStatus
         );
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is view list of development from getDevelopments.");
