@@ -36,6 +36,9 @@ public class InputTestRequestResponse {
     @Schema(description = "외주입고 입고번호")
     Long outsourcingInputNo;   // purchaseInputId
 
+    @Schema(description = "품목 고유아이디")
+    Long itemId;
+
     @Schema(description = "품번")
     String itemNo;
 
@@ -98,18 +101,18 @@ public class InputTestRequestResponse {
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate testCompletionRequestDate;
 
-    @Schema(description = "지시번호")
-    String workOrderNo;
+//    @Schema(description = "지시번호")
+//    String workOrderNo;
 
     public InputTestRequestResponse division(InputTestDivision inputTestDivision) {
         if (inputTestDivision.equals(PART)) {
             setOutsourcingInputNo(null);
             setTestCompletionRequestDate(null);
-            setWorkOrderNo(null);
+//            setWorkOrderNo(null);
         } else if (inputTestDivision.equals(OUT_SOURCING)){
             setPurchaseInputNo(null);
             setTestCompletionRequestDate(null);
-            setWorkOrderNo(null);
+//            setWorkOrderNo(null);
             setCoc(null);
             setTestReportYn(null);
             setUrgentYn(null);

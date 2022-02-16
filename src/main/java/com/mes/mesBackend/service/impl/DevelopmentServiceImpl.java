@@ -59,12 +59,11 @@ public class DevelopmentServiceImpl implements DevelopmentService {
             LocalDate fromDate,
             LocalDate toDate,
             Long userId,
-            String itemNo,
-            String itemName,
+            String itemNoOrItemName,
             DevelopmentStatusType status,
             DevelopmentChildrenStatusType childrenStatus){
         return developmentRepository.findDevelopByCondition(
-                userId, fromDate, toDate, itemNo, itemName, status, childrenStatus);
+                userId, fromDate, toDate, itemNoOrItemName, status, childrenStatus);
     }
 
     //개발품목 단건 조회

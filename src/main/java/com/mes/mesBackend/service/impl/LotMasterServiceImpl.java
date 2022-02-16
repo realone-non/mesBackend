@@ -7,6 +7,7 @@ import com.mes.mesBackend.dto.response.MaterialStockReponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.LotLogHelper;
@@ -188,9 +189,10 @@ public class LotMasterServiceImpl implements LotMasterService {
             EnrollmentType enrollmentType,
             Boolean stockYn,
             Long lotTypeId,
-            Boolean testingYn
+            Boolean testingYn,
+            WorkProcessDivision workProcessDivision
     ) {
-        List<LotMasterResponse> lotMasterResponses = lotMasterRepo.findLotMastersByCondition(itemGroupId, lotNo, itemNoAndItemName, wareHouseId, enrollmentType, stockYn, lotTypeId, testingYn);
+        List<LotMasterResponse> lotMasterResponses = lotMasterRepo.findLotMastersByCondition(itemGroupId, lotNo, itemNoAndItemName, wareHouseId, enrollmentType, stockYn, lotTypeId, testingYn, workProcessDivision);
         lotMasterResponses.forEach(LotMasterResponse::setReturnAmounts);
         return lotMasterResponses;
     }

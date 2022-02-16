@@ -152,4 +152,18 @@ public class LotConnectRepositoryImpl implements LotConnectRepositoryCustom {
                         .fetchOne()
         );
     }
+
+    @Override
+    public Optional<Long> findDummyLotIdByChildLotId(Long realLotMasterId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(lotConnect.parentLot.parentLot.id)
+                        .from(lotConnect)
+                        .where(
+                                lotConnect.childLot.id.eq(realLotMasterId),
+                                lotConnect.division.eq(EXHAUST)
+                        )
+                        .fetchOne()
+        );
+    }
 }

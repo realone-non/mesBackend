@@ -11,5 +11,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaCustomRepository<User, Long>, UserRepositoryCustom {
     User findByUserCodeAndPassword(String userCode, String password);
     Optional<User> findByUserCode(String userCode);
-    boolean existsByUserCode(String userCode);
+    boolean existsByUserCodeAndDeleteYnFalse(String userCode);
+    Optional<User> findByMailAndDeleteYnFalse(String mail);
+    boolean existsByMailAndDeleteYnFalse(String mail);
 }

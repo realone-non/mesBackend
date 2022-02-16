@@ -46,7 +46,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                 Arrays.asList(
                                         "http://localhost:3000",
                                         "http://dev-mes-grid.s3-website.ap-northeast-2.amazonaws.com",
-                                        "http://prod-mes-grid.s3-website.ap-northeast-2.amazonaws.com"
+                                        "http://prod-mes-grid.s3-website.ap-northeast-2.amazonaws.com",
+                                        "http://prod-mes.s3-website.ap-northeast-2.amazonaws.com"
                                 )
                         );
                         config.setAllowedMethods(Collections.singletonList("*"));
@@ -69,6 +70,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/auth/signin").permitAll()
                 .antMatchers("/auth/signup").permitAll()
                 .antMatchers("/auth/reissue").permitAll()
+                .antMatchers("/auth/reset-password").permitAll()
                 .antMatchers("/pop/work-processes").permitAll()
                 .antMatchers("/label-prints/**").permitAll()
                 .antMatchers("/**").authenticated()

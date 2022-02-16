@@ -2,10 +2,7 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.EnrollmentType;
-import com.mes.mesBackend.entity.enumeration.GoodsType;
-import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
-import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.entity.enumeration.*;
 import com.mes.mesBackend.repository.custom.LotMasterRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -19,6 +16,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 
@@ -117,7 +115,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
             EnrollmentType enrollmentType,
             Boolean stockYn,
             Long lotTypeId,
-            Boolean testingYn
+            Boolean testingYn,
+            WorkProcessDivision workProcessDivision
     ) {
         return jpaQueryFactory
                 .select(
@@ -154,6 +153,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
                 .leftJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
                 .leftJoin(itemGroup).on(itemGroup.id.eq(item.itemGroup.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
                 .where(
                         isItemGroupEq(itemGroupId),
                         isLotNoContain(lotNo),
@@ -163,9 +163,15 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         isStockYn(stockYn),
                         isLotTypeEq(lotTypeId),
                         isCheckAmountYn(testingYn),
+                        isWorkProcessDivisionEq(workProcessDivision),
+                        lotMaster.lotMasterDivision.eq(REAL_LOT),
                         isDeleteYnFalse()
                 )
                 .fetch();
+    }
+
+    private BooleanExpression isWorkProcessDivisionEq(WorkProcessDivision workProcessDivision) {
+        return workProcessDivision != null ? workProcess.workProcessDivision.eq(workProcessDivision) : null;
     }
 
     //외주입고정보로 LOT마스터 조회

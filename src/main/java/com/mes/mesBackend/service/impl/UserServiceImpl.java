@@ -58,16 +58,21 @@ public class UserServiceImpl implements UserService {
 
     // userCode 가 중복되지 않게 확인
     private void checkUserCode(String userCode) throws BadRequestException {
-        boolean existsByUserCode = userRepository.existsByUserCode(userCode);
-
-        if (existsByUserCode) {
-            throw new BadRequestException("이미 존재하는 유저코드 입니다. 다른 유저코드를 입력 해주세요.");
-        }
+        boolean existsByUserCode = userRepository.existsByUserCodeAndDeleteYnFalse(userCode);
+        if (existsByUserCode) throw new BadRequestException("이미 존재하는 유저코드 입니다. 다른 유저코드를 입력 해주세요.");
+    }
+    // 중복되는 이메일이 있는지 체크
+    private void checkUserEmail(String email) throws BadRequestException {
+        boolean existsByMail = userRepository.existsByMailAndDeleteYnFalse(email);
+        if (existsByMail) throw new BadRequestException("이미 존재하는 이메일 입니다. 다른 이메일을 입력 해주세요.");
     }
 
     // 직원(작업자) 생성
     public UserResponse createUser(UserCreateRequest userRequest) throws NotFoundException, BadRequestException {
+        // 중복되는 유저코드가 있는지 체크
         checkUserCode(userRequest.getUserCode());
+        // 중복되는 이메일이 있는지 체크
+        checkUserEmail(userRequest.getMail());
 
         Department department = userRequest.getDepartment() != null ? departmentService.getDepartmentOrThrow(userRequest.getDepartment()) : null;
         User user = mapper.toEntity(userRequest, User.class);
@@ -112,8 +117,9 @@ public class UserServiceImpl implements UserService {
 //    }
 
     // 직원(작업자) 수정
-    public UserResponse updateUser(Long id, UserUpdateRequest userRequest) throws NotFoundException {
-        Department newDepartment = departmentService.getDepartmentOrThrow(userRequest.getDepartment());
+    public UserResponse updateUser(Long id, UserUpdateRequest userRequest) throws NotFoundException, BadRequestException {
+        checkUserEmail(userRequest.getMail());
+        Department newDepartment = userRequest.getDepartment() != null ? departmentService.getDepartmentOrThrow(userRequest.getDepartment()) : null;
         User newUser = mapper.toEntity(userRequest, User.class);
         User findUser = getUserOrThrow(id);
         findUser.put(newUser, newDepartment);
@@ -245,6 +251,34 @@ public class UserServiceImpl implements UserService {
             password = md.digest();                         // md 객체의 다이제스트를 얻어 pass를 갱신.
         }
         return byteToString(password);
+    }
+
+    // 비밀번호 초기화
+    @Override
+    public void resetPassword(String email) throws NotFoundException {
+        User user = userRepository.findByMailAndDeleteYnFalse(email)
+                .orElseThrow(() -> new NotFoundException("입력한 이메일에 해당하는 직원정보가 없습니다."));
+
+        String salt = createSalt();
+        user.setSalt(salt);
+        user.setPassword(passwordHashing(user.getUserCode().getBytes(), salt));
+        userRepository.save(user);
+    }
+
+    // 비밀번호 변경
+    @Override
+    public void updatePassword(String userCode, UserCreateRequest.password password) throws NotFoundException, BadRequestException {
+        if (password.getPassword().length() <= 4) {
+            throw new BadRequestException("비밀번호를 5자 이상 입력해주세요.");
+        }
+
+        User user = userRepository.findByUserCode(userCode)
+                .orElseThrow(() -> new NotFoundException("유저정보를 찾을 수 없습니다."));
+
+        String salt = createSalt();
+        user.setSalt(salt);
+        user.setPassword(passwordHashing(password.getPassword().getBytes(), salt));
+        userRepository.save(user);
     }
 
     // =============================== 18-3. 사용자 등록 ===============================
