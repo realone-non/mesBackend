@@ -6,6 +6,7 @@ import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.WareHouse;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 
@@ -24,7 +25,8 @@ public interface LotMasterService {
             EnrollmentType enrollmentType,
             Boolean stockYn,
             Long lotTypeId,
-            Boolean testingYn
+            Boolean testingYn,
+            WorkProcessDivision workProcessDivision
     );
     // lot master 단일 조회 및 예외
     LotMaster getLotMasterOrThrow(Long id) throws NotFoundException;

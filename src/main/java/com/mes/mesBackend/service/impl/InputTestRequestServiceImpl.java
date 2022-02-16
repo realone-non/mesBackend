@@ -11,10 +11,7 @@ import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
-import com.mes.mesBackend.repository.InputTestDetailRepository;
-import com.mes.mesBackend.repository.InputTestRequestRepository;
-import com.mes.mesBackend.repository.LotLogRepository;
-import com.mes.mesBackend.repository.LotMasterRepository;
+import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.InputTestRequestService;
 import com.mes.mesBackend.service.LotMasterService;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +36,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     private final LotMasterRepository lotMasterRepo;
     private final InputTestDetailRepository inputTestDetailRepo;
     private final LotLogRepository lotLogRepo;
+    private final LotConnectRepository lotConnectRepository;
 
     // 외주수입검사의뢰 생성
     /*
@@ -83,12 +81,12 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     public InputTestRequestResponse getInputTestRequestResponse(Long inputTestId, InputTestDivision inputTestDivision) throws NotFoundException {
         InputTestRequestResponse response = inputTestRequestRepo.findResponseByIdAndDeleteYnFalse(inputTestId, inputTestDivision)
                 .orElseThrow(() -> new NotFoundException("inputTestRequest does not exist. input id: " + inputTestId));
-        if (inputTestDivision.equals(PRODUCT)) {
-            // lotMaster id 로 PACKAGING 끝난 작업지시 가져옴
-            String workOrderNo = lotLogRepo.findWorkOrderIdByLotMasterIdAndWorkProcessDivision(response.getLotId(), PACKAGING)
-                    .orElseThrow(() -> new NotFoundException("lot 에 해당하는 작업지시가 없음. 조건: PACKAGING 공정이 완료된 작업지시"));
-            response.setWorkOrderNo(workOrderNo);
-        }
+//        if (inputTestDivision.equals(PRODUCT)) {
+//            // lotMaster id 로 PACKAGING 끝난 작업지시 가져옴
+//            String workOrderNo = lotLogRepo.findWorkOrderIdByLotMasterIdAndWorkProcessDivision(response.getLotId(), PACKAGING)
+//                    .orElseThrow(() -> new NotFoundException("lot 에 해당하는 작업지시가 없음. 조건: PACKAGING 공정이 완료된 작업지시"));
+//            response.setWorkOrderNo(workOrderNo);
+//        }
         return response.division(inputTestDivision);
     }
 
@@ -122,14 +120,15 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
                 int testAmountSum = testAmountList.stream().mapToInt(Integer::intValue).sum();
                 response.setTestAmount(testAmountSum);
 
-                // 완제품에 대한 작업지시번호
-                if (inputTestDivision.equals(PRODUCT)) {
-                    Long lotId = response.getLotId();
-                    // lotMaster id 로 PACKAGING 끝난 작업지시 가져옴
-                    String workOrderNo = lotLogRepo.findWorkOrderIdByLotMasterIdAndWorkProcessDivision(lotId, PACKAGING)
-                            .orElseThrow(() -> new NotFoundException("lot 에 해당하는 작업지시가 없음. 조건: PACKAGING 공정이 완료된 작업지시"));
-                    response.setWorkOrderNo(workOrderNo);
-                }
+//                // 완제품에 대한 작업지시번호
+//                if (inputTestDivision.equals(PRODUCT)) {
+//                    Long realLotId = response.getLotId();
+//                    Long dummyLotId = lotConnectRepository.findDummyLotIdByChildLotId(realLotId).orElseThrow(() -> new NotFoundException("[데이터오류] 입력한 realLot 에 대한 dummyLot 가 존재하지 않음."));
+//                    // lotMaster id 로 PACKAGING 끝난 작업지시 가져옴
+//                    String workOrderNo = lotLogRepo.findWorkOrderIdByLotMasterIdAndWorkProcessDivision(dummyLotId, PACKAGING)
+//                            .orElseThrow(() -> new NotFoundException("lot 에 해당하는 작업지시가 없음. 조건: PACKAGING 공정이 완료된 작업지시"));
+//                    response.setWorkOrderNo(workOrderNo);
+//                }
             }
             return responses.stream().map(res -> res.division(inputTestDivision)).collect(Collectors.toList());
     }

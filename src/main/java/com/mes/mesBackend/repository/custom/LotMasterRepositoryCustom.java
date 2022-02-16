@@ -7,6 +7,7 @@ import com.mes.mesBackend.entity.OutSourcingInput;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,7 +29,8 @@ public interface LotMasterRepositoryCustom {
             EnrollmentType enrollmentType,
             Boolean stockYn,
             Long lotTypeId,
-            Boolean testingYn
+            Boolean testingYn,
+            WorkProcessDivision workProcessDivision
     );
     //제품분류에 따른 가장 마지막에 생성된 LOT NO 반환
     Optional<String> findLotNoByGoodsType(GoodsType goodsType, LocalDate startDate, LocalDate endDate);

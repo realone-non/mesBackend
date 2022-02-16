@@ -3,6 +3,7 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.PurchaseStatusCheckResponse;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
@@ -55,10 +56,11 @@ public class LotMasterController {
             @RequestParam(required = false) @Parameter(description = "재고유무") Boolean stockYn,
             @RequestParam(required = false) @Parameter(description = "LOT 유형 id") Long lotTypeId,
             @RequestParam(required = false) @Parameter(description = "검사중 여부") Boolean testingYn,
+            @RequestParam(required = false) @Parameter(description = "공정구분") WorkProcessDivision workProcessDivision,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
         List<LotMasterResponse> lotMasters =
-                lotMasterService.getLotMasters(itemGroupId, lotNo, itemNoAndItemName, wareHouseId, enrollmentType, stockYn, lotTypeId, testingYn);
+                lotMasterService.getLotMasters(itemGroupId, lotNo, itemNoAndItemName, wareHouseId, enrollmentType, stockYn, lotTypeId, testingYn, workProcessDivision);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getLotMasters.");
         return new ResponseEntity<>(lotMasters, OK);

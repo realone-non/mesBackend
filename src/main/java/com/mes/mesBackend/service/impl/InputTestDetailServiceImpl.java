@@ -73,13 +73,13 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
         for (InputTestRequestInfoResponse response : responses) {
             int testAmount = inputTestDetailRepo.findTestAmountByInputTestRequestId(response.getId()).stream().mapToInt(Integer::intValue).sum();
             response.setTestAmount(testAmount);
-            if (inputTestDivision.equals(PRODUCT)) {
-                // lotMaster id 로 PACKAGING 끝난 작업지시 가져옴
-                String workOrderNo = lotLogRepository.findWorkOrderIdByLotMasterIdAndWorkProcessDivision(response.getLotMasterId(), PACKAGING)
-                        .orElseThrow(() -> new NotFoundException("lot 에 해당하는 작업지시가 없음. 조건: 공정 PACKAGING 이 끝난 작업지시"));
-                response.setWorkOrderNo(workOrderNo);
-                }
-            }
+//            if (inputTestDivision.equals(PRODUCT)) {
+//                // lotMaster id 로 PACKAGING 끝난 작업지시 가져옴
+//                String workOrderNo = lotLogRepository.findWorkOrderIdByLotMasterIdAndWorkProcessDivision(response.getLotMasterId(), PACKAGING)
+//                        .orElseThrow(() -> new NotFoundException("lot 에 해당하는 작업지시가 없음. 조건: 공정 PACKAGING 이 끝난 작업지시"));
+//                response.setWorkOrderNo(workOrderNo);
+//            }
+        }
         return responses.stream().map(res -> res.division(inputTestDivision)).collect(Collectors.toList());
     }
 
