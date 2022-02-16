@@ -54,8 +54,8 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                                 )
                             )
                 .from(development)
+                .leftJoin(developmentState).on(developmentState.development.id.eq(development.id))
                 .innerJoin(user).on(user.id.eq(development.user.id))
-                .innerJoin(developmentState).on(developmentState.development.id.eq(development.id))
                 .where(
                         isUserIdEq(userId),
                         dateNull(fromDate, toDate),
@@ -63,6 +63,8 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                         statusEq(statusType),
                         childrenStatusEq(childrenStatusType)
                 )
+                .groupBy(development.id)
+                .orderBy(developmentState.createdDate.desc())
                 .fetch();
     }
 

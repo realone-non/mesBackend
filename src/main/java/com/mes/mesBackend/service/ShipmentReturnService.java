@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.ShipmentReturnRequest;
+import com.mes.mesBackend.dto.response.ShipmentReturnLotResponse;
 import com.mes.mesBackend.dto.response.ShipmentReturnResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -18,4 +19,6 @@ public interface ShipmentReturnService {
     ShipmentReturnResponse updateShipmentReturn(Long id, ShipmentReturnRequest shipmentReturnRequest) throws NotFoundException, BadRequestException;
     // 출하반품 삭제
     void deleteShipmentReturn(Long id) throws NotFoundException;
+    // clientId 로 shipmentIds 조회
+    List<ShipmentReturnLotResponse> getShipmentLots(Long clientId) throws NotFoundException;
 }

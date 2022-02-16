@@ -10,6 +10,7 @@ import javax.persistence.*;
 /*
  * 담당자
  * */
+// TODO 삭제
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "MANAGERS")

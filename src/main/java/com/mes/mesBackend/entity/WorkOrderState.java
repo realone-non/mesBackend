@@ -13,6 +13,7 @@
 //import static lombok.AccessLevel.PUBLIC;
 //
 //// 8-1. 작업지시 상태 이력 정보
+// TODO 삭제
 ////@AllArgsConstructor
 //@NoArgsConstructor(access = PUBLIC)
 //@Entity(name = "WORK_ORDER_STATES")

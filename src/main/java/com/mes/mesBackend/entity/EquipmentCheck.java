@@ -10,7 +10,7 @@
 //import static javax.persistence.FetchType.LAZY;
 //import static javax.persistence.GenerationType.IDENTITY;
 //import static lombok.AccessLevel.PUBLIC;
-//
+// TODO: 삭제
 ///*
 // * 17-1. 설비 점검 실적 등록
 // * 검색: 공장,설비유형,점검유형,작업기간
