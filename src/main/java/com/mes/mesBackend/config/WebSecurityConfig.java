@@ -47,7 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                         "http://localhost:3000",
                                         "http://dev-mes-grid.s3-website.ap-northeast-2.amazonaws.com",
                                         "http://prod-mes-grid.s3-website.ap-northeast-2.amazonaws.com",
-                                        "http://nonmesprod-env.eba-trmusaem.ap-northeast-2.elasticbeanstalk.com"
+                                        "http://prod-mes.s3-website.ap-northeast-2.amazonaws.com"
                                 )
                         );
                         config.setAllowedMethods(Collections.singletonList("*"));
