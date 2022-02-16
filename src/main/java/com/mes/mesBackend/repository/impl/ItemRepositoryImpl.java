@@ -55,8 +55,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                         item.itemAccount.account.eq(rawMaterial).or(item.itemAccount.account.eq(subMaterial)),
                         item.deleteYn.eq(false),
                         isItemGroupEq(itemGroupId),
-                        isItemNoOrItemNameToItemNoOrItemName(itemNoAndName),
-                        isItemNoContaining(itemNoAndName)
+                        isItemNoOrItemNameToItemNoOrItemName(itemNoAndName)
                 )
                 .fetch();
     }
