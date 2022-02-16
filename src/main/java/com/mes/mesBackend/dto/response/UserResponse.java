@@ -28,7 +28,7 @@ public class UserResponse {
     String position;    // 직위
 
     @Schema(description = "직무")
-    String jop;         // 직무
+    String job;         // 직무
 
     @Schema(description = "연락처")
     String telNumber;   // 연락처
