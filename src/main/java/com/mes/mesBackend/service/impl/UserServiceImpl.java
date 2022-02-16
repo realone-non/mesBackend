@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse createUser(UserCreateRequest userRequest) throws NotFoundException, BadRequestException {
         checkUserCode(userRequest.getUserCode());
 
-        Department department = departmentService.getDepartmentOrThrow(userRequest.getDepartment());
+        Department department = userRequest.getDepartment() != null ? departmentService.getDepartmentOrThrow(userRequest.getDepartment()) : null;
         User user = mapper.toEntity(userRequest, User.class);
 
         // salt 생성
