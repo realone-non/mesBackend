@@ -70,7 +70,7 @@ public class ItemRequest {
     @NotNull(message = NOT_NULL)
     int validDay;
 
-    @Schema(description = "LOT유형 id")
+    @Schema(description = "LOT 유형 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long lotType;

@@ -1,9 +1,7 @@
 package com.mes.mesBackend.auth;
 
-import com.mes.mesBackend.dto.request.BadItemRequest;
 import com.mes.mesBackend.dto.request.UserCreateRequest;
 import com.mes.mesBackend.dto.request.UserLogin;
-import com.mes.mesBackend.dto.response.BadItemResponse;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.CustomJwtException;
@@ -21,8 +19,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -110,17 +106,17 @@ public class AuthController {
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity resetPassword(@RequestParam String email) {
+    public ResponseEntity resetPassword(@RequestParam String email) throws NotFoundException {
         userService.resetPassword(email);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info("user email" + email + " is reset password . from resetPassword.");
+        cLogger.info("user email " + email + " is reset password . from resetPassword.");
         return new ResponseEntity<>(OK);
     }
 
     // 비밀번호 변경
-    @PatchMapping
-    @ResponseBody()
-    @Operation(summary = "비밀번호 변경", description = "")
+    @PatchMapping("/password")
+    @ResponseBody
+    @Operation(summary = "비밀번호 변경", description = "변경 비밀번호 5자 이상 입력")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -129,13 +125,14 @@ public class AuthController {
             }
     )
     @SecurityRequirement(name = AUTHORIZATION)
-    public ResponseEntity<BadItemResponse> updatePassword(
-            @RequestParam String password,
+    public ResponseEntity updatePassword(
+            @RequestBody @Valid UserCreateRequest.password password,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        userService.updatePassword(password);
+    ) throws NotFoundException, BadRequestException {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        userService.updatePassword(userCode, password);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + badItem.getId() + " from updateBadItem.");
-        return new ResponseEntity<>(badItem, OK);
+        cLogger.info( userCode + " is modified the password. from updateBadItem.");
+        return new ResponseEntity<>(OK);
     }
 }

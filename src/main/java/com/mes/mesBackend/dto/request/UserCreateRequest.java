@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import java.util.List;
 
@@ -63,4 +64,13 @@ public class UserCreateRequest {
 //
 //    @Schema(description = "권한 ids")
 //    List<Long> roles;
+
+    @Getter
+    @Setter
+    @Schema(description = "비번변경")
+    public static class password {
+        @Size(min = 5, message = "비밀번호를 5자 이상으로 입력 해주세요.")
+        @NotBlank(message = NOT_EMPTY)
+        String password;
+    }
 }
