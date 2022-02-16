@@ -11,7 +11,7 @@
 // * 17-2. 수리항목,부품,작업자 정보
 // * 수리코드,수리내용
 // * 수리부품,수리부품명,수량,비고
-// * 보전원 ID
+// * 보전원 ID TODO: 삭제
 // * */
 //@AllArgsConstructor
 //@NoArgsConstructor(access = AccessLevel.PUBLIC)

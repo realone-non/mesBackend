@@ -1,28 +1,20 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.ShipmentReturnRequest;
+import com.mes.mesBackend.dto.response.ShipmentReturnLotResponse;
 import com.mes.mesBackend.dto.response.ShipmentReturnResponse;
-import com.mes.mesBackend.entity.LotMaster;
-import com.mes.mesBackend.entity.ShipmentLot;
-import com.mes.mesBackend.entity.ShipmentReturn;
-import com.mes.mesBackend.entity.WareHouse;
+import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.AmountHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
-import com.mes.mesBackend.repository.LotMasterRepository;
-import com.mes.mesBackend.repository.ShipmentLotRepository;
-import com.mes.mesBackend.repository.ShipmentReturnRepository;
-import com.mes.mesBackend.repository.WareHouseRepository;
+import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.ShipmentReturnService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-
-import static com.mes.mesBackend.entity.enumeration.ItemLogType.STOCK_AMOUNT;
-import static com.mes.mesBackend.entity.enumeration.ItemLogType.STORE_AMOUNT;
 
 // 4-6. 출하반품 등록
 @Service
@@ -34,6 +26,7 @@ public class ShipmentReturnServiceImpl implements ShipmentReturnService {
     private final ModelMapper mapper;
     private final WareHouseRepository wareHouseRepository;
     private final AmountHelper amountHelper;
+    private final ClientRepository clientRepository;
 
     // 출하반품 생성
     @Override
@@ -101,6 +94,18 @@ public class ShipmentReturnServiceImpl implements ShipmentReturnService {
         shipmentReturnRepo.save(shipmentReturn);
         lotMasterRepo.save(lotMaster);
 //        amountHelper.amountUpdate(lotMaster.getItem().getId(), shipmentReturn.getWareHouse().getId(), null, STORE_AMOUNT, shipmentReturn.getReturnAmount() * -1, false);
+    }
+
+    // clientId 로 shipmentIds 조회
+    @Override
+    public List<ShipmentReturnLotResponse> getShipmentLots(Long clientId) throws NotFoundException {
+        Client client = getClientOrThrow(clientId);
+        return shipmentReturnRepo.findShipmentReturnLotResponseByClientId(client.getId());
+    }
+
+    private Client getClientOrThrow(Long id) throws NotFoundException {
+        return clientRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("client does not exist. input id: " + id));
     }
 
     // 출하 반품 단일 조회 및 예외

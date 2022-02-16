@@ -25,7 +25,7 @@
 //@NoArgsConstructor(access = AccessLevel.PROTECTED)
 //@Entity(name = "PRODUCE_ORDER_DETAIL")
 //@Data
-//public class ProduceOrderDetail {
+//public class ProduceOrderDetail { TODO: 삭제
 //    @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
 //    @Column(name = "ID", columnDefinition = "bigint COMMENT '제조오더 세부내역 고유아이디'")

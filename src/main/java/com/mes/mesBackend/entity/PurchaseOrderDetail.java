@@ -34,6 +34,7 @@
 //@AllArgsConstructor
 //@NoArgsConstructor(access = AccessLevel.PROTECTED)
 //@Entity(name = "PURCHASE_ORDER_DETAILS")
+// TODO: 삭제
 //@Data
 //public class PurchaseOrderDetail extends BaseTimeEntity {
 //    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
