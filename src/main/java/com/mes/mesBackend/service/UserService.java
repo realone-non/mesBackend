@@ -31,7 +31,7 @@ public interface UserService {
 //    Page<UserResponse> getUsers(Pageable pageable);
 
     // 직원(작업자) 수정
-    UserResponse updateUser(Long id, UserUpdateRequest userRequest) throws NotFoundException, NoSuchAlgorithmException;
+    UserResponse updateUser(Long id, UserUpdateRequest userRequest) throws NotFoundException, NoSuchAlgorithmException, BadRequestException;
 
     // 직원(작업자) 삭제
     void deleteUser(Long id) throws NotFoundException;
@@ -55,4 +55,8 @@ public interface UserService {
     UserRegistrationResponse updateUserRegistration(Long id, UserRegistrationRequest userRegistrationRequest) throws NotFoundException;
     // 사용자 삭제
     void deleteUserRegistration(Long id) throws NotFoundException;
+    // 비밀번호 초기화
+    void resetPassword(String email) throws NotFoundException;
+    // 비밀번호 변경
+    void updatePassword(String userCode, UserCreateRequest.password password) throws NotFoundException, BadRequestException;
 }
