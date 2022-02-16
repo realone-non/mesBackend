@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.UserUpdateRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -95,7 +96,7 @@ public class UserController {
             @PathVariable Long id,
             @RequestBody @Valid UserUpdateRequest userRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException, NoSuchAlgorithmException {
+    ) throws NotFoundException, NoSuchAlgorithmException, BadRequestException {
         UserResponse user = userService.updateUser(id, userRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + user.getId() + " from updateUser.");
