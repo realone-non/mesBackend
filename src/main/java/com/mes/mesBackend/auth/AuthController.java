@@ -1,7 +1,9 @@
 package com.mes.mesBackend.auth;
 
+import com.mes.mesBackend.dto.request.BadItemRequest;
 import com.mes.mesBackend.dto.request.UserCreateRequest;
 import com.mes.mesBackend.dto.request.UserLogin;
+import com.mes.mesBackend.dto.response.BadItemResponse;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.CustomJwtException;
@@ -11,8 +13,10 @@ import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -26,6 +30,7 @@ import javax.validation.Valid;
 import java.security.NoSuchAlgorithmException;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.OK;
 
 
@@ -93,5 +98,44 @@ public class AuthController {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromToken(tokenRequestDto.accessToken) + " is token reissue. from updateRefreshToken.");
         return new ResponseEntity<>(reissue, OK);
+    }
+
+    // 비밀번호 초기화
+    @PatchMapping("/reset-password")
+    @ResponseBody
+    @Operation(summary = "비밀번호 초기화", description = "초기화 된 password 는 userCode 와 동일")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    public ResponseEntity resetPassword(@RequestParam String email) {
+        userService.resetPassword(email);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info("user email" + email + " is reset password . from resetPassword.");
+        return new ResponseEntity<>(OK);
+    }
+
+    // 비밀번호 변경
+    @PatchMapping
+    @ResponseBody()
+    @Operation(summary = "비밀번호 변경", description = "")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    @SecurityRequirement(name = AUTHORIZATION)
+    public ResponseEntity<BadItemResponse> updatePassword(
+            @RequestParam String password,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        userService.updatePassword(password);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + badItem.getId() + " from updateBadItem.");
+        return new ResponseEntity<>(badItem, OK);
     }
 }
