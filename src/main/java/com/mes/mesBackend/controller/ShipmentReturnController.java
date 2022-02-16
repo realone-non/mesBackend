@@ -1,6 +1,7 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.ShipmentReturnRequest;
+import com.mes.mesBackend.dto.response.ShipmentReturnLotResponse;
 import com.mes.mesBackend.dto.response.ShipmentReturnResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -116,10 +117,24 @@ public class ShipmentReturnController {
     public ResponseEntity deleteShipmentReturn(
             @PathVariable @Parameter(description = "출하 반품 id") Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException, BadRequestException {
+    ) throws NotFoundException {
         shipmentReturnService.deleteShipmentReturn(id);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteShipmentReturn.");
         return new ResponseEntity(NO_CONTENT);
+    }
+
+    // clientId 로 shipmentIds 조회
+    @GetMapping("/shipment-lots")
+    @ResponseBody
+    @Operation(summary = "거래처로 shipmentLotId 조회", description = "검색조건: 거래처 id")
+    public ResponseEntity<List<ShipmentReturnLotResponse>> getShipmentLots(
+            @RequestParam @Parameter(description = "거래처 id") Long clientId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        List<ShipmentReturnLotResponse> shipmentReturnLotResponses = shipmentReturnService.getShipmentLots(clientId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getShipmentLots.");
+        return new ResponseEntity<>(shipmentReturnLotResponses, OK);
     }
 }

@@ -1,5 +1,6 @@
 package com.mes.mesBackend.repository.impl;
 
+import com.mes.mesBackend.dto.response.ShipmentReturnLotResponse;
 import com.mes.mesBackend.dto.response.ShipmentReturnResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.ShipmentReturnRepositoryCustom;
@@ -11,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 
 // 4-6. 출하반품 등록
 @RequiredArgsConstructor
@@ -55,7 +58,8 @@ public class ShipmentReturnRepositoryImpl implements ShipmentReturnRepositoryCus
                                 lotMaster.shipmentAmount.as("shipmentAmount"),
                                 wareHouse.id.as("warehouseId"),
                                 wareHouse.wareHouseName.as("warehouseName"),
-                                shipmentReturn.note.as("note")
+                                shipmentReturn.note.as("note"),
+                                shipmentLot.id.as("shipmentLotId")
                         )
                 )
                 .from(shipmentReturn)
@@ -100,7 +104,8 @@ public class ShipmentReturnRepositoryImpl implements ShipmentReturnRepositoryCus
                                         lotMaster.shipmentAmount.as("shipmentAmount"),
                                         wareHouse.id.as("warehouseId"),
                                         wareHouse.wareHouseName.as("warehouseName"),
-                                        shipmentReturn.note.as("note")
+                                        shipmentReturn.note.as("note"),
+                                        shipmentLot.id.as("shipmentLotId")
                                 )
                         )
                         .from(shipmentReturn)
@@ -119,6 +124,41 @@ public class ShipmentReturnRepositoryImpl implements ShipmentReturnRepositoryCus
                         )
                         .fetchOne()
         );
+    }
+
+    // clientId 로 shipmentLot 조회
+    @Override
+    public List<ShipmentReturnLotResponse> findShipmentReturnLotResponseByClientId(Long clientId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                ShipmentReturnLotResponse.class,
+                                shipmentLot.id.as("shipmentLotId"),
+                                shipment.shipmentNo.as("shipmentNo"),
+                                client.clientName.as("clientName"),
+                                client.clientCode.as("clientCode"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                lotMaster.lotNo.as("lotNo"),
+                                lotType.lotType.as("lotType")
+                        )
+                )
+                .from(shipmentLot)
+                .leftJoin(shipmentItem).on(shipmentItem.id.eq(shipmentLot.shipmentItem.id))
+                .leftJoin(shipment).on(shipment.id.eq(shipmentItem.shipment.id))
+                .leftJoin(client).on(client.id.eq(shipment.client.id))
+                .leftJoin(contractItem).on(contractItem.id.eq(shipmentItem.contractItem.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                .leftJoin(lotMaster).on(lotMaster.id.eq(shipmentLot.lotMaster.id))
+                .leftJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
+                .where(
+                        client.id.eq(clientId),
+                        shipmentLot.deleteYn.isFalse(),
+                        shipmentItem.deleteYn.isFalse(),
+                        shipment.deleteYn.isFalse(),
+                        shipment.orderState.eq(COMPLETION)
+                )
+                .fetch();
     }
 
     // 품번|품명

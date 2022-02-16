@@ -1,5 +1,6 @@
 package com.mes.mesBackend.repository.custom;
 
+import com.mes.mesBackend.dto.response.ShipmentReturnLotResponse;
 import com.mes.mesBackend.dto.response.ShipmentReturnResponse;
 
 import java.time.LocalDate;
@@ -12,4 +13,6 @@ public interface ShipmentReturnRepositoryCustom {
     List<ShipmentReturnResponse> findShipmentReturnResponsesByCondition(Long clientId, String itemNoAndItemName, LocalDate fromDate, LocalDate toDate);
     // 출하반품 단일 조회
     Optional<ShipmentReturnResponse> findShipmentReturnResponseByIdAndDeleteYnFalse(Long id);
+    // clientId 로 shipmentLot 조회
+    List<ShipmentReturnLotResponse> findShipmentReturnLotResponseByClientId(Long clientId);
 }

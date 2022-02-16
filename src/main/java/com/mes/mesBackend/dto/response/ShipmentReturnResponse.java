@@ -1,7 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mes.mesBackend.entity.LotType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -63,4 +62,7 @@ public class ShipmentReturnResponse {
 
     @Schema(description = "비고")
     String note;
+
+    @Schema(description = "출하 LOT 정보 고유아이디")
+    Long shipmentLotId;
 }
