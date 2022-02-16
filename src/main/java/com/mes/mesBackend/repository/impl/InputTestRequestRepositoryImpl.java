@@ -113,6 +113,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                 lotMaster.lotNo.as("lotNo"),
                                 purchaseInput.id.as("purchaseInputNo"),
                                 outSourcingInput.id.as("outsourcingInputNo"),
+                                item.id.as("itemId"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
                                 item.manufacturerPartNo.as("itemManufacturerPartNo"), // 제조사품번: 품목의 제조사품번

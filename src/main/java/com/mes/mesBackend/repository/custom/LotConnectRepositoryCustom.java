@@ -20,4 +20,5 @@ public interface LotConnectRepositoryCustom {
     List<PopLotMasterResponse> findPopLotMasterResponseByEquipmentLotId(Long equipmentLotId);
     // realLot 에 해당하는 equipmentLotId 조회, 구분 값: FAMILY
     Optional<LotConnect> findByChildLotIdAndDivisionFamily(Long childLotId);
+    Optional<Long> findDummyLotIdByChildLotId(Long realLotMasterId);
 }
