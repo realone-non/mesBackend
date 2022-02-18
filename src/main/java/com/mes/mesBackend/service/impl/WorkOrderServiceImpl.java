@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
 
 // 6-2. 작업지시 등록
@@ -89,7 +88,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         WorkOrderResponse workOrderResponse = workOrderDetailRepo.findWorkOrderResponseByProduceOrderIdAndWorkOrderId(produceOrderId, workOrderId)
                 .orElseThrow(() -> new NotFoundException("workOrderDetail does not exists. input id: " + workOrderId));
 
-        Item bomDetailItem = workOrderDetailRepo.findBomDetailByBomMasterItemIdAndWorkProcessId(workOrderResponse.getProduceOrderItemId(), workOrderResponse.getWorkProcessId())
+        Item bomDetailItem = workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(workOrderResponse.getProduceOrderItemId(), workOrderResponse.getWorkProcessId(), null)
                 .orElse(null);
 
         workOrderResponse.setCostTime();        // 소요시간
@@ -109,7 +108,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         List<WorkOrderResponse> workOrderDetails = workOrderDetailRepo.findWorkOrderResponseByProduceOrderIdAndDeleteYnFalse(produceOrder.getId());
 
         for (WorkOrderResponse response : workOrderDetails) {
-            Item bomDetailItem = workOrderDetailRepo.findBomDetailByBomMasterItemIdAndWorkProcessId(response.getProduceOrderItemId(), response.getWorkProcessId())
+            Item bomDetailItem = workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(response.getProduceOrderItemId(), response.getWorkProcessId(), null)
                     .orElse(null);
             response.setCostTime();
             if (bomDetailItem != null) {

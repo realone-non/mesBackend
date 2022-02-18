@@ -2,6 +2,7 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.WorkOrderDetailRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.GoodsType.HALF_PRODUCT;
+import static com.mes.mesBackend.entity.enumeration.GoodsType.PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL_INPUT;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.SHIPMENT;
@@ -584,7 +586,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     }
 
     @Override
-    public Optional<Item> findBomDetailByBomMasterItemIdAndWorkProcessId(Long itemId, Long workProcessId) {
+    public Optional<Item> findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(Long itemId, Long workProcessId, GoodsType goodsType) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .select(item)
@@ -596,12 +598,16 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         .where(
                                 qBomItemDetail.bomMaster.item.id.eq(itemId),
                                 workProcess.id.eq(workProcessId),
-                                itemAccount.goodsType.eq(HALF_PRODUCT),
+                                isGoodsTypeEq(goodsType),
                                 qBomItemDetail.deleteYn.isFalse(),
                                 bomMaster.deleteYn.isFalse()
                         )
                         .fetchOne()
         );
+    }
+
+    private BooleanExpression isGoodsTypeEq(GoodsType goodsType) {
+        return goodsType != null ? itemAccount.goodsType.eq(goodsType) : null;
     }
 
     // bomMaster 의 item 에 해당하는 bomDetail 의 item 정보 가져옴

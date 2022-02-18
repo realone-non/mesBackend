@@ -23,7 +23,7 @@ public class ItemAccountCodeRepositoryImpl implements ItemAccountCodeRepositoryC
                 .select(
                         Projections.fields(
                                 ItemAccountCodeResponse.class,
-                                itemAccountCode.id.as("itemAccountCodeId"),
+                                itemAccountCode.id.as("id"),
                                 itemAccountCode.itemAccount.id.as("itemAccountId"),
                                 itemAccountCode.detail.as("detail"),
                                 itemAccountCode.code.as("code")
