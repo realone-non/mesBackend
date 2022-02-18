@@ -137,4 +137,7 @@ public class ShipmentReturnController {
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getShipmentLots.");
         return new ResponseEntity<>(shipmentReturnLotResponses, OK);
     }
+
+    // 조건: lotNo
+    // 단건조회
 }

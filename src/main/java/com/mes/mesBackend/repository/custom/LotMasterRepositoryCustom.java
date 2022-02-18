@@ -66,4 +66,5 @@ public interface LotMasterRepositoryCustom {
     List<LabelPrintResponse> findPrintsByWorkProcessAndEquipment(Long workProcessId, Long equipmentId);
     // 생성날짜가 오늘이고, lotDivision 이 dummny 인 걸 찾아옴
     Optional<String> findDummyNoByDivision(LotMasterDivision lotMasterDivision, LocalDate startDate);
+    Optional<BadItemWorkOrderResponse.subDto> findLotMaterByDummyLotIdAndWorkProcessId(Long dummyLotId, Long workProcessId);
 }

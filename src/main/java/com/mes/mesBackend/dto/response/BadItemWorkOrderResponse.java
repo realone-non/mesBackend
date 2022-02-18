@@ -33,6 +33,9 @@ public class BadItemWorkOrderResponse {
     @Schema(description = "작업라인")
     String workLineName;
 
+    @JsonIgnore
+    Long itemId;
+
     @Schema(description = "품번")
     String itemNo;
 
@@ -57,4 +60,13 @@ public class BadItemWorkOrderResponse {
 
     @Schema(description = "생산수량")
     int productionAmount;
+
+    @Getter
+    @Setter
+    public static class subDto {
+        int badAmount;
+        int createAmount;
+        String itemNo;
+        String itemName;
+    }
 }

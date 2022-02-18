@@ -36,6 +36,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     final QUnit unit = QUnit.unit;
     final QLotLog lotLog = QLotLog.lotLog;
     final QWorkOrderDetail workOrderDetail = QWorkOrderDetail.workOrderDetail;
+    final QLotEquipmentConnect lotEquipmentConnect = QLotEquipmentConnect.lotEquipmentConnect;
 
     // id 로 itemAccountCode 의 symbol 조회
     @Override
@@ -480,6 +481,31 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .orderBy(lotMaster.createdDate.desc())
                 .limit(1)
                 .fetchOne());
+    }
+
+    @Override
+    public Optional<BadItemWorkOrderResponse.subDto> findLotMaterByDummyLotIdAndWorkProcessId(Long dummyLotId, Long workProcessId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(
+                                Projections.fields(
+                                        BadItemWorkOrderResponse.subDto.class,
+                                        lotEquipmentConnect.childLot.badItemAmount.max().as("badAmount"),
+                                        lotEquipmentConnect.childLot.createdAmount.max().as("createAmount"),
+                                        lotEquipmentConnect.parentLot.item.itemName.as("itemNo"),
+                                        lotEquipmentConnect.parentLot.item.itemName.as("itemName")
+                                )
+                        )
+                        .from(lotEquipmentConnect)
+                        .where(
+                                lotEquipmentConnect.parentLot.id.eq(dummyLotId),
+//                                lotEquipmentConnect.parentLot.workProcess.id.eq(workProcessId),
+                                lotEquipmentConnect.parentLot.lotMasterDivision.eq(REAL_LOT),
+                                lotEquipmentConnect.parentLot.deleteYn.isFalse()
+                        )
+                        .groupBy(lotEquipmentConnect.parentLot.id)
+                        .fetchOne()
+        );
     }
 
     // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 유효여부

@@ -130,10 +130,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             Long produceOrderId,
             Long workOrderId,
             WorkOrderUpdateRequest newWorkOrderRequest
-    ) throws NotFoundException, BadRequestException {
+    ) throws NotFoundException {
         WorkOrderDetail findWorkOrderDetail = getWorkOrderDetailOrThrow(workOrderId, produceOrderId);
-
-        if (newWorkOrderRequest.getOrderState().equals(COMPLETION)) throw new BadRequestException("지시상태를 완료로 변경 할 수 없습니다.");
 
         WorkLine newWorkLine = workLineService.getWorkLineOrThrow(newWorkOrderRequest.getWorkLine());
         User newUser = newWorkOrderRequest.getUser() != null ? userService.getUserOrThrow(newWorkOrderRequest.getUser()) : null;
@@ -145,7 +143,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         if (orderAmount !=  findWorkOrderDetail.getOrderAmount()) {
             // 사용자가 입력한 지시수량이 수주품목의 수량보다 크면 예외
-            throwIfOrderAmountGreaterThanProduceOrderAmount(orderAmount, produceOrder.getContractItem().getAmount());
+//            throwIfOrderAmountGreaterThanProduceOrderAmount(orderAmount, produceOrder.getContractItem().getAmount());
             // 사용자가 입력한 생산수량이 지시수량보다 크면 예외
 //            throwIfProductionAmountGreaterThanOrderAmount(newWorkOrderRequest.getProductionAmount(), orderAmount);
         }

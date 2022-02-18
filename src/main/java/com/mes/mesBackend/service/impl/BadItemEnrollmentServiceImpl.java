@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 
@@ -45,8 +46,7 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
             LocalDate toDate,
             String itemNoAndItemName
     ) throws NotFoundException {
-        // 작업지시의 지시상태가 COMPLETION 인것만 조회
-        // TODO: 공정이 자재입고, 출하는 제외
+        // 작업지시의 지시상태가 COMPLETION, 공정구분이 출하, 자재입고 제외
         // TODO: 조회되는 품목, 품번은 productOrder 의 item이 아니구 bomDetailMaster의 ITEM 이어야 함
         List<BadItemWorkOrderResponse> workOrderResponses = workOrderDetailRepo.findBadItemWorkOrderResponseByCondition(
                 workCenterId,
@@ -62,9 +62,16 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
             Long workOrderId = response.getWorkOrderId();
             Long workProcessId = response.getWorkProcessId();
             LotLog lotLog = lotLogRepository.findLotLogByWorkOrderIdAndWorkProcessId(workOrderId, workProcessId)
-                    .orElseThrow(() -> new NotFoundException("공정 완료된 작업지시가 LotLog 에 등록되지 않았습니다."));
-            response.setBadAmount(lotLog.getLotMaster().getBadItemAmount());        // lotMaster 의 불량수량
-            response.setProductionAmount(lotLog.getLotMaster().getCreatedAmount()); // lotMaster 의 생성수량
+                    .orElseThrow(() -> new NotFoundException("[데이터오류] 공정 완료된 작업지시가 LotLog 에 등록되지 않았습니다."));
+//            response.setBadAmount(lotLog.getLotMaster().getBadItemAmount());        // lotMaster 의 불량수량
+//            response.setProductionAmount(lotLog.getLotMaster().getCreatedAmount()); // lotMaster 의 생성수량
+            Long dummyLotId = lotLog.getLotMaster().getId();
+            BadItemWorkOrderResponse.subDto subDto = lotMasterRepo.findLotMaterByDummyLotIdAndWorkProcessId(dummyLotId, workProcessId)
+                    .orElseThrow(() -> new NotFoundException("[데이터오류] lotLog 에 등록된 lotMaster(id: " + dummyLotId + ") 가 lotEquipmentConnect parentLot 로 등록되지 않았습니다."));
+            response.setItemNo(subDto.getItemNo());
+            response.setItemName(subDto.getItemName());
+            response.setBadAmount(subDto.getBadAmount());
+            response.setProductionAmount(subDto.getCreateAmount());
         }
         return workOrderResponses;
     }

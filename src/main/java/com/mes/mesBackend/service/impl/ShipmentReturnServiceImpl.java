@@ -97,7 +97,7 @@ public class ShipmentReturnServiceImpl implements ShipmentReturnService {
     }
 
     // clientId 로 shipmentIds 조회
-    // TODO: 기간조회, 페이징
+    // TODO: 기간조회(shipmentDate), 페이징 20개씩
     @Override
     public List<ShipmentReturnLotResponse> getShipmentLots(Long clientId) throws NotFoundException {
         Client client = getClientOrThrow(clientId);

@@ -597,7 +597,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 qBomItemDetail.bomMaster.item.id.eq(itemId),
                                 workProcess.id.eq(workProcessId),
                                 itemAccount.goodsType.eq(HALF_PRODUCT),
-                                qBomItemDetail.deleteYn.isFalse()
+                                qBomItemDetail.deleteYn.isFalse(),
+                                bomMaster.deleteYn.isFalse()
                         )
                         .fetchOne()
         );
@@ -620,6 +621,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     // =============================================== 8-5. 불량등록 ===============================================
     // 작업지시 정보 리스트 조회,
     // 검색조건: 작업장 id, 작업라인 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목
+    // COMPLETION 만 조회, 작업공정 구분이 자재입고, 출하는 제외
     @Override
     public List<BadItemWorkOrderResponse> findBadItemWorkOrderResponseByCondition(
             Long workCenterId,
@@ -639,8 +641,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.orderNo.as("workOrderNo"),
                                 workProcess.workProcessName.as("workProcessName"),
                                 workLine.workLineName.as("workLineName"),
-//                                item.itemNo.as("itemNo"),
-//                                item.itemName.as("itemName"),
+                                item.id.as("itemId"),
                                 workOrderDetail.startDate.as("workDateTime"),
                                 user.korName.as("userKorName"),
                                 contract.contractNo.as("contractNo"),
