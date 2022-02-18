@@ -60,6 +60,7 @@ public class Item extends BaseTimeEntity {
     private ItemForm itemForm = new ItemForm();          // 품목형태
 
     // 다대일 단방향
+    // TODO: 삭제
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "USE_TYPE", columnDefinition = "bigint COMMENT '용도유형'")
     private UseType useType;            // 용도유형

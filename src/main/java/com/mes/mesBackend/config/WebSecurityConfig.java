@@ -41,8 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration config = new CorsConfiguration();
-//                        config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-                        config.setAllowedOrigins(
+                        config.setAllowedOrigins(   // 서버의 자원에 접근할 수 있는 출처를 명시한다. 와일드카드(*) 를 사용하면 아무 출처에서나 서버의 자원에 접근할 수 있다.
                                 Arrays.asList(
                                         "http://localhost:3000",
                                         "http://dev-mes-grid.s3-website.ap-northeast-2.amazonaws.com",
@@ -50,10 +49,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                         "http://prod-mes.s3-website.ap-northeast-2.amazonaws.com"
                                 )
                         );
+                        // 요청이 허용되는 메소드를 지정한다. 와일드카드(*)를 통해 모든 메소더를 허용할 수 있다.
                         config.setAllowedMethods(Collections.singletonList("*"));
+                        // 같은 출처라면 기본적으로 쿠키가 request 헤더에 자동으로 설정된다. 하지만 CORS 는 다른 출처간의 통신이기 때문에 자동으로 설정되지 않음. 응답헤더에 true 주면 클라이언트에서 보낸 쿠키를 받을 수 있다.
                         config.setAllowCredentials(true);
+                        // 요청이 허용되는 메소드를 지정한다. 와일드카드(*)를 통해 모든 메소더를 허용할 수 있다.
                         config.setAllowedHeaders(Collections.singletonList("*"));
-                        config.setExposedHeaders(Arrays.asList(AUTHORIZATION));
+                        // 브라우저에게 표시할 헤더를 명시한다. 브라우저에서 확인할 수 있게 하려면 이렇게 명시 하면 됨.
+                        config.setExposedHeaders(Collections.singletonList(AUTHORIZATION));
+                        // preflight 요청 결과를 캐시할 수 있는 시간을 의미한다.
                         config.setMaxAge(3600L);
                         return config;
                     }
