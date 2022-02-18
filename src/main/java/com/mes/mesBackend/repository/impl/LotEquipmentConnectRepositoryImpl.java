@@ -16,63 +16,59 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRepositoryCustom {
-//    private final JPAQueryFactory jpaQueryFactory;
-//    final QLotEquipmentConnect lotEquipmentConnect = QLotEquipmentConnect.lotEquipmentConnect;
-//    final QLotMaster lotMaster = QLotMaster.lotMaster;
-//    final QEquipment equipment = QEquipment.equipment;
+    private final JPAQueryFactory jpaQueryFactory;
+    final QLotEquipmentConnect lotEquipmentConnect = QLotEquipmentConnect.lotEquipmentConnect;
+    final QLotMaster lotMaster = QLotMaster.lotMaster;
+    final QEquipment equipment = QEquipment.equipment;
 
     // 오늘날짜, 같은 설비 기준으로 equipmentLot 조회
     @Override
     public Optional<LotEquipmentConnect> findByTodayAndEquipmentId(Long equipmentId, LocalDate now) {
-//        return Optional.ofNullable(
-//                jpaQueryFactory
-//                        .selectFrom(lotEquipmentConnect)
-//                        .leftJoin(lotMaster).on(lotMaster.id.eq(lotEquipmentConnect.childLot.id))
-//                        .leftJoin(equipment).on(equipment.id.eq(lotMaster.equipment.id))
-//                        .where(
-//                                equipment.id.eq(equipmentId),
-//                                lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0))
-//                        )
-//                        .fetchOne()
-//        );
-        return null;
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(lotEquipmentConnect)
+                        .leftJoin(lotMaster).on(lotMaster.id.eq(lotEquipmentConnect.childLot.id))
+                        .leftJoin(equipment).on(equipment.id.eq(lotMaster.equipment.id))
+                        .where(
+                                equipment.id.eq(equipmentId),
+                                lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0))
+                        )
+                        .fetchOne()
+        );
     }
 
     // 설비 lot id 로 조회
     @Override
     public Optional<LotEquipmentConnect> findByChildId(Long childLotId) {
-//        return Optional.ofNullable(
-//                jpaQueryFactory
-//                        .selectFrom(lotEquipmentConnect)
-//                        .leftJoin(lotMaster).on(lotMaster.id.eq(lotEquipmentConnect.childLot.id))
-//                        .where(lotMaster.id.eq(childLotId))
-//                        .fetchOne()
-//        );
-        return null;
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(lotEquipmentConnect)
+                        .leftJoin(lotMaster).on(lotMaster.id.eq(lotEquipmentConnect.childLot.id))
+                        .where(lotMaster.id.eq(childLotId))
+                        .fetchOne()
+        );
     }
 
     // dummyLot 로 조회
     @Override
     public List<PopWorkOrderStates> findPopWorkOrderStates(Long dummyLotId) {
-//        return jpaQueryFactory
-//                .select(
-//                        Projections.fields(
-//                                PopWorkOrderStates.class,
-//                                lotEquipmentConnect.childLot.id.as("lotMasterId"),
-//                                equipment.equipmentName.as("equipmentName"),
-//                                lotEquipmentConnect.processStatus.as("processStatus"),
-//                                lotEquipmentConnect.modifiedDate.as("updateDateTime"),
-//                                lotEquipmentConnect.childLot.createdAmount.as("createdAmount")
-//                        )
-//                )
-//                .from(lotEquipmentConnect)
-//                .leftJoin(lotMaster).on(lotMaster.id.eq(lotEquipmentConnect.childLot.id))
-//                .leftJoin(equipment).on(equipment.id.eq(lotMaster.equipment.id))
-//                .where(
-//                        lotEquipmentConnect.parentLot.id.eq(dummyLotId)
-//                )
-//                .fetch();
-//    }
-        return null;
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                PopWorkOrderStates.class,
+                                lotEquipmentConnect.childLot.id.as("lotMasterId"),
+                                equipment.equipmentName.as("equipmentName"),
+                                lotEquipmentConnect.processStatus.as("processStatus"),
+                                lotEquipmentConnect.modifiedDate.as("updateDateTime"),
+                                lotEquipmentConnect.childLot.createdAmount.as("createdAmount")
+                        )
+                )
+                .from(lotEquipmentConnect)
+                .leftJoin(lotMaster).on(lotMaster.id.eq(lotEquipmentConnect.childLot.id))
+                .leftJoin(equipment).on(equipment.id.eq(lotMaster.equipment.id))
+                .where(
+                        lotEquipmentConnect.parentLot.id.eq(dummyLotId)
+                )
+                .fetch();
     }
 }
