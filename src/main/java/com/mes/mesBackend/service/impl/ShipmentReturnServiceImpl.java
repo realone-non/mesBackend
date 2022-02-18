@@ -11,10 +11,14 @@ import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.ShipmentReturnService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 
 // 4-6. 출하반품 등록
 @Service
@@ -27,6 +31,7 @@ public class ShipmentReturnServiceImpl implements ShipmentReturnService {
     private final WareHouseRepository wareHouseRepository;
     private final AmountHelper amountHelper;
     private final ClientRepository clientRepository;
+    private final ShipmentRepository shipmentRepo;
 
     // 출하반품 생성
     @Override
@@ -96,12 +101,23 @@ public class ShipmentReturnServiceImpl implements ShipmentReturnService {
 //        amountHelper.amountUpdate(lotMaster.getItem().getId(), shipmentReturn.getWareHouse().getId(), null, STORE_AMOUNT, shipmentReturn.getReturnAmount() * -1, false);
     }
 
-    // clientId 로 shipmentIds 조회
-    // TODO: 기간조회(shipmentDate), 페이징 20개씩
+    // clientId 로 shipmentIds 조회 기간조회(shipmentDate), 페이징 20개씩, 출하 완료된것만
     @Override
-    public List<ShipmentReturnLotResponse> getShipmentLots(Long clientId) throws NotFoundException {
+    public Page<ShipmentReturnLotResponse> getShipmentLots(Long clientId, LocalDate fromDate, LocalDate toDate, Pageable pageable) throws NotFoundException {
         Client client = getClientOrThrow(clientId);
-        return shipmentReturnRepo.findShipmentReturnLotResponseByClientId(client.getId());
+        return shipmentReturnRepo.findShipmentReturnLotResponsesByClientId(client.getId(), fromDate, toDate, pageable);
+    }
+
+    // 바코드 번호로 조회
+    @Override
+    public ShipmentReturnLotResponse getShipmentLotByBarcodeNo(String barcodeNo) throws NotFoundException, BadRequestException {
+        Shipment shipment = shipmentRepo.findByBarcodeNumberAndDeleteYnFalse(barcodeNo)
+                .orElseThrow(() -> new NotFoundException("해당 바코드번호로 등록된 출하정보가 없습니다."));
+        if (!shipment.getOrderState().equals(COMPLETION)) {
+            throw new BadRequestException("출하번호 " + shipment.getShipmentNo() + " 로 등록된 출하정보는 출하가 완료된 상태가 아니므로, 반품등록이 불가합니다.");
+        }
+        return shipmentReturnRepo.findShipmentReturnLotResponseByClientId(shipment.getId());
+
     }
 
     private Client getClientOrThrow(Long id) throws NotFoundException {

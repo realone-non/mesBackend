@@ -5,6 +5,8 @@ import com.mes.mesBackend.dto.response.ShipmentReturnLotResponse;
 import com.mes.mesBackend.dto.response.ShipmentReturnResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,5 +22,7 @@ public interface ShipmentReturnService {
     // 출하반품 삭제
     void deleteShipmentReturn(Long id) throws NotFoundException;
     // clientId 로 shipmentIds 조회
-    List<ShipmentReturnLotResponse> getShipmentLots(Long clientId) throws NotFoundException;
+    Page<ShipmentReturnLotResponse> getShipmentLots(Long clientId, LocalDate fromDate, LocalDate toDate, Pageable pageable) throws NotFoundException;
+    // 바코드 번호로 조회
+    ShipmentReturnLotResponse getShipmentLotByBarcodeNo(String barcodeNo) throws NotFoundException, BadRequestException;
 }
