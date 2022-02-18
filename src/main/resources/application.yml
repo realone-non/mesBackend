@@ -89,8 +89,8 @@ server:
 # swagger ui
 springdoc:
   swagger-ui:
-    disable-swagger-default-url: true
-    path: /
+    disable-swagger-default-url: true # 기본 petstore URL 비활성화
+    path: /                     # swagger-ui HTML 문서의 사용자 정의 경로
     operations-sorter: alpha    # ui 정렬
     tags-sorter: alpha
   api-docs:

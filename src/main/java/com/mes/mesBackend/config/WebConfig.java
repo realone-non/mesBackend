@@ -7,7 +7,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    // https://dev-pengun.tistory.com/entry/Spring-Boot-CORS-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0
+    /*
+    * addMapping: 모든 경로에 대해 cors 적용
+    * exposedHeaders: 브라우저에 표시할 헤더를 명시, JWT 로그인을 위해서 클라이언트가 헤더에 접근할 수 있게 적용
+    * allowOrigins: 서버의 자원에 접근할 수 있는 출처를 명시한다.
+    * allowCredentials: 같은 출처라면 기본적으로 쿠키가 request 헤더에 자동으로 설정된다.
+    * 하지만 CORS 는 다른 출처간의 통신이기 때문에 자동으로 설정되지 않음. 응답헤더에 true 주면 클라이언트에서 보낸 쿠키를 받을 수 있다.
+    * allowedMethods: 요청이 허용되는 메소드 지정
+    * */
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")

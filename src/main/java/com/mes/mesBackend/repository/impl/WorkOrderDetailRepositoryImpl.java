@@ -18,6 +18,8 @@ import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.GoodsType.HALF_PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL_INPUT;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.SHIPMENT;
 
 @RequiredArgsConstructor
 public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryCustom {
@@ -637,8 +639,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.orderNo.as("workOrderNo"),
                                 workProcess.workProcessName.as("workProcessName"),
                                 workLine.workLineName.as("workLineName"),
-                                item.itemNo.as("itemNo"),
-                                item.itemName.as("itemName"),
+//                                item.itemNo.as("itemNo"),
+//                                item.itemName.as("itemName"),
                                 workOrderDetail.startDate.as("workDateTime"),
                                 user.korName.as("userKorName"),
                                 contract.contractNo.as("contractNo"),
@@ -662,7 +664,9 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isItemNoAndItemNameContain(itemNoAndItemName),
                         isWorkOrderStartDateBetween(fromDate, toDate),
                         isDeleteYnFalse(),
-                        workOrderDetail.orderState.eq(COMPLETION)
+                        workOrderDetail.orderState.eq(COMPLETION),
+                        workProcess.workProcessDivision.notIn(MATERIAL_INPUT),  // 공정 자제입고 제외
+                        workProcess.workProcessDivision.notIn(SHIPMENT)         // 공정 출하 제외
                 )
                 .fetch();
     }

@@ -46,6 +46,8 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
             String itemNoAndItemName
     ) throws NotFoundException {
         // 작업지시의 지시상태가 COMPLETION 인것만 조회
+        // TODO: 공정이 자재입고, 출하는 제외
+        // TODO: 조회되는 품목, 품번은 productOrder 의 item이 아니구 bomDetailMaster의 ITEM 이어야 함
         List<BadItemWorkOrderResponse> workOrderResponses = workOrderDetailRepo.findBadItemWorkOrderResponseByCondition(
                 workCenterId,
                 workLineId,
@@ -57,7 +59,9 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
                 itemNoAndItemName
         );
         for (BadItemWorkOrderResponse response : workOrderResponses) {
-            LotLog lotLog = lotLogRepository.findLotLogByWorkOrderIdAndWorkProcessId(response.getWorkOrderId(), response.getWorkProcessId())
+            Long workOrderId = response.getWorkOrderId();
+            Long workProcessId = response.getWorkProcessId();
+            LotLog lotLog = lotLogRepository.findLotLogByWorkOrderIdAndWorkProcessId(workOrderId, workProcessId)
                     .orElseThrow(() -> new NotFoundException("공정 완료된 작업지시가 LotLog 에 등록되지 않았습니다."));
             response.setBadAmount(lotLog.getLotMaster().getBadItemAmount());        // lotMaster 의 불량수량
             response.setProductionAmount(lotLog.getLotMaster().getCreatedAmount()); // lotMaster 의 생성수량
