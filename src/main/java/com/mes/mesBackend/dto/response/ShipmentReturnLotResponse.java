@@ -34,4 +34,7 @@ public class ShipmentReturnLotResponse {
 
     @Schema(description = "출하 수량")
     int shipmentAmount;
+
+    @Schema(description = "규격")
+    String standard;
 }

@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.EQUIPMENT_LOT;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL_INPUT;
 
@@ -105,6 +106,7 @@ public class LotMasterRequest {
         setEnrollmentType(enrollmentType);               // 등록유형
         setEquipmentId(equipmentId);                     // 설비유형
         setLotMasterDivision(division);            // lot 생성 구분
-        if (division.equals(REAL_LOT)) setStockAmount(createdAmount);
+        if (division.equals(REAL_LOT)) setStockAmount(this.stockAmount + createdAmount);
+        if (division.equals(EQUIPMENT_LOT)) setStockAmount(this.stockAmount + createdAmount);
     }
 }
