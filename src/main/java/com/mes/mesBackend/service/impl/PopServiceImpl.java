@@ -499,7 +499,7 @@ public class PopServiceImpl implements PopService {
 
         // equipmentLot 불량수량, 재고수량 update
         equipmentLot.setBadItemAmount((equipmentLot.getBadItemAmount() - beforeAmount) + badItemAmount);
-        equipmentLot.setStockAmount((equipmentLot.getStockAmount() + beforeAmount) + badItemAmount);
+        equipmentLot.setStockAmount((equipmentLot.getStockAmount() + beforeAmount) - badItemAmount);
         lotMasterRepo.save(equipmentLot);
 
         // 불량수량 수정
