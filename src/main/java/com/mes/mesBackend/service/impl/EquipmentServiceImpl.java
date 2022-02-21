@@ -50,8 +50,8 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     // 설비 전체 조회
     @Override
-    public List<EquipmentResponse> getEquipments() {
-        List<Equipment> equipments = equipmentRepository.findAllByDeleteYnFalse();
+    public List<EquipmentResponse> getEquipments(String equipmentName) {
+        List<Equipment> equipments = equipmentRepository.findByCondition(equipmentName);
         return mapper.toListResponses(equipments, EquipmentResponse.class);
     }
 //    public Page<EquipmentResponse> getEquipments(Pageable pageable) {

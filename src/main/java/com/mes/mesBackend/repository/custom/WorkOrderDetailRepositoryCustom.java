@@ -3,6 +3,7 @@ package com.mes.mesBackend.repository.custom;
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.Item;
 import com.mes.mesBackend.entity.WorkOrderDetail;
+import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 
 import java.time.LocalDate;
@@ -89,7 +90,9 @@ public interface WorkOrderDetailRepositoryCustom {
     // 수주수량
     Integer findContractItemAmountByWorkOrderId(Long workOrderId);
     // 해당 공정에 해당하는 반제품 품목 가져옴
-    Optional<Item> findBomDetailByBomMasterItemIdAndWorkProcessId(Long itemId, Long workProcessId);
+    Optional<Item> findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(Long itemId, Long workProcessId, GoodsType goodsType);
+    // 해당 공정에 해당하는 완제품 품목 가져옴
+//    Optional<Item> findBomDetailProductByBomMasterItemIdAndWorkProcessId(Long itemId, Long workProcessId);
     // 품목에 해당하는 bomDetail 의 item 정보 가져옴
     List<Item> findBomDetailItemByBomMasterItem(Long bomMasterItemId);
 

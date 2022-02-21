@@ -6,6 +6,7 @@ import com.mes.mesBackend.entity.QEquipment;
 import com.mes.mesBackend.entity.QWorkProcess;
 import com.mes.mesBackend.repository.custom.EquipmentRepositoryCustom;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,5 +54,19 @@ public class EquipmentRepositoryImpl implements EquipmentRepositoryCustom {
                 )
                 .limit(1)
                 .fetchOne();
+    }
+
+    @Override
+    public List<Equipment> findByCondition(String equipmentName) {
+        return  jpaQueryFactory
+                .selectFrom(equipment)
+                .where(
+                        isEquipmentNameContain(equipmentName),
+                        equipment.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+    private BooleanExpression isEquipmentNameContain(String equipmentName) {
+        return equipmentName != null ? equipment.equipmentName.contains(equipmentName) : null;
     }
 }

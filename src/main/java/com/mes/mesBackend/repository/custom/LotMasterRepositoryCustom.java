@@ -36,7 +36,7 @@ public interface LotMasterRepositoryCustom {
     Optional<String> findLotNoByGoodsType(GoodsType goodsType, LocalDate startDate, LocalDate endDate);
 
     //제품분류에 따른 가장 마지막에 생성된 LOT NO 반환(수정버전)
-    Optional<String> findLotNoByAccountCode(Long itemAccountCodeId, LocalDate startDate, LocalDate endDate);
+    Optional<String> findLotNoByAccountCode(Long itemAccountCodeId, LocalDate startDate);
     //외주입고정보로 LOT정보 가져오기
     List<OutsourcingInputLOTResponse> findLotMastersByOutsourcing(Long inputId);
     //LOT정보 조회
@@ -66,4 +66,5 @@ public interface LotMasterRepositoryCustom {
     List<LabelPrintResponse> findPrintsByWorkProcessAndEquipment(Long workProcessId, Long equipmentId);
     // 생성날짜가 오늘이고, lotDivision 이 dummny 인 걸 찾아옴
     Optional<String> findDummyNoByDivision(LotMasterDivision lotMasterDivision, LocalDate startDate);
+    Optional<BadItemWorkOrderResponse.subDto> findLotMaterByDummyLotIdAndWorkProcessId(Long dummyLotId, Long workProcessId);
 }

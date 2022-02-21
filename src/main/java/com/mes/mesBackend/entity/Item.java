@@ -17,10 +17,11 @@ import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+import static lombok.AccessLevel.PUBLIC;
 
 // 3-2-1. 품목등록
 @AllArgsConstructor
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = PUBLIC)
 @Entity(name = "ITEMS")
 @Data
 @Table(indexes = {

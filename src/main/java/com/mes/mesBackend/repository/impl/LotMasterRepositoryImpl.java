@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.DUMMY_LOT;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
@@ -36,6 +37,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     final QUnit unit = QUnit.unit;
     final QLotLog lotLog = QLotLog.lotLog;
     final QWorkOrderDetail workOrderDetail = QWorkOrderDetail.workOrderDetail;
+    final QLotEquipmentConnect lotEquipmentConnect = QLotEquipmentConnect.lotEquipmentConnect;
 
     // id 로 itemAccountCode 의 symbol 조회
     @Override
@@ -88,16 +90,18 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     }
 
     @Transactional(readOnly = true)
-    public Optional<String> findLotNoByAccountCode(Long itemAccountCodeId, LocalDate startDate, LocalDate endDate){
+    public Optional<String> findLotNoByAccountCode(Long itemAccountCodeId, LocalDate startDate){
         return Optional.ofNullable(jpaQueryFactory
                     .select(lotMaster.lotNo)
                     .from(lotMaster)
                         .leftJoin(item).on(item.id.eq(lotMaster.item.id))
                         .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
-                        .leftJoin(itemAccountCode).on(itemAccountCode.itemAccount.id.eq(itemAccountCode.id))
+                        .leftJoin(itemAccountCode).on(itemAccountCode.id.eq(itemAccountCode.id))
                     .where(
-                            lotMaster.createdDate.between(startDate.atStartOfDay(), endDate.atStartOfDay()),
-                            itemAccountCode.id.eq(itemAccountCodeId)
+                            lotMaster.createdDate.between(startDate.atStartOfDay(), LocalDateTime.of(startDate, LocalTime.MAX).withNano(0)),
+                            itemAccountCode.id.eq(itemAccountCodeId),
+                            lotMaster.lotMasterDivision.eq(REAL_LOT),
+                            lotMaster.deleteYn.isFalse()
                     )
                     .orderBy(lotMaster.createdDate.desc())
                     .limit(1)
@@ -435,7 +439,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         lotMaster.item.id.eq(itemId),
                         lotMaster.deleteYn.isFalse(),
                         isLotNoContain(lotNo),
-                        lotMaster.stockAmount.goe(1)
+                        lotMaster.stockAmount.goe(1),
+                        lotMaster.lotMasterDivision.eq(REAL_LOT)
                 )
                 .fetch();
     }
@@ -480,6 +485,34 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .orderBy(lotMaster.createdDate.desc())
                 .limit(1)
                 .fetchOne());
+    }
+
+    @Override
+    public Optional<BadItemWorkOrderResponse.subDto> findLotMaterByDummyLotIdAndWorkProcessId(Long dummyLotId, Long workProcessId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(
+                                Projections.fields(
+                                        BadItemWorkOrderResponse.subDto.class,
+                                        lotEquipmentConnect.childLot.badItemAmount.max().as("badAmount"),
+                                        lotEquipmentConnect.childLot.createdAmount.max().as("createAmount"),
+                                        item.itemName.as("itemNo"),
+                                        item.itemName.as("itemName")
+                                )
+                        )
+                        .from(lotEquipmentConnect)
+                        .leftJoin(lotMaster).on(lotMaster.id.eq(lotEquipmentConnect.parentLot.id))
+                        .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                        .leftJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
+                        .where(
+                                lotMaster.id.eq(dummyLotId),
+                                workProcess.id.eq(workProcessId),
+                                lotMaster.lotMasterDivision.eq(DUMMY_LOT),
+                                lotMaster.deleteYn.isFalse()
+                        )
+                        .groupBy(lotMaster.id)
+                        .fetchOne()
+        );
     }
 
     // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 유효여부

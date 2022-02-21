@@ -148,14 +148,14 @@ public class LotHelperImpl implements LotHelper {
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = LocalDate.now().plusDays(1);
 
-        String beforeRealLotNo = lotMasterRepo.findLotNoByAccountCode(itemAccountCode.getId(), startDate, endDate)
+        String beforeRealLotNo = lotMasterRepo.findLotNoByAccountCode(itemAccountCode.getId(), LocalDate.now())
                 .orElse(null);
         // 생성날짜가 오늘이고, lotDivision 이 dummny 인 걸 찾아옴
         String beforeDummyOrEquipmentLotNo = lotMasterRepo.findDummyNoByDivision(lotMasterDivision, startDate).orElse(null);
 
         startDate = LocalDate.now().withDayOfMonth(1);
         endDate = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
-        String productLotNo = lotMasterRepo.findLotNoByAccountCode(itemAccountCode.getId(), startDate, endDate)
+        String productLotNo = lotMasterRepo.findLotNoByAccountCode(itemAccountCode.getId(), startDate)
                 .orElse(null);
         int seq = 1;
 
@@ -198,7 +198,7 @@ public class LotHelperImpl implements LotHelper {
                                 + equipmentNo + String.format("%03d", seq);
                     }
                     else{
-                        seq = Integer.parseInt(Objects.requireNonNull(beforeRealLotNo).substring(beforeRealLotNo.length() - 4)) + 1;
+                        seq = Integer.parseInt(Objects.requireNonNull(beforeRealLotNo).substring(beforeRealLotNo.length() - 3)) + 1;
                         createdLotNo = dateCode + code + equipmentNo + String.format("%03d", seq);
                     }
                 }
