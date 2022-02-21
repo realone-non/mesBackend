@@ -47,7 +47,6 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
             String itemNoAndItemName
     ) throws NotFoundException {
         // 작업지시의 지시상태가 COMPLETION, 공정구분이 출하, 자재입고 제외
-        // TODO: 조회되는 품목, 품번은 productOrder 의 item이 아니구 bomDetailMaster의 ITEM 이어야 함
         List<BadItemWorkOrderResponse> workOrderResponses = workOrderDetailRepo.findBadItemWorkOrderResponseByCondition(
                 workCenterId,
                 workLineId,
@@ -66,6 +65,7 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
 //            response.setBadAmount(lotLog.getLotMaster().getBadItemAmount());        // lotMaster 의 불량수량
 //            response.setProductionAmount(lotLog.getLotMaster().getCreatedAmount()); // lotMaster 의 생성수량
             Long dummyLotId = lotLog.getLotMaster().getId();
+            // TODO: 여기 테스트
             BadItemWorkOrderResponse.subDto subDto = lotMasterRepo.findLotMaterByDummyLotIdAndWorkProcessId(dummyLotId, workProcessId)
                     .orElseThrow(() -> new NotFoundException("[데이터오류] lotLog 에 등록된 lotMaster(id: " + dummyLotId + ") 가 lotEquipmentConnect parentLot 로 등록되지 않았습니다."));
             response.setItemNo(subDto.getItemNo());

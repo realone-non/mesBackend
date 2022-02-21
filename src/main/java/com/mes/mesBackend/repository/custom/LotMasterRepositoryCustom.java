@@ -36,7 +36,7 @@ public interface LotMasterRepositoryCustom {
     Optional<String> findLotNoByGoodsType(GoodsType goodsType, LocalDate startDate, LocalDate endDate);
 
     //제품분류에 따른 가장 마지막에 생성된 LOT NO 반환(수정버전)
-    Optional<String> findLotNoByAccountCode(Long itemAccountCodeId, LocalDate startDate, LocalDate endDate);
+    Optional<String> findLotNoByAccountCode(Long itemAccountCodeId, LocalDate startDate);
     //외주입고정보로 LOT정보 가져오기
     List<OutsourcingInputLOTResponse> findLotMastersByOutsourcing(Long inputId);
     //LOT정보 조회
