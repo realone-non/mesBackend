@@ -14,11 +14,6 @@ import static com.mes.mesBackend.exception.Message.*;
 @Setter
 @Schema(description = "작업라인")
 public class WorkLineRequest {
-    @Schema(description = "라인코드 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
-    Long workLineCode;           // 라인코드
-
     @Schema(description = "작업라인명")
     @NotBlank(message = NOT_EMPTY)
     String workLineName;          // 작업라인명

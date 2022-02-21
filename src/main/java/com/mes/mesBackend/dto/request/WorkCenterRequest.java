@@ -13,11 +13,6 @@ import static com.mes.mesBackend.exception.Message.*;
 @Setter
 @Schema(description = "작업장")
 public class WorkCenterRequest {
-    @Schema(description = "작업장코드 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
-    Long workCenterCode;
-
     @Schema(description = "작업장명")
     String workCenterName;
 

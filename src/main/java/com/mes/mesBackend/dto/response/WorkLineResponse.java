@@ -15,9 +15,6 @@ public class WorkLineResponse {
     @Schema(description = "고유아이디")
     Long id;
 
-    @Schema(description = "라인코드")
-    CodeResponse.idAndCode workLineCode;              // 라인코드
-
     @Schema(description = "작업라인명")
     String workLineName;                    // 작업라인명
 

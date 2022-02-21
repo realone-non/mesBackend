@@ -15,9 +15,6 @@ public class ItemGroupResponse {
     @Schema(description = "고유아이디")
     Long id;
 
-    @Schema(description = "그룹코드")
-    CodeResponse.idAndCode itemGroupCode;
-
     @Schema(description = "상위그룹코드")
     String topGroupCode;
 

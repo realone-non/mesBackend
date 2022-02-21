@@ -13,12 +13,6 @@ import static com.mes.mesBackend.exception.Message.*;
 @Setter
 @Schema(description = "품목그룹")
 public class ItemGroupRequest {
-
-    @Schema(description = "그룹코드 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
-    Long itemGroupCode;
-
     @Schema(description = "상위그룹코드")
     String topGroupCode;        // 상위그룹코드
 

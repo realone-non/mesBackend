@@ -19,9 +19,9 @@ public class ItemGroup extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '품목그룹 등록 고유아이디'")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ITEM_GROUP_CODES_ID", columnDefinition = "bigint COMMENT '그룹코드'", nullable = false)
-    private ItemGroupCode itemGroupCode;
+//    @ManyToOne(fetch = FetchType.LAZY)    TODO: 삭제
+//    @JoinColumn(name = "ITEM_GROUP_CODES_ID", columnDefinition = "bigint COMMENT '그룹코드'", nullable = false)
+//    private ItemGroupCode itemGroupCode;
 
     @Column(name = "TOP_GROUP_CODE", columnDefinition = "varchar(255) COMMENT '상위그룹코드'")
     private String topGroupCode;        // 상위그룹코드
@@ -44,12 +44,7 @@ public class ItemGroup extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn;       // 삭제여부
 
-    public void add(ItemGroupCode itemGroupCode) {
-        setItemGroupCode(itemGroupCode);
-    }
-
-    public void put(ItemGroup newItemGroup, ItemGroupCode newItemGroupCode) {
-        setItemGroupCode(newItemGroupCode);
+    public void put(ItemGroup newItemGroup) {
         setTopGroupCode(newItemGroup.topGroupCode);
         setTopGroupName(newItemGroup.topGroupName);
         setGroupName(newItemGroup.groupName);
