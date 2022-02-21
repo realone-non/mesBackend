@@ -591,8 +591,8 @@ public class PopServiceImpl implements PopService {
         lotMasterRepo.save(equipmentLot);
 
         // realLot stockAmount 변경, createdAmount 변경
-        realLot.setStockAmount((realLot.getStockAmount() - beforeAmount) + amount);
-        realLot.setCreatedAmount((realLot.getStockAmount() - beforeAmount) + amount);
+        realLot.setStockAmount(amount);
+        realLot.setCreatedAmount(amount);
         lotMasterRepo.save(realLot);
 
         lotConnect.setAmount(amount);
