@@ -13,7 +13,7 @@ spring:
   # jpa
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: validate # validate 바꿔주세요ㅜㅜ
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl

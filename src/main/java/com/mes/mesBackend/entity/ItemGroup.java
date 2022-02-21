@@ -13,15 +13,10 @@ import javax.persistence.*;
 @Entity(name = "ITEM_GROUPS")
 @Data
 public class ItemGroup extends BaseTimeEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '품목그룹 등록 고유아이디'")
     private Long id;
-
-//    @ManyToOne(fetch = FetchType.LAZY)    TODO: 삭제
-//    @JoinColumn(name = "ITEM_GROUP_CODES_ID", columnDefinition = "bigint COMMENT '그룹코드'", nullable = false)
-//    private ItemGroupCode itemGroupCode;
 
     @Column(name = "TOP_GROUP_CODE", columnDefinition = "varchar(255) COMMENT '상위그룹코드'")
     private String topGroupCode;        // 상위그룹코드
