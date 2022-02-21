@@ -28,10 +28,6 @@ public class WorkLine extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업라인 등록 고유아이디'")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "WORK_LINE_CODE", columnDefinition = "bigint COMMENT '라인코드'")
-    private WorkLineCode workLineCode;          // 라인코드
-
     @Column(name = "WORK_LINE_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '작업라인명'")
     private String workLineName;    // 작업라인명
 
@@ -65,22 +61,19 @@ public class WorkLine extends BaseTimeEntity {
 
 
     public void addMapping(
-            WorkLineCode workLineCode,
             WorkCenter workCenter,
             WorkProcess workProcess
     ) {
-        setWorkLineCode(workLineCode);
         setWorkCenter(workCenter);
         setWorkProcess(workProcess);
     }
 
     public void put(
             WorkLine newWorkLine,
-            WorkLineCode newWorkLineCode,
             WorkCenter newWorkCenter,
             WorkProcess newWorkProcess
     ) {
-        addMapping(newWorkLineCode,newWorkCenter,newWorkProcess);
+        addMapping(newWorkCenter,newWorkProcess);
         setWorkLineName(newWorkLine.workLineName);
         setPopStartFormid(newWorkLine.popStartFormid);
         setTime(newWorkLine.time);

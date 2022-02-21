@@ -16,9 +16,6 @@ public class WorkCenterResponse {
     @Schema(description = "고유아이디")
     Long id;
 
-    @Schema(description = "작업장코드")
-    CodeResponse.idAndCode workCenterCode;
-
     @Schema(description = "작업장명")
     String workCenterName;
 

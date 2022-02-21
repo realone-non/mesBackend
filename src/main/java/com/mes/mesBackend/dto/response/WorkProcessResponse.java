@@ -17,9 +17,6 @@ public class WorkProcessResponse {
     @Schema(description = "고유아이디")
     Long id;
 
-    @Schema(description = "작업공정코드")
-    CodeResponse.idAndCode workProcessCode;        // 작업공정코드
-
     @Schema(description = "작업공정명")
     String workProcessName;     // 작업공정명
 

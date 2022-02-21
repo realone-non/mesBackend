@@ -30,10 +30,6 @@ public class WorkProcess extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업공정 고유아이디'")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "WORK_PROCESS_CODE", columnDefinition = "bigint COMMENT '작업공정코드'")
-    private WorkProcessCode workProcessCode;
-
     @Column(name = "WORK_PROCESS_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '작업공정명'")
     private String workProcessName;     // 작업공정명
 
@@ -56,14 +52,8 @@ public class WorkProcess extends BaseTimeEntity {
     @Column(name = "RECYCLE_YN", columnDefinition = "bit(1) COMMENT '재사용 공정 여부'")
     private boolean recycleYn = false;  // 라벨링, 포장
 
-    // 연관 매핑 편리메서드
-    public void addWorkProcessCode(WorkProcessCode workProcessCode) {
-        setWorkProcessCode(workProcessCode);
-    }
-
     // 수정
-    public void put(WorkProcess newWorkProcess, WorkProcessCode newWorkProcessCode) {
-        setWorkProcessCode(newWorkProcessCode);
+    public void put(WorkProcess newWorkProcess) {
         setWorkProcessName(newWorkProcess.workProcessName);
         setProcessTest(newWorkProcess.processTest);
         setOrders(newWorkProcess.orders);
