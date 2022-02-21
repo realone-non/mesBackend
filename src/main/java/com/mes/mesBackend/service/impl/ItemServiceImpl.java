@@ -125,7 +125,7 @@ public class ItemServiceImpl implements ItemService {
         ItemAccount newItemAccount = itemAccountService.getItemAccountOrThrow(itemRequest.getItemAccount());
         ItemAccountCode newItemAccountCode = itemAccountCodeService.getItemAccountCodeOrThrow(itemRequest.getItemAccountCode());
 
-        ifItemAccountDifferentFromItemAccountCodeThrow(newItemAccount.getId(), newItemAccountCode.getId());
+        ifItemAccountDifferentFromItemAccountCodeThrow(newItemAccount.getId(), newItemAccountCode.getItemAccount().getId());
 
         ItemGroup newItemGroup = itemRequest.getItemGroup() != null ? itemGroupService.getItemGroupOrThrow(itemRequest.getItemGroup()) : null;
         ItemForm newItemForm = itemRequest.getItemForm() != null ? itemFormService.getItemFormOrThrow(itemRequest.getItemForm()) : null;

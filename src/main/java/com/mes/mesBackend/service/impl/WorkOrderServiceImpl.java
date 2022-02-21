@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
 
 // 6-2. 작업지시 등록
@@ -89,7 +88,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         WorkOrderResponse workOrderResponse = workOrderDetailRepo.findWorkOrderResponseByProduceOrderIdAndWorkOrderId(produceOrderId, workOrderId)
                 .orElseThrow(() -> new NotFoundException("workOrderDetail does not exists. input id: " + workOrderId));
 
-        Item bomDetailItem = workOrderDetailRepo.findBomDetailByBomMasterItemIdAndWorkProcessId(workOrderResponse.getProduceOrderItemId(), workOrderResponse.getWorkProcessId())
+        Item bomDetailItem = workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(workOrderResponse.getProduceOrderItemId(), workOrderResponse.getWorkProcessId(), null)
                 .orElse(null);
 
         workOrderResponse.setCostTime();        // 소요시간
@@ -109,7 +108,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         List<WorkOrderResponse> workOrderDetails = workOrderDetailRepo.findWorkOrderResponseByProduceOrderIdAndDeleteYnFalse(produceOrder.getId());
 
         for (WorkOrderResponse response : workOrderDetails) {
-            Item bomDetailItem = workOrderDetailRepo.findBomDetailByBomMasterItemIdAndWorkProcessId(response.getProduceOrderItemId(), response.getWorkProcessId())
+            Item bomDetailItem = workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(response.getProduceOrderItemId(), response.getWorkProcessId(), null)
                     .orElse(null);
             response.setCostTime();
             if (bomDetailItem != null) {
@@ -130,10 +129,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             Long produceOrderId,
             Long workOrderId,
             WorkOrderUpdateRequest newWorkOrderRequest
-    ) throws NotFoundException, BadRequestException {
+    ) throws NotFoundException {
         WorkOrderDetail findWorkOrderDetail = getWorkOrderDetailOrThrow(workOrderId, produceOrderId);
-
-        if (newWorkOrderRequest.getOrderState().equals(COMPLETION)) throw new BadRequestException("지시상태를 완료로 변경 할 수 없습니다.");
 
         WorkLine newWorkLine = workLineService.getWorkLineOrThrow(newWorkOrderRequest.getWorkLine());
         User newUser = newWorkOrderRequest.getUser() != null ? userService.getUserOrThrow(newWorkOrderRequest.getUser()) : null;
@@ -145,7 +142,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         if (orderAmount !=  findWorkOrderDetail.getOrderAmount()) {
             // 사용자가 입력한 지시수량이 수주품목의 수량보다 크면 예외
-            throwIfOrderAmountGreaterThanProduceOrderAmount(orderAmount, produceOrder.getContractItem().getAmount());
+//            throwIfOrderAmountGreaterThanProduceOrderAmount(orderAmount, produceOrder.getContractItem().getAmount());
             // 사용자가 입력한 생산수량이 지시수량보다 크면 예외
 //            throwIfProductionAmountGreaterThanOrderAmount(newWorkOrderRequest.getProductionAmount(), orderAmount);
         }

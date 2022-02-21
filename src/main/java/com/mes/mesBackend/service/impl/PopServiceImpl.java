@@ -3,10 +3,7 @@ package com.mes.mesBackend.service.impl;
 import com.mes.mesBackend.dto.request.LotMasterRequest;
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
-import com.mes.mesBackend.entity.enumeration.OrderState;
-import com.mes.mesBackend.entity.enumeration.ProcessStatus;
-import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
+import com.mes.mesBackend.entity.enumeration.*;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.*;
@@ -20,11 +17,11 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PRODUCTION;
+import static com.mes.mesBackend.entity.enumeration.GoodsType.HALF_PRODUCT;
+import static com.mes.mesBackend.entity.enumeration.GoodsType.PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.INPUT_AMOUNT;
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.STORE_AMOUNT;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
@@ -32,6 +29,7 @@ import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.FAMILY;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.*;
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 import static com.mes.mesBackend.entity.enumeration.ProcessStatus.MATERIAL_REGISTRATION;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 
 @Service
 @RequiredArgsConstructor
@@ -83,11 +81,12 @@ public class PopServiceImpl implements PopService {
         // 조건: 작업예정일이 오늘, 작업공정
         List<PopWorkOrderResponse> todayWorkOrders = workOrderDetailRepository.findPopWorkOrderResponsesByCondition(workProcessId, now);
 
-        for (PopWorkOrderResponse todayWorkOrder : todayWorkOrders) {
-            // 제조오더의 품목정보에 해당하고, 검색공정과 같고, 반제품인 bomItemDetail 을 가져옴
-            Item item = workOrderDetailRepository.findBomDetailByBomMasterItemIdAndWorkProcessId(todayWorkOrder.getProduceOrderItemId(), workProcess.getId())
-                    .orElseThrow(() -> new NotFoundException("[데이터 오류] 공정에 맞는 반제품을 찾을 수 없습니다."));
 
+        for (PopWorkOrderResponse todayWorkOrder : todayWorkOrders) {
+            // 제조오더의 품목정보에 해당하고, 검색공정과 같고, 공정이 포장공정이면 완제품, 나머지 다른 공정이면 반제품인 bomItemDetail 을 가져옴
+            GoodsType goodsType = workProcessDivision.equals(PACKAGING) ? PRODUCT : HALF_PRODUCT;
+            Item item = workOrderDetailRepository.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(todayWorkOrder.getProduceOrderItemId(), workProcess.getId(), goodsType)
+                    .orElseThrow(() -> new NotFoundException("[데이터 오류] 공정에 맞는 반제품 또는 완제품을 찾을 수 없습니다."));
             todayWorkOrder.setItemId(item.getId());
             todayWorkOrder.setItemNo(item.getItemNo());
             todayWorkOrder.setItemName(item.getItemName());
@@ -591,8 +590,9 @@ public class PopServiceImpl implements PopService {
         equipmentLot.setStockAmount((equipmentLot.getStockAmount() + beforeAmount) - amount);
         lotMasterRepo.save(equipmentLot);
 
-        // realLot stockAmount 변경
+        // realLot stockAmount 변경, createdAmount 변경
         realLot.setStockAmount((realLot.getStockAmount() - beforeAmount) + amount);
+        realLot.setCreatedAmount((realLot.getStockAmount() - beforeAmount) + amount);
         lotMasterRepo.save(realLot);
 
         lotConnect.setAmount(amount);

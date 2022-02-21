@@ -25,7 +25,7 @@ public class WorkOrderCreateRequest {
     @NotNull(message = NOT_NULL)
     Long workLine;
 
-    @Schema(description = "지시수량 id")
+    @Schema(description = "지시수량")
     @NotNull(message = NOT_NULL)
     int orderAmount;
 
@@ -63,9 +63,9 @@ public class WorkOrderCreateRequest {
     @NotNull(message = NOT_NULL)
     boolean lastProcessYn;
 
-    @Schema(description = "생산수량")
-    @NotNull(message = NOT_NULL)
-    int productionAmount = 0;
+//    @Schema(description = "생산수량")
+//    @NotNull(message = NOT_NULL)
+//    int productionAmount = 0;
 
     @Schema(description = "투입인원")
     @NotNull(message = NOT_NULL)

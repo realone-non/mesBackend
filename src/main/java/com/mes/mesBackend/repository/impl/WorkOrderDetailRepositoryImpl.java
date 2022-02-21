@@ -2,6 +2,7 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.WorkOrderDetailRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.GoodsType.HALF_PRODUCT;
+import static com.mes.mesBackend.entity.enumeration.GoodsType.PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL_INPUT;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.SHIPMENT;
@@ -584,7 +586,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     }
 
     @Override
-    public Optional<Item> findBomDetailByBomMasterItemIdAndWorkProcessId(Long itemId, Long workProcessId) {
+    public Optional<Item> findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(Long itemId, Long workProcessId, GoodsType goodsType) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .select(item)
@@ -596,11 +598,16 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         .where(
                                 qBomItemDetail.bomMaster.item.id.eq(itemId),
                                 workProcess.id.eq(workProcessId),
-                                itemAccount.goodsType.eq(HALF_PRODUCT),
-                                qBomItemDetail.deleteYn.isFalse()
+                                isGoodsTypeEq(goodsType),
+                                qBomItemDetail.deleteYn.isFalse(),
+                                bomMaster.deleteYn.isFalse()
                         )
                         .fetchOne()
         );
+    }
+
+    private BooleanExpression isGoodsTypeEq(GoodsType goodsType) {
+        return goodsType != null ? itemAccount.goodsType.eq(goodsType) : null;
     }
 
     // bomMaster 의 item 에 해당하는 bomDetail 의 item 정보 가져옴
@@ -620,6 +627,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     // =============================================== 8-5. 불량등록 ===============================================
     // 작업지시 정보 리스트 조회,
     // 검색조건: 작업장 id, 작업라인 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목
+    // COMPLETION 만 조회, 작업공정 구분이 자재입고, 출하는 제외
     @Override
     public List<BadItemWorkOrderResponse> findBadItemWorkOrderResponseByCondition(
             Long workCenterId,
@@ -639,8 +647,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.orderNo.as("workOrderNo"),
                                 workProcess.workProcessName.as("workProcessName"),
                                 workLine.workLineName.as("workLineName"),
-//                                item.itemNo.as("itemNo"),
-//                                item.itemName.as("itemName"),
+                                item.id.as("itemId"),
                                 workOrderDetail.startDate.as("workDateTime"),
                                 user.korName.as("userKorName"),
                                 contract.contractNo.as("contractNo"),

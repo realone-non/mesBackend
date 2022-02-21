@@ -3,6 +3,7 @@ package com.mes.mesBackend.repository.custom;
 import com.mes.mesBackend.dto.response.PopEquipmentResponse;
 import com.mes.mesBackend.entity.Equipment;
 
+import javax.swing.*;
 import java.util.List;
 
 public interface EquipmentRepositoryCustom {
@@ -11,4 +12,6 @@ public interface EquipmentRepositoryCustom {
 
     // 작업공정으로 단일 설비 조회
     Equipment findByWorkProcess(Long workProcessId);
+
+    List<Equipment> findByCondition(String equipmentName);
 }

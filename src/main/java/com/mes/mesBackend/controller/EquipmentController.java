@@ -88,9 +88,10 @@ public class EquipmentController {
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<EquipmentResponse>> getEquipments(
+            @RequestParam(required = false) @Parameter(description = "설비명") String equipmentName,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<EquipmentResponse> equipments = equipmentService.getEquipments();
+        List<EquipmentResponse> equipments = equipmentService.getEquipments(equipmentName);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getEquipments.");
         return new ResponseEntity<>(equipments, OK);

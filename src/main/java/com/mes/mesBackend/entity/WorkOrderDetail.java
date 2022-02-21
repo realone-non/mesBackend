@@ -141,9 +141,7 @@ public class WorkOrderDetail extends BaseTimeEntity {
         setUph(newWorkOrderDetail.uph);
         setExpectedWorkDate(newWorkOrderDetail.expectedWorkDate);
         setExpectedWorkTime(newWorkOrderDetail.expectedWorkTime);
-        setOrderState(newWorkOrderDetail.orderState);
         setLastProcessYn(newWorkOrderDetail.lastProcessYn);
-        setProductionAmount(newWorkOrderDetail.productionAmount);
         setInputUser(newWorkOrderDetail.inputUser);
         setNote(newWorkOrderDetail.note);
     }

@@ -1,7 +1,5 @@
 package com.mes.mesBackend.dto.request;
 
-import com.mes.mesBackend.entity.enumeration.OrderState;
-import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,17 +45,17 @@ public class WorkOrderUpdateRequest {
     @NotBlank(message = NOT_EMPTY)
     String expectedWorkTime;
 
-    @Schema(description = "지시상태")
-    @NotNull(message = NOT_NULL)
-    OrderState orderState = OrderState.SCHEDULE;
+//    @Schema(description = "지시상태")
+//    @NotNull(message = NOT_NULL)
+//    OrderState orderState = OrderState.SCHEDULE;
 
     @Schema(description = "최종공정")
     @NotNull(message = NOT_NULL)
     boolean lastProcessYn;
 
-    @Schema(description = "생산수량")
-    @NotNull(message = NOT_NULL)
-    int productionAmount = 0;
+//    @Schema(description = "생산수량")
+//    @NotNull(message = NOT_NULL)
+//    int productionAmount = 0;
 
     @Schema(description = "투입인원")
     @NotNull(message = NOT_NULL)
