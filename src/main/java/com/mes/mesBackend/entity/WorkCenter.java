@@ -27,10 +27,6 @@ public class WorkCenter extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업장 등록 고유아이디'")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "WORK_CENTER_CODE", columnDefinition = "bigint COMMENT '작업장 코드'", nullable = false)
-    private WorkCenterCode workCenterCode;      // 작업장 코드
-
     @Column(name = "WORK_CENTER_NAME", columnDefinition = "varchar(255) COMMENT '작업장명'")
     private String workCenterName;      // 작업장명
 
@@ -48,14 +44,12 @@ public class WorkCenter extends BaseTimeEntity {
     private boolean deleteYn = false;  // 삭제여부
 
     // workCenterCode, client 추가
-    public void addWorkCenterCodeAndClient(WorkCenterCode workCenterCode, Client client) {
-        setWorkCenterCode(workCenterCode);
+    public void addWorkCenterCodeAndClient(Client client) {
         setOutCompany(client);
     }
 
     // 수정
-    public void put(WorkCenter newWorkCenter, WorkCenterCode newWorkCenterCode, Client newClient) {
-        setWorkCenterCode(newWorkCenterCode);
+    public void put(WorkCenter newWorkCenter, Client newClient) {
         setWorkCenterName(newWorkCenter.workCenterName);
         setOutCompany(newClient);
         setCostCenter(newWorkCenter.costCenter);

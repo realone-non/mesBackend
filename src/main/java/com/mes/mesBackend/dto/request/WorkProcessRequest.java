@@ -14,11 +14,6 @@ import static com.mes.mesBackend.exception.Message.*;
 @Setter
 @Schema(description = "작업공정")
 public class WorkProcessRequest {
-    @Schema(description = "작업공정코드 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
-    Long workProcessCode;
-
     @Schema(description = "작업공정명")
     @NotBlank(message = NOT_EMPTY)
     String workProcessName;
