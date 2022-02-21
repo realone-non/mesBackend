@@ -150,7 +150,8 @@ public class ShipmentReturnRepositoryImpl implements ShipmentReturnRepositoryCus
                                 item.itemName.as("itemName"),
                                 lotMaster.lotNo.as("lotNo"),
                                 lotType.lotType.as("lotType"),
-                                lotMaster.shipmentAmount.as("shipmentAmount")
+                                lotMaster.shipmentAmount.as("shipmentAmount"),
+                                item.standard.as("standard")
                         )
                 )
                 .from(shipmentLot)
@@ -189,7 +190,8 @@ public class ShipmentReturnRepositoryImpl implements ShipmentReturnRepositoryCus
                                         item.itemName.as("itemName"),
                                         lotMaster.lotNo.as("lotNo"),
                                         lotType.lotType.as("lotType"),
-                                        lotMaster.shipmentAmount.as("shipmentAmount")
+                                        lotMaster.shipmentAmount.as("shipmentAmount"),
+                                        item.standard.as("standard")
                                 )
                         )
                         .from(shipmentLot)

@@ -469,7 +469,7 @@ public class PopServiceImpl implements PopService {
 
         // equipmentLot 불량수량 update
         equipmentLot.setBadItemAmount(equipmentLot.getBadItemAmount() + badItemAmount);
-        equipmentLot.setStockAmount(equipmentLot.getCreatedAmount() - equipmentLot.getBadItemAmount());
+        equipmentLot.setStockAmount(equipmentLot.getStockAmount() - badItemAmount);
         lotMasterRepo.save(equipmentLot);
 
         // workOrderBadItem 생성
@@ -499,7 +499,7 @@ public class PopServiceImpl implements PopService {
 
         // equipmentLot 불량수량, 재고수량 update
         equipmentLot.setBadItemAmount((equipmentLot.getBadItemAmount() - beforeAmount) + badItemAmount);
-        equipmentLot.setStockAmount(equipmentLot.getCreatedAmount() - equipmentLot.getBadItemAmount());
+        equipmentLot.setStockAmount((equipmentLot.getStockAmount() + beforeAmount) + badItemAmount);
         lotMasterRepo.save(equipmentLot);
 
         // 불량수량 수정
@@ -525,7 +525,7 @@ public class PopServiceImpl implements PopService {
 
         // equipmentLot 불량수량, 재고수량 update
         equipmentLot.setBadItemAmount(equipmentLot.getBadItemAmount() - beforeBadItemAmount);
-        equipmentLot.setStockAmount(equipmentLot.getCreatedAmount() - equipmentLot.getBadItemAmount());
+        equipmentLot.setStockAmount(equipmentLot.getStockAmount() - beforeBadItemAmount);
         lotMasterRepo.save(equipmentLot);
 
         // 불량 삭제
