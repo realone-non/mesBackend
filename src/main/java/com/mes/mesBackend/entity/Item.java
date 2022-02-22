@@ -61,12 +61,6 @@ public class Item extends BaseTimeEntity {
     private ItemForm itemForm = new ItemForm();          // 품목형태
 
     // 다대일 단방향
-    // TODO: 삭제
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "USE_TYPE", columnDefinition = "bigint COMMENT '용도유형'")
-    private UseType useType;            // 용도유형
-
-    // 다대일 단방향
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "ROUTING", columnDefinition = "bigint COMMENT '라우팅'")
     private Routing routing;            // 라우팅 (라우팅 명)
@@ -151,7 +145,6 @@ public class Item extends BaseTimeEntity {
             ItemAccount itemAccount,
             ItemGroup itemGroup,
             ItemForm itemForm,
-            UseType useType,
             Routing routing,
             Unit unit,
             LotType lotType,
@@ -162,7 +155,6 @@ public class Item extends BaseTimeEntity {
         setItemAccount(itemAccount);
         setItemGroup(itemGroup);
         setItemForm(itemForm);
-        setUseType(useType);
         setRouting(routing);
         setUnit(unit);
         setLotType(lotType);
@@ -176,7 +168,6 @@ public class Item extends BaseTimeEntity {
             ItemAccount newItemAccount,
             ItemGroup newItemGroup,
             ItemForm newItemForm,
-            UseType newUseType,
             Routing newRouting,
             Unit newUnit,
             LotType newLotType,
@@ -190,7 +181,6 @@ public class Item extends BaseTimeEntity {
         setItemAccount(newItemAccount);
         setItemGroup(newItemGroup);
         setItemForm(newItemForm);
-        setUseType(newUseType);
         setRouting(newRouting);
         setUnit(newUnit);
         setUhp(newItem.uhp);

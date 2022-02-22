@@ -51,7 +51,7 @@ public class Client extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '거래처 고유아이디'")
     private Long id;
 
-    @Column(name = "CLIENT_CODE", nullable = false, columnDefinition = "varchar(255) COMMENT '거래처 코드'")
+    @Column(name = "CLIENT_CODE", columnDefinition = "varchar(255) COMMENT '거래처 코드'")
     private String clientCode;  // 거래처코드
 
     @Column(name = "CLIENT_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '거래처 명'")

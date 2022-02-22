@@ -36,7 +36,6 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     final QClient client = QClient.client;
     final QWareHouse wareHouse = QWareHouse.wareHouse;
     final QItemForm itemForm = QItemForm.itemForm;
-    final QTestProcess testProcess = QTestProcess.testProcess1;
     final QTestCriteria testCriteria = QTestCriteria.testCriteria1;
     final QPurchaseInput purchaseInput = QPurchaseInput.purchaseInput;
     final QUser user = QUser.user;

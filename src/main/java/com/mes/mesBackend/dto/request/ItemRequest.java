@@ -49,10 +49,6 @@ public class ItemRequest {
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long itemForm;
 
-    @Schema(description = "용도유형 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    Long useType;
-
     @Schema(description = " 라우팅 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     Long routing;

@@ -24,8 +24,8 @@ public class Routing extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '라우팅 등록 고유아이디'")
     private Long id;
 
-    @Column(name = "ROUTING_NO", unique = true, columnDefinition = "bigint COMMENT '라우팅 번호'")
-    private Long routingNo;     // 라우팅 번호
+    @Column(name = "ROUTING_NO",  columnDefinition = "varchar(255) COMMENT '라우팅 번호'")
+    private String routingNo;     // 라우팅 번호
 
     @Column(name = "ROUTING_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '라우팅 명'")
     private String routingName;     // 라우팅 명

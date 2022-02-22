@@ -24,7 +24,6 @@ public class WorkPlaceRequest {
     String workPlaceName;   // 사업장명
 
     @Schema(description = "사업자등록번호")
-    @NotBlank(message = NOT_EMPTY)
     String businessRegNo;  // 사업자등록번호
 
     @Schema(description = "대표자명")

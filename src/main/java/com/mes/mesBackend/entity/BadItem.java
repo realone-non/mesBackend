@@ -57,6 +57,7 @@ public class BadItem extends BaseTimeEntity {
         setOrders(newBadItem.orders);
         setUseYn(newBadItem.useYn);
         setWorkProcess(newWorkProcess);
+        setExhaustItem(newBadItem.exhaustItem);
     }
 
     public void delete() {
