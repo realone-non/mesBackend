@@ -87,9 +87,9 @@ public class ItemRequest {
     @NotNull(message = NOT_NULL)
     int inputUnitPrice;
 
-    @Schema(description = "저장위치")
-    @NotBlank(message = NOT_EMPTY)
-    String storageLocation;
+    @Schema(description = "저장위치 (창고 id)")
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    Long storageLocation;
 
     @Schema(description = "거래처품번")
     String clientItemNo;

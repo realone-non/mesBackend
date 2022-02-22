@@ -269,7 +269,9 @@ public class MapperConfig {
             ModelMapper modelMapper = new ModelMapper();
             Equipment equipment = context.getSource();
             EquipmentResponse response = modelMapper.map(equipment, EquipmentResponse.class);
-            response.setEquipmentType(equipment.getWorkLine().getWorkLineName());
+            if (equipment.getWorkLine() != null) {
+                response.setEquipmentType(equipment.getWorkLine().getWorkLineName());
+            }
             return response;
         }
     };

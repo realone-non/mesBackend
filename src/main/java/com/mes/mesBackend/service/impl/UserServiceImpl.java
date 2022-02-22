@@ -118,10 +118,13 @@ public class UserServiceImpl implements UserService {
 
     // 직원(작업자) 수정
     public UserResponse updateUser(Long id, UserUpdateRequest userRequest) throws NotFoundException, BadRequestException {
-        checkUserEmail(userRequest.getMail());
         Department newDepartment = userRequest.getDepartment() != null ? departmentService.getDepartmentOrThrow(userRequest.getDepartment()) : null;
         User newUser = mapper.toEntity(userRequest, User.class);
         User findUser = getUserOrThrow(id);
+
+        // 이메일 변경 시 중복 이메일인지 체크
+        if (!findUser.getMail().equals(userRequest.getMail())) checkUserEmail(userRequest.getMail());
+
         findUser.put(newUser, newDepartment);
         userRepository.save(findUser);
         return mapper.toResponse(findUser, UserResponse.class);
