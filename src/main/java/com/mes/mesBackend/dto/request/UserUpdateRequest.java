@@ -43,7 +43,6 @@ public class UserUpdateRequest {
     String mail;        // 메일
 
     @Schema(description = "휴대폰 번호(카카오)")
-    @NotBlank(message = NOT_EMPTY)
     String phoneNumber; // 휴대폰 번호(카카오)
 
     @Schema(description = "사용여부")
