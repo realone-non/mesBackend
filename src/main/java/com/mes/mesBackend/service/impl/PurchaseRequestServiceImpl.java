@@ -47,11 +47,11 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(purchaseRequestRequest.getProduceOrder());
 
         // 총 구매요청수량이 수주수량을 초과하면 예외
-        throwIfPurchaseRequestAmountGreaterThanContractItemAmount(
-                produceOrder.getId(),
-                purchaseRequestRequest.getRequestAmount(),
-                produceOrder.getContractItem().getAmount()
-        );
+//        throwIfPurchaseRequestAmountGreaterThanContractItemAmount(
+//                produceOrder.getId(),
+//                purchaseRequestRequest.getRequestAmount(),
+//                produceOrder.getContractItem().getAmount()
+//        );
 
         /*
         * 구매요청 품목정보는 produceOrder 의 contractItem 의 item 을 찾아서
@@ -102,12 +102,12 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         // 구매요청이 ONGOING, COMPLETION 이면 수정 불가능
         throwIfPurchaseRequestOrderStateNotSchedule(findPurchaseRequest.getOrdersState());
 
-        // 총 구매요청수량이 수주수량을 초과하면 예외
-        throwIfPurchaseRequestAmountGreaterThanContractItemAmount(
-                newProduceOrder.getId(),
-                newPurchaseRequestRequest.getRequestAmount(),
-                newProduceOrder.getContractItem().getAmount()
-        );
+//        // 총 구매요청수량이 수주수량을 초과하면 예외
+//        throwIfPurchaseRequestAmountGreaterThanContractItemAmount(
+//                newProduceOrder.getId(),
+//                newPurchaseRequestRequest.getRequestAmount(),
+//                newProduceOrder.getContractItem().getAmount()
+//        );
 
         List<Long> findItemIds = purchaseRequestRepo.findItemIdByContractItemId(newProduceOrder.getContractItem().getItem().getId());
 
