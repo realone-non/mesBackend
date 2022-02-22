@@ -16,7 +16,7 @@ public class RoutingResponse {
     Long id;
 
     @Schema(description = "라우팅 번호")
-    Long routingNo;
+    String routingNo;
 
     @Schema(description = "라우팅 명")
     String routingName;

@@ -20,8 +20,7 @@ import java.util.Optional;
 import static com.mes.mesBackend.entity.enumeration.GoodsType.HALF_PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.GoodsType.PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
-import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL_INPUT;
-import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.SHIPMENT;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.*;
 
 @RequiredArgsConstructor
 public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryCustom {
@@ -546,6 +545,24 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .fetch();
     }
 
+    @Override
+    public Optional<Item> findPopWorkOrderItem(Long workProcessId, LocalDate fromDate) {
+        return Optional.ofNullable(jpaQueryFactory
+                .select(item)
+                .from(workOrderDetail)
+                .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
+                .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
+                .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                .where(
+                        isWorkProcessIdEq(workProcessId),
+                        workOrderDetail.expectedWorkDate.eq(fromDate),
+                        workOrderDetail.deleteYn.isFalse()
+                )
+                .fetchOne());
+    }
+
     // 작업지시 상세 정보
     @Override
     public List<PopWorkOrderDetailResponse> findPopWorkOrderDetailResponsesByItemId(Long itemId) {
@@ -614,12 +631,38 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     @Override
     public List<Item> findBomDetailItemByBomMasterItem(Long bomMasterItemId) {
         return jpaQueryFactory
-                .select(qBomItemDetail.item)
+                .select(item)
                 .from(qBomItemDetail)
                 .leftJoin(bomMaster).on(bomMaster.id.eq(qBomItemDetail.bomMaster.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(qBomItemDetail.workProcess.id))
+                .leftJoin(item).on(item.id.eq(qBomItemDetail.item.id))
                 .where(
-                        qBomItemDetail.bomMaster.item.id.eq(bomMasterItemId),
-                        qBomItemDetail.deleteYn.isFalse()
+                        bomMaster.item.id.eq(bomMasterItemId),
+                        qBomItemDetail.deleteYn.isFalse(),
+                        workProcess.workProcessDivision.eq(MATERIAL_MIXING), // 원료혼합
+                        workProcess.workProcessDivision.eq(FILLING),         // 충진
+                        workProcess.workProcessDivision.eq(CAP_ASSEMBLY),    // 캡조립
+                        workProcess.workProcessDivision.eq(LABELING)         // 라벨링
+
+                )
+                .fetch();
+    }
+
+    // 품목에 해당하는 bomDetail 의 라벨링 공정의 bomDetail 의 Item, 포장공정의(원부자재) 의 item 가져옴
+    @Override
+    public List<Item> findBomDetailItemByBomMasterItemWorkProcessPackaging(Long bomMasterItemId) {
+        return jpaQueryFactory
+                .select(item)
+                .from(qBomItemDetail)
+                .leftJoin(bomMaster).on(bomMaster.id.eq(qBomItemDetail.bomMaster.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(qBomItemDetail.workProcess.id))
+                .leftJoin(item).on(item.id.eq(qBomItemDetail.item.id))
+                .where(
+                        bomMaster.item.id.eq(bomMasterItemId),
+                        bomMaster.deleteYn.isFalse(),
+                        qBomItemDetail.deleteYn.isFalse(),
+                        workProcess.workProcessDivision.eq(LABELING),           // 라벨링
+                        workProcess.workProcessDivision.eq(PACKAGING)           // 패키징
                 )
                 .fetch();
     }

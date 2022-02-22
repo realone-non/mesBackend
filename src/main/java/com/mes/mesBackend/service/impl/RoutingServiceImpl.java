@@ -13,6 +13,7 @@ import com.mes.mesBackend.service.RoutingService;
 import com.mes.mesBackend.service.WareHouseService;
 import com.mes.mesBackend.service.WorkCenterService;
 import com.mes.mesBackend.service.WorkProcessService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,22 +22,14 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class RoutingServiceImpl implements RoutingService {
-    @Autowired
-    RoutingRepository routingRepository;
-
-    @Autowired
-    RoutingDetailsRepository routingDetailRepository;
-
-    @Autowired
-    WorkProcessService workProcessService;
-    @Autowired
-    WorkCenterService workCenterService;
-    @Autowired
-    WareHouseService wareHouseService;
-
-    @Autowired
-    ModelMapper mapper;
+    private final RoutingRepository routingRepository;
+    private final RoutingDetailsRepository routingDetailRepository;
+    private final WorkProcessService workProcessService;
+    private final WorkCenterService workCenterService;
+    private final WareHouseService wareHouseService;
+    private final ModelMapper mapper;
 
     // 라우팅 단일 조회 및 예외
     @Override

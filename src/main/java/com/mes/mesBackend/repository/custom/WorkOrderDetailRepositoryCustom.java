@@ -84,7 +84,7 @@ public interface WorkOrderDetailRepositoryCustom {
     // =============================================== pop ===============================================
     // 작업지시 정보 리스트, 조건: 작업자, 작업공정
     List<PopWorkOrderResponse> findPopWorkOrderResponsesByCondition(Long workProcessId, LocalDate fromDate);
-
+    Optional<Item> findPopWorkOrderItem(Long workProcessId, LocalDate fromDate);
     // 작업지시 상세 정보
     List<PopWorkOrderDetailResponse> findPopWorkOrderDetailResponsesByItemId(Long itemId);
     // 수주수량
@@ -95,6 +95,8 @@ public interface WorkOrderDetailRepositoryCustom {
 //    Optional<Item> findBomDetailProductByBomMasterItemIdAndWorkProcessId(Long itemId, Long workProcessId);
     // 품목에 해당하는 bomDetail 의 item 정보 가져옴
     List<Item> findBomDetailItemByBomMasterItem(Long bomMasterItemId);
+    // 품목에 해당하는 bomDetail 의 라벨링 공정의 bomDetailItem, 포장공정의 원자재 부자재 가져옴
+    List<Item> findBomDetailItemByBomMasterItemWorkProcessPackaging(Long bomMasterItemId);
 
     // =============================================== 8-5. 불량등록 ===============================================
     // 작업지시 정보 리스트 조회, 검색조건: 작업장 id, 작업라인 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목

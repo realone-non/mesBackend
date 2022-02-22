@@ -29,6 +29,7 @@ import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.FAMILY;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.*;
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 import static com.mes.mesBackend.entity.enumeration.ProcessStatus.MATERIAL_REGISTRATION;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.LABELING;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 
 @Service
@@ -81,12 +82,17 @@ public class PopServiceImpl implements PopService {
         // 조건: 작업예정일이 오늘, 작업공정
         List<PopWorkOrderResponse> todayWorkOrders = workOrderDetailRepository.findPopWorkOrderResponsesByCondition(workProcessId, now);
 
-
         for (PopWorkOrderResponse todayWorkOrder : todayWorkOrders) {
             // 제조오더의 품목정보에 해당하고, 검색공정과 같고, 공정이 포장공정이면 완제품, 나머지 다른 공정이면 반제품인 bomItemDetail 을 가져옴
-            GoodsType goodsType = workProcessDivision.equals(PACKAGING) ? PRODUCT : HALF_PRODUCT;
-            Item item = workOrderDetailRepository.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(todayWorkOrder.getProduceOrderItemId(), workProcess.getId(), goodsType)
-                    .orElseThrow(() -> new NotFoundException("[데이터 오류] 공정에 맞는 반제품 또는 완제품을 찾을 수 없습니다."));
+//            GoodsType goodsType = workProcessDivision.equals(LABELING) ? PRODUCT : HALF_PRODUCT;
+//            Item item = workOrderDetailRepository.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(todayWorkOrder.getProduceOrderItemId(), workProcess.getId(), goodsType)
+//                    .orElseThrow(() -> new NotFoundException("[데이터 오류] 공정에 맞는 반제품 또는 완제품을 찾을 수 없습니다."));
+
+            Item item = workProcessDivision.equals(PACKAGING) ?
+                    workOrderDetailRepository.findPopWorkOrderItem(workProcessId, now).orElseThrow(() -> new NotFoundException("[데이터 오류] 포장공정의 완제품을 찾을 수 없습니다."))
+                    : workOrderDetailRepository.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(todayWorkOrder.getProduceOrderItemId(), workProcess.getId(), null)
+                            .orElseThrow(() -> new NotFoundException("[데이터 오류] 공정에 맞는 반제품 또는 완제품을 찾을 수 없습니다."));
+
             todayWorkOrder.setItemId(item.getId());
             todayWorkOrder.setItemNo(item.getItemNo());
             todayWorkOrder.setItemName(item.getItemName());
@@ -258,31 +264,44 @@ public class PopServiceImpl implements PopService {
     }
 
     // 해당 품목(반제품)에 대한 원자재, 부자재 정보 가져와야함
+    // TODO: lotMaster 의 공정이 포장공정일 경우에만 가져오는 로직이 다름.
     @Override
     public List<PopBomDetailItemResponse> getPopBomDetailItems(Long lotMasterId) throws NotFoundException {
         LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);
         Item bomMasterItem = lotMaster.getItem();
-        // lotMaster 의 item 에 해당하는 bomDetail 의 item 정보 가져옴
-        List<Item> bomDetailItems = workOrderDetailRepository.findBomDetailItemByBomMasterItem(bomMasterItem.getId());
 
         List<PopBomDetailItemResponse> popBomDetailItemResponses = new ArrayList<>();
-        for (Item bomDetailItem : bomDetailItems) {
+
+
+        // TODO: 여기에 해당하는 bomMaster 에 포장공정에 해당하는 bomMasterDetail(item 품목계정: 원자재, 부자재) 집어넣고 테스트 돌려봐야함
+//        List<Item> items = lotMaster.getWorkProcess().getWorkProcessDivision().equals(PACKAGING) ?
+//                workOrderDetailRepository.findBomDetailItemByBomMasterItemWorkProcessPackaging(bomMasterItem.getId())
+//                : workOrderDetailRepository.findBomDetailItemByBomMasterItem(bomMasterItem.getId());
+        List<Item> items  = new ArrayList<>();
+//        if (lotMaster.getWorkProcess().getWorkProcessDivision().equals(PACKAGING)) {
+//
+//        }
+
+        // lotMaster 의 item 에 해당하는 bomDetail 의 item 정보 가져옴
+//        List<Item> bomDetailItems = workOrderDetailRepository.findBomDetailItemByBomMasterItem(bomMasterItem.getId());
+
+        for (Item item : items) {
             PopBomDetailItemResponse response = new PopBomDetailItemResponse();
             response.setBomMasterItemId(bomMasterItem.getId());
             response.setBomMasterItemNo(bomMasterItem.getItemNo());
             response.setBomMasterItemName(bomMasterItem.getItemName());
             response.setBomMasterItemAmount(lotMaster.getCreatedAmount());
 
-            response.setBomDetailItemId(bomDetailItem.getId());
-            response.setBomDetailItemNo(bomDetailItem.getItemNo());
-            response.setBomDetailItemName(bomDetailItem.getItemName());
-            response.setBomDetailExhaustYn(bomDetailItem.getUnit().isExhaustYn());
-            response.setBomDetailUnitCodeName(bomDetailItem.getUnit().getUnitCode());
+            response.setBomDetailItemId(item.getId());
+            response.setBomDetailItemNo(item.getItemNo());
+            response.setBomDetailItemName(item.getItemName());
+            response.setBomDetailExhaustYn(item.getUnit().isExhaustYn());
+            response.setBomDetailUnitCodeName(item.getUnit().getUnitCode());
 
             // 소진량
-            List<LotConnect> lotConnects = lotConnectRepo.findLotConnectsByItemIdOfChildLotMasterEqAndDivisionExhaust(bomDetailItem.getId(), lotMasterId);
+            List<LotConnect> lotConnects = lotConnectRepo.findLotConnectsByItemIdOfChildLotMasterEqAndDivisionExhaust(item.getId(), lotMasterId);
             for (LotConnect lotConnect : lotConnects) {
-                if (bomDetailItem.getId().equals(lotConnect.getChildLot().getItem().getId())) {
+                if (item.getId().equals(lotConnect.getChildLot().getItem().getId())) {
                     int allAmount = lotConnects.stream().mapToInt(LotConnect::getAmount).sum();
                     response.setBomDetailExhaustAmount(allAmount);
                 } else
@@ -290,6 +309,7 @@ public class PopServiceImpl implements PopService {
             }
             popBomDetailItemResponses.add(response);
         }
+
         return popBomDetailItemResponses;
     }
 
