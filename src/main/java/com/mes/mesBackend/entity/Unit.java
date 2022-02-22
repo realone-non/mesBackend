@@ -39,7 +39,7 @@ public class Unit extends BaseTimeEntity {
     @Column(name = "DEFAULT_UNIT", columnDefinition = "varchar(255) COMMENT '기본단위'")
     private String defaultUnit; // 기본단위
 
-    @Column(name = "BASE_SCALE", nullable = false, columnDefinition = "float COMMENT 'base 대비 율'")
+    @Column(name = "BASE_SCALE", columnDefinition = "float COMMENT 'base 대비 율'")
     private float baseScale;      // base대비 율
 
     @Column(name = "DECIMAL_POINT", nullable = false, columnDefinition = "int COMMENT '소수점자리수'")

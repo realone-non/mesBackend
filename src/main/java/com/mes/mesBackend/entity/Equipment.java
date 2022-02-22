@@ -40,40 +40,40 @@ public class Equipment extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '설비등록 고유아이디'")
     private Long id;
 
-    @Column(name = "EQUIPMENT_CODE", nullable = false, columnDefinition = "varchar(255) COMMENT '설비코드'")
+    @Column(name = "EQUIPMENT_CODE", columnDefinition = "varchar(255) COMMENT '설비코드'")
     private String equipmentCode;        // 설비코드
 
     @Column(name = "EQUIPMENT_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '설비명'")
     private String equipmentName;        // 설비명
 
-    @Column(name = "MODEL", columnDefinition = "varchar(255) COMMENT '규격모델'", nullable = false)
+    @Column(name = "MODEL", columnDefinition = "varchar(255) COMMENT '규격모델'")
     private String model;               // 규격&모델
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '구매처'", nullable = false)
+    @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '구매처'")
     private Client client;
 
-    @Column(name = "PURCHASE_DATE", columnDefinition = "datetime(6) COMMENT '구매일자'", nullable = false)
+    @Column(name = "PURCHASE_DATE", columnDefinition = "datetime(6) COMMENT '구매일자'")
     private LocalDateTime purchaseDate;        // 구매일자
 
     @Column(name = "PURCHASE_AMOUNT", columnDefinition = "int COMMENT '구입금액'")
     private int purchaseAmount;      // 구입금액
 
-    @Column(name = "MAKER", columnDefinition = "varchar(255) COMMENT '생산업체명'", nullable = false)
+    @Column(name = "MAKER", columnDefinition = "varchar(255) COMMENT '생산업체명'")
     private String maker;               // 생산업체명
 
     @Column(name = "SERIAL_NO", columnDefinition = "varchar(255) COMMENT '시리얼번호'")
     private String serialNo;            // 시리얼번호
 
-    @Column(name = "START_DATE", columnDefinition = "datetime(6) COMMENT '생산개시일자'", nullable = false)
+    @Column(name = "START_DATE", columnDefinition = "datetime(6) COMMENT '생산개시일자'")
     private LocalDateTime startDate;        // 생산개시일자
 
     // 다대일 단방향
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "WORK_LINE", columnDefinition = "bigint COMMENT '작업라인,설비유형'", nullable = false)
+    @JoinColumn(name = "WORK_LINE", columnDefinition = "bigint COMMENT '작업라인,설비유형'")
     private WorkLine workLine;              // 작업라인,설비유형
 
-    @Column(name = "CHECK_CYCLE", columnDefinition = "int COMMENT '점검주기'", nullable = false)
+    @Column(name = "CHECK_CYCLE", columnDefinition = "int COMMENT '점검주기'")
     private int checkCycle;             // 점검주기
 
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
