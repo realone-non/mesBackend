@@ -223,7 +223,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.note.as("note"),
                                 workOrderDetail.startDate.as("startDateTime"),
                                 workOrderDetail.endDate.as("endDateTime"),
-                                item.id.as("produceOrderItemId")
+                                item.id.as("produceOrderItemId"),
+                                workProcess.workProcessDivision.as("workProcessDivision")
                         )
                 )
                 .from(workOrderDetail)
@@ -639,13 +640,18 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .where(
                         bomMaster.item.id.eq(bomMasterItemId),
                         qBomItemDetail.deleteYn.isFalse(),
-                        workProcess.workProcessDivision.eq(workProcessDivision) // 원료혼합
+                        isWorkProcessDivision(workProcessDivision)
+//                        workProcess.workProcessDivision.eq(workProcessDivision) // 원료혼합
 //                        workProcess.workProcessDivision.eq(FILLING),         // 충진
 //                        workProcess.workProcessDivision.eq(CAP_ASSEMBLY),    // 캡조립
 //                        workProcess.workProcessDivision.eq(LABELING)         // 라벨링
 
                 )
                 .fetch();
+    }
+
+    private BooleanExpression isWorkProcessDivision(WorkProcessDivision workProcessDivision) {
+        return workProcessDivision != null ? workProcess.workProcessDivision.eq(workProcessDivision) : null;
     }
 
     // 품목에 해당하는 bomDetail 의 라벨링 공정의 bomDetail 의 Item, 포장공정의(원부자재) 의 item 가져옴

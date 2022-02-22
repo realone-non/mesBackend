@@ -1,6 +1,8 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.enumeration.GoodsType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,6 +40,9 @@ public class ProduceOrderDetailResponse {
 
     @Schema(description = "오더단위")
     String orderUnit;
+
+    @JsonIgnore
+    GoodsType goodsType;
 
     // 예약수량 메서드
     // bom의 투입수량 * 수주 수량

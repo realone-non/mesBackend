@@ -1,6 +1,7 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.PurchaseRequestRequest;
+import com.mes.mesBackend.dto.response.ProduceRequestBomDetail;
 import com.mes.mesBackend.dto.response.PurchaseRequestResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -145,5 +146,19 @@ public class PurchaseRequestController {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deletePurchaseRequest.");
         return new ResponseEntity(NO_CONTENT);
+    }
+
+    // 수주품목에 해당하는 원부자재
+    @GetMapping("/bom-details")
+    @ResponseBody
+    @Operation(summary = "수주품목에 해당하는 원부자재")
+    public ResponseEntity<List<ProduceRequestBomDetail>> getProduceOrderBomDetails(
+            @RequestParam @Parameter(description = "제조 오더 id") Long produceOrderId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        List<ProduceRequestBomDetail> produceRequestBomDetails = purchaseRequestService.getProduceOrderBomDetails(produceOrderId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProduceOrderBomDetails.");
+        return new ResponseEntity<>(produceRequestBomDetails, OK);
     }
 }

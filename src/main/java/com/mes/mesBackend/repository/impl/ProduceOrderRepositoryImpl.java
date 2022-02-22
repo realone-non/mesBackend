@@ -68,7 +68,8 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
                                 bomItemDetail.amount.as("bomAmount"),
                                 workProcess.workProcessName.as("workProcess"),
                                 unit.unitCodeName.as("orderUnit"),
-                                bomItemDetail.level.as("level")
+                                bomItemDetail.level.as("level"),
+                                itemAccount.goodsType.as("goodsType")
                         )
                 )
                 .from(bomItemDetail)
