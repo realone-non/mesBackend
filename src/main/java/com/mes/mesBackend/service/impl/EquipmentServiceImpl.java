@@ -32,9 +32,9 @@ public class EquipmentServiceImpl implements EquipmentService {
     // 설비 생성
     @Override
     public EquipmentResponse createEquipment(EquipmentRequest equipmentRequest) throws NotFoundException {
-        Client client = clientService.getClientOrThrow(equipmentRequest.getClient());
-        WorkLine workLine = workLineService.getWorkLineOrThrow(equipmentRequest.getWorkLine());
-        WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(equipmentRequest.getWorkProcessId());
+        Client client = equipmentRequest.getClient() != null ? clientService.getClientOrThrow(equipmentRequest.getClient()) : null;
+        WorkLine workLine = equipmentRequest.getWorkLine() != null ? workLineService.getWorkLineOrThrow(equipmentRequest.getWorkLine()) : null;
+        WorkProcess workProcess = equipmentRequest.getWorkProcessId() != null ? workProcessService.getWorkProcessOrThrow(equipmentRequest.getWorkProcessId()) : null;
         Equipment equipment = mapper.toEntity(equipmentRequest, Equipment.class);
         equipment.addJoin(client, workLine, workProcess);
         equipmentRepository.save(equipment);
@@ -63,11 +63,11 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     public EquipmentResponse updateEquipment(Long id, EquipmentRequest equipmentRequest) throws NotFoundException {
         Equipment findEquipment = getEquipmentOrThrow(id);
-        Client newClient = clientService.getClientOrThrow(equipmentRequest.getClient());
-        WorkLine newWorkLine = workLineService.getWorkLineOrThrow(equipmentRequest.getWorkLine());
-        WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(equipmentRequest.getWorkProcessId());
+        Client newClient = equipmentRequest.getClient() != null ? clientService.getClientOrThrow(equipmentRequest.getClient()) : null;
+        WorkLine newWorkLine = equipmentRequest.getWorkLine() != null ? workLineService.getWorkLineOrThrow(equipmentRequest.getWorkLine()) : null;
+        WorkProcess newWorkProcess = equipmentRequest.getWorkProcessId() != null ? workProcessService.getWorkProcessOrThrow(equipmentRequest.getWorkProcessId()) : null;
         Equipment newEquipment = mapper.toEntity(equipmentRequest, Equipment.class);
-        findEquipment.update(newEquipment, newClient, newWorkLine, workProcess);
+        findEquipment.update(newEquipment, newClient, newWorkLine, newWorkProcess);
         equipmentRepository.save(findEquipment);
         return mapper.toResponse(findEquipment, EquipmentResponse.class);
     }
