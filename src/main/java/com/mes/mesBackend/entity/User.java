@@ -56,7 +56,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(name = "MAIL", nullable = false, columnDefinition = "varchar(255) COMMENT '메일'")
     private String mail;        // 메일
 
-    @Column(name = "PHONE_NUMBER", nullable = false, columnDefinition = "varchar(255) COMMENT '휴대폰번호'")
+    @Column(name = "PHONE_NUMBER", columnDefinition = "varchar(255) COMMENT '휴대폰번호'")
     private String phoneNumber; // 휴대폰 번호(카카오)
 
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")

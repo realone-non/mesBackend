@@ -33,6 +33,9 @@ public class UserResponse {
     @Schema(description = "연락처")
     String telNumber;   // 연락처
 
+    @Schema(description = "영문이름")
+    String engName;
+
     @Schema(description = "영문이름+직위")
     String engNameAndPosition;  // 영문이름+직위
 
