@@ -30,7 +30,6 @@ public class UnitRequest {
     String defaultUnit; // 기본단위
 
     @Schema(description = "base 대비 율")
-    @NotNull(message = NOT_NULL)
     float baseScale;      // base대비 율
 
     @Schema(description = "소수점자리수")
