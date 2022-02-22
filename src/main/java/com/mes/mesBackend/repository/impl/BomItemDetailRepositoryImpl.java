@@ -25,6 +25,7 @@ public class BomItemDetailRepositoryImpl implements BomItemDetailRepositoryCusto
     final QUnit unit = QUnit.unit;
     final QClient client = QClient.client;
     final QWorkProcess workProcess = QWorkProcess.workProcess;
+    final QWareHouse wareHouse = QWareHouse.wareHouse;
 
     @Transactional(readOnly = true)
     @Override
@@ -44,7 +45,7 @@ public class BomItemDetailRepositoryImpl implements BomItemDetailRepositoryCusto
                                 item.manufacturerPartNo.as("itemManufacturerPartNo"),
                                 item.manufacturer.clientName.as("itemClientName"),
                                 unit.unitCodeName.as("itemUnitCodeName"),
-                                item.storageLocation.as("itemStorageLocation"),
+                                wareHouse.wareHouseName.as("itemStorageLocation"),
                                 item.inputUnitPrice.as("itemInputUnitPrice"),
                                 bomItemDetail.amount.as("amount"),
                                 client.id.as("toBuyId"),
@@ -64,6 +65,7 @@ public class BomItemDetailRepositoryImpl implements BomItemDetailRepositoryCusto
                 .leftJoin(client).on(client.id.eq(bomItemDetail.toBuy.id))
                 .leftJoin(workProcess).on(workProcess.id.eq(bomItemDetail.workProcess.id))
                 .leftJoin(qBomMaster).on(qBomMaster.id.eq(bomItemDetail.bomMaster.id))
+                .leftJoin(wareHouse).on(wareHouse.id.eq(item.storageLocation.id))
                 .where(
                         isBomMasterEq(bomMasterId),
                         isItemNoOrItemNameToItemNoOrItemName(itemNoOrItemName),
