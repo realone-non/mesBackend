@@ -61,14 +61,16 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                         dateNull(fromDate, toDate),
                         isItemNoOrItemNameToItemNoOrItemName(itemNoOrItemName),
                         statusEq(statusType),
-                        childrenStatusEq(childrenStatusType)
+                        childrenStatusEq(childrenStatusType),
+                        development.deleteYn.eq(false),
+                        development.useYn.eq(true)
                 )
                 .groupBy(development.id)
                 .orderBy(developmentState.createdDate.desc())
                 .fetch();
     }
 
-    //개발품목 전체 조회
+    //개발품목 단건 조회
     @Transactional(readOnly = true)
     public DevelopmentResponse findDevelopByIdAndDeleteYnFalse(Long id){
         return jpaQueryFactory
@@ -93,7 +95,8 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                 .innerJoin(user).on(user.id.eq(development.user.id))
                 .where(
                         development.id.eq(id),
-                        development.deleteYn.eq(false)
+                        development.deleteYn.eq(false),
+                        development.useYn.eq(true)
                 )
                 .fetchOne();
     }
