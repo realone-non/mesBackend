@@ -63,7 +63,9 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         List<Long> findItemIds = purchaseRequestRepo.findItemIdByContractItemId(produceOrder.getContractItem().getItem().getId());
 
         // 입력받은 itemId 가 findItemIds 에 해당되는지 체크
-        Item item = getItemAndCheckItemId(purchaseRequestRequest.getItemId(), findItemIds);
+//        Item item = getItemAndCheckItemId(purchaseRequestRequest.getItemId(), findItemIds);
+
+        Item item = itemService.getItemOrThrow(purchaseRequestRequest.getItemId());
 
         PurchaseRequest purchaseRequest = mapper.toEntity(purchaseRequestRequest, PurchaseRequest.class);
 
@@ -109,7 +111,8 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
 
         List<Long> findItemIds = purchaseRequestRepo.findItemIdByContractItemId(newProduceOrder.getContractItem().getItem().getId());
 
-        Item newItem = getItemAndCheckItemId(newPurchaseRequestRequest.getItemId(), findItemIds);
+//        Item newItem = getItemAndCheckItemId(newPurchaseRequestRequest.getItemId(), findItemIds);
+        Item newItem = itemService.getItemOrThrow(newPurchaseRequestRequest.getItemId());
 
         PurchaseRequest newPurchaseRequest = mapper.toEntity(newPurchaseRequestRequest, PurchaseRequest.class);
 

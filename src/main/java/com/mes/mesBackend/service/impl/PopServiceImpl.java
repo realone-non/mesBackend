@@ -214,7 +214,8 @@ public class PopServiceImpl implements PopService {
             // 오늘날짜, 같은 설비 기준으로 equipmentLot 조회해서 없으면 생성, 있으면 update
             LotEquipmentConnect equipmentConnect = lotEquipmentConnectRepo.findByTodayAndEquipmentId(equipmentId, LocalDate.now()).orElse(null);
 
-            // 없으면 update
+            // TODO: 여기다시
+            // 없으면 insert
             if (equipmentConnect == null) {
                 equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
                 equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
