@@ -37,6 +37,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
     private final ModelMapper mapper;
     private final S3Uploader s3Uploader;
+    private final WareHouseService wareHouseService;
 
 
     // 품목 생성
@@ -55,10 +56,11 @@ public class ItemServiceImpl implements ItemService {
         LotType lotType = lotTypeService.getLotTypeOrThrow(itemRequest.getLotType());
         Client manufacturer = clientService.getClientOrThrow(itemRequest.getManufacturer());
         TestCriteria testCriteria = itemRequest.getTestCriteria() != null ? testCriteriaService.getTestCriteriaOrThrow(itemRequest.getTestCriteria()) : null;
+        WareHouse wareHouse = itemRequest.getStorageLocation() != null ? wareHouseService.getWareHouseOrThrow(itemRequest.getStorageLocation()) : null;
 
         Item item = mapper.toEntity(itemRequest, Item.class);
 
-        item.mapping(itemAccount, itemGroup, itemForm, routing, unit, lotType, manufacturer, testCriteria, itemAccountCode);
+        item.mapping(itemAccount, itemGroup, itemForm, routing, unit, lotType, manufacturer, testCriteria, itemAccountCode, wareHouse);
 
         itemRepository.save(item);
         return mapper.toResponse(item, ItemResponse.class);
@@ -131,10 +133,11 @@ public class ItemServiceImpl implements ItemService {
         LotType newLotType = lotTypeService.getLotTypeOrThrow(itemRequest.getLotType());
         Client newManufacturer = clientService.getClientOrThrow(itemRequest.getManufacturer());
         TestCriteria newTestCriteria = itemRequest.getTestCriteria() != null ? testCriteriaService.getTestCriteriaOrThrow(itemRequest.getTestCriteria()) : null;
+        WareHouse newWareHouse = itemRequest.getStorageLocation() != null ? wareHouseService.getWareHouseOrThrow(itemRequest.getStorageLocation()) : null;
 
         Item newItem = mapper.toEntity(itemRequest, Item.class);
 
-        findItem.update(newItem, newItemAccount, newItemGroup, newItemForm, newRouting, newUnit, newLotType, newManufacturer, newTestCriteria, newItemAccountCode);
+        findItem.update(newItem, newItemAccount, newItemGroup, newItemForm, newRouting, newUnit, newLotType, newManufacturer, newTestCriteria, newItemAccountCode, newWareHouse);
         itemRepository.save(findItem);
         return mapper.toResponse(findItem, ItemResponse.class);
     }

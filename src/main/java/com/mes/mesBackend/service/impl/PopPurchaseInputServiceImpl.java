@@ -9,6 +9,7 @@ import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.LotHelper;
 import com.mes.mesBackend.repository.PurchaseInputRepository;
 import com.mes.mesBackend.repository.PurchaseOrderRepository;
 import com.mes.mesBackend.repository.PurchaseRequestRepository;
@@ -34,7 +35,7 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
     private final PurchaseOrderRepository purchaseOrderRepo;
     private final PurchaseInputRepository purchaseInputRepo;
     private final PurchaseRequestRepository purchaseRequestRepo;
-    private final LotMasterService lotMasterService;
+    private final LotHelper lotHelper;
 
     // 구매발주 등록이 완료 된 구매발주 리스트 GET
     @Override
@@ -130,7 +131,7 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
         lotMasterRequest.setWorkProcessDivision(MATERIAL_INPUT);
         lotMasterRequest.setLotMasterDivision(REAL_LOT);
 
-        String lotMaster = lotMasterService.createLotMaster(lotMasterRequest).getLotNo();  // lotMaster 생성
+        String lotMaster = lotHelper.createLotMaster(lotMasterRequest).getLotNo();  // lotMaster 생성
 
         if (lotMaster == null) {
             purchaseInputRepo.deleteById(purchaseInput.getId());
