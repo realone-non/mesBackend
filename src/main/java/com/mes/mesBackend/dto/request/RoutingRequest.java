@@ -16,9 +16,8 @@ import static com.mes.mesBackend.exception.Message.*;
 public class RoutingRequest {
 
     @Schema(description = "라우팅 번호")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
-    Long routingNo;
+    @NotBlank(message = NOT_NULL)
+    String routingNo;
 
     @Schema(description = "라우팅 명")
     @NotBlank(message = NOT_NULL)

@@ -204,13 +204,35 @@ public class LotHelperImpl implements LotHelper {
                 }
                 break;
             case PRODUCT:
-                if(productLotNo == null){
-                    createdLotNo = productHeader + productDateCode + code + equipmentNo
-                            + String.format("%04d", seq);
+                // dummyLot
+                if (lotMasterDivision.equals(DUMMY_LOT)) {
+                    if (beforeDummyOrEquipmentLotNo == null) {
+                        createdLotNo = POP + NOW_YYMMDD + String.format("%04d", seq);
+                    } else {
+                        seq = Integer.parseInt(beforeDummyOrEquipmentLotNo.substring(beforeDummyOrEquipmentLotNo.length() - 4)) + 1;
+                        createdLotNo = POP + NOW_YYMMDD + String.format("%04d", seq);
+                    }
                 }
-                else{
-                    seq = Integer.parseInt(Objects.requireNonNull(beforeRealLotNo).substring(beforeRealLotNo.length() - 4)) + 1;
-                    createdLotNo = productHeader + productDateCode + code + equipmentNo + String.format("%04d", seq);
+                // equipmentLot
+                if (lotMasterDivision.equals(EQUIPMENT_LOT)) {
+                    if (beforeDummyOrEquipmentLotNo == null) {
+                        createdLotNo = EQU + NOW_YYMMDD + String.format("%04d", seq);;
+                    } else {
+                        seq = Integer.parseInt(beforeDummyOrEquipmentLotNo.substring(beforeDummyOrEquipmentLotNo.length() -4)) + 1;
+                        createdLotNo = EQU + NOW_YYMMDD + String.format("%04d", seq);
+                    }
+
+                }
+                // 분할 lot
+                if (lotMasterDivision.equals(REAL_LOT)) {
+                    if(productLotNo == null){
+                        createdLotNo = productHeader + productDateCode + code + equipmentNo
+                                + String.format("%04d", seq);
+                    }
+                    else{
+                        seq = Integer.parseInt(Objects.requireNonNull(beforeRealLotNo).substring(beforeRealLotNo.length() - 4)) + 1;
+                        createdLotNo = productHeader + productDateCode + code + equipmentNo + String.format("%04d", seq);
+                    }
                 }
                 break;
             case NONE:
