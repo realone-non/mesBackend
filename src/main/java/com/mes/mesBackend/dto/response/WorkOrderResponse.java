@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.entity.enumeration.TestCategory;
 import com.mes.mesBackend.entity.enumeration.TestType;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -101,6 +102,8 @@ public class WorkOrderResponse {
     LocalDateTime endDateTime;
     @JsonIgnore
     Long produceOrderItemId;        // 제조오더의 item 고유아이디
+    @JsonIgnore
+    WorkProcessDivision workProcessDivision;
 
     // costTime 변경
     public void setCostTime() {

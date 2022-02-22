@@ -6,6 +6,7 @@ import com.mes.mesBackend.dto.response.WorkOrderProduceOrderResponse;
 import com.mes.mesBackend.dto.response.WorkOrderResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.NumberAutomatic;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 
 // 6-2. 작업지시 등록
 @Service
@@ -108,13 +110,15 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         List<WorkOrderResponse> workOrderDetails = workOrderDetailRepo.findWorkOrderResponseByProduceOrderIdAndDeleteYnFalse(produceOrder.getId());
 
         for (WorkOrderResponse response : workOrderDetails) {
-            Item bomDetailItem = workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(response.getProduceOrderItemId(), response.getWorkProcessId(), null)
+            Item item = response.getWorkProcessDivision().equals(PACKAGING) ?
+                    produceOrder.getContractItem().getItem()
+                    : workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(response.getProduceOrderItemId(), response.getWorkProcessId(), null)
                     .orElse(null);
             response.setCostTime();
-            if (bomDetailItem != null) {
-                response.setUnitCodeName(bomDetailItem.getUnit().getUnitCode());       // 공정에 해당하는 반제품 품목 단위
-                response.setTestCategory(bomDetailItem.getTestCategory());             // 공정에 해당하는 반제품 품목 검사종류
-                response.setTestType(bomDetailItem.getTestType());                     // 공정에 해당하는 반제품 품목 검사유형
+            if (item != null) {
+                response.setUnitCodeName(item.getUnit().getUnitCode());       // 공정에 해당하는 반제품 품목 단위
+                response.setTestCategory(item.getTestCategory());             // 공정에 해당하는 반제품 품목 검사종류
+                response.setTestType(item.getTestType());                     // 공정에 해당하는 반제품 품목 검사유형
             }
         }
         return workOrderDetails;
