@@ -66,7 +66,7 @@ public class UserController {
     @ResponseBody()
     @Operation(summary = "직원(작업자) 전체 조회", description = "검색조건: 부서, 사번, 이름")
     @SecurityRequirement(name = AUTHORIZATION)
-    @ApiResponse(responseCode = "401", description = "un authorized")
+    @ApiResponse(responseCode = "401", description = "unauthorized")
     public ResponseEntity<List<UserResponse>> getUsers(
             @RequestParam(required = false) @Parameter(description = "부서 id") Long departmentId,
             @RequestParam(required = false) @Parameter(description = "사번") String userCode,
