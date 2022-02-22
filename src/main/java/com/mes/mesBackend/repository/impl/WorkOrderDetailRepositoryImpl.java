@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.repository.custom.WorkOrderDetailRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -36,7 +37,6 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     final QWorkLine workLine = QWorkLine.workLine;
     final QWorkProcess workProcess = QWorkProcess.workProcess;
     final QUser user = QUser.user;
-    final QTestProcess testProcess = QTestProcess.testProcess1;
     final QUnit unit = QUnit.unit;
     final QBomItemDetail qBomItemDetail = QBomItemDetail.bomItemDetail;
     final QBomMaster bomMaster = QBomMaster.bomMaster;
@@ -629,7 +629,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
 
     // bomMaster 의 item 에 해당하는 bomDetail 의 item 정보 가져옴
     @Override
-    public List<Item> findBomDetailItemByBomMasterItem(Long bomMasterItemId) {
+    public List<Item> findBomDetailItemByBomMasterItem(Long bomMasterItemId, WorkProcessDivision workProcessDivision) {
         return jpaQueryFactory
                 .select(item)
                 .from(qBomItemDetail)
@@ -639,10 +639,10 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .where(
                         bomMaster.item.id.eq(bomMasterItemId),
                         qBomItemDetail.deleteYn.isFalse(),
-                        workProcess.workProcessDivision.eq(MATERIAL_MIXING), // 원료혼합
-                        workProcess.workProcessDivision.eq(FILLING),         // 충진
-                        workProcess.workProcessDivision.eq(CAP_ASSEMBLY),    // 캡조립
-                        workProcess.workProcessDivision.eq(LABELING)         // 라벨링
+                        workProcess.workProcessDivision.eq(workProcessDivision) // 원료혼합
+//                        workProcess.workProcessDivision.eq(FILLING),         // 충진
+//                        workProcess.workProcessDivision.eq(CAP_ASSEMBLY),    // 캡조립
+//                        workProcess.workProcessDivision.eq(LABELING)         // 라벨링
 
                 )
                 .fetch();
@@ -661,8 +661,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         bomMaster.item.id.eq(bomMasterItemId),
                         bomMaster.deleteYn.isFalse(),
                         qBomItemDetail.deleteYn.isFalse(),
-                        workProcess.workProcessDivision.eq(LABELING),           // 라벨링
-                        workProcess.workProcessDivision.eq(PACKAGING)           // 패키징
+                        workProcess.workProcessDivision.eq(LABELING).or(workProcess.workProcessDivision.eq(PACKAGING))           // 라벨링
                 )
                 .fetch();
     }

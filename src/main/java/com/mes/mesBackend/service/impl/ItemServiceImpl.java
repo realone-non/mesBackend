@@ -27,13 +27,11 @@ public class ItemServiceImpl implements ItemService {
     private final ItemAccountService itemAccountService;
     private final ItemGroupService itemGroupService;
     private final ItemFormService itemFormService;
-    private final UseTypeService useTypeService;
     private final RoutingService routingService;
     private final UnitService unitService;
     private final LotTypeService lotTypeService;
     private final ClientService clientService;
     private final TestCriteriaService testCriteriaService;
-    private final TestProcessService testProcessService;
     private final ItemAccountCodeService itemAccountCodeService;
     private final ItemFileRepository itemFileRepository;
     private final UserService userService;
@@ -52,7 +50,6 @@ public class ItemServiceImpl implements ItemService {
 
         ItemGroup itemGroup = itemRequest.getItemGroup() != null ? itemGroupService.getItemGroupOrThrow(itemRequest.getItemGroup()) : null;
         ItemForm itemForm = itemRequest.getItemForm() != null ? itemFormService.getItemFormOrThrow(itemRequest.getItemForm()) : null;
-        UseType useType = itemRequest.getUseType() != null ? useTypeService.getUseTypeOrThrow(itemRequest.getUseType()) : null;
         Routing routing = itemRequest.getRouting() != null ? routingService.getRoutingOrThrow(itemRequest.getRouting()) : null;
         Unit unit = unitService.getUnitOrThrow(itemRequest.getUnit());
         LotType lotType = lotTypeService.getLotTypeOrThrow(itemRequest.getLotType());
@@ -61,7 +58,7 @@ public class ItemServiceImpl implements ItemService {
 
         Item item = mapper.toEntity(itemRequest, Item.class);
 
-        item.mapping(itemAccount, itemGroup, itemForm, useType, routing, unit, lotType, manufacturer, testCriteria, itemAccountCode);
+        item.mapping(itemAccount, itemGroup, itemForm, routing, unit, lotType, manufacturer, testCriteria, itemAccountCode);
 
         itemRepository.save(item);
         return mapper.toResponse(item, ItemResponse.class);
@@ -129,7 +126,6 @@ public class ItemServiceImpl implements ItemService {
 
         ItemGroup newItemGroup = itemRequest.getItemGroup() != null ? itemGroupService.getItemGroupOrThrow(itemRequest.getItemGroup()) : null;
         ItemForm newItemForm = itemRequest.getItemForm() != null ? itemFormService.getItemFormOrThrow(itemRequest.getItemForm()) : null;
-        UseType newUseType = itemRequest.getUseType() != null ? useTypeService.getUseTypeOrThrow(itemRequest.getUseType()) : null;
         Routing newRouting = itemRequest.getRouting() != null ? routingService.getRoutingOrThrow(itemRequest.getRouting()) : null;
         Unit newUnit = unitService.getUnitOrThrow(itemRequest.getUnit());
         LotType newLotType = lotTypeService.getLotTypeOrThrow(itemRequest.getLotType());
@@ -138,7 +134,7 @@ public class ItemServiceImpl implements ItemService {
 
         Item newItem = mapper.toEntity(itemRequest, Item.class);
 
-        findItem.update(newItem, newItemAccount, newItemGroup, newItemForm, newUseType, newRouting, newUnit, newLotType, newManufacturer, newTestCriteria, newItemAccountCode);
+        findItem.update(newItem, newItemAccount, newItemGroup, newItemForm, newRouting, newUnit, newLotType, newManufacturer, newTestCriteria, newItemAccountCode);
         itemRepository.save(findItem);
         return mapper.toResponse(findItem, ItemResponse.class);
     }

@@ -61,7 +61,7 @@ public class Factory extends BaseTimeEntity {
     @Column(name = "FAX_NUMBER", columnDefinition = "varchar(255) COMMENT 'fax번호'")
     private String faxNumber;       // fax번호
 
-    @Column(name = "LOT_CODE", columnDefinition = "varchar(255) COMMENT 'LOT용 코드'", nullable = false)
+    @Column(name = "LOT_CODE", columnDefinition = "varchar(255) COMMENT 'LOT용 코드'")
     private String lotCode;         // LOT용 코드
 
     // 다대일 단방향
