@@ -6,6 +6,7 @@ import com.mes.mesBackend.entity.enumeration.TestCategory;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.service.ItemAccountCodeService;
 import com.querydsl.core.annotations.QueryInit;
+import com.sun.imageio.plugins.common.LZWCompressor;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -94,13 +95,14 @@ public class Item extends BaseTimeEntity {
     @Column(name = "INPUT_UNIT_PRICE", nullable = false,columnDefinition = "int COMMENT '입고단가'")
     private int inputUnitPrice;         // 입고단가
 
-    @Column(name = "STORAGE_LOCATION", nullable = false, columnDefinition = "varchar(255) COMMENT '저장위치'")
-    private String storageLocation;    // 저장위치
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "STORAGE_LOCATION", columnDefinition = "bigint COMMENT '저장위치'")
+    private WareHouse storageLocation;    // 저장위치
 
     @Column(name = "CLIENT_ITEM_NO", columnDefinition = "varchar(255) COMMENT '거래처품번'")
     private String clientItemNo;        // 거래처 품번
 
-    @Column(name = "MANUFACTURER_PART_NO", nullable = false,columnDefinition = "varchar(255) COMMENT '제조사'")
+    @Column(name = "MANUFACTURER_PART_NO", columnDefinition = "varchar(255) COMMENT '제조사'")
     private String manufacturerPartNo;        // 제조사품번
 
     // 다대일 단방향
@@ -150,7 +152,8 @@ public class Item extends BaseTimeEntity {
             LotType lotType,
             Client  manufacturer,
             TestCriteria testCriteria,
-            ItemAccountCode itemAccountCode
+            ItemAccountCode itemAccountCode,
+            WareHouse wareHouse
     ) {
         setItemAccount(itemAccount);
         setItemGroup(itemGroup);
@@ -161,6 +164,7 @@ public class Item extends BaseTimeEntity {
         setManufacturer(manufacturer);
         setTestCriteria(testCriteria);
         setItemAccountCode(itemAccountCode);
+        setStorageLocation(wareHouse);
     }
 
     public void update(
@@ -173,7 +177,8 @@ public class Item extends BaseTimeEntity {
             LotType newLotType,
             Client newClient,
             TestCriteria newTestCriteria,
-            ItemAccountCode newItemAccountCode
+            ItemAccountCode newItemAccountCode,
+            WareHouse newWareHouse
     ) {
         setItemNo(newItem.itemNo);
         setItemName(newItem.itemName);
@@ -190,7 +195,7 @@ public class Item extends BaseTimeEntity {
         setDevelopStatus(newItem.developStatus);
         setStockControl(newItem.stockControl);
         setInputUnitPrice(newItem.inputUnitPrice);
-        setStorageLocation(newItem.storageLocation);
+        setStorageLocation(newWareHouse);
         setClientItemNo(newItem.clientItemNo);
         setManufacturerPartNo(newItem.manufacturerPartNo);
         setManufacturer(newClient);

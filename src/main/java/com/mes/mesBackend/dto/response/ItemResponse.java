@@ -66,8 +66,8 @@ public class ItemResponse {
     @Schema(description = "입고단가")
     int inputUnitPrice;         // 입고단가
 
-    @Schema(description = "저장위치")
-    String storageLocation;    // 저장위치
+    @Schema(description = "저장위치 (창고)")
+    WareHouseResponse.idAndName storageLocation;    // 저장위치
 
     @Schema(description = "거래처품번")
     String clientItemNo;        // 거래처 품번
@@ -125,7 +125,7 @@ public class ItemResponse {
         String unitCodeName;        // 재고단위
 
         @Schema(description = "저장위치")
-        String storageLocation;    // 저장위치
+        WareHouseResponse.idAndName storageLocation;    // 저장위치
 
         @Schema(description = "입고단가")
         int inputUnitPrice;         // 입고단가

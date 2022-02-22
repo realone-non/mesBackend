@@ -37,7 +37,7 @@ public class OutSourcingInput extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "OUT_SOURCING_PRODUCTION_REQUEST", columnDefinition = "varchar(255) COMMENT '외주생산요청'")
+    @JoinColumn(name = "OUT_SOURCING_PRODUCTION_REQUEST", columnDefinition = "bigint COMMENT '외주생산요청'")
     private OutSourcingProductionRequest productionRequest;         // 외주처, 생산요청번호, 생산품번, 생산품명
 
     @Column(name = "INPUT_DATE", nullable = false, columnDefinition = "date COMMENT '입고일시'")
