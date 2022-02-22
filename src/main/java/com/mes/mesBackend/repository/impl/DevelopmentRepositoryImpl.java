@@ -66,7 +66,7 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                         development.useYn.eq(true)
                 )
                 .groupBy(development.id)
-                .orderBy(developmentState.createdDate.desc())
+                .orderBy(development.createdDate.desc())
                 .fetch();
     }
 
