@@ -48,7 +48,6 @@ public class FactoryRequest {
     String faxNumber;       // fax번호
 
     @Schema(description = "LOT용 코드")
-    @NotBlank(message = NOT_NULL)
     String lotCode;         // LOT용 코드
 
     @Schema(description = "사용여부")

@@ -25,7 +25,7 @@ public class WorkPlace extends BaseTimeEntity {
     @Column(name = "WORK_PLACE_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '사업장명'")
     private String workPlaceName;   // 사업장명
 
-    @Column(name = "BUSINESS_REG_NO", nullable = false, columnDefinition = "varchar(255) COMMENT '사업자등록번호'")
+    @Column(name = "BUSINESS_REG_NO", columnDefinition = "varchar(255) COMMENT '사업자등록번호'")
     private String businessRegNo;  // 사업자등록번호
 
     @Column(name = "CEO_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '대표자명'")

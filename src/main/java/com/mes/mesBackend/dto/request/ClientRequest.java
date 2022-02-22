@@ -17,7 +17,6 @@ import static com.mes.mesBackend.exception.Message.*;
 public class ClientRequest {
 
     @Schema(description = "거래처코드")
-    @NotBlank(message = NOT_NULL)
     String clientCode;
 
     @Schema(description = "거래처명")

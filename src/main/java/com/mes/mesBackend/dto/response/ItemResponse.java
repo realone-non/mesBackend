@@ -39,9 +39,6 @@ public class ItemResponse {
     @Schema(description = "품목형태")
     ItemFormResponse itemForm;          // 품목형태
 
-    @Schema(description = "용도유형")
-    UseTypeResponse useType;            // 용도유형
-
     @Schema(description = " 라우팅")
     RoutingResponse.idAndName routing;            // 라우팅 (라우팅 명)
 

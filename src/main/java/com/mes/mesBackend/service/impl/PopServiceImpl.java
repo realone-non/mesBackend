@@ -264,26 +264,17 @@ public class PopServiceImpl implements PopService {
     }
 
     // 해당 품목(반제품)에 대한 원자재, 부자재 정보 가져와야함
-    // TODO: lotMaster 의 공정이 포장공정일 경우에만 가져오는 로직이 다름.
     @Override
     public List<PopBomDetailItemResponse> getPopBomDetailItems(Long lotMasterId) throws NotFoundException {
         LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);
         Item bomMasterItem = lotMaster.getItem();
+        WorkProcessDivision workProcessDivision = lotMaster.getWorkProcess().getWorkProcessDivision();
 
         List<PopBomDetailItemResponse> popBomDetailItemResponses = new ArrayList<>();
 
-
-        // TODO: 여기에 해당하는 bomMaster 에 포장공정에 해당하는 bomMasterDetail(item 품목계정: 원자재, 부자재) 집어넣고 테스트 돌려봐야함
-//        List<Item> items = lotMaster.getWorkProcess().getWorkProcessDivision().equals(PACKAGING) ?
-//                workOrderDetailRepository.findBomDetailItemByBomMasterItemWorkProcessPackaging(bomMasterItem.getId())
-//                : workOrderDetailRepository.findBomDetailItemByBomMasterItem(bomMasterItem.getId());
-        List<Item> items  = new ArrayList<>();
-//        if (lotMaster.getWorkProcess().getWorkProcessDivision().equals(PACKAGING)) {
-//
-//        }
-
-        // lotMaster 의 item 에 해당하는 bomDetail 의 item 정보 가져옴
-//        List<Item> bomDetailItems = workOrderDetailRepository.findBomDetailItemByBomMasterItem(bomMasterItem.getId());
+        List<Item> items = workProcessDivision.equals(PACKAGING) ?
+                workOrderDetailRepository.findBomDetailItemByBomMasterItemWorkProcessPackaging(bomMasterItem.getId())
+                : workOrderDetailRepository.findBomDetailItemByBomMasterItem(bomMasterItem.getId(), workProcessDivision);
 
         for (Item item : items) {
             PopBomDetailItemResponse response = new PopBomDetailItemResponse();
