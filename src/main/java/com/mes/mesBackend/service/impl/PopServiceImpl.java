@@ -206,8 +206,8 @@ public class PopServiceImpl implements PopService {
             // workOrderDetail id, workProcess id 로 LotLog 찾음
             dummyLot = lotLogHelper.getLotLogByWorkOrderDetailIdAndWorkProcessIdOrThrow(workOrder.getId(), workProcess.getId()).getLotMaster();
 
-            // 오늘날짜, 같은 설비 기준으로 equipmentLot 조회해서 없으면 생성, 있으면 update
-            LotEquipmentConnect equipmentConnect = lotEquipmentConnectRepo.findByTodayAndEquipmentId(equipmentId, LocalDate.now()).orElse(null);
+            // 오늘날짜, 더미로트가 같고, 같은 설비 기준으로 equipmentLot 조회해서 없으면 생성, 있으면 update
+            LotEquipmentConnect equipmentConnect = lotEquipmentConnectRepo.findByTodayAndEquipmentId(equipmentId, LocalDate.now(), dummyLot.getId()).orElse(null);
 
             // 없으면 insert
             if (equipmentConnect == null) {
