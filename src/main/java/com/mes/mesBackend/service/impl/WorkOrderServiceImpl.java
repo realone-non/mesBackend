@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
+import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 
 // 6-2. 작업지시 등록
@@ -144,11 +144,19 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         // orderAmount: 사용자가 입력한 지시수량
         int orderAmount = newWorkOrderRequest.getOrderAmount() != 0 ? newWorkOrderRequest.getOrderAmount() : produceOrder.getContractItem().getAmount();
 
-        if (orderAmount !=  findWorkOrderDetail.getOrderAmount()) {
-            // 사용자가 입력한 지시수량이 수주품목의 수량보다 크면 예외
-//            throwIfOrderAmountGreaterThanProduceOrderAmount(orderAmount, produceOrder.getContractItem().getAmount());
-            // 사용자가 입력한 생산수량이 지시수량보다 크면 예외
-//            throwIfProductionAmountGreaterThanOrderAmount(newWorkOrderRequest.getProductionAmount(), orderAmount);
+//        if (orderAmount !=  findWorkOrderDetail.getOrderAmount()) {
+//            // 사용자가 입력한 지시수량이 수주품목의 수량보다 크면 예외
+////            throwIfOrderAmountGreaterThanProduceOrderAmount(orderAmount, produceOrder.getContractItem().getAmount());
+//            // 사용자가 입력한 생산수량이 지시수량보다 크면 예외
+////            throwIfProductionAmountGreaterThanOrderAmount(newWorkOrderRequest.getProductionAmount(), orderAmount);
+//        }
+
+        if (findWorkOrderDetail.getOrderState().equals(COMPLETION)) {
+            if (orderAmount > findWorkOrderDetail.getOrderAmount()) {
+                // 입력받은 지시수량이 현재 작업한 생산수량보다 크면 상태값 ONGOING 으로 변경;;
+                findWorkOrderDetail.setOrderState(ONGOING);
+                produceOrder.setOrderState(ONGOING);
+            }
         }
 
         newWorkOrderRequest.setOrderAmount(orderAmount);

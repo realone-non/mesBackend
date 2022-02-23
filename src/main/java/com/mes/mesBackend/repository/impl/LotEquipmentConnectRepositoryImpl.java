@@ -23,7 +23,7 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
 
     // 오늘날짜, 같은 설비 기준으로 equipmentLot 조회
     @Override
-    public Optional<LotEquipmentConnect> findByTodayAndEquipmentId(Long equipmentId, LocalDate now) {
+    public Optional<LotEquipmentConnect> findByTodayAndEquipmentId(Long equipmentId, LocalDate now, Long dummyLotId) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .selectFrom(lotEquipmentConnect)
@@ -31,7 +31,8 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
                         .leftJoin(equipment).on(equipment.id.eq(lotMaster.equipment.id))
                         .where(
                                 equipment.id.eq(equipmentId),
-                                lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0))
+                                lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0)),
+                                lotEquipmentConnect.parentLot.id.eq(dummyLotId)
                         )
                         .fetchOne()
         );

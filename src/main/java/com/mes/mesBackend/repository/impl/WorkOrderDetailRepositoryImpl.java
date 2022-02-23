@@ -603,6 +603,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .fetchOne();
     }
 
+    // 여기서 [javax.persistence.NonUniqueResultException: query did not return a unique result: 2] 에러가 난다면
+    // BomMaster 에 같은 item 이 2 개 이상 등록되어 있어서 나는 에러임
     @Override
     public Optional<Item> findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(Long itemId, Long workProcessId, GoodsType goodsType) {
         return Optional.ofNullable(

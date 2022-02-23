@@ -188,6 +188,7 @@ public class LotLogRepositoryImpl implements LotLogRepositoryCustom {
                                 lotLog.workOrderDetail.id.eq(workOrderDetailId)
                         )
                         .orderBy(lotLog.createdDate.desc())
+//                        .limit(1)
                         .fetchOne()
         );
     }
