@@ -6,6 +6,7 @@ import com.mes.mesBackend.dto.response.BomItemDetailResponse;
 import com.mes.mesBackend.dto.response.BomItemResponse;
 import com.mes.mesBackend.dto.response.BomMasterResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.BomItemDetailRepository;
@@ -19,19 +20,20 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class BomMasterServiceImpl implements BomMasterService {
-
     private final BomMasterRepository bomMasterRepository;
     private final ModelMapper mapper;
     private final ItemService itemService;
     private final ClientService clientService;
     private final WorkProcessService workProcessService;
     private final BomItemDetailRepository bomItemDetailRepository;
-    private final UnitService unitService;
 
     // BOM 마스터 생성
     @Override
-    public BomMasterResponse createBomMaster(BomMasterRequest bomMasterRequest) throws NotFoundException {
+    public BomMasterResponse createBomMaster(BomMasterRequest bomMasterRequest) throws NotFoundException, BadRequestException {
         Item item = itemService.getItemOrThrow(bomMasterRequest.getItem());
+
+        // 입력받은 item 이 bomMaster 에 이미 등록되어 있는지 채크
+        throwIfNotDuplicateItemInBomMasters(item);
         BomMaster bomMaster = mapper.toEntity(bomMasterRequest, BomMaster.class);
 
         bomMaster.addJoin(item);
@@ -162,4 +164,11 @@ public class BomMasterServiceImpl implements BomMasterService {
         return bomItemDetailRepository.findByBomMasterAndIdAndDeleteYnFalse(bomMaster, bomItemDetailId)
                 .orElseThrow(() -> new NotFoundException("bomItemDetail does not exist. input id:" + bomItemDetailId));
     }
+
+    // 입력받은 item 이 bomMaster 에 이미 등록되어 있는지 채크
+    private void throwIfNotDuplicateItemInBomMasters(Item item) throws NotFoundException, BadRequestException {
+        boolean b = bomMasterRepository.existsByItemInBomMasters(item.getId());
+        if (b) throw new BadRequestException("입략한 품목이 이미 Bom 에 등록되어 있으므로 중복 등록이 불가능 합니다.");
+    }
+
 }
