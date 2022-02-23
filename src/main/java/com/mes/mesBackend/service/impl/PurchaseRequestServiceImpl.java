@@ -1,15 +1,21 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.PurchaseRequestRequest;
+import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
+import com.mes.mesBackend.dto.response.ProduceOrderResponse;
+import com.mes.mesBackend.dto.response.ProduceRequestBomDetail;
 import com.mes.mesBackend.dto.response.PurchaseRequestResponse;
 import com.mes.mesBackend.entity.Item;
 import com.mes.mesBackend.entity.ProduceOrder;
 import com.mes.mesBackend.entity.PurchaseRequest;
+import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
+import com.mes.mesBackend.repository.ProduceOrderRepository;
 import com.mes.mesBackend.repository.PurchaseRequestRepository;
+import com.mes.mesBackend.repository.WorkOrderDetailRepository;
 import com.mes.mesBackend.service.ItemService;
 import com.mes.mesBackend.service.ProduceOrderService;
 import com.mes.mesBackend.service.PurchaseRequestService;
@@ -17,8 +23,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static com.mes.mesBackend.entity.enumeration.GoodsType.*;
 import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
 
 // 9-1. 구매요청 등록
@@ -29,6 +38,8 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
     private final ProduceOrderService produceOrderService;
     private final ModelMapper mapper;
     private final ItemService itemService;
+    private final ProduceOrderRepository produceOrderRepo;
+    private final WorkOrderDetailRepository workOrderDetailRepo;
 
     // 구매요청 생성
     @Override
@@ -36,11 +47,11 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(purchaseRequestRequest.getProduceOrder());
 
         // 총 구매요청수량이 수주수량을 초과하면 예외
-        throwIfPurchaseRequestAmountGreaterThanContractItemAmount(
-                produceOrder.getId(),
-                purchaseRequestRequest.getRequestAmount(),
-                produceOrder.getContractItem().getAmount()
-        );
+//        throwIfPurchaseRequestAmountGreaterThanContractItemAmount(
+//                produceOrder.getId(),
+//                purchaseRequestRequest.getRequestAmount(),
+//                produceOrder.getContractItem().getAmount()
+//        );
 
         /*
         * 구매요청 품목정보는 produceOrder 의 contractItem 의 item 을 찾아서
@@ -52,7 +63,9 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         List<Long> findItemIds = purchaseRequestRepo.findItemIdByContractItemId(produceOrder.getContractItem().getItem().getId());
 
         // 입력받은 itemId 가 findItemIds 에 해당되는지 체크
-        Item item = getItemAndCheckItemId(purchaseRequestRequest.getItemId(), findItemIds);
+//        Item item = getItemAndCheckItemId(purchaseRequestRequest.getItemId(), findItemIds);
+
+        Item item = itemService.getItemOrThrow(purchaseRequestRequest.getItemId());
 
         PurchaseRequest purchaseRequest = mapper.toEntity(purchaseRequestRequest, PurchaseRequest.class);
 
@@ -89,16 +102,17 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         // 구매요청이 ONGOING, COMPLETION 이면 수정 불가능
         throwIfPurchaseRequestOrderStateNotSchedule(findPurchaseRequest.getOrdersState());
 
-        // 총 구매요청수량이 수주수량을 초과하면 예외
-        throwIfPurchaseRequestAmountGreaterThanContractItemAmount(
-                newProduceOrder.getId(),
-                newPurchaseRequestRequest.getRequestAmount(),
-                newProduceOrder.getContractItem().getAmount()
-        );
+//        // 총 구매요청수량이 수주수량을 초과하면 예외
+//        throwIfPurchaseRequestAmountGreaterThanContractItemAmount(
+//                newProduceOrder.getId(),
+//                newPurchaseRequestRequest.getRequestAmount(),
+//                newProduceOrder.getContractItem().getAmount()
+//        );
 
         List<Long> findItemIds = purchaseRequestRepo.findItemIdByContractItemId(newProduceOrder.getContractItem().getItem().getId());
 
-        Item newItem = getItemAndCheckItemId(newPurchaseRequestRequest.getItemId(), findItemIds);
+//        Item newItem = getItemAndCheckItemId(newPurchaseRequestRequest.getItemId(), findItemIds);
+        Item newItem = itemService.getItemOrThrow(newPurchaseRequestRequest.getItemId());
 
         PurchaseRequest newPurchaseRequest = mapper.toEntity(newPurchaseRequestRequest, PurchaseRequest.class);
 
@@ -163,5 +177,38 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
     public PurchaseRequestResponse getPurchaseRequestResponseOrThrow(Long id) throws NotFoundException {
         return purchaseRequestRepo.findByIdAndOrderStateSchedule(id)
                 .orElseThrow(() -> new NotFoundException("purchaseRequest does not exist. input purchaseRequest id : " + id));
+    }
+
+    // 수주품목에 해당하는 원부자재
+    @Override
+    public List<ProduceRequestBomDetail> getProduceOrderBomDetails(Long produceOrderId) throws NotFoundException {
+        ProduceOrder produceOrder = getProduceOrderOrThrow(produceOrderId);
+        Item item = produceOrder.getContractItem().getItem();
+
+        List<ProduceOrderDetailResponse> produceDetails = produceOrderRepo.findAllProduceOrderDetail(item.getId());
+        List<ProduceRequestBomDetail> responses = new ArrayList<>();
+        List<Item> items = new ArrayList<>();
+
+        for (ProduceOrderDetailResponse res : produceDetails) {
+
+            if (res.getGoodsType().equals(RAW_MATERIAL) || res.getGoodsType().equals(SUB_MATERIAL)) {
+                Item item1 = itemService.getItemOrThrow(res.getItemId());
+                items.add(item1);
+            } else {
+                items.addAll(workOrderDetailRepo.findBomDetailItemByBomMasterItem(res.getItemId(), null));
+            }
+        }
+
+        for (Item item1 : items) {
+            ProduceRequestBomDetail detail = new ProduceRequestBomDetail();
+            responses.add(detail.converter(item1));
+        }
+        return responses.stream().filter(f -> !f.getGoodsType().equals(HALF_PRODUCT)).collect(Collectors.toList());
+    }
+
+    // 제조 오더 단일 조회 및 예외
+    private ProduceOrder getProduceOrderOrThrow(Long id) throws NotFoundException {
+        return produceOrderRepo.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("produceOrder does not exist. id : " + id));
     }
 }

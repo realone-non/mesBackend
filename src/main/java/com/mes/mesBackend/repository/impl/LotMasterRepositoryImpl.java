@@ -39,7 +39,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     final QWorkOrderDetail workOrderDetail = QWorkOrderDetail.workOrderDetail;
     final QLotEquipmentConnect lotEquipmentConnect = QLotEquipmentConnect.lotEquipmentConnect;
 
-    // id 로 itemAccountCode 의 symbol 조회
+    // id 로 itemAccountCode 의 code 조회
     @Override
     @Transactional(readOnly = true)
     public ItemAccountCode findCodeByItemId(Long itemId) {

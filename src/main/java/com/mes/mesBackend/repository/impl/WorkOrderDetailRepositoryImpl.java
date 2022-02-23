@@ -223,7 +223,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.note.as("note"),
                                 workOrderDetail.startDate.as("startDateTime"),
                                 workOrderDetail.endDate.as("endDateTime"),
-                                item.id.as("produceOrderItemId")
+                                item.id.as("produceOrderItemId"),
+                                workProcess.workProcessDivision.as("workProcessDivision")
                         )
                 )
                 .from(workOrderDetail)
@@ -602,6 +603,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .fetchOne();
     }
 
+    // 여기서 [javax.persistence.NonUniqueResultException: query did not return a unique result: 2] 에러가 난다면
+    // BomMaster 에 같은 item 이 2 개 이상 등록되어 있어서 나는 에러임
     @Override
     public Optional<Item> findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(Long itemId, Long workProcessId, GoodsType goodsType) {
         return Optional.ofNullable(
@@ -639,13 +642,18 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .where(
                         bomMaster.item.id.eq(bomMasterItemId),
                         qBomItemDetail.deleteYn.isFalse(),
-                        workProcess.workProcessDivision.eq(workProcessDivision) // 원료혼합
+                        isWorkProcessDivision(workProcessDivision)
+//                        workProcess.workProcessDivision.eq(workProcessDivision) // 원료혼합
 //                        workProcess.workProcessDivision.eq(FILLING),         // 충진
 //                        workProcess.workProcessDivision.eq(CAP_ASSEMBLY),    // 캡조립
 //                        workProcess.workProcessDivision.eq(LABELING)         // 라벨링
 
                 )
                 .fetch();
+    }
+
+    private BooleanExpression isWorkProcessDivision(WorkProcessDivision workProcessDivision) {
+        return workProcessDivision != null ? workProcess.workProcessDivision.eq(workProcessDivision) : null;
     }
 
     // 품목에 해당하는 bomDetail 의 라벨링 공정의 bomDetail 의 Item, 포장공정의(원부자재) 의 item 가져옴

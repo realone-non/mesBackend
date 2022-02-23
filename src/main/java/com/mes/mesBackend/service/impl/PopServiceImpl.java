@@ -83,11 +83,6 @@ public class PopServiceImpl implements PopService {
         List<PopWorkOrderResponse> todayWorkOrders = workOrderDetailRepository.findPopWorkOrderResponsesByCondition(workProcessId, now);
 
         for (PopWorkOrderResponse todayWorkOrder : todayWorkOrders) {
-            // 제조오더의 품목정보에 해당하고, 검색공정과 같고, 공정이 포장공정이면 완제품, 나머지 다른 공정이면 반제품인 bomItemDetail 을 가져옴
-//            GoodsType goodsType = workProcessDivision.equals(LABELING) ? PRODUCT : HALF_PRODUCT;
-//            Item item = workOrderDetailRepository.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(todayWorkOrder.getProduceOrderItemId(), workProcess.getId(), goodsType)
-//                    .orElseThrow(() -> new NotFoundException("[데이터 오류] 공정에 맞는 반제품 또는 완제품을 찾을 수 없습니다."));
-
             Item item = workProcessDivision.equals(PACKAGING) ?
                     workOrderDetailRepository.findPopWorkOrderItem(workProcessId, now).orElseThrow(() -> new NotFoundException("[데이터 오류] 포장공정의 완제품을 찾을 수 없습니다."))
                     : workOrderDetailRepository.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(todayWorkOrder.getProduceOrderItemId(), workProcess.getId(), null)
@@ -211,10 +206,10 @@ public class PopServiceImpl implements PopService {
             // workOrderDetail id, workProcess id 로 LotLog 찾음
             dummyLot = lotLogHelper.getLotLogByWorkOrderDetailIdAndWorkProcessIdOrThrow(workOrder.getId(), workProcess.getId()).getLotMaster();
 
-            // 오늘날짜, 같은 설비 기준으로 equipmentLot 조회해서 없으면 생성, 있으면 update
-            LotEquipmentConnect equipmentConnect = lotEquipmentConnectRepo.findByTodayAndEquipmentId(equipmentId, LocalDate.now()).orElse(null);
+            // 오늘날짜, 더미로트가 같고, 같은 설비 기준으로 equipmentLot 조회해서 없으면 생성, 있으면 update
+            LotEquipmentConnect equipmentConnect = lotEquipmentConnectRepo.findByTodayAndEquipmentId(equipmentId, LocalDate.now(), dummyLot.getId()).orElse(null);
 
-            // 없으면 update
+            // 없으면 insert
             if (equipmentConnect == null) {
                 equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
                 equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
@@ -225,6 +220,7 @@ public class PopServiceImpl implements PopService {
                 // 있으면 update
                 equipmentLot = equipmentConnect.getChildLot();
                 equipmentLot.setCreatedAmount(equipmentLot.getCreatedAmount() + productAmount);
+                equipmentLot.setStockAmount(equipmentLot.getStockAmount() + productAmount);
             }
 
             dummyLot.setCreatedAmount(dummyLot.getCreatedAmount() + productAmount);   // lotMaster: 생성수량 update

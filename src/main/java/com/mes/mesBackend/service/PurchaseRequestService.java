@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.PurchaseRequestRequest;
+import com.mes.mesBackend.dto.response.ProduceRequestBomDetail;
 import com.mes.mesBackend.dto.response.PurchaseRequestResponse;
 import com.mes.mesBackend.entity.PurchaseRequest;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -22,4 +23,6 @@ public interface PurchaseRequestService {
     void deletePurchaseRequest(Long id) throws NotFoundException, BadRequestException;
     // 구매요청 단일 조회 및 예외
     PurchaseRequest getPurchaseRequestOrThrow(Long id) throws NotFoundException;
+    // 수주품목에 해당하는 원부자재
+    List<ProduceRequestBomDetail> getProduceOrderBomDetails(Long produceOrderId) throws NotFoundException;
 }

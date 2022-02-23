@@ -95,7 +95,6 @@ public class ItemRequest {
     String clientItemNo;
 
     @Schema(description = "제조사품번")
-    @NotBlank(message = NOT_EMPTY)
     String manufacturerPartNo;
 
     @Schema(description = "제조사 id")

@@ -5,6 +5,7 @@ import com.mes.mesBackend.dto.request.BomMasterRequest;
 import com.mes.mesBackend.dto.response.BomItemDetailResponse;
 import com.mes.mesBackend.dto.response.BomItemResponse;
 import com.mes.mesBackend.dto.response.BomMasterResponse;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -55,7 +56,7 @@ public class NewProductBomController {
     public ResponseEntity<BomMasterResponse> createBomMaster(
             @RequestBody @Valid BomMasterRequest bomMasterRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         BomMasterResponse bomMaster = bomMasterService.createBomMaster(bomMasterRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + bomMaster.getId() + " from createBomMaster.");

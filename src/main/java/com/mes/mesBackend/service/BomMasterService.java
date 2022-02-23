@@ -5,6 +5,7 @@ import com.mes.mesBackend.dto.request.BomMasterRequest;
 import com.mes.mesBackend.dto.response.BomItemDetailResponse;
 import com.mes.mesBackend.dto.response.BomItemResponse;
 import com.mes.mesBackend.dto.response.BomMasterResponse;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +14,7 @@ import java.util.List;
 
 public interface BomMasterService {
     // BOM 마스터 생성
-    BomMasterResponse createBomMaster(BomMasterRequest bomMasterRequest) throws NotFoundException;
+    BomMasterResponse createBomMaster(BomMasterRequest bomMasterRequest) throws NotFoundException, BadRequestException;
     // BOM 마스처 단일 조회
     BomMasterResponse getBomMaster(Long bomMasterId) throws NotFoundException;
     // BOM 마스터 페이징 조회 검색조건: 품목계정, 품목그룹, 품번|품명
