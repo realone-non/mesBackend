@@ -160,6 +160,19 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                 .fetch();
     }
 
+    // equipmentLot 에 해당하는 불량수량 모두
+    @Override
+    public List<Integer> findBadItemAmountByEquipmentLotMaster(Long equipmentLotId) {
+        return jpaQueryFactory
+                .select(workOrderBadItem.badItemAmount)
+                .from(workOrderBadItem)
+                .where(
+                        workOrderBadItem.lotMaster.id.eq(equipmentLotId),
+                        workOrderBadItem.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+
     private BooleanExpression isWorkProcessIdEq(Long workProcessId) {
         return workProcessId != null ? workProcess.id.eq(workProcessId) : null;
     }

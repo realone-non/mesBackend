@@ -12,8 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.EQUIPMENT_LOT;
-import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.*;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL_INPUT;
 
 @Getter
@@ -95,6 +94,8 @@ public class LotMasterRequest {
             WorkProcessDivision workProcessDivision,
             WareHouse wareHouse,
             int createdAmount,
+            int stockAmount,
+            int badItemAmount,
             EnrollmentType enrollmentType,
             Long equipmentId,
             LotMasterDivision division
@@ -102,11 +103,26 @@ public class LotMasterRequest {
         setItem(item);                                    // 품목
         setWorkProcessDivision(workProcessDivision);    // 공정
         setWareHouse(wareHouse);                          // 창고
-        setCreatedAmount(this.createdAmount + createdAmount);                  // 생성수량
         setEnrollmentType(enrollmentType);               // 등록유형
         setEquipmentId(equipmentId);                     // 설비유형
         setLotMasterDivision(division);            // lot 생성 구분
-        if (division.equals(REAL_LOT)) setStockAmount(this.stockAmount + createdAmount);
-        if (division.equals(EQUIPMENT_LOT)) setStockAmount(this.stockAmount + createdAmount);
+
+        setCreatedAmount(this.createdAmount + createdAmount);    // 생성수량
+
+        // 더미 로트
+        if (division.equals(DUMMY_LOT)) {
+            setBadItemAmount(this.badItemAmount + badItemAmount);   // 불량수량
+        }
+
+        // 설비 로트
+        if (division.equals(EQUIPMENT_LOT)) {
+            setStockAmount(stockAmount);
+            setBadItemAmount(badItemAmount);
+        }
+
+        // 분할 로트
+        if (division.equals(REAL_LOT)) {
+            setStockAmount(this.stockAmount + createdAmount);    // 재고수량
+        }
     }
 }

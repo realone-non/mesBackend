@@ -1,9 +1,12 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.ModifiedLog;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -32,6 +35,15 @@ public class WorkLineResponse {
 
     @Schema(description = "사용여부")
     boolean useYn;
+
+    // ============ 수정 기록
+    @Schema(description = "사번")
+    String userCode;
+    @Schema(description = "수정일자")
+    LocalDateTime updateDate;
+    @Schema(description = "유저권한레벨")
+    int userLevel;
+
 
     @Getter
     @Setter
@@ -62,4 +74,9 @@ public class WorkLineResponse {
         String workLineName;
     }
 
+    public void modifiedLog(ModifiedLog modifiedLog) {
+        setUserCode(modifiedLog.getUserCode());
+        setUpdateDate(modifiedLog.getModifiedDate());
+        setUserLevel(modifiedLog.getUserLevel());
+    }
 }
