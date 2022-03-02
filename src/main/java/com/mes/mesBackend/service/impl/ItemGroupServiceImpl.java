@@ -3,7 +3,10 @@ package com.mes.mesBackend.service.impl;
 import com.mes.mesBackend.dto.request.ItemGroupRequest;
 import com.mes.mesBackend.dto.response.ItemGroupResponse;
 import com.mes.mesBackend.entity.ItemGroup;
+import com.mes.mesBackend.entity.ModifiedLog;
+import com.mes.mesBackend.entity.enumeration.ModifiedDivision;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.ModifiedLogHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.ItemGroupRepository;
 import com.mes.mesBackend.service.ItemGroupService;
@@ -12,12 +15,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.ModifiedDivision.ITEM_GROUP;
+
 // 품목그룹
 @Service
 @RequiredArgsConstructor
 public class ItemGroupServiceImpl implements ItemGroupService {
     private final ItemGroupRepository itemGroupRepository;
     private final ModelMapper mapper;
+    private final ModifiedLogHelper modifiedLogHelper;
 
     // 품목그룹 생성
     @Override
@@ -38,7 +44,12 @@ public class ItemGroupServiceImpl implements ItemGroupService {
     @Override
     public List<ItemGroupResponse> getItemGroups() {
         List<ItemGroup> itemGroups = itemGroupRepository.findAllByDeleteYnFalse();
-        return mapper.toListResponses(itemGroups, ItemGroupResponse.class);
+        List<ItemGroupResponse> responses = mapper.toListResponses(itemGroups, ItemGroupResponse.class);
+        for (ItemGroupResponse r : responses) {
+            ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(ITEM_GROUP, r.getId());
+            if (modifiedLog != null) r.modifiedLog(modifiedLog);
+        }
+        return responses;
     }
 
     // 품목그룹 페이징 조회
@@ -50,11 +61,13 @@ public class ItemGroupServiceImpl implements ItemGroupService {
 
     // 품목그룹 수정
     @Override
-    public ItemGroupResponse updateItemGroup(Long id, ItemGroupRequest itemGroupRequest) throws NotFoundException {
+    public ItemGroupResponse updateItemGroup(Long id, ItemGroupRequest itemGroupRequest, String userCode) throws NotFoundException {
         ItemGroup findItemGroup = getItemGroupOrThrow(id);
         ItemGroup newItemGroup = mapper.toEntity(itemGroupRequest, ItemGroup.class);
         findItemGroup.put(newItemGroup);
         itemGroupRepository.save(findItemGroup);
+
+        modifiedLogHelper.createModifiedLog(userCode, ITEM_GROUP, findItemGroup);
         return mapper.toResponse(findItemGroup, ItemGroupResponse.class);
     }
 

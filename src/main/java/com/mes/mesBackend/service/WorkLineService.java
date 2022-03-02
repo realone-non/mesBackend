@@ -18,7 +18,7 @@ public interface WorkLineService {
     // 작업라인 페이징 조회
 //    Page<WorkLineResponse> getWorkLines(Pageable pageable);
     // 작업라인 수정
-    WorkLineResponse updateWorkLine(Long id, WorkLineRequest workLineRequest) throws NotFoundException;
+    WorkLineResponse updateWorkLine(Long id, WorkLineRequest workLineRequest, String userCode) throws NotFoundException;
     // 작업라인 삭제
     void deleteWorkLine(Long id) throws NotFoundException;
     // 작업라인 조회 및 예외

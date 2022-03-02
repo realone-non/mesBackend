@@ -109,9 +109,10 @@ public class WorkProcessController {
             @RequestBody @Valid WorkProcessRequest workProcessRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        WorkProcessResponse workProcess = workProcessService.updateWorkProcess(id, workProcessRequest);
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        WorkProcessResponse workProcess = workProcessService.updateWorkProcess(id, workProcessRequest, userCode);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + workProcess.getId() + " from updateWorkProcess.");
+        cLogger.info(userCode + " is modified the " + workProcess.getId() + " from updateWorkProcess.");
         return new ResponseEntity<>(workProcess, OK);
     }
 

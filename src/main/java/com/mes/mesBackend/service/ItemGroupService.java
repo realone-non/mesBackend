@@ -18,7 +18,7 @@ public interface ItemGroupService {
     // 품목그룹 페이징 조회
 //    Page<ItemGroupResponse> getItemGroups(Pageable pageable);
     // 품목그룹 수정
-    ItemGroupResponse updateItemGroup(Long id, ItemGroupRequest itemGroupRequest) throws NotFoundException;
+    ItemGroupResponse updateItemGroup(Long id, ItemGroupRequest itemGroupRequest, String userCode) throws NotFoundException;
     // 품목그룹 삭제
     void deleteItemGroup(Long id) throws NotFoundException;
     // 품목그룹 조회 및 예외
