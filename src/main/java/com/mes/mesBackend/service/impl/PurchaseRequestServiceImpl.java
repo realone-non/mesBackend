@@ -2,16 +2,16 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.PurchaseRequestRequest;
 import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
-import com.mes.mesBackend.dto.response.ProduceOrderResponse;
 import com.mes.mesBackend.dto.response.ProduceRequestBomDetail;
 import com.mes.mesBackend.dto.response.PurchaseRequestResponse;
 import com.mes.mesBackend.entity.Item;
+import com.mes.mesBackend.entity.ModifiedLog;
 import com.mes.mesBackend.entity.ProduceOrder;
 import com.mes.mesBackend.entity.PurchaseRequest;
-import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.ModifiedLogHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.ProduceOrderRepository;
 import com.mes.mesBackend.repository.PurchaseRequestRepository;
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.mes.mesBackend.entity.enumeration.GoodsType.*;
+import static com.mes.mesBackend.entity.enumeration.ModifiedDivision.PURCHASE_REQUEST;
 import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
 
 // 9-1. 구매요청 등록
@@ -40,6 +41,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
     private final ItemService itemService;
     private final ProduceOrderRepository produceOrderRepo;
     private final WorkOrderDetailRepository workOrderDetailRepo;
+    private final ModifiedLogHelper modifiedLogHelper;
 
     // 구매요청 생성
     @Override
@@ -88,12 +90,17 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
             String manufacturerPartNo,
             Boolean orderCompletion
     ) {
-        return purchaseRequestRepo.findAllByCondition(fromDate, toDate, produceOrderNo, itemGroupId, itemNoAndName, manufacturerPartNo, orderCompletion);
+        List<PurchaseRequestResponse> responses = purchaseRequestRepo.findAllByCondition(fromDate, toDate, produceOrderNo, itemGroupId, itemNoAndName, manufacturerPartNo, orderCompletion);
+        for (PurchaseRequestResponse r : responses) {
+            ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(PURCHASE_REQUEST, r.getId());
+            if (modifiedLog != null) r.modifiedLog(modifiedLog);
+        }
+        return responses;
     }
 
     // 구매요청 수정
     @Override
-    public PurchaseRequestResponse updatePurchaseRequest(Long id, PurchaseRequestRequest newPurchaseRequestRequest) throws NotFoundException, BadRequestException {
+    public PurchaseRequestResponse updatePurchaseRequest(Long id, PurchaseRequestRequest newPurchaseRequestRequest, String userCode) throws NotFoundException, BadRequestException {
         PurchaseRequest findPurchaseRequest = getPurchaseRequestOrThrow(id);
         ProduceOrder newProduceOrder = produceOrderService.getProduceOrderOrThrow(newPurchaseRequestRequest.getProduceOrder());
 
@@ -109,7 +116,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
 //                newProduceOrder.getContractItem().getAmount()
 //        );
 
-        List<Long> findItemIds = purchaseRequestRepo.findItemIdByContractItemId(newProduceOrder.getContractItem().getItem().getId());
+//        List<Long> findItemIds = purchaseRequestRepo.findItemIdByContractItemId(newProduceOrder.getContractItem().getItem().getId());
 
 //        Item newItem = getItemAndCheckItemId(newPurchaseRequestRequest.getItemId(), findItemIds);
         Item newItem = itemService.getItemOrThrow(newPurchaseRequestRequest.getItemId());
@@ -118,6 +125,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
 
         findPurchaseRequest.update(newPurchaseRequest, newProduceOrder, newItem);
         purchaseRequestRepo.save(findPurchaseRequest);
+        modifiedLogHelper.createModifiedLog(userCode, PURCHASE_REQUEST, findPurchaseRequest);   // 업데이트 로그 생성
         return getPurchaseRequestResponseOrThrow(findPurchaseRequest.getId());
     }
 

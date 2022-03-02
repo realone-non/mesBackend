@@ -34,6 +34,9 @@ public class ModifiedLogRepositoryImpl implements ModifiedLogRepositoryCustom {
         if (modifiedDivision.equals(ITEM_GROUP)) return modifiedLog.itemGroup.id.eq(divisionId);
         if (modifiedDivision.equals(WORK_PROCESS)) return modifiedLog.workProcess.id.eq(divisionId);
         if (modifiedDivision.equals(WORK_LINE)) return modifiedLog.workLine.id.eq(divisionId);
+        if (modifiedDivision.equals(WORK_DOCUMENT)) return modifiedLog.workDocument.id.eq(divisionId);
+        if (modifiedDivision.equals(EQUIPMENT_MAINTENANCE)) return modifiedLog.equipmentMaintenance.id.eq(divisionId);
+        if (modifiedDivision.equals(PURCHASE_REQUEST)) return modifiedLog.purchaseRequest.id.eq(divisionId);
         return null;
     }
 }
