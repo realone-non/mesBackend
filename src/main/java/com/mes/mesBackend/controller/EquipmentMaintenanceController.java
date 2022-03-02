@@ -109,9 +109,10 @@ public class EquipmentMaintenanceController {
             @RequestBody @Valid EquipmentMaintenanceRequest equipmentMaintenanceRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        EquipmentMaintenanceResponse equipmentMaintenance = equipmentMaintenanceService.updateEquipmentMaintenance(id, equipmentMaintenanceRequest);
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        EquipmentMaintenanceResponse equipmentMaintenance = equipmentMaintenanceService.updateEquipmentMaintenance(id, equipmentMaintenanceRequest, userCode);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + equipmentMaintenance.getId() + " from updateEquipmentMaintenance.");
+        cLogger.info(userCode + " is modified the " + equipmentMaintenance.getId() + " from updateEquipmentMaintenance.");
         return new ResponseEntity<>(equipmentMaintenance, OK);
     }
 
