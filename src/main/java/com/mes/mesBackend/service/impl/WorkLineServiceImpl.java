@@ -2,10 +2,13 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.WorkLineRequest;
 import com.mes.mesBackend.dto.response.WorkLineResponse;
+import com.mes.mesBackend.entity.ModifiedLog;
 import com.mes.mesBackend.entity.WorkCenter;
 import com.mes.mesBackend.entity.WorkLine;
 import com.mes.mesBackend.entity.WorkProcess;
+import com.mes.mesBackend.entity.enumeration.ModifiedDivision;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.ModifiedLogHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.WorkLineRepository;
 import com.mes.mesBackend.service.WorkCenterService;
@@ -16,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.ModifiedDivision.WORK_LINE;
+
 @Service
 @RequiredArgsConstructor
 public class WorkLineServiceImpl implements WorkLineService {
@@ -23,6 +28,7 @@ public class WorkLineServiceImpl implements WorkLineService {
     private final WorkCenterService workCenterService;
     private final WorkProcessService workProcessService;
     private final ModelMapper mapper;
+    private final ModifiedLogHelper modifiedLogHelper;
 
 
     // 작업라인 생성
@@ -49,7 +55,12 @@ public class WorkLineServiceImpl implements WorkLineService {
     @Override
     public List<WorkLineResponse> getWorkLines() {
         List<WorkLine> workLines = workLineRepository.findAllByDeleteYnFalse();
-        return mapper.toListResponses(workLines, WorkLineResponse.class);
+        List<WorkLineResponse> res = mapper.toListResponses(workLines, WorkLineResponse.class);
+        for (WorkLineResponse r : res) {
+            ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(WORK_LINE, r.getId());
+            if (modifiedLog != null) r.modifiedLog(modifiedLog);
+        }
+        return res;
     }
 
     // 작업라인 페이징 조회
@@ -61,7 +72,7 @@ public class WorkLineServiceImpl implements WorkLineService {
 
     // 작업라인 수정
     @Override
-    public WorkLineResponse updateWorkLine(Long id, WorkLineRequest workLineRequest) throws NotFoundException {
+    public WorkLineResponse updateWorkLine(Long id, WorkLineRequest workLineRequest, String userCode) throws NotFoundException {
         WorkCenter newWorkCenter = workLineRequest.getWorkCenter() != null ? workCenterService.getWorkCenterOrThrow(workLineRequest.getWorkCenter()) : null;
         WorkProcess newWorkProcess = workLineRequest.getWorkProcess() != null ? workProcessService.getWorkProcessOrThrow(workLineRequest.getWorkProcess()) : null;
 
@@ -70,6 +81,8 @@ public class WorkLineServiceImpl implements WorkLineService {
 
         findWorkLine.put(newWorkLine, newWorkCenter, newWorkProcess);
         workLineRepository.save(findWorkLine);
+
+        modifiedLogHelper.createModifiedLog(userCode, WORK_LINE, findWorkLine);
         return mapper.toResponse(findWorkLine, WorkLineResponse.class);
     }
 

@@ -116,6 +116,7 @@ public class PopServiceImpl implements PopService {
         lotEquipmentConnectRepo.save(lotEquipmentConnect);
     }
 
+    // (생산수량, 양품수량, 불량수량)
     /*
      * workOrderDetail: 상태값 변경, 작업자 변경, 작업수량 변경, startDate 변경, endDate 변경 update
      * productOrder: 상태값 변경 update
@@ -133,7 +134,9 @@ public class PopServiceImpl implements PopService {
             Long workOrderId,
             Long itemId,
             String userCode,
-            int productAmount,
+            int productAmount,  // 생산수량
+            int stockAmount,    // 양품수량
+            int badItemAmount,  // 불량수량
             Long equipmentId
     ) throws NotFoundException, BadRequestException {
         WorkOrderDetail workOrder = getWorkOrderDetailOrThrow(workOrderId);
@@ -144,6 +147,10 @@ public class PopServiceImpl implements PopService {
         throwIfWorkOrderStateIsCompletion(workOrder.getOrderState());
         // 작업수량이 0 이면 예외
         throwIfProductAmountIsNotZero(productAmount);
+
+        if ((stockAmount + badItemAmount) != productAmount) {
+            throw new BadRequestException("입력한 양품수량과 불량수량을 합한 수량이 입력한 생산수량과 같지 않습니다.");
+        }
 
         // workOderDetail: user 변경
         User user = getUserByUserCode(userCode);
@@ -166,14 +173,14 @@ public class PopServiceImpl implements PopService {
 
         if (workOrder.getOrderState().equals(SCHEDULE)) {
             // dummyLot 생성: 품목, 창고, 생성수량, 등록유형, 설비유형, lot 생성 구분
-            dummyLotRequest.putPopWorkOrder(
-                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, PRODUCTION, equipmentId, DUMMY_LOT
+            dummyLotRequest.putPopWorkOrder(    // 더미로트에 재고수량은 관리 안함
+                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, 0, badItemAmount, PRODUCTION, equipmentId, DUMMY_LOT
             );
             dummyLot = lotHelper.createLotMaster(dummyLotRequest);
 
             // equipmentLot 생성: 품목, 창고, 생성수량, 등록유형, 설비유형, lot 생성 구분
             equipmentLotRequest.putPopWorkOrder(
-                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT
+                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT
             );
             equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
 
@@ -206,24 +213,31 @@ public class PopServiceImpl implements PopService {
             // workOrderDetail id, workProcess id 로 LotLog 찾음
             dummyLot = lotLogHelper.getLotLogByWorkOrderDetailIdAndWorkProcessIdOrThrow(workOrder.getId(), workProcess.getId()).getLotMaster();
 
-            // 오늘날짜, 더미로트가 같고, 같은 설비 기준으로 equipmentLot 조회해서 없으면 생성, 있으면 update
-            LotEquipmentConnect equipmentConnect = lotEquipmentConnectRepo.findByTodayAndEquipmentId(equipmentId, LocalDate.now(), dummyLot.getId()).orElse(null);
+//             오늘날짜, 더미로트가 같고, 같은 설비 기준으로 equipmentLot 조회해서 없으면 생성, 있으면 update
+//            LotEquipmentConnect equipmentConnect = lotEquipmentConnectRepo.findByTodayAndEquipmentId(equipmentId, LocalDate.now(), dummyLot.getId()).orElse(null);
+            // 작업수량 들어올때마다 equipmentLot 생성으로 로직변경 - 2022.03.02
+            equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
+            equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
+            lotMasterRepo.save(equipmentLot);
+            lotEquipmentConnect.create(dummyLot, equipmentLot, MATERIAL_REGISTRATION);
+            lotEquipmentConnectRepo.save(lotEquipmentConnect);
 
-            // 없으면 insert
-            if (equipmentConnect == null) {
-                equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
-                equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
-                lotMasterRepo.save(equipmentLot);
-                lotEquipmentConnect.create(dummyLot, equipmentLot, MATERIAL_REGISTRATION);
-                lotEquipmentConnectRepo.save(lotEquipmentConnect);
-            } else {
-                // 있으면 update
-                equipmentLot = equipmentConnect.getChildLot();
-                equipmentLot.setCreatedAmount(equipmentLot.getCreatedAmount() + productAmount);
-                equipmentLot.setStockAmount(equipmentLot.getStockAmount() + productAmount);
-            }
+//            // 없으면 insert
+//            if (equipmentConnect == null) {
+//                equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
+//                equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
+//                lotMasterRepo.save(equipmentLot);
+//                lotEquipmentConnect.create(dummyLot, equipmentLot, MATERIAL_REGISTRATION);
+//                lotEquipmentConnectRepo.save(lotEquipmentConnect);
+//            } else {
+//                // 있으면 update
+//                equipmentLot = equipmentConnect.getChildLot();
+//                equipmentLot.setCreatedAmount(equipmentLot.getCreatedAmount() + productAmount);
+//                equipmentLot.setStockAmount(equipmentLot.getStockAmount() + productAmount);
+//            }
 
             dummyLot.setCreatedAmount(dummyLot.getCreatedAmount() + productAmount);   // lotMaster: 생성수량 update
+            dummyLot.setBadItemAmount(dummyLot.getBadItemAmount() + badItemAmount);   // lotMaster: 불량수량 update
             lotMasterRepo.save(dummyLot);
 
             // workOrderDetail
@@ -424,7 +438,8 @@ public class PopServiceImpl implements PopService {
     public PopTestItemResponse getPopTestItem(Long lotMasterId) throws NotFoundException {
         LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);
         PopTestItemResponse response = new PopTestItemResponse();
-        response.put(lotMaster);
+        int equipmentAllBadItemAmount = workOrderBadItemRepo.findBadItemAmountByEquipmentLotMaster(lotMasterId).stream().mapToInt(Integer::intValue).sum();
+        response.put(lotMaster, equipmentAllBadItemAmount);
         return response;
     }
 
@@ -450,7 +465,7 @@ public class PopServiceImpl implements PopService {
     // 불량 등록
     @Override
     public PopTestBadItemResponse createPopBadItemEnrollment(
-            Long lotMasterId,
+            Long lotMasterId,   // 설비로트
             Long badItemTypeId,
             int badItemAmount
     ) throws NotFoundException, BadRequestException {
@@ -465,19 +480,23 @@ public class PopServiceImpl implements PopService {
         ).orElseThrow(() -> new BadRequestException("[데이터오류] 더미로트와 작업공정에 해당하는 lotLog 가 없습니다.")).getWorkOrderDetail();
         BadItem badItem = getBadItemTypeOrThrow(badItemTypeId);
 
-        // badItemAmount 가 equipmentLot 의 createAmount - badItemAmount 보다 크면 예외
-        throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(badItemAmount, (equipmentLot.getCreatedAmount() - equipmentLot.getBadItemAmount()));
+        // badItemAmount 가 equipmentLot 의 BadItemAmount 보다 크면 예외
+        throwIfBadItemAmountGreaterThanEquipmentLotBadItemAmount(badItemAmount, equipmentLot.getBadItemAmount(), equipmentLot.getId(), 0);
         // 하나의 lotMaster 에 중복 불량유형이 있으면 안됨 예외
         throwIfBadItemIdInLotMaster(lotMasterId, badItemTypeId);
 
-        // dummyLot 불량수량 update
-        dummyLot.setBadItemAmount(dummyLot.getBadItemAmount() + badItemAmount);
-        lotMasterRepo.save(dummyLot);
+        // badItemAmount 가 equipmentLot 의 createAmount - badItemAmount 보다 크면 예외
+//        throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(badItemAmount, (equipmentLot.getCreatedAmount() - equipmentLot.getBadItemAmount()));
 
-        // equipmentLot 불량수량 update
-        equipmentLot.setBadItemAmount(equipmentLot.getBadItemAmount() + badItemAmount);
-        equipmentLot.setStockAmount(equipmentLot.getStockAmount() - badItemAmount);
-        lotMasterRepo.save(equipmentLot);
+
+        // dummyLot 불량수량 update
+//        dummyLot.setBadItemAmount(dummyLot.getBadItemAmount() + badItemAmount);
+//        lotMasterRepo.save(dummyLot);
+//
+//        // equipmentLot 불량수량 update
+//        equipmentLot.setBadItemAmount(equipmentLot.getBadItemAmount() + badItemAmount);
+//        equipmentLot.setStockAmount(equipmentLot.getStockAmount() - badItemAmount);
+//        lotMasterRepo.save(equipmentLot);
 
         // workOrderBadItem 생성
         WorkOrderBadItem workOrderBadItem = new WorkOrderBadItem();
@@ -493,21 +512,27 @@ public class PopServiceImpl implements PopService {
     @Override
     public PopTestBadItemResponse putPopBadItemEnrollment(Long enrollmentBadItemId, int badItemAmount) throws NotFoundException, BadRequestException {
         WorkOrderBadItem workOrderBadItem = getWorkOrderBadItemOrThrow(enrollmentBadItemId, EQUIPMENT_LOT);
+
+
         int beforeAmount = workOrderBadItem.getBadItemAmount();
         LotMaster equipmentLot = workOrderBadItem.getLotMaster();
-        LotMaster dummyLot = getLotEquipmentConnectByChildLotOrThrow(equipmentLot.getId()).getParentLot();
+//        LotMaster dummyLot = getLotEquipmentConnectByChildLotOrThrow(equipmentLot.getId()).getParentLot();
+
+
+        // badItemAmount 가 equipmentLot 의 BadItemAmount 보다 크면 예외
+        throwIfBadItemAmountGreaterThanEquipmentLotBadItemAmount(badItemAmount, equipmentLot.getBadItemAmount(), equipmentLot.getId(), beforeAmount);
 
         // 입력받은 불량수량이 createAmount + badItemAmount - beforeAmount 보다 많을 경우 예외
-        throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(badItemAmount, (equipmentLot.getStockAmount() + beforeAmount));
+//        throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(badItemAmount, (equipmentLot.getStockAmount() + beforeAmount));
 
         // dummyLot 불량수량 update
-        dummyLot.setBadItemAmount((dummyLot.getBadItemAmount() - beforeAmount) + badItemAmount);
-        lotMasterRepo.save(dummyLot);
+//        dummyLot.setBadItemAmount((dummyLot.getBadItemAmount() - beforeAmount) + badItemAmount);
+//        lotMasterRepo.save(dummyLot);
 
         // equipmentLot 불량수량, 재고수량 update
-        equipmentLot.setBadItemAmount((equipmentLot.getBadItemAmount() - beforeAmount) + badItemAmount);
-        equipmentLot.setStockAmount((equipmentLot.getStockAmount() + beforeAmount) - badItemAmount);
-        lotMasterRepo.save(equipmentLot);
+//        equipmentLot.setBadItemAmount((equipmentLot.getBadItemAmount() - beforeAmount) + badItemAmount);
+//        equipmentLot.setStockAmount((equipmentLot.getStockAmount() + beforeAmount) - badItemAmount);
+//        lotMasterRepo.save(equipmentLot);
 
         // 불량수량 수정
         workOrderBadItem.update(badItemAmount);
@@ -521,19 +546,19 @@ public class PopServiceImpl implements PopService {
     @Override
     public void deletePopBadItemEnrollment(Long enrollmentBadItemId) throws NotFoundException {
         WorkOrderBadItem workOrderBadItem = getWorkOrderBadItemOrThrow(enrollmentBadItemId, EQUIPMENT_LOT);
-        LotMaster equipmentLot = workOrderBadItem.getLotMaster();
-        LotMaster dummyLot = getLotEquipmentConnectByChildLotOrThrow(equipmentLot.getId()).getParentLot();
+//        LotMaster equipmentLot = workOrderBadItem.getLotMaster();
+//        LotMaster dummyLot = getLotEquipmentConnectByChildLotOrThrow(equipmentLot.getId()).getParentLot();
 
-        int beforeBadItemAmount = workOrderBadItem.getBadItemAmount();
+//        int beforeBadItemAmount = workOrderBadItem.getBadItemAmount();
 
-        // dummyLot 불량수량 update
-        dummyLot.setBadItemAmount(dummyLot.getBadItemAmount() - beforeBadItemAmount);
-        lotMasterRepo.save(dummyLot);
-
-        // equipmentLot 불량수량, 재고수량 update
-        equipmentLot.setBadItemAmount(equipmentLot.getBadItemAmount() - beforeBadItemAmount);
-        equipmentLot.setStockAmount(equipmentLot.getStockAmount() + beforeBadItemAmount);
-        lotMasterRepo.save(equipmentLot);
+//        // dummyLot 불량수량 update
+//        dummyLot.setBadItemAmount(dummyLot.getBadItemAmount() - beforeBadItemAmount);
+//        lotMasterRepo.save(dummyLot);
+//
+//        // equipmentLot 불량수량, 재고수량 update
+//        equipmentLot.setBadItemAmount(equipmentLot.getBadItemAmount() - beforeBadItemAmount);
+//        equipmentLot.setStockAmount(equipmentLot.getStockAmount() + beforeBadItemAmount);
+//        lotMasterRepo.save(equipmentLot);
 
         // 불량 삭제
         workOrderBadItem.delete();
@@ -563,6 +588,8 @@ public class PopServiceImpl implements PopService {
                 equipmentLot.getWorkProcess().getWorkProcessDivision(),
                 equipmentLot.getWareHouse(),
                 amount,
+                0,
+                0,
                 equipmentLot.getEnrollmentType(),
                 equipmentLot.getEquipment().getId(),
                 REAL_LOT
@@ -699,9 +726,18 @@ public class PopServiceImpl implements PopService {
                 .orElseThrow(() -> new NotFoundException("badItemType does not exist. input id: " + id));
     }
 
-    // 입력받은 badItemAmount 가 해당 lotMaster 의 생성수량보다 크면 안됨
-    private void throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(int badItemAmount, int createdAmount) throws BadRequestException {
-        if (badItemAmount > createdAmount) throw new BadRequestException("입력한 불량수량이 입력 가능한 수량보다 많습니다.");
+    // 불량수량 등록 체크
+    private void throwIfBadItemAmountGreaterThanEquipmentLotBadItemAmount(int inputBadItemAmount, int equipmentLotBadItemAmount, Long equipmentLotId, int beforeAmount) throws BadRequestException {
+        int equipmentAllBadItemAmount = workOrderBadItemRepo.findBadItemAmountByEquipmentLotMaster(equipmentLotId).stream().mapToInt(Integer::intValue).sum() - beforeAmount;
+        int possibleBadItemAmount = equipmentLotBadItemAmount - equipmentAllBadItemAmount;
+        if (possibleBadItemAmount < inputBadItemAmount) {
+            throw new BadRequestException("불량입력 가능 수량을 초과했습니다. " +
+                    "작업완료 시 입력한 불량수량: " + equipmentLotBadItemAmount + ", " +
+                    "등록되어 있는 불량수량: " + equipmentAllBadItemAmount + ", " +
+                    "현재 입력한 불량수량: " + inputBadItemAmount + ", " +
+                    "등록 가능한 불량수량: " + possibleBadItemAmount
+            );
+        }
     }
 
     // 입력받은 lotMaster 는 같은 불량유형이 존재하면 안됨.

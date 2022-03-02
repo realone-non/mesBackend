@@ -14,23 +14,16 @@ import java.util.List;
 public interface UnitService {
     // 생성
     UnitResponse createUnit(UnitRequest unitRequest) throws NotFoundException, BadRequestException;
-
     // 단일 조회
     UnitResponse getUnit(Long id) throws NotFoundException;
-
     // 전체 조회
     List<UnitResponse> getUnits();
-
     // 페이징 조회
 //    Page<UnitResponse> getUnits(Pageable pageable);
-
     // 수정
-    UnitResponse updateUnit(Long id, UnitRequest unitRequest) throws NotFoundException;
-
+    UnitResponse updateUnit(Long id, UnitRequest unitRequest, String userCode) throws NotFoundException;
     // 삭제
     void deleteUnit(Long id) throws NotFoundException;
-
     // 예외처리 단일조회
     Unit getUnitOrThrow(Long id) throws NotFoundException;
-
 }

@@ -21,4 +21,6 @@ public interface WorkOrderBadItemRepositoryCustom {
     List<PopTestBadItemResponse> findPopTestBadItemResponseByLotMasterId(Long lotMasterId);
     // 불량항목 전체 조회
     List<BadItem> findBadItemByCondition(Long workProcessId);
+    // equipmentLot 에 해당하는 불량수량 모두
+    List<Integer> findBadItemAmountByEquipmentLotMaster(Long equipmentLotId);
 }

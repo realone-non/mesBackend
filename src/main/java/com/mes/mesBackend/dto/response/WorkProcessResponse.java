@@ -2,10 +2,13 @@ package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.ModifiedLog;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -35,10 +38,24 @@ public class WorkProcessResponse {
     @Schema(description = "공정 구분")
     WorkProcessDivision workProcessDivision;
 
+    // ============ 수정 기록
+    @Schema(description = "사번")
+    String userCode;
+    @Schema(description = "수정일자")
+    LocalDateTime updateDate;
+    @Schema(description = "유저권한레벨")
+    int userLevel;
+
     @Getter
     @Setter
     public static class idAndName {
         Long id;
         String workProcessName;     // 작업공정명
+    }
+
+    public void modifiedLog(ModifiedLog modifiedLog) {
+        setUserCode(modifiedLog.getUserCode());
+        setUpdateDate(modifiedLog.getModifiedDate());
+        setUserLevel(modifiedLog.getUserLevel());
     }
 }
