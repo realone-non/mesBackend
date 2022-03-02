@@ -37,7 +37,13 @@ public class PopTestItemResponse {
     @Schema(description = "불량수량")
     int badItemAmount;
 
-    public void put(LotMaster lotMaster) {
+    @Schema(description = "등록 가능한 불량수량")
+    int possibleBadItemAmount;
+
+    @Schema(description = "등록된 불량 수량")
+    int completeBadItemAmount;
+
+    public void put(LotMaster lotMaster, int equipmentAllBadItemAmount) {
         setItemId(lotMaster.getItem().getId());
         setItemNo(lotMaster.getItem().getItemNo());
         setItemName(lotMaster.getItem().getItemName());
@@ -46,5 +52,7 @@ public class PopTestItemResponse {
         setCreatedAmount(lotMaster.getCreatedAmount());
         setStockAmount(lotMaster.getStockAmount());
         setBadItemAmount(lotMaster.getBadItemAmount());
+        setPossibleBadItemAmount(lotMaster.getBadItemAmount() - equipmentAllBadItemAmount);
+        setCompleteBadItemAmount(equipmentAllBadItemAmount);
     }
 }

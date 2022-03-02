@@ -22,7 +22,7 @@ public interface WorkProcessService {
 //    Page<WorkProcessResponse> getWorkProcesses(Pageable pageable);
 
     // 작업공정 수정
-    WorkProcessResponse updateWorkProcess(Long workProcessId, WorkProcessRequest workProcessRequest) throws NotFoundException;
+    WorkProcessResponse updateWorkProcess(Long workProcessId, WorkProcessRequest workProcessRequest, String userCode) throws NotFoundException;
 
     WorkProcess getWorkProcessOrThrow(Long id) throws NotFoundException;
 
