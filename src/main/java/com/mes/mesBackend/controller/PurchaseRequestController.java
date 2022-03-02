@@ -122,9 +122,10 @@ public class PurchaseRequestController {
             @RequestBody @Valid PurchaseRequestRequest purchaseRequestRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        PurchaseRequestResponse purchaseRequest = purchaseRequestService.updatePurchaseRequest(id, purchaseRequestRequest);
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        PurchaseRequestResponse purchaseRequest = purchaseRequestService.updatePurchaseRequest(id, purchaseRequestRequest, userCode);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + purchaseRequest.getId() + " from updatePurchaseRequest.");
+        cLogger.info(userCode + " is modified the " + purchaseRequest.getId() + " from updatePurchaseRequest.");
         return new ResponseEntity<>(purchaseRequest, OK);
     }
 

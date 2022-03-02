@@ -51,6 +51,18 @@ public class ModifiedLog {
     @JoinColumn(name = "WORK_LINE", columnDefinition = "bigint COMMENT '작업라인'")
     private WorkLine workLine;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "WORK_DOCUMENT", columnDefinition = "bigint COMMENT '작업표준서'")
+    private WorkDocument workDocument;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "EQUIPMENT_MAINTENANCE", columnDefinition = "bigint COMMENT '설비보전항목'")
+    private EquipmentMaintenance equipmentMaintenance;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "PURCHASE_REQUEST", columnDefinition = "bigint COMMENT '구매요청'")
+    private PurchaseRequest purchaseRequest;
+
     public <T> ModifiedLog created(String userCode, ModifiedDivision modifiedDivision, int userLevel, T t) {
         setUserCode(userCode);
         setModifiedDate(LocalDateTime.now());
@@ -63,10 +75,16 @@ public class ModifiedLog {
             case ITEM_GROUP: setItemGroup(t);
                 break;
             case WORK_PROCESS: setWorkProcess(t);
-            break;
+                break;
             case WORK_LINE: setWorkLine(t);
+                break;
+            case WORK_DOCUMENT: setWorkDocument(t);
+                break;
+            case EQUIPMENT_MAINTENANCE: setEquipmentMaintenance(t);
+                break;
+            case PURCHASE_REQUEST: setPurchaseRequest(t);
+                break;
         }
-
         return this;
     }
 
@@ -79,7 +97,8 @@ public class ModifiedLog {
     public <T> void setWorkProcess(T t) {
         this.workProcess = (WorkProcess) t;
     }
-    public <T> void setWorkLine(T t) {
-        this.workLine = (WorkLine) t;
-    }
+    public <T> void setWorkLine(T t) { this.workLine = (WorkLine) t; }
+    public <T> void setWorkDocument(T t) { this.workDocument = (WorkDocument) t; }
+    public <T> void setEquipmentMaintenance(T t) { this.equipmentMaintenance = (EquipmentMaintenance) t; }
+    public <T> void setPurchaseRequest(T t) { this.purchaseRequest = (PurchaseRequest) t; }
 }

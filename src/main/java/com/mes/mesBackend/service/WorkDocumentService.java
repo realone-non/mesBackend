@@ -21,7 +21,7 @@ public interface WorkDocumentService {
     // 작업표준서 페이징 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
 //    Page<WorkDocumentResponse> getWorkDocuments(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Pageable pageable);
     // 작업표준서 수정
-    WorkDocumentResponse updateWorkDocument(Long id, WorkDocumentRequest workDocumentRequest) throws NotFoundException;
+    WorkDocumentResponse updateWorkDocument(Long id, WorkDocumentRequest workDocumentRequest, String userCode) throws NotFoundException;
     // 작업표준서 삭제
     void deleteWorkDocument(Long id) throws NotFoundException;
     // 작업표준서 파일 추가
