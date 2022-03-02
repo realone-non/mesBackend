@@ -117,9 +117,10 @@ public class WorkDocumentController {
             @RequestBody @Valid WorkDocumentRequest workDocumentRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        WorkDocumentResponse workDocument = workDocumentService.updateWorkDocument(id, workDocumentRequest);
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        WorkDocumentResponse workDocument = workDocumentService.updateWorkDocument(id, workDocumentRequest, userCode);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + workDocument.getId() + " from updateWorkDocument.");
+        cLogger.info(userCode + " is modified the " + workDocument.getId() + " from updateWorkDocument.");
         return new ResponseEntity<>(workDocument, OK);
     }
 

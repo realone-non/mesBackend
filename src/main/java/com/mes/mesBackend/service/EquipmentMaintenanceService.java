@@ -19,7 +19,7 @@ public interface EquipmentMaintenanceService {
     List<EquipmentMaintenanceResponse> getEquipmentMaintenances();
 //    Page<EquipmentMaintenanceResponse> getEquipmentMaintenances(Pageable pageable);
     // 설비 보전항목 수정
-    EquipmentMaintenanceResponse updateEquipmentMaintenance(Long id, EquipmentMaintenanceRequest equipmentMaintenanceRequest) throws NotFoundException;
+    EquipmentMaintenanceResponse updateEquipmentMaintenance(Long id, EquipmentMaintenanceRequest equipmentMaintenanceRequest, String userCode) throws NotFoundException;
     // 설비 보전항목 삭제
     void deleteEquipmentMaintenance(Long id) throws NotFoundException;
     // 설비 보전항목 단일 조회 및 예외
