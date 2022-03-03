@@ -9,6 +9,9 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -172,7 +175,7 @@ public class LotLogRepositoryImpl implements LotLogRepositoryCustom {
                         .selectFrom(lotLog)
                         .where(
                                 lotLog.lotMaster.id.eq(lotMasterId),
-                                lotLog.workProcess.id.eq(workProcessId)
+                                isWorkProcessIdEq(workProcessId)
                         )
                         .fetchOne()
         );
@@ -189,6 +192,37 @@ public class LotLogRepositoryImpl implements LotLogRepositoryCustom {
                         )
                         .orderBy(lotLog.createdDate.desc())
 //                        .limit(1)
+                        .fetchOne()
+        );
+    }
+
+    // 조건: lorMasterId, 작업공정, 오늘
+    @Override
+    public Optional<LotLog> findByLotMasterIdAndWorkProcessDivision(Long lotMasterId, WorkProcessDivision workProcessDivision, LocalDate now) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(lotLog)
+                        .from(lotLog)
+                        .where(
+                                lotLog.lotMaster.id.eq(lotMasterId),
+                                lotLog.workProcess.workProcessDivision.eq(workProcessDivision),
+                                lotLog.lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0)),
+                                lotMaster.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // 검색조건: lotMasterId, workProcessDivision, 반환: LotLog
+    @Override
+    public Optional<LotLog> findByLotMasterIdAndWorkProcessDivision(Long lotMasterId, WorkProcessDivision workProcessDivision) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(lotLog)
+                        .where(
+                                lotLog.lotMaster.id.eq(lotMasterId),
+                                lotLog.lotMaster.workProcess.workProcessDivision.eq(workProcessDivision)
+                        )
                         .fetchOne()
         );
     }

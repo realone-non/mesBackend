@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.response.*;
+import com.mes.mesBackend.entity.enumeration.BreakReason;
 import com.mes.mesBackend.entity.enumeration.ProcessStatus;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -64,4 +65,6 @@ public interface PopService {
     void deletePopLotMasters(Long lotMasterId) throws NotFoundException;
     // 충진공정 설비 선택
     void putFillingEquipmentOfRealLot(Long lotMasterId, Long equipmentId) throws NotFoundException, BadRequestException;
+    // 충진공정 설비 고장등록 api
+    void createFillingEquipmentError(Long workOrderId, Long lotMasterId, Long transferEquipmentId, BreakReason breakReason) throws NotFoundException, BadRequestException;
 }

@@ -3,7 +3,9 @@ package com.mes.mesBackend.repository.custom;
 import com.mes.mesBackend.dto.response.PopBomDetailLotMasterResponse;
 import com.mes.mesBackend.dto.response.PopLotMasterResponse;
 import com.mes.mesBackend.entity.LotConnect;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +23,6 @@ public interface LotConnectRepositoryCustom {
     // realLot 에 해당하는 equipmentLotId 조회, 구분 값: FAMILY
     Optional<LotConnect> findByChildLotIdAndDivisionFamily(Long childLotId);
     Optional<Long> findDummyLotIdByChildLotId(Long realLotMasterId);
+    // equipmentLotId(parentLot.childLot) 로 오늘 생성, 공정 원료혼합
+    Optional<LotConnect> findByParentLotOfEquipmentLotId(Long equipmentLotId, WorkProcessDivision workProcessDivision, LocalDate now, Long produceOrderId);
 }

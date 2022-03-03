@@ -3,11 +3,16 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.PopBomDetailLotMasterResponse;
 import com.mes.mesBackend.dto.response.PopLotMasterResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.repository.custom.LotConnectRepositoryCustom;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +27,9 @@ public class LotConnectRepositoryImpl implements LotConnectRepositoryCustom {
     final QItem item = QItem.item;
     final QUnit unit = QUnit.unit;
     final QLotEquipmentConnect lotEquipmentConnect = QLotEquipmentConnect.lotEquipmentConnect;
+    final QWorkOrderDetail workOrderDetail = QWorkOrderDetail.workOrderDetail;
+    final QLotLog lotLog = QLotLog.lotLog;
+    final QProduceOrder produceOrder = QProduceOrder.produceOrder;
 
 //    // 부모 lotMaster 랑 같고, 자식 lotMaster 의 item 이 파라미터 itemId 와 같고, 구분값이 EXHAUST 인것 조회
     @Override
@@ -165,5 +173,36 @@ public class LotConnectRepositoryImpl implements LotConnectRepositoryCustom {
                         )
                         .fetchOne()
         );
+    }
+
+    // equipmentLotId(parentLot.childLot) 로 realLot 가 오늘 생성, 공정 원료혼합
+    @Override
+    public Optional<LotConnect> findByParentLotOfEquipmentLotId(Long equipmentLotId, WorkProcessDivision workProcessDivision, LocalDate now, Long produceOrderId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(lotConnect)
+                        .from(lotConnect)
+                        .leftJoin(lotEquipmentConnect).on(lotEquipmentConnect.childLot.id.eq(lotConnect.parentLot.childLot.id))
+                        .leftJoin(lotLog).on(lotLog.lotMaster.id.eq(lotEquipmentConnect.parentLot.id))
+                        .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
+                        .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                        .leftJoin(lotMaster).on(lotMaster.id.eq(lotEquipmentConnect.childLot.id))
+                        .where(
+                                isLotMasterIdEq(equipmentLotId),
+//                                lotMaster.id.eq(equipmentLotId),
+                                lotMaster.workProcess.workProcessDivision.eq(workProcessDivision),
+                                lotMaster.deleteYn.isFalse(),
+                                lotConnect.childLot.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0)),
+                                lotConnect.childLot.workProcess.workProcessDivision.eq(workProcessDivision),
+                                produceOrder.id.eq(produceOrderId),
+                                lotConnect.division.eq(FAMILY)
+                        )
+                        .fetchOne()
+        );
+    }
+
+
+    private BooleanExpression isLotMasterIdEq(Long lotMasterId) {
+        return lotMasterId != null ? lotMaster.id.eq(lotMasterId) : null;
     }
 }

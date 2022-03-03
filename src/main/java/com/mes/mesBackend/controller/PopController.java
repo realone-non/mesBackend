@@ -1,6 +1,7 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.*;
+import com.mes.mesBackend.entity.enumeration.BreakReason;
 import com.mes.mesBackend.entity.enumeration.ProcessStatus;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -438,6 +439,25 @@ public class PopController {
         popService.putFillingEquipmentOfRealLot(lotMasterId, equipmentId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is putFillingEquipmentOfRealLot.");
+        return new ResponseEntity<>(OK);
+    }
+
+    // 충진공정 설비 고장등록 api
+    @SecurityRequirement(name = AUTHORIZATION)
+    @PostMapping("/filling-equipment-errors")
+    @ResponseBody
+    @Operation(summary = "(pop) 충진공정 설비 고장 등록", description = "")
+    public ResponseEntity createFillingEquipmentError(
+            @RequestParam @Parameter(description = "작업지시 id") Long workOrderId,
+            @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "이전할 설비 id") Long transferEquipmentId,
+            @RequestParam @Parameter(description = "고장 사유") BreakReason breakReason,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException, BadRequestException {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        popService.createFillingEquipmentError(workOrderId, lotMasterId, transferEquipmentId, breakReason);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from createFillingEquipmentError.");
         return new ResponseEntity<>(OK);
     }
 }
