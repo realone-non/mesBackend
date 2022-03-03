@@ -42,7 +42,7 @@ public class MaterialStockInspectApprovalController {
     private CustomLogger cLogger;
 
     //재고실사 승인 등록
-    @PostMapping("/{request-id}/approvals/{user-id}")
+    @PostMapping("/{request-id}/approvals")
     @ResponseBody
     @Operation(summary = "재고실사 승인 등록")
     @ApiResponses(
@@ -54,10 +54,9 @@ public class MaterialStockInspectApprovalController {
     )
     public ResponseEntity<List<MaterialStockInspectResponse>> createStockInspectApproval(
             @PathVariable(value = "request-id") @Parameter(description = "실사의뢰 ID") Long requestId,
-            @PathVariable(value = "user-id") @Parameter(description = "승인자 ID") Long userId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        List<MaterialStockInspectResponse> responseList = materialWarehouseService.createStockInspectApproval(requestId, userId);
+        List<MaterialStockInspectResponse> responseList = materialWarehouseService.createStockInspectApproval(requestId, logService.getUserCodeFromHeader(tokenHeader));
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the stockInspect requestId:" + requestId + " from createStockInspectData.");
         return new ResponseEntity<>(responseList, OK);
