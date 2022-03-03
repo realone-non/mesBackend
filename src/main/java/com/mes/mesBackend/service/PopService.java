@@ -19,7 +19,15 @@ public interface PopService {
     // 작업지시 진행상태 변경
     void updatePopWorkOrderState(Long lotMasterId, ProcessStatus processStatus) throws NotFoundException;
     // 작업지시 상태 변경
-    Long createWorkOrder(Long workOrderId, Long itemId, String userCode, int productAmount, int stockAmount, int badItemAmount, Long equipmentId) throws NotFoundException, BadRequestException;
+    Long createWorkOrder(
+            Long workOrderId,
+            Long itemId,
+            String userCode,
+            int productAmount,
+            int stockAmount,
+            int badItemAmount,
+            Long equipmentId
+    ) throws NotFoundException, BadRequestException;
     // 공정으로 공정에 해당하는 설비정보 가져오기 GET
     List<PopEquipmentResponse> getPopEquipments(WorkProcessDivision workProcessDivision) throws NotFoundException;
     // 해당 품목(반제품)에 대한 원자재, 부자재 정보 가져와야함
@@ -54,4 +62,6 @@ public interface PopService {
     PopLotMasterResponse putPopLotMasters(Long lotMasterId, int amount) throws NotFoundException, BadRequestException;
     // 분할 lot 삭제
     void deletePopLotMasters(Long lotMasterId) throws NotFoundException;
+    // 충진공정 설비 선택
+    void putFillingEquipmentOfRealLot(Long lotMasterId, Long equipmentId) throws NotFoundException, BadRequestException;
 }

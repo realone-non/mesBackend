@@ -3,6 +3,7 @@ package com.mes.mesBackend.helper;
 import com.mes.mesBackend.entity.ProductionPerformance;
 import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.NotFoundException;
 
 // 작업지시 orderState 변경

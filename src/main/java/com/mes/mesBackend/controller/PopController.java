@@ -124,6 +124,7 @@ public class PopController {
     }
 
     // 작업완료 수량 입력
+    // 원료혼합 공정에서만 fillingEquipmentId 값이 들어오는데, 다음 공정인 충진공정에서 사용할 설비를 지정해주는 값이다.
     @SecurityRequirement(name = AUTHORIZATION)
     @PostMapping("/work-orders/{work-order-id}")
     @ResponseBody
@@ -135,7 +136,6 @@ public class PopController {
             @RequestParam @Parameter(description = "양품 수량") int stockAmount,
             @RequestParam @Parameter(description = "불량 수량") int badItemAmount,
             @RequestParam @Parameter(description = "설비 id") Long equipmentId,
-            // TODO: 고장났을때 승계할 설비 id
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
@@ -422,5 +422,22 @@ public class PopController {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is viewed the list of from deletePopLotMasters.");
         return new ResponseEntity(NO_CONTENT);
+    }
+
+    // 충진 설비 선택 api
+    @SecurityRequirement(name = AUTHORIZATION)
+    @PutMapping("/filling-equipments")
+    @ResponseBody
+    @Operation(summary = "(pop) 충진공정 설비 선택", description = "")
+    public ResponseEntity putFillingEquipmentOfRealLot(
+            @RequestParam @Parameter(description = "분할 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "충진공정 설비 id") Long equipmentId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException, BadRequestException {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        popService.putFillingEquipmentOfRealLot(lotMasterId, equipmentId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is putFillingEquipmentOfRealLot.");
+        return new ResponseEntity<>(OK);
     }
 }

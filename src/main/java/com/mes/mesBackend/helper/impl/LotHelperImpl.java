@@ -45,16 +45,8 @@ public class LotHelperImpl implements LotHelper {
         OutSourcingInput outSourcingInput = lotMasterRequest.getOutsourcingInputId() != null ? getOutsourcingInputOrThrow(lotMasterRequest.getOutsourcingInputId()) : null;
         Long workProcessId = lotMasterRequest.getWorkProcessDivision() != null ? lotLogHelper.getWorkProcessByDivisionOrThrow(lotMasterRequest.getWorkProcessDivision()) : null;
         WorkProcess workProcess = workProcessId != null ? getWorkProcessIdOrThrow(workProcessId) : null;
-
-        Equipment equipment;
-        if (lotMasterRequest.getEquipmentId() != null) {
-            equipment = equipmentRepository.findByIdAndDeleteYnFalse(lotMasterRequest.getEquipmentId())
-                    .orElseThrow(() -> new NotFoundException("[LotHelper] equipment does not exist. "));
-        } else {
-            equipment = equipmentRepository.findByWorkProcess(workProcess.getId());
-        }
-
-//        LotMaster lotMaster = modelMapper.toEntity(lotMasterRequest, LotMaster.class);
+        // 설비 -> 설비값이 없을경우 공정에 해당하는 첫번째 설비로 등록
+        Equipment equipment = lotMasterRequest.getEquipmentId() != null ? getEquipmentOrThrow(lotMasterRequest.getEquipmentId()) : equipmentRepository.findByWorkProcess(workProcess.getId());
 
         LotMaster lotMaster = new LotMaster();
         lotMaster.setItem(lotMasterRequest.getItem());
@@ -268,5 +260,11 @@ public class LotHelperImpl implements LotHelper {
     private LotType getLotTypeOrThrow(Long id) throws NotFoundException {
         return lotTypeRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("lotType does not exist. input id: " + id));
+    }
+
+    // 설비 단일 조회 및 예외
+    private Equipment getEquipmentOrThrow(Long equipmentId) throws NotFoundException {
+        return equipmentRepository.findByIdAndDeleteYnFalse(equipmentId)
+                .orElseThrow(() -> new NotFoundException("[LotHelper] equipment does not exist. "));
     }
 }
