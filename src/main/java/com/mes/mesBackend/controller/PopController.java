@@ -135,6 +135,7 @@ public class PopController {
             @RequestParam @Parameter(description = "양품 수량") int stockAmount,
             @RequestParam @Parameter(description = "불량 수량") int badItemAmount,
             @RequestParam @Parameter(description = "설비 id") Long equipmentId,
+            // TODO: 고장났을때 승계할 설비 id
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
