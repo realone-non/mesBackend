@@ -152,6 +152,10 @@ public class LotMaster extends BaseTimeEntity {
     @JoinColumn(name = "EQUIPMENT", columnDefinition = "bigint COMMENT '설비'")
     private Equipment equipment;        // 설비
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "INPUT_EQUIPMENT", columnDefinition = "bigint COMMENT '충진 투입 설비'")
+    private Equipment inputEquipment;       // 원료혼합에서 생성된 반제품이 쓰일 충진 공정 투입 설비
+
 //    @Column(name = "END_YN", columnDefinition = "bit(1) COMMENT '로트 엔드'")
 //    private boolean endYn;      // 로트엔드
 

@@ -63,6 +63,10 @@ public class ModifiedLog {
     @JoinColumn(name = "PURCHASE_REQUEST", columnDefinition = "bigint COMMENT '구매요청'")
     private PurchaseRequest purchaseRequest;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "WORK_CENTER_CHECK_DETAIL", columnDefinition = "bigint COMMENT '작업장별 점검항목'")
+    private WorkCenterCheckDetail workCenterCheckDetail;
+
     public <T> ModifiedLog created(String userCode, ModifiedDivision modifiedDivision, int userLevel, T t) {
         setUserCode(userCode);
         setModifiedDate(LocalDateTime.now());
@@ -84,6 +88,8 @@ public class ModifiedLog {
                 break;
             case PURCHASE_REQUEST: setPurchaseRequest(t);
                 break;
+            case WORK_CENTER_CHECK_DETAIL: setWorkCenterCheckDetail(t);
+                break;
         }
         return this;
     }
@@ -101,4 +107,5 @@ public class ModifiedLog {
     public <T> void setWorkDocument(T t) { this.workDocument = (WorkDocument) t; }
     public <T> void setEquipmentMaintenance(T t) { this.equipmentMaintenance = (EquipmentMaintenance) t; }
     public <T> void setPurchaseRequest(T t) { this.purchaseRequest = (PurchaseRequest) t; }
+    public <T> void setWorkCenterCheckDetail(T t) { this.workCenterCheckDetail = (WorkCenterCheckDetail) t; }
 }
