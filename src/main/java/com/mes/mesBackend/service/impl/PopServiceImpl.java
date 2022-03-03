@@ -15,13 +15,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PRODUCTION;
-import static com.mes.mesBackend.entity.enumeration.GoodsType.HALF_PRODUCT;
-import static com.mes.mesBackend.entity.enumeration.GoodsType.PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.INPUT_AMOUNT;
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.STORE_AMOUNT;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
@@ -53,6 +52,7 @@ public class PopServiceImpl implements PopService {
     private final WorkOrderBadItemRepository workOrderBadItemRepo;
     private final LotEquipmentConnectRepository lotEquipmentConnectRepo;
     private final LotLogRepository lotLogRepo;
+    private final EquipmentBreakdownRepository equipmentBreakdownRepo;
 
     // 작업공정 전체 조회
     @Override
@@ -218,14 +218,35 @@ public class PopServiceImpl implements PopService {
             // workOrderDetail id, workProcess id 로 LotLog 찾음
             dummyLot = lotLogHelper.getLotLogByWorkOrderDetailIdAndWorkProcessIdOrThrow(workOrder.getId(), workProcess.getId()).getLotMaster();
 
-//             오늘날짜, 더미로트가 같고, 같은 설비 기준으로 equipmentLot 조회해서 없으면 생성, 있으면 update
-//            LotEquipmentConnect equipmentConnect = lotEquipmentConnectRepo.findByTodayAndEquipmentId(equipmentId, LocalDate.now(), dummyLot.getId()).orElse(null);
-            // 작업수량 들어올때마다 equipmentLot 생성으로 로직변경 - 2022.03.02
-            equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
-            equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
-            lotMasterRepo.save(equipmentLot);
-            lotEquipmentConnect.create(dummyLot, equipmentLot, MATERIAL_REGISTRATION);
-            lotEquipmentConnectRepo.save(lotEquipmentConnect);
+
+            // 원료혼합 공정일땐 하나의 작업지시에 하나의 lot 만 생성됨
+            // 오늘 생산된 lotMaster, 작업공정은 원료혼합
+            LotEquipmentConnect equipmentConnect = lotEquipmentConnectRepo.findByTodayAndWorkProcessDivision(LocalDate.now(), MATERIAL_MIXING, workOrderId)
+                    .orElse(null);
+
+            if (workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING)) {
+                // 없으면 새로 생성
+                if (equipmentConnect == null) {
+                    equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
+                    equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
+                    lotMasterRepo.save(equipmentLot);
+                    lotEquipmentConnect.create(dummyLot, equipmentLot, MATERIAL_REGISTRATION);
+                    lotEquipmentConnectRepo.save(lotEquipmentConnect);
+                } else {
+                    // 있으면 update
+                    equipmentLot = equipmentConnect.getChildLot();
+                    equipmentLot.setCreatedAmount(equipmentLot.getCreatedAmount() + productAmount);
+                    equipmentLot.setStockAmount(equipmentLot.getStockAmount() + productAmount);
+                    equipmentLot.setBadItemAmount(equipmentLot.getBadItemAmount() + badItemAmount);
+                }
+            } else {
+                // 작업수량 들어올때마다 equipmentLot 생성으로 로직변경 - 2022.03.02
+                equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
+                equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
+                lotMasterRepo.save(equipmentLot);
+                lotEquipmentConnect.create(dummyLot, equipmentLot, MATERIAL_REGISTRATION);
+                lotEquipmentConnectRepo.save(lotEquipmentConnect);
+            }
 
 //            // 없으면 insert
 //            if (equipmentConnect == null) {
@@ -586,29 +607,79 @@ public class PopServiceImpl implements PopService {
         // amount 가 equipmentLot 의 stockAmount 보다 크면 예외
         throwIfAmountGreaterThanLotMasterStockAmount(amount, equipmentLot.getStockAmount());
 
-        // 분할 lot 생성
         LotMasterRequest realLotRequest = new LotMasterRequest();
-        realLotRequest.putPopWorkOrder(
-                equipmentLot.getItem(),
-                equipmentLot.getWorkProcess().getWorkProcessDivision(),
-                equipmentLot.getWareHouse(),
-                amount,
-                0,
-                0,
-                equipmentLot.getEnrollmentType(),
-                equipmentLot.getEquipment().getId(),
-                REAL_LOT
-        );
-        LotMaster realLot = lotHelper.createLotMaster(realLotRequest);
+        LotMaster realLot = new LotMaster();
 
-        // 분할 된 lot 와 부모로트 생성
-        LotConnect lotConnect = new LotConnect();
-        lotConnect.create(lotEquipmentConnect, realLot, amount, FAMILY);
-        lotConnectRepo.save(lotConnect);
+        if (equipmentLot.getWorkProcess().getWorkProcessDivision().equals(MATERIAL_MIXING)) {
+            // 입력받은 equipmentLotId 로 lotConnect 에서 오늘날짜로 생성된 realLot 가 있으면 가져오고 아님 말고
+            // 제조오더도 같아야함
+            // 제조오더 찾기?
 
-        // equipmentLot 의 stockAmount 변경
-        equipmentLot.setStockAmount(equipmentLot.getStockAmount() - amount);
-        lotMasterRepo.save(equipmentLot);
+            // 입력받은 설비 lot 의 제조오더
+            LotLog lotLog = lotLogRepo.findByLotMasterIdAndWorkProcessDivision(lotEquipmentConnect.getParentLot().getId(), MATERIAL_MIXING)
+                    .orElseThrow(() -> new NotFoundException("[데이터오류] 설비 lot 로 생성된 lotlog 가 없습니다."));
+            ProduceOrder produceOrder = lotLog.getWorkOrderDetail().getProduceOrder();
+
+            LotConnect findLotConnect = lotConnectRepo.findByParentLotOfEquipmentLotId(equipmentLot.getId(), MATERIAL_MIXING, LocalDate.now(), produceOrder.getId())
+                    .orElse(null);
+
+            // 없으면 insert
+            if (findLotConnect == null) {
+                realLotRequest.putPopWorkOrder(
+                        equipmentLot.getItem(),
+                        equipmentLot.getWorkProcess().getWorkProcessDivision(),
+                        equipmentLot.getWareHouse(),
+                        amount,
+                        amount,
+                        0,
+                        equipmentLot.getEnrollmentType(),
+                        equipmentLot.getEquipment().getId(),
+                        REAL_LOT
+                );
+                realLot = lotHelper.createLotMaster(realLotRequest);
+
+                LotConnect lotConnect = new LotConnect();
+                lotConnect.create(lotEquipmentConnect, realLot, amount, FAMILY);
+                lotConnectRepo.save(lotConnect);
+
+                // equipmentLot 의 stockAmount 변경
+                equipmentLot.setStockAmount(equipmentLot.getStockAmount() - amount);
+                lotMasterRepo.save(equipmentLot);
+
+            } else {
+                // 있으면 update
+                realLot = findLotConnect.getChildLot();
+                realLot.setCreatedAmount(realLot.getCreatedAmount() + amount);
+                realLot.setStockAmount(realLot.getStockAmount() + amount);
+                lotMasterRepo.save(realLot);
+
+                // equipmentLot 의 stockAmount 변경
+                equipmentLot.setStockAmount(equipmentLot.getStockAmount() - amount);
+                lotMasterRepo.save(equipmentLot);
+            }
+        } else {    // 다른공정일 경우
+            // 분할 lot 생성
+            realLotRequest.putPopWorkOrder(
+                    equipmentLot.getItem(),
+                    equipmentLot.getWorkProcess().getWorkProcessDivision(),
+                    equipmentLot.getWareHouse(),
+                    amount,
+                    amount,
+                    0,
+                    equipmentLot.getEnrollmentType(),
+                    equipmentLot.getEquipment().getId(),
+                    REAL_LOT
+            );
+            realLot = lotHelper.createLotMaster(realLotRequest);
+            // 분할 된 lot 와 부모로트 생성
+            LotConnect lotConnect = new LotConnect();
+            lotConnect.create(lotEquipmentConnect, realLot, amount, FAMILY);
+            lotConnectRepo.save(lotConnect);
+
+            // equipmentLot 의 stockAmount 변경
+            equipmentLot.setStockAmount(equipmentLot.getStockAmount() - amount);
+            lotMasterRepo.save(equipmentLot);
+        }
 
         PopLotMasterResponse popLotMasterResponse = new PopLotMasterResponse();
         return popLotMasterResponse.put(realLot);
@@ -671,6 +742,48 @@ public class PopServiceImpl implements PopService {
             throw new BadRequestException("입력한 설비가 충진공정의 설비에 해당되지 않습니다.");
         realLot.setInputEquipment(fillingEquipment);
         lotMasterRepo.save(realLot);
+    }
+
+    // 충진공정 설비 고장등록 api
+    @Override
+    public void createFillingEquipmentError(
+            Long workOrderId,   // 충진공정 작업지시 id
+            Long lotMasterId,   // 충진공정 설비 lot id
+            Long transferEquipmentId,
+            BreakReason breakReason
+    ) throws NotFoundException, BadRequestException {
+        LotMaster equipmentLot = getLotMasterOrThrow(lotMasterId);
+        Equipment transferEquipment = getEquipmentOrThrow(transferEquipmentId);
+        WorkOrderDetail workOrder = getWorkOrderDetailOrThrow(workOrderId);
+
+        LotEquipmentConnect lotEquipmentConnect = getLotEquipmentConnectByChildLotOrThrow(equipmentLot.getId());
+
+        ProduceOrder produceOrder = workOrder.getProduceOrder();
+
+        LotConnect findLotConnect = lotConnectRepo.findByParentLotOfEquipmentLotId(null, MATERIAL_MIXING, LocalDate.now(), produceOrder.getId())
+                .orElseThrow(() -> new BadRequestException("[데이터 오류] 입력한 설비로트와 같은 제조오더의 원료혼합 공정에서 생성 된 반제품이 존재하지 않습니다."));
+        LotMaster halfLot = findLotConnect.getChildLot();   // 같은 제조오더의 원료혼합 공정에서 당일에 만들어진 realLot
+
+        // 고장난 설비에 대한 반제품 소모 등록
+        LotConnect beforeEquipmentLotConnect = new LotConnect();
+        beforeEquipmentLotConnect.setAmount(0);
+        beforeEquipmentLotConnect.setErrorYn(true);
+        beforeEquipmentLotConnect.setDivision(EXHAUST);
+        beforeEquipmentLotConnect.setParentLot(lotEquipmentConnect);
+        beforeEquipmentLotConnect.setChildLot(halfLot);
+        lotConnectRepo.save(beforeEquipmentLotConnect);
+
+        halfLot.setInputEquipment(transferEquipment);
+        lotMasterRepo.save(halfLot);
+
+        // 설비 고장내역 등록
+        EquipmentBreakdown equipmentBreakdown = new EquipmentBreakdown();
+        equipmentBreakdown.setBreakDownDate(LocalDate.now());
+        equipmentBreakdown.setEquipment(equipmentLot.getEquipment());
+        equipmentBreakdown.setReportDate(LocalDateTime.now());
+        equipmentBreakdown.setBreakReason(breakReason);
+        equipmentBreakdown.setVisibleYn(true);
+        equipmentBreakdownRepo.save(equipmentBreakdown);
     }
 
     // 설비 단일 조회 및 예외

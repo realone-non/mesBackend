@@ -2,6 +2,7 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.PopWorkOrderStates;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.repository.custom.LotEquipmentConnectRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -20,6 +21,8 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
     final QLotEquipmentConnect lotEquipmentConnect = QLotEquipmentConnect.lotEquipmentConnect;
     final QLotMaster lotMaster = QLotMaster.lotMaster;
     final QEquipment equipment = QEquipment.equipment;
+    final QLotLog lotLog = QLotLog.lotLog;
+    final QWorkProcess workProcess = QWorkProcess.workProcess;
 
     // 오늘날짜, 같은 설비 기준으로 equipmentLot 조회
     @Override
@@ -71,5 +74,30 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
                         lotEquipmentConnect.parentLot.id.eq(dummyLotId)
                 )
                 .fetch();
+    }
+
+    // 작업공정이 원료혼합이고, 오늘 생산된 lotMaster, 작업지시가 같음 찾아야함
+    @Override
+    public Optional<LotEquipmentConnect> findByTodayAndWorkProcessDivision(
+            LocalDate now,
+            WorkProcessDivision workProcessDivision,
+            Long workOrderId
+    ) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(lotEquipmentConnect)
+                        .from(lotEquipmentConnect)
+                        .leftJoin(lotMaster).on(lotMaster.id.eq(lotEquipmentConnect.childLot.id))
+                        .leftJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
+                        .leftJoin(lotLog).on(lotLog.lotMaster.id.eq(lotEquipmentConnect.parentLot.id))
+                        .where(
+                                lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0)),
+                                workProcess.workProcessDivision.eq(workProcessDivision),
+                                lotMaster.deleteYn.isFalse(),
+                                lotLog.workOrderDetail.id.eq(workOrderId),
+                                lotLog.workOrderDetail.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
     }
 }
