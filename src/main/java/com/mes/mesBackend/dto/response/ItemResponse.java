@@ -99,6 +99,9 @@ public class ItemResponse {
     @Schema(description = "검사방법")
     InspectionType inspectionType;
 
+    @Schema(description = "약어명")
+    String itemShortName;
+
     @Getter
     @Setter
     @JsonInclude(NON_NULL)
