@@ -47,6 +47,9 @@ public interface PurchaseOrderRepositoryCustom {
             LocalDate toDate
     );
 
+    // 9-3. 발주현황조회 단일
+    Optional<PurchaseOrderStatusResponse> findPurchaseOrderStatusResponse(Long purchaseOrderId);
+
     // pop
     // 구매발주 등록이 완료 된 구매발주 리스트 GET
     List<PopPurchaseOrderResponse> findPopPurchaseOrderResponses(String clientName);

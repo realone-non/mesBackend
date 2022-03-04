@@ -18,7 +18,7 @@ public interface PopService {
     // 작업지시 진행상태 정보 조회
     List<PopWorkOrderStates> getPopWorkOrderStates(Long workOrderId) throws NotFoundException;
     // 작업지시 진행상태 변경
-    void updatePopWorkOrderState(Long lotMasterId, ProcessStatus processStatus) throws NotFoundException;
+    void updatePopWorkOrderState(Long lotMasterId, ProcessStatus processStatus) throws NotFoundException, BadRequestException;
     // 작업지시 상태 변경
     Long createWorkOrder(
             Long workOrderId,

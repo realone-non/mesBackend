@@ -1,6 +1,7 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.PurchaseStatusCheckResponse;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
@@ -51,7 +52,7 @@ public class PurchaseStatusCheckController {
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "입고기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "입고기간 toDate") LocalDate toDate,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
+    ) throws NotFoundException {
         List<PurchaseStatusCheckResponse> purchaseStatusChecks = purchaseInputService.getPurchaseStatusChecks(clientId, itemNoAndItemName, fromDate, toDate);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPurchaseStatusChecks.");

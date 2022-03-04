@@ -1,7 +1,9 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -62,4 +64,23 @@ public class PurchaseStatusCheckResponse {
 
     @Schema(description = "LOT 번호")
     String lotNo;
+
+    @JsonIgnore
+    Long purchaseOrderId;
+
+
+    // 구매발주 정보
+    @Schema(description = "발주금액")
+    int orderPrice;
+    @Schema(description = "발주수량")
+    int orderAmount;
+    @Schema(description = "취소수량")
+    int cancelAmount;
+    @Schema(description = "비고")
+    String note;
+    @Schema(description = "지시상태")
+    OrderState orderState;
+    @Schema(description = "담당자")
+    String userName;
+
 }

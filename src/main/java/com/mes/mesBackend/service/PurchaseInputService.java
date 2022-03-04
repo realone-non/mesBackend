@@ -38,5 +38,5 @@ public interface PurchaseInputService {
     // =========================================== 9-4. 구매현황 조회 ===========================================
     // 구매현황 리스트 조회
     // 검색조건: 거래처 id, 품명|품목, 입고기간 fromDate~toDate
-    List<PurchaseStatusCheckResponse> getPurchaseStatusChecks(Long clientId, String itemNoAndItemName, LocalDate fromDate, LocalDate toDate);
+    List<PurchaseStatusCheckResponse> getPurchaseStatusChecks(Long clientId, String itemNoAndItemName, LocalDate fromDate, LocalDate toDate) throws NotFoundException;
 }

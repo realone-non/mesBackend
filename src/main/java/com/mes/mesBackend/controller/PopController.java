@@ -111,13 +111,13 @@ public class PopController {
     @ResponseBody
     @Operation(
             summary = "(pop) 작업지시 진행상태 변경",
-            description = "[원자재 등록: MATERIAL_REGISTRATION, 중간 검사: MIDDLE_TEST, 로트 분할: LOT_DIVIDE]"
+            description = "[원자재 등록: MATERIAL_REGISTRATION, 중간 검사: MIDDLE_TEST, 로트 분할: LOT_DIVIDE] "
     )
     public ResponseEntity updatePopWorkOrderState(
             @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "상태 값") ProcessStatus processStatus,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         popService.updatePopWorkOrderState(lotMasterId, processStatus);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from updatePopWorkOrderState.");
@@ -450,7 +450,7 @@ public class PopController {
     public ResponseEntity createFillingEquipmentError(
             @RequestParam @Parameter(description = "작업지시 id") Long workOrderId,
             @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
-            @RequestParam @Parameter(description = "이전할 설비 id") Long transferEquipmentId,
+            @RequestParam @Parameter(description = "이전할 설비 id") Long transferEquipmentId, // TODO: 삭제
             @RequestParam @Parameter(description = "고장 사유") BreakReason breakReason,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
