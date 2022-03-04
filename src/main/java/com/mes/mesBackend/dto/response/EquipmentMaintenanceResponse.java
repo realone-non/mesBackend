@@ -30,6 +30,12 @@ public class EquipmentMaintenanceResponse {
     @Schema(description = "사용")
     boolean useYn;
 
+    @Schema(description = "상위항목")
+    String parent;
+
+    @Schema(description = "상위항목명")
+    String parentName;
+
     // ============ 수정 기록
     @Schema(description = "사번")
     String userCode;

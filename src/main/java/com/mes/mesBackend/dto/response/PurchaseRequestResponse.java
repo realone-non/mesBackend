@@ -97,6 +97,12 @@ public class PurchaseRequestResponse {
     @Schema(description = "생성 유저권한레벨")
     int insertUserLevel;
 
+    @Schema(description = "재고단위요청수량")
+    int stockUnitRequestAmount;
+
+    @Schema(description = "재고단위발주수량")
+    int stockUnitOrderAmount;
+
     // 수정 기록
     public void modifiedLog(ModifiedLog modifiedLog) {
         setUserCode(modifiedLog.getUserCode());

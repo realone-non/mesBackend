@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -63,4 +64,11 @@ public class EquipmentResponse {
 
     @Schema(description = "사용")
     boolean useYn = true;
+
+    @Schema(description = "수명(월)정보")
+    String life;
+
+    @Schema(description = "최종점검일자")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
+    LocalDate lastTestDate;
 }
