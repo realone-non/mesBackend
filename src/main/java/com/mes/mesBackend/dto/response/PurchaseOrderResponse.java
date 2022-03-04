@@ -85,6 +85,9 @@ public class PurchaseOrderResponse {
     @Schema(description = "특이사항")
     String specialNote;
 
+    @Schema(description = "요청번호")
+    Long purchaseRequestId;
+
     public PurchaseOrderResponse orderStateCondition() {
         return this.orderState.equals(OrderState.COMPLETION) ? this : null;
     }

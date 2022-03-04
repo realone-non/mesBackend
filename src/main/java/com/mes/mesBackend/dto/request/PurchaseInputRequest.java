@@ -48,6 +48,9 @@ public class PurchaseInputRequest {
     @NotNull(message = NOT_NULL)
     boolean processYn;
 
+    @Schema(description = "거래처 LOT 번호")
+    String clientLotNo;
+
     // 구매입고 수정
     @Getter
     @Setter

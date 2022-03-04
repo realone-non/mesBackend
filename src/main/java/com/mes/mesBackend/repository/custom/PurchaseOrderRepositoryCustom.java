@@ -33,6 +33,9 @@ public interface PurchaseOrderRepositoryCustom {
     // 발주등록상세 리스트 전체조회
     List<PurchaseOrderDetailResponse> findAllByPurchaseOrderIdAndDeleteYnFalse(Long purchaseOrderId);
 
+    // 구매발주에 등록된 구매요청 하나 조회
+    Optional<Long> findOneByPurchaseRequestId(Long purchaseOrderId);
+
     // 9-3. 발주현황조회
     // 검색조건: 화폐 id, 담당자 id, 거래처 id, 입고창고 id, 발주기간 fromDate~toDate
     List<PurchaseOrderStatusResponse> findPurchaseOrderStatusResponseAllByCondition(

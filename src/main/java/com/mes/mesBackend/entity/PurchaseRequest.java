@@ -93,6 +93,9 @@ public class PurchaseRequest extends BaseTimeEntity {
     @Column(name = "STOCK_UNIT_ORDER_AMOUNT", columnDefinition = "int COMMENT '재고단위발주수량'")
     private int stockUnitOrderAmount;
 
+    @Column(name = "INPUT_TEST_YN", columnDefinition = "bit(1) COMMENT '수입검사여부'")
+    private boolean inputTestYn;
+
     public void update(
             PurchaseRequest newPurchaseRequest,
             ProduceOrder newProduceOrder,
@@ -104,8 +107,9 @@ public class PurchaseRequest extends BaseTimeEntity {
         setRequestAmount(newPurchaseRequest.requestAmount);
         setPeriodDate(newPurchaseRequest.periodDate);
         setNote(newPurchaseRequest.note);
-        setStockUnitRequestAmount(newPurchaseRequest.getRequestAmount());
+        setStockUnitRequestAmount(newPurchaseRequest.stockUnitRequestAmount);
         setStockUnitOrderAmount(newPurchaseRequest.stockUnitOrderAmount);
+        setInputTestYn(newPurchaseRequest.inputTestYn);
     }
 
     public void mapping(
