@@ -33,5 +33,9 @@ public interface WorkCenterCheckService {
     // 작업장별 점검유형 세부 조회
     WorkCenterCheckDetailResponse getWorkCenterCheckDetail(Long workCenterCheckId, Long workCenterCheckDetailId) throws NotFoundException;
     // 작업장별 점검유형 세부 생성
-    WorkCenterCheckDetailResponse createWorkCenterCheckDetail(Long workCenterCheckId, WorkCenterCheckDetailRequest workCenterCheckDetailRequest) throws NotFoundException, BadRequestException;
+    WorkCenterCheckDetailResponse createWorkCenterCheckDetail(
+            Long workCenterCheckId,
+            WorkCenterCheckDetailRequest workCenterCheckDetailRequest,
+            String userCode
+    ) throws NotFoundException, BadRequestException;
 }

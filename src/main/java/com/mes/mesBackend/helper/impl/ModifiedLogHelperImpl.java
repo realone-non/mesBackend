@@ -17,17 +17,35 @@ public class ModifiedLogHelperImpl implements ModifiedLogHelper {
     private final UserRepository userRepo;
     private final ModifiedLogRepository modifiedLogRepo;
 
+    // 업데이트 시 로그 생성
     @Override
     public <T> void createModifiedLog(String userCode, ModifiedDivision modifiedDivision, T t) throws NotFoundException {
         User user = getUserOrThrow(userCode);
         ModifiedLog modifiedLog = new ModifiedLog();
-        modifiedLog.created(user.getUserCode(), modifiedDivision, user.getLevel(), t);
+        modifiedLog.created(user.getUserCode(), modifiedDivision, user.getLevel(), t, false);
         modifiedLogRepo.save(modifiedLog);
     }
 
+    // 생성 시 로그 생성
+    @Override
+    public <T> void createInsertLog(String userCode, ModifiedDivision modifiedDivision, T t) throws NotFoundException {
+        User user = getUserOrThrow(userCode);
+        ModifiedLog modifiedLog = new ModifiedLog();
+        modifiedLog.created(user.getUserCode(), modifiedDivision, user.getLevel(), t, true);
+        modifiedLogRepo.save(modifiedLog);
+    }
+
+    // 업데이트 기록 조회
     @Override
     public ModifiedLog getModifiedLog(ModifiedDivision modifiedDivision, Long divisionId) {
         return modifiedLogRepo.findByModifiedDivisionId(divisionId, modifiedDivision)
+                .orElse(null);
+    }
+
+    // 생성 기록 조회
+    @Override
+    public ModifiedLog getInsertLog(ModifiedDivision modifiedDivision, Long divisionId) {
+        return modifiedLogRepo.findByInsertDivisionId(divisionId, modifiedDivision)
                 .orElse(null);
     }
 
