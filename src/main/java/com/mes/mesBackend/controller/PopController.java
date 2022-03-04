@@ -450,7 +450,7 @@ public class PopController {
     public ResponseEntity createFillingEquipmentError(
             @RequestParam @Parameter(description = "작업지시 id") Long workOrderId,
             @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
-            @RequestParam @Parameter(description = "이전할 설비 id") Long transferEquipmentId,
+            @RequestParam @Parameter(description = "이전할 설비 id") Long transferEquipmentId, // TODO: 삭제
             @RequestParam @Parameter(description = "고장 사유") BreakReason breakReason,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {

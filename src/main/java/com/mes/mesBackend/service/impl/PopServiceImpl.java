@@ -154,12 +154,6 @@ public class PopServiceImpl implements PopService {
      * productionPerformance(작업지시의 상태값이 ONGOING -> COMPLETION 으로 변경되는 시점에서 create or update): 더미로트로 생성
      * workOrderDetailUserLog: 작업지시에 수량이 update 될 때 마다 insert, equipmentLotMaster: 설비로트
      * */
-
-    private void throwIfProductAmountCheck(int stockAmount, int badItemAmount, int productAmount) throws BadRequestException {
-        if ((stockAmount + badItemAmount) != productAmount) {
-            throw new BadRequestException("입력한 양품수량과 불량수량을 합한 수량이 입력한 생산수량과 같지 않습니다.");
-        }
-    }
     @Override
     public Long createWorkOrder(
             Long workOrderId,
@@ -941,5 +935,12 @@ public class PopServiceImpl implements PopService {
     // 작업수량이 0 이면 예외
     private void throwIfProductAmountIsNotZero(int productAmount) throws BadRequestException {
         if (productAmount == 0) throw new BadRequestException("입력한 작업수량은 0 일 수 없습니다.");
+    }
+
+    // 생산수량 체크
+    private void throwIfProductAmountCheck(int stockAmount, int badItemAmount, int productAmount) throws BadRequestException {
+        if ((stockAmount + badItemAmount) != productAmount) {
+            throw new BadRequestException("입력한 양품수량과 불량수량을 합한 수량이 입력한 생산수량과 같지 않습니다.");
+        }
     }
 }

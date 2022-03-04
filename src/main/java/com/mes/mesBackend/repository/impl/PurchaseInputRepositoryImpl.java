@@ -240,7 +240,8 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                                 purchaseInput.id.as("purchaseInputNo"),
                                 unit.unitCodeName.as("orderUnitCodeName"),
                                 (purchaseInput.inputAmount.multiply(item.inputUnitPrice).doubleValue()).multiply(0.1).as("vat"),
-                                lotMaster.lotNo.as("lotNo")
+                                lotMaster.lotNo.as("lotNo"),
+                                purchaseOrder.id.as("purchaseOrderId")
                         )
                 )
                 .from(purchaseInput)
