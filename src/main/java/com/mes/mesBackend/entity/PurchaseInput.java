@@ -56,6 +56,9 @@ public class PurchaseInput extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;
 
+    @Column(name = "CLIENT_LOT_NO", columnDefinition = "varchar(255) COMMENT '거래처 LOT 번호'")
+    private String clientLotNo;
+
     public void put(PurchaseInput newPurchaseInput) {
         setInputAmount(newPurchaseInput.inputAmount);
         setValidDate(newPurchaseInput.validDate);
@@ -63,6 +66,7 @@ public class PurchaseInput extends BaseTimeEntity {
         setUrgentYn(newPurchaseInput.urgentYn);
         setTestReportYn(newPurchaseInput.testReportYn);
         setCoc(newPurchaseInput.coc);
+        setClientLotNo(newPurchaseInput.clientLotNo);
     }
 
     public void delete() {

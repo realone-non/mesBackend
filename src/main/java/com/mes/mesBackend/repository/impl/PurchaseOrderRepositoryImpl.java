@@ -288,7 +288,8 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 wareHouse.wareHouseName.as("wareHouseName"),
                                 currency.currency.as("currencyUnit"),
                                 purchaseRequest.cancelAmount.as("cancelAmount"),
-                                purchaseRequest.ordersState.as("orderState")
+                                purchaseRequest.ordersState.as("orderState"),
+                                purchaseOrder.createdDate.as("createdDate")
                         )
                 )
                 .from(purchaseRequest)
@@ -336,6 +337,22 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                 .groupBy(purchaseOrder.id)
                 .orderBy(purchaseOrder.purchaseOrderDate.desc())
                 .fetch();
+    }
+
+    // 구매발주에 등록된 구매요청 하나 조회
+    @Override
+    public Optional<Long> findOneByPurchaseRequestId(Long purchaseOrderId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(purchaseRequest.id)
+                        .from(purchaseRequest)
+                        .where(
+                                purchaseRequest.purchaseOrder.id.eq(purchaseOrderId)
+                        )
+                        .orderBy(purchaseRequest.createdDate.asc())
+                        .limit(1)
+                        .fetchOne()
+        );
     }
 
     private BooleanExpression isClientNameContain(String clientName) {

@@ -44,4 +44,7 @@ public class PurchaseRequestRequest {
 
     @Schema(description = "재고단위발주수량")
     int stockUnitOrderAmount;
+
+    @Schema(description = "수입검사여부")
+    boolean inputTestYn;
 }

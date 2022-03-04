@@ -110,6 +110,12 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                                 findPeriodDate(purchaseOrder.getId())
                         )
         );
+        // 요청번호 추가: 구매발주에 등록 된 구매요청 1개(조건: 등록순 asc)
+        purchaseOrders.forEach(
+                purchaseOrder ->
+                        purchaseOrder.setPurchaseRequestId(purchaseOrderRepo.findOneByPurchaseRequestId(purchaseOrder.getId())
+                                .orElse(null))
+        );
 
         // 검색조건 orderCompletion 에 대한 필터
         List<PurchaseOrderResponse> purchaseOrdersByOrderStateCompletion = new ArrayList<>();

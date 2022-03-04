@@ -103,6 +103,9 @@ public class PurchaseRequestResponse {
     @Schema(description = "재고단위발주수량")
     int stockUnitOrderAmount;
 
+    @Schema(description = "수입검사여부")
+    boolean inputTestYn;
+
     // 수정 기록
     public void modifiedLog(ModifiedLog modifiedLog) {
         setUserCode(modifiedLog.getUserCode());
