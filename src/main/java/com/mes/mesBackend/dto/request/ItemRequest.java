@@ -127,4 +127,7 @@ public class ItemRequest {
     @Schema(description = "검사방법 [Sampling: SAMPLING, 전수: FULL_INSPECTION]")
     @NotNull(message = NOT_NULL)
     InspectionType inspectionType;  // 검사방법: ex) Sampling, 전수
+
+    @Schema(description = "약어명")
+    String itemShortName;
 }

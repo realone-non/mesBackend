@@ -57,4 +57,7 @@ public class PurchaseInputDetailResponse {
 
     @Schema(description = "COC")
     boolean coc;
+
+    @Schema(description = "거래처 LOT 번호")
+    String clientLotNo;
 }

@@ -35,10 +35,18 @@ public class EquipmentMaintenance extends BaseTimeEntity {
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
+    @Column(name = "PARENT", columnDefinition = "varchar(255) COMMENT '상위항목'")
+    private String parent;
+
+    @Column(name = "PARENT_NAME", columnDefinition = "varchar(255) COMMENT '상위항목명'")
+    private String parentName;
+
     public void update(EquipmentMaintenance newEquipmentMaintenance) {
         setMaintenanceCode(newEquipmentMaintenance.maintenanceCode);
         setMaintenanceName(newEquipmentMaintenance.maintenanceName);
         setUseYn(newEquipmentMaintenance.useYn);
+        setParent(newEquipmentMaintenance.parent);
+        setParentName(newEquipmentMaintenance.parentName);
     }
 
     public void delete() {

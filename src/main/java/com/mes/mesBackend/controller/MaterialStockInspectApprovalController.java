@@ -58,7 +58,7 @@ public class MaterialStockInspectApprovalController {
     ) throws NotFoundException {
         List<MaterialStockInspectResponse> responseList = materialWarehouseService.createStockInspectApproval(requestId, logService.getUserCodeFromHeader(tokenHeader));
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the stockInspect requestId:" + requestId + " from createStockInspectData.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + "is created the stockInspect by requestId:" + requestId + " from createStockInspectData.");
         return new ResponseEntity<>(responseList, OK);
     }
 

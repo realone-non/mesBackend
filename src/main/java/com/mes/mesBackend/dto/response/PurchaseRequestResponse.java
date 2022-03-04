@@ -88,10 +88,35 @@ public class PurchaseRequestResponse {
     @Schema(description = "유저권한레벨")
     int userLevel;
 
+    // ============ 생성 기록
+    @Schema(description = "사번")
+    String insertUserCode;
+    @Schema(description = "생성일자")
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM_SS, timezone = ASIA_SEOUL)
+    LocalDateTime insertDate;
+    @Schema(description = "생성 유저권한레벨")
+    int insertUserLevel;
 
+    @Schema(description = "재고단위요청수량")
+    int stockUnitRequestAmount;
+
+    @Schema(description = "재고단위발주수량")
+    int stockUnitOrderAmount;
+
+    @Schema(description = "수입검사여부")
+    boolean inputTestYn;
+
+    // 수정 기록
     public void modifiedLog(ModifiedLog modifiedLog) {
         setUserCode(modifiedLog.getUserCode());
-        setUpdateDate(modifiedLog.getModifiedDate());
+        setUpdateDate(modifiedLog.getDate());
         setUserLevel(modifiedLog.getUserLevel());
+    }
+
+    // 생성 기록
+    public void insertLog(ModifiedLog modifiedLog) {
+        setInsertUserCode(modifiedLog.getUserCode());
+        setInsertDate(modifiedLog.getDate());
+        setInsertUserLevel(modifiedLog.getUserLevel());
     }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface WorkDocumentService {
     // 작업표준서 생성
-    WorkDocumentResponse createWorkDocument(WorkDocumentRequest workDocumentRequest) throws NotFoundException;
+    WorkDocumentResponse createWorkDocument(WorkDocumentRequest workDocumentRequest, String userCode) throws NotFoundException;
     // 작업표준서 단일 조회
     WorkDocumentResponse getWorkDocument(Long id) throws NotFoundException;
     // 작업표준서 전체 조회 검색조건: 품목그룹, 품목계정, 품번, 품명

@@ -63,7 +63,7 @@ public class PurchaseInputResponse {
     // 어디에 납기일자 ?
     // 구매발주등록 디테일에 보여주는 데이터
     @Schema(description = "납기일자")
-    @JsonFormat(pattern = YYYY_MM_DD, timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate periodDate;
 
     @Schema(description = "발주번호")

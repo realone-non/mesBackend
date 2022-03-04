@@ -17,14 +17,33 @@ public class ModifiedLogRepositoryImpl implements ModifiedLogRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
     private final QModifiedLog modifiedLog = QModifiedLog.modifiedLog;
 
+    // 수정 기록 생성
     @Override
     public Optional<ModifiedLog> findByModifiedDivisionId(Long divisionId, ModifiedDivision modifiedDivision) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .select(modifiedLog)
                         .from(modifiedLog)
-                        .where(isModifiedDivision(divisionId, modifiedDivision))
-                        .orderBy(modifiedLog.modifiedDate.desc())
+                        .where(
+                                isModifiedDivision(divisionId, modifiedDivision),
+                                modifiedLog.division.isFalse()
+                        )
+                        .orderBy(modifiedLog.date.desc())
+                        .fetchFirst()
+        );
+    }
+
+    // 생성 기록 생성
+    @Override
+    public Optional<ModifiedLog> findByInsertDivisionId(Long divisionId, ModifiedDivision modifiedDivision) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(modifiedLog)
+                        .where(
+                                isModifiedDivision(divisionId, modifiedDivision),
+                                modifiedLog.division.isTrue()
+                        )
+                        .orderBy(modifiedLog.date.desc())
                         .fetchFirst()
         );
     }

@@ -57,9 +57,10 @@ public class PurchaseRequestController {
             @RequestBody @Valid PurchaseRequestRequest purchaseRequestRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws BadRequestException, NotFoundException {
-        PurchaseRequestResponse purchaseRequest = purchaseRequestService.createPurchaseRequest(purchaseRequestRequest);
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        PurchaseRequestResponse purchaseRequest = purchaseRequestService.createPurchaseRequest(purchaseRequestRequest, userCode);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + purchaseRequest.getId() + " from createPurchaseRequest.");
+        cLogger.info(userCode + " is created the " + purchaseRequest.getId() + " from createPurchaseRequest.");
         return new ResponseEntity<>(purchaseRequest, OK);
     }
 

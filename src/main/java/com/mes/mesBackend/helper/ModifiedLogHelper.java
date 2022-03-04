@@ -8,6 +8,10 @@ import com.mes.mesBackend.exception.NotFoundException;
 public interface ModifiedLogHelper {
     // 업데이트 시 로그 생성
     <T> void createModifiedLog(String userCode, ModifiedDivision modifiedDivision, T t) throws NotFoundException;
-    // 조회
+    // 생성 시 로그 생성
+    <T> void createInsertLog(String userCode, ModifiedDivision modifiedDivision, T t) throws NotFoundException;
+    // 업데이트 기록 조회
     ModifiedLog getModifiedLog(ModifiedDivision modifiedDivision, Long divisionId);
+    // 생성 기록 조회
+    ModifiedLog getInsertLog(ModifiedDivision modifiedDivision, Long divisionId);
 }

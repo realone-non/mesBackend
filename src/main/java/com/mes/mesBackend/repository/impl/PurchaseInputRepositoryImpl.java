@@ -176,7 +176,8 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                                 item.inspectionType.as("inspectionType"),   // 검사방법 ex) 샘플링
                                 purchaseInput.urgentYn.as("urgentYn"),
                                 purchaseInput.testReportYn.as("testReportYn"),
-                                purchaseInput.coc.as("coc")
+                                purchaseInput.coc.as("coc"),
+                                purchaseInput.clientLotNo.as("clientLotNo")
                         )
                 )
                 .from(purchaseInput)
