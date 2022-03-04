@@ -7,12 +7,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
-
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static com.mes.mesBackend.exception.Message.NOT_EMPTY;
 import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM_SS;
 
@@ -66,9 +63,26 @@ public class WorkCenterCheckDetailResponse {
     @Schema(description = "유저권한레벨")
     int userLevel;
 
+    // ============ 생성 기록
+    @Schema(description = "사번")
+    String insertUserCode;
+    @Schema(description = "생성일자")
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM_SS, timezone = ASIA_SEOUL)
+    LocalDateTime insertDate;
+    @Schema(description = "생성 유저권한레벨")
+    int insertUserLevel;
+
+    // 수정 기록
     public void modifiedLog(ModifiedLog modifiedLog) {
         setUserCode(modifiedLog.getUserCode());
-        setUpdateDate(modifiedLog.getModifiedDate());
+        setUpdateDate(modifiedLog.getDate());
         setUserLevel(modifiedLog.getUserLevel());
+    }
+
+    // 생성 기록
+    public void insertLog(ModifiedLog modifiedLog) {
+        setInsertUserCode(modifiedLog.getUserCode());
+        setInsertDate(modifiedLog.getDate());
+        setInsertUserLevel(modifiedLog.getUserLevel());
     }
 }

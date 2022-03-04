@@ -29,8 +29,8 @@ public class ModifiedLog {
     @Column(name = "MODIFIED_DIVISION", columnDefinition = "varchar(255) COMMENT '구분'", nullable = false)
     private ModifiedDivision modifiedDivision;
 
-    @Column(name = "MODIFIED_DATE", columnDefinition = "datetime COMMENT '수정일'", nullable = false)
-    private LocalDateTime modifiedDate;
+    @Column(name = "DATE", columnDefinition = "datetime COMMENT '수정, 생성일'", nullable = false)
+    private LocalDateTime date;
 
     @Column(name = "USER_LEVEL", columnDefinition = "int COMMENT '유저권한레벨'", nullable = false)
     private int userLevel;
@@ -67,15 +67,19 @@ public class ModifiedLog {
     @JoinColumn(name = "WORK_CENTER_CHECK_DETAIL", columnDefinition = "bigint COMMENT '작업장별 점검항목'")
     private WorkCenterCheckDetail workCenterCheckDetail;
 
-    public <T> ModifiedLog created(String userCode, ModifiedDivision modifiedDivision, int userLevel, T t) {
+    @Column(name = "DIVISION", columnDefinition = "bit(1) COMMENT '생성, 수정 구분'")
+    private boolean division;   // false: 수정, true: 생성
+
+    public <T> ModifiedLog created(String userCode, ModifiedDivision modifiedDivision, int userLevel, T t, boolean division) {
         setUserCode(userCode);
-        setModifiedDate(LocalDateTime.now());
         setModifiedDivision(modifiedDivision);
         setUserLevel(userLevel);
+        setDivision(division);
+        setDate(LocalDateTime.now());
 
         switch (modifiedDivision) {
             case UNIT: setUnit(t);
-                break;
+               break;
             case ITEM_GROUP: setItemGroup(t);
                 break;
             case WORK_PROCESS: setWorkProcess(t);

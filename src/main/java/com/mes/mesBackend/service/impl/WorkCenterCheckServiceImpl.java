@@ -112,7 +112,8 @@ public class WorkCenterCheckServiceImpl implements WorkCenterCheckService {
     @Override
     public WorkCenterCheckDetailResponse createWorkCenterCheckDetail(
             Long workCenterCheckId,
-            WorkCenterCheckDetailRequest workCenterCheckDetailRequest
+            WorkCenterCheckDetailRequest workCenterCheckDetailRequest,
+            String userCode
     ) throws NotFoundException, BadRequestException {
         // lsl, usl 소수점 검증
         checkDecimalPoint(workCenterCheckDetailRequest.getLsl(), "lsl decimal point is 3 decimal places.");
@@ -121,6 +122,7 @@ public class WorkCenterCheckServiceImpl implements WorkCenterCheckService {
         WorkCenterCheckDetail workCenterCheckDetail = mapper.toEntity(workCenterCheckDetailRequest, WorkCenterCheckDetail.class);
         workCenterCheckDetail.add(workCenterCheck);
         workCenterCheckDetailRepository.save(workCenterCheckDetail);
+        modifiedLogHelper.createInsertLog(userCode, WORK_CENTER_CHECK_DETAIL, workCenterCheckDetail);   // insert 로그 생성
         return mapper.toResponse(workCenterCheckDetail, WorkCenterCheckDetailResponse.class);
     }
 
@@ -163,7 +165,9 @@ public class WorkCenterCheckServiceImpl implements WorkCenterCheckService {
         List<WorkCenterCheckDetailResponse> responses = mapper.toListResponses(workCenterCheckDetails, WorkCenterCheckDetailResponse.class);
         for (WorkCenterCheckDetailResponse r : responses) {
             ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(WORK_CENTER_CHECK_DETAIL, r.getId());
+            ModifiedLog insertLog = modifiedLogHelper.getInsertLog(WORK_CENTER_CHECK_DETAIL, r.getId());
             if (modifiedLog != null) r.modifiedLog(modifiedLog);
+            if (insertLog != null) r.insertLog(insertLog);
         }
         return responses;
     }
