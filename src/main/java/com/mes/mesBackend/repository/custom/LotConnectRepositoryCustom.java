@@ -22,6 +22,8 @@ public interface LotConnectRepositoryCustom {
     List<PopLotMasterResponse> findPopLotMasterResponseByEquipmentLotId(Long equipmentLotId);
     // realLot 에 해당하는 equipmentLotId 조회, 구분 값: FAMILY
     Optional<LotConnect> findByChildLotIdAndDivisionFamily(Long childLotId);
-    // equipmentLotId(parentLot.childLot) 로 오늘 생성, 공정 원료혼합
-    Optional<LotConnect> findByParentLotOfEquipmentLotId(Long equipmentLotId, WorkProcessDivision workProcessDivision, LocalDate now, Long produceOrderId, Long inputEquipmentId);
+    // 제조오더에 해당되고 입력한 설비랑 같은 원료혼합 재고수량이 1 이상인 lot
+    Optional<LotConnect> findByTodayProduceOrderAndEquipmentIdEqAndLotStockAmountOneLoe(Long produceOrderId, Long equipmentId, LocalDate now);
+    // 제조오더에 해당되고, 입력한 충진 설비 lot 가 고장이었는지
+    boolean existsByProduceOrderLotConnectIsError(Long produceOrderId, Long fillingEquLotMasterId);
 }

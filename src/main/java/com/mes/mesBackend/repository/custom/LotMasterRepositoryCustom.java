@@ -67,4 +67,10 @@ public interface LotMasterRepositoryCustom {
     // 생성날짜가 오늘이고, lotDivision 이 dummny 인 걸 찾아옴
     Optional<String> findDummyNoByDivision(LotMasterDivision lotMasterDivision, LocalDate startDate);
     Optional<BadItemWorkOrderResponse.subDto> findLotMaterByDummyLotIdAndWorkProcessId(Long dummyLotId, Long workProcessId);
+    // 생성날짜가 오늘이고, 공정구분, inputEquipment 가 같은거
+    Optional<LotMaster> findByTodayAndWorkProcessDivisionEqAndInputEquipmentEq(
+            LocalDate now,
+            WorkProcessDivision workProcessDivision,
+            Long inputEquipmentId
+    );
 }

@@ -515,6 +515,25 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
         );
     }
 
+    // 생성날짜가 오늘이고, 공정구분, inputEquipment 가 같은거
+    @Override
+    public Optional<LotMaster> findByTodayAndWorkProcessDivisionEqAndInputEquipmentEq(LocalDate now, WorkProcessDivision workProcessDivision, Long inputEquipmentId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(lotMaster)
+                        .where(
+                                lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0)),
+                                lotMaster.workProcess.workProcessDivision.eq(workProcessDivision),
+                                lotMaster.inputEquipment.id.eq(inputEquipmentId),
+                                lotMaster.deleteYn.isFalse(),
+                                lotMaster.exhaustYn.isFalse(),
+                                lotMaster.stockAmount.goe(1),
+                                lotMaster.lotMasterDivision.eq(REAL_LOT)
+                        )
+                        .fetchOne()
+        );
+    }
+
     // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 유효여부
     // 품목그룹
     private BooleanExpression isItemGroupEq(Long itemGroupId) {

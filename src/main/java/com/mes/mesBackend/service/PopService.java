@@ -19,7 +19,7 @@ public interface PopService {
     List<PopWorkOrderStates> getPopWorkOrderStates(Long workOrderId) throws NotFoundException;
     // 작업지시 진행상태 변경
     void updatePopWorkOrderState(Long lotMasterId, ProcessStatus processStatus) throws NotFoundException, BadRequestException;
-    // 작업지시 상태 변경
+    // 작업지시 상태 변경 (작업완료)
     Long createWorkOrder(
             Long workOrderId,
             Long itemId,
@@ -66,5 +66,5 @@ public interface PopService {
     // 충진공정 설비 선택
     void putFillingEquipmentOfRealLot(Long lotMasterId, Long equipmentId) throws NotFoundException, BadRequestException;
     // 충진공정 설비 고장등록 api
-    void createFillingEquipmentError(Long workOrderId, Long lotMasterId, Long transferEquipmentId, BreakReason breakReason) throws NotFoundException, BadRequestException;
+    void createFillingEquipmentError(Long workOrderId, Long lotMasterId, BreakReason breakReason) throws NotFoundException, BadRequestException;
 }

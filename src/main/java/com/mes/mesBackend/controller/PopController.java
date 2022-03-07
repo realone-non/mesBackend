@@ -111,7 +111,8 @@ public class PopController {
     @ResponseBody
     @Operation(
             summary = "(pop) 작업지시 진행상태 변경",
-            description = "[원자재 등록: MATERIAL_REGISTRATION, 중간 검사: MIDDLE_TEST, 로트 분할: LOT_DIVIDE] "
+            description = "[원자재 등록: MATERIAL_REGISTRATION, 중간 검사: MIDDLE_TEST, 로트 분할: LOT_DIVIDE] <br />" +
+                    "설비로트의 생산공정이 충진이고, 상태값이 MIDDLE_TEST 이면 원료혼합의 반제품이 소진된다."
     )
     public ResponseEntity updatePopWorkOrderState(
             @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
@@ -429,7 +430,7 @@ public class PopController {
     @SecurityRequirement(name = AUTHORIZATION)
     @PutMapping("/filling-equipments")
     @ResponseBody
-    @Operation(summary = "(pop) 충진공정 설비 선택", description = "")
+    @Operation(summary = "(pop) 충진공정 설비 선택", description = "등록 완료 시 설비의 생산가능 상태가 false 로 변경됨. [생산가능: true, 생산불가능: false]")
     public ResponseEntity putFillingEquipmentOfRealLot(
             @RequestParam @Parameter(description = "분할 lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "충진공정 설비 id") Long equipmentId,
@@ -450,12 +451,11 @@ public class PopController {
     public ResponseEntity createFillingEquipmentError(
             @RequestParam @Parameter(description = "작업지시 id") Long workOrderId,
             @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
-            @RequestParam @Parameter(description = "이전할 설비 id") Long transferEquipmentId, // TODO: 삭제
             @RequestParam @Parameter(description = "고장 사유") BreakReason breakReason,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
-        popService.createFillingEquipmentError(workOrderId, lotMasterId, transferEquipmentId, breakReason);
+        popService.createFillingEquipmentError(workOrderId, lotMasterId, breakReason);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is viewed the list of from createFillingEquipmentError.");
         return new ResponseEntity<>(OK);

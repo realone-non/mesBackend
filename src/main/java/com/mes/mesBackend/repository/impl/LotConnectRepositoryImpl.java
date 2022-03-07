@@ -17,8 +17,10 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.GoodsType.HALF_PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.FAMILY;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 
 @RequiredArgsConstructor
 public class LotConnectRepositoryImpl implements LotConnectRepositoryCustom {
@@ -162,41 +164,47 @@ public class LotConnectRepositoryImpl implements LotConnectRepositoryCustom {
         );
     }
 
-    // equipmentLotId(parentLot.childLot) 로 realLot 가 오늘 생성, 공정 원료혼합
+    // 제조오더에 해당되고 입력한 설비랑 같은 원료혼합 재고수량이 1 이상인 lot
     @Override
-    public Optional<LotConnect> findByParentLotOfEquipmentLotId(
-            Long equipmentLotId,
-            WorkProcessDivision workProcessDivision,
-            LocalDate now,
-            Long produceOrderId,
-            Long inputEquipmentId
-    ) {
+    public Optional<LotConnect> findByTodayProduceOrderAndEquipmentIdEqAndLotStockAmountOneLoe(Long produceOrderId, Long inputEquipmentId, LocalDate now) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .select(lotConnect)
                         .from(lotConnect)
-                        .leftJoin(lotEquipmentConnect).on(lotEquipmentConnect.id.eq(lotConnect.parentLot.id))
-                        .leftJoin(lotLog).on(lotLog.lotMaster.id.eq(lotEquipmentConnect.parentLot.id))
-                        .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
-                        .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
-                        .leftJoin(lotMaster).on(lotMaster.id.eq(lotEquipmentConnect.childLot.id))
+                        .leftJoin(lotLog).on(lotLog.lotMaster.id.eq(lotConnect.parentLot.parentLot.id))
                         .where(
-                                isLotMasterIdEq(equipmentLotId),
-                                lotMaster.workProcess.workProcessDivision.eq(workProcessDivision),
-                                lotMaster.deleteYn.isFalse(),
-                                lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0)),
-                                lotMaster.workProcess.workProcessDivision.eq(workProcessDivision),
-                                produceOrder.id.eq(produceOrderId),
-                                lotConnect.division.eq(FAMILY)
-//                                lotMaster.lotMasterDivision.eq(LotMasterDivision.REAL_LOT)
-//                                isInputEquipmentIdEq(inputEquipmentId)
+                                lotLog.workOrderDetail.produceOrder.id.eq(produceOrderId),  // 제조오더 같은거
+                                lotConnect.childLot.inputEquipment.id.eq(inputEquipmentId), // 투입 될 충진 설비 같은거
+                                lotConnect.childLot.deleteYn.isFalse(),     // 삭제 안된거
+                                lotConnect.division.eq(FAMILY),             // 분할로트
+                                lotConnect.childLot.lotMasterDivision.eq(REAL_LOT),         // 분할로트
+                                lotConnect.errorYn.isFalse(),               // 에러난거 제외
+                                lotConnect.childLot.exhaustYn.isFalse(),    // 폐기처리된거 제외
+                                lotConnect.childLot.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0)),   // 금일 생산된
+                                lotConnect.childLot.stockAmount.goe(1)  // 재고수량 1 이상
                         )
                         .fetchOne()
         );
     }
 
+    // 제조오더에 해당되고, 입력한 충진 설비 lot 가 고장이었는지
+    @Override
+    public boolean existsByProduceOrderLotConnectIsError(Long produceOrderId, Long fillingEquLotMasterId) {
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(lotConnect)
+                .leftJoin(lotLog).on(lotLog.lotMaster.id.eq(lotConnect.parentLot.parentLot.id))
+                .where(
+                        lotLog.workOrderDetail.produceOrder.id.eq(produceOrderId),  // 제조오더 같은거
+                        lotConnect.parentLot.childLot.id.eq(fillingEquLotMasterId), // 설비 lot 번호
+                        lotConnect.errorYn.isTrue() // 고장처리된거
+                )
+                .fetchFirst();
+        return fetchOne != null;
+    }
+
     private BooleanExpression isInputEquipmentIdEq(Long inputEquipmentId) {
-        return inputEquipmentId != null ? lotMaster.inputEquipment.id.eq(inputEquipmentId) : null;
+        return inputEquipmentId != null ? lotConnect.childLot.inputEquipment.id.eq(inputEquipmentId) : null;
     }
 
 

@@ -94,10 +94,14 @@ public class Equipment extends BaseTimeEntity {
     @Column(name = "LAST_TEST_DATE", columnDefinition = "date COMMENT '최종점검일자'")
     private LocalDate lastTestDate;
 
+    @Column(name = "PRODUCE_YN", columnDefinition = "bit(1) COMMENT '원료혼합 공정 반제품 생성 가능 여부'", nullable = false)
+    private boolean produceYn;  // true: 생성가능, false: 생성 불가능
+
     public void addJoin(Client client, WorkLine workLine, WorkProcess workProcess) {
         setClient(client);
         setWorkLine(workLine);
         setWorkProcess(workProcess);
+        setProduceYn(true);
     }
 
     public void update(Equipment newEquipment, Client newClient, WorkLine newWorkLine, WorkProcess workProcess) {
