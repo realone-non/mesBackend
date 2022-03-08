@@ -3,6 +3,7 @@ package com.mes.mesBackend.service;
 import com.mes.mesBackend.dto.request.WareHouseRequest;
 import com.mes.mesBackend.dto.response.WareHouseResponse;
 import com.mes.mesBackend.entity.WareHouse;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +13,7 @@ import java.util.List;
 // 창고
 public interface WareHouseService {
     // 생성
-    WareHouseResponse createWareHouse(WareHouseRequest wareHouseRequest) throws NotFoundException;
+    WareHouseResponse createWareHouse(WareHouseRequest wareHouseRequest) throws NotFoundException, BadRequestException;
 
     // 단일
     WareHouseResponse getWareHouse(Long id) throws NotFoundException;

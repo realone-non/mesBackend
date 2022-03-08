@@ -85,7 +85,7 @@ public interface WorkOrderDetailRepositoryCustom {
     // =============================================== pop ===============================================
     // 작업지시 정보 리스트, 조건: 작업자, 작업공정
     List<PopWorkOrderResponse> findPopWorkOrderResponsesByCondition(Long workProcessId, LocalDate fromDate);
-    Optional<Item> findPopWorkOrderItem(Long workProcessId, LocalDate fromDate);
+    Optional<Item> findPopWorkOrderItem(Long workProcessId, LocalDate fromDate, Long workOrderId);
     // 작업지시 상세 정보
     List<PopWorkOrderDetailResponse> findPopWorkOrderDetailResponsesByItemId(Long itemId);
     // 수주수량
