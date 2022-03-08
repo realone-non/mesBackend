@@ -117,7 +117,7 @@ public class LotMasterRequest {
         // 설비 로트
         if (division.equals(EQUIPMENT_LOT)) {
             setStockAmount(stockAmount);
-            setBadItemAmount(badItemAmount);
+            setBadItemAmount(this.badItemAmount + badItemAmount);
         }
 
         // 분할 로트

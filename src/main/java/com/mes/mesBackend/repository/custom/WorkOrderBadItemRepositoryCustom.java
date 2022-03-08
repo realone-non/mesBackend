@@ -23,4 +23,8 @@ public interface WorkOrderBadItemRepositoryCustom {
     List<BadItem> findBadItemByCondition(Long workProcessId);
     // equipmentLot 에 해당하는 불량수량 모두
     List<Integer> findBadItemAmountByEquipmentLotMaster(Long equipmentLotId);
+    // 공정에 해당하는 첫번째 불량유형
+    Optional<BadItem> findByWorkOrderIdLimitOne(Long workOrderId);
+    // dummyLot 에 해당되는 불량수량 모두
+    List<Integer> findBadItemAmountByDummyLotMaster(Long dummyLotId);
 }
