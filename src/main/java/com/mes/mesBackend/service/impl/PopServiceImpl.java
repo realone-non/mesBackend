@@ -178,9 +178,12 @@ public class PopServiceImpl implements PopService {
         WorkProcess workProcess = workOrder.getWorkProcess();
         int beforeProductionAmount = workOrder.getProductionAmount();
         Equipment equipment = getEquipmentOrThrow(equipmentId);
+        BadItem badItem = new BadItem();
         // 공정에 해당하는 첫번째 불량유형
-        BadItem badItem = workOrderBadItemRepo.findByWorkOrderIdLimitOne(workProcess.getId())
-                .orElseThrow(() -> new NotFoundException("해당 공정에 등록된 불량유형이 존재하지 않습니다."));
+        if (badItemAmount != 0) {
+            badItem = workOrderBadItemRepo.findByWorkOrderIdLimitOne(workProcess.getId())
+                    .orElseThrow(() -> new NotFoundException("해당 공정에 등록된 불량유형이 존재하지 않습니다."));
+        }
 
         // 작업지시의 상태가 COMPLETION 일 경우 더 이상 추가 할 수 없음. 추가하려면 workOrderDetail 의 productionAmount(지시수량) 을 늘려야함
         // 원료혼합 공정은 제외
