@@ -86,7 +86,7 @@ public class PopServiceImpl implements PopService {
 
         for (PopWorkOrderResponse todayWorkOrder : todayWorkOrders) {
             Item item = workProcessDivision.equals(PACKAGING) ?
-                    workOrderDetailRepository.findPopWorkOrderItem(workProcessId, now).orElseThrow(() -> new NotFoundException("[데이터 오류] 포장공정의 완제품을 찾을 수 없습니다."))
+                    workOrderDetailRepository.findPopWorkOrderItem(workProcessId, now, todayWorkOrder.getWorkOrderId()).orElseThrow(() -> new NotFoundException("[데이터 오류] 포장공정의 완제품을 찾을 수 없습니다."))
                     : workOrderDetailRepository.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(todayWorkOrder.getProduceOrderItemId(), workProcess.getId(), null)
                             .orElseThrow(() -> new NotFoundException("[데이터 오류] 공정에 맞는 반제품 또는 완제품을 찾을 수 없습니다."));
 

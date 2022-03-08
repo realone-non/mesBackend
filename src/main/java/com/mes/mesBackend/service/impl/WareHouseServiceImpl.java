@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.request.WareHouseRequest;
 import com.mes.mesBackend.dto.response.WareHouseResponse;
 import com.mes.mesBackend.entity.WareHouse;
 import com.mes.mesBackend.entity.WareHouseType;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.WareHouseRepository;
@@ -26,8 +27,12 @@ public class WareHouseServiceImpl implements WareHouseService {
 
     // 생성
     @Override
-    public WareHouseResponse createWareHouse(WareHouseRequest wareHouseRequest) throws NotFoundException {
+    public WareHouseResponse createWareHouse(WareHouseRequest wareHouseRequest) throws NotFoundException, BadRequestException {
         WareHouseType wareHouseType = wareHouseTypeService.getWareHouseTypeOrThrow(wareHouseRequest.getWareHouseType());
+
+        // 공정용 창고가 2개 이상 등록되면 안됨
+        if (wareHouseRepository.existsByWorkProcessYnTrueAndDeleteYnFalse()) throw new BadRequestException("공정용 창고는 한개만 등록 가능합니다.");
+
         WareHouse wareHouse = mapper.toEntity(wareHouseRequest, WareHouse.class);
         wareHouse.addJoin(wareHouseType);
         wareHouseRepository.save(wareHouse);

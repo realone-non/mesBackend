@@ -547,7 +547,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     }
 
     @Override
-    public Optional<Item> findPopWorkOrderItem(Long workProcessId, LocalDate fromDate) {
+    public Optional<Item> findPopWorkOrderItem(Long workProcessId, LocalDate fromDate, Long workOrderId) {
         return Optional.ofNullable(jpaQueryFactory
                 .select(item)
                 .from(workOrderDetail)
@@ -559,7 +559,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .where(
                         isWorkProcessIdEq(workProcessId),
                         workOrderDetail.expectedWorkDate.eq(fromDate),
-                        workOrderDetail.deleteYn.isFalse()
+                        workOrderDetail.deleteYn.isFalse(),
+                        workOrderDetail.id.eq(workOrderId)
                 )
                 .fetchOne());
     }
