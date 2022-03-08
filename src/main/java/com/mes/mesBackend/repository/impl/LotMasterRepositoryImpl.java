@@ -16,6 +16,8 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
+import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.FAMILY;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.DUMMY_LOT;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
@@ -38,6 +40,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     final QLotLog lotLog = QLotLog.lotLog;
     final QWorkOrderDetail workOrderDetail = QWorkOrderDetail.workOrderDetail;
     final QLotEquipmentConnect lotEquipmentConnect = QLotEquipmentConnect.lotEquipmentConnect;
+    final QLotConnect lotConnect = QLotConnect.lotConnect;
 
     // id 로 itemAccountCode 의 code 조회
     @Override
@@ -515,6 +518,25 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
         );
     }
 
+    // 생성날짜가 오늘이고, 공정구분, inputEquipment 가 같은거
+    @Override
+    public Optional<LotMaster> findByTodayAndWorkProcessDivisionEqAndInputEquipmentEq(LocalDate now, WorkProcessDivision workProcessDivision, Long inputEquipmentId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(lotMaster)
+                        .where(
+                                lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0)),
+                                lotMaster.workProcess.workProcessDivision.eq(workProcessDivision),
+                                lotMaster.inputEquipment.id.eq(inputEquipmentId),
+                                lotMaster.deleteYn.isFalse(),
+                                lotMaster.exhaustYn.isFalse(),
+                                lotMaster.stockAmount.goe(1),
+                                lotMaster.lotMasterDivision.eq(REAL_LOT)
+                        )
+                        .fetchOne()
+        );
+    }
+
     // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 유효여부
     // 품목그룹
     private BooleanExpression isItemGroupEq(Long itemGroupId) {
@@ -565,6 +587,101 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
         return checkAmountYn != null ?
                 (checkAmountYn ? lotMaster.checkAmount.goe(1).and(lotMaster.checkAmount.lt(lotMaster.stockAmount)) : lotMaster.checkAmount.lt(1))
                 : null;
+    }
+
+    // ================================================== 7-2. Lot Tracking ==============================================
+
+    // lotTracking 검색조건: LOT 번호(필수값), 추적유형(필수값), 품명|품번
+    // 정방향 true: 입력된 LOT 로 생산된 LOT 조회
+    // 입력된 LOT NO 로 등록된 LotConnect 모두
+    @Override
+    public List<LotEquipmentConnect> findExhaustLotByLotNoAndTrackTypeTrue(String lotNo) {
+        return jpaQueryFactory
+                .select(lotEquipmentConnect)
+                .from(lotConnect)
+                .leftJoin(lotMaster).on(lotMaster.id.eq(lotConnect.childLot.id))
+                .leftJoin(lotEquipmentConnect).on(lotEquipmentConnect.id.eq(lotConnect.parentLot.id))
+                .where(
+                        lotMaster.lotNo.eq(lotNo),                   // LOT 번호 같은거
+                        lotConnect.division.eq(EXHAUST),             // 구분값 소진으로 등록
+                        lotMaster.deleteYn.isFalse(),                // 검색할 LOT 삭제 여부
+                        lotMaster.lotMasterDivision.eq(REAL_LOT)     // lotMaster 구분 분할로트
+                )
+                .fetch();
+    }
+
+    // 위에 쿼리에서 return 받은 equipmentLotId 로 lotConnect 의 division 이 분할인걸 찾아서 조회?
+    @Override
+    public List<LotTrackingResponse> findLotTrackingResponseByTrackingTypeTrue(Long lotEquipmentConnectId, String itemNoAndItemName) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                LotTrackingResponse.class,
+                                lotMaster.id.as("lotMasterId"),
+                                lotMaster.lotNo.as("lotNo"),
+                                lotMaster.item.itemNo.as("itemNo"),
+                                lotMaster.item.itemName.as("itemName"),
+                                lotMaster.enrollmentType.as("enrollmentType"),
+                                lotMaster.createdDate.as("createdDate")
+                        )
+                )
+                .from(lotConnect)
+                .leftJoin(lotMaster).on(lotMaster.id.eq(lotConnect.childLot.id))
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .where(
+                        lotConnect.parentLot.childLot.id.eq(lotEquipmentConnectId),      // lotEquipmentConnect 같은거
+                        lotConnect.division.eq(FAMILY),                         // 구분값 분할로트
+                        lotMaster.deleteYn.isFalse(),                           // 검색할 LOT 삭제 여부
+                        isItemNoAndItemNameContain(itemNoAndItemName),          // 품번|품명,
+                        lotMaster.lotMasterDivision.eq(REAL_LOT)                // lotMaster 구분 분할로트
+                )
+                .fetch();
+    }
+
+    // lotTracking 검색조건: LOT 번호(필수값), 추적유형(필수값), 품명|품번
+    // 역방향 false: 입력된 LOT 를 생산하기 위해 투입된 LOT
+    @Override
+    public List<LotTrackingResponse> findLotTrackingResponseByTrackingTypeFalse(Long equipmentLotId, String itemNoAndItemName) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                LotTrackingResponse.class,
+                                lotMaster.id.as("lotMasterId"),
+                                lotMaster.lotNo.as("lotNo"),
+                                lotMaster.item.itemNo.as("itemNo"),
+                                lotMaster.item.itemName.as("itemName"),
+                                lotMaster.enrollmentType.as("enrollmentType"),
+                                lotMaster.createdDate.as("createdDate")
+                        )
+                )
+                .from(lotConnect)
+                .leftJoin(lotMaster).on(lotMaster.id.eq(lotConnect.childLot.id))
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .where(
+                        lotConnect.parentLot.childLot.id.eq(equipmentLotId),
+                        lotConnect.division.eq(EXHAUST),
+                        lotMaster.deleteYn.isFalse(),
+                        isItemNoAndItemNameContain(itemNoAndItemName)
+                )
+                .fetch();
+    }
+
+    // 분할 lotNo 로 설비 LOT id 하나 찾음
+    @Override
+    public Optional<LotMaster> findEquipmentLotMasterByRealLotNo(String realLotNo) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(lotConnect.parentLot.childLot)
+                        .from(lotConnect)
+                        .where(
+                                lotConnect.childLot.lotMasterDivision.eq(REAL_LOT),  // lotMaster 구분 분할로트
+                                lotConnect.division.eq(FAMILY),                    // 구분값 분할
+                                lotConnect.parentLot.childLot.deleteYn.isFalse(),
+                                lotConnect.childLot.lotNo.eq(realLotNo)               // 분할로트
+                        )
+                        .limit(1)
+                        .fetchOne()
+        );
     }
 
     private BooleanExpression isLotNoLengthEq(int length) {

@@ -34,7 +34,7 @@ public interface MaterialWarehouseService {
     //재고실사 삭제
     void deleteMaterialStockInspect(Long requestId, Long inspectId) throws NotFoundException;
     //재고실사 승인 등록
-    List<MaterialStockInspectResponse> createStockInspectApproval(Long requestId, Long userId) throws NotFoundException;
+    List<MaterialStockInspectResponse> createStockInspectApproval(Long requestId, String userCode) throws NotFoundException;
     //재고현황 조회
     JSONArray getMaterialStock(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Long warehouseId);
     //헤더용 창고 목록 조회

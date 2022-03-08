@@ -64,7 +64,8 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                         isWorkCenterEq(workCenterId),
                         isEquipmentTypeContain(workLineId),
                         isWorkDateBetween(fromDate, toDate),
-                        isEquipmentBreakdownDeleteYnFalse()
+                        isEquipmentBreakdownDeleteYnFalse(),
+                        equipmentBreakdown.visibleYn.isFalse()
                 )
                 .fetch();
     }
@@ -102,7 +103,8 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                         .leftJoin(workLine).on(workLine.id.eq(equipment.workLine.id))
                         .where(
                                 isEquipmentBreakdownIdEq(equipmentBreakdownId),
-                                isEquipmentBreakdownDeleteYnFalse()
+                                isEquipmentBreakdownDeleteYnFalse(),
+                                equipmentBreakdown.visibleYn.isFalse()
                         )
                         .fetchOne()
         );

@@ -160,9 +160,10 @@ public class WorkCenterCheckController {
             @RequestBody @Valid WorkCenterCheckDetailRequest workCenterCheckDetailRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        WorkCenterCheckDetailResponse workCenterCheckDetail = workCenterCheckService.createWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailRequest);
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        WorkCenterCheckDetailResponse workCenterCheckDetail = workCenterCheckService.createWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailRequest, userCode);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workCenterCheckDetail.getId()
+        cLogger.info(userCode + " is created the " + workCenterCheckDetail.getId()
                 + " from createWorkCenterCheckDetail.");
         return new ResponseEntity<>(workCenterCheckDetail, OK);
     }
@@ -216,9 +217,10 @@ public class WorkCenterCheckController {
             @RequestBody @Valid WorkCenterCheckDetailRequest workCenterCheckDetailRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        WorkCenterCheckDetailResponse workCenterCheckDetail = workCenterCheckService.updateWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailId, workCenterCheckDetailRequest);
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        WorkCenterCheckDetailResponse workCenterCheckDetail = workCenterCheckService.updateWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailId, workCenterCheckDetailRequest, userCode);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + workCenterCheckDetail.getId() + " from updateWorkCenterCheckDetail.");
+        cLogger.info(userCode + " is modified the " + workCenterCheckDetail.getId() + " from updateWorkCenterCheckDetail.");
         return new ResponseEntity<>(workCenterCheckDetail, OK);
     }
 

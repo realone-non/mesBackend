@@ -3,6 +3,7 @@ package com.mes.mesBackend.helper.impl;
 import com.mes.mesBackend.entity.ProduceOrder;
 import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.WorkOrderStateHelper;
 import com.mes.mesBackend.repository.ProduceOrderRepository;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL_MIXING;
 
 // 작업지시 orderState 변경
 @Component
@@ -44,14 +46,13 @@ public class WorkOrderStateHelperImpl implements WorkOrderStateHelper {
     * 지시수량보다 작업수량이 같거나 커지면? COMPLETION
     * 지시수량보다 작업수량이 작으면? ONGOING
     * 작업수량이 0 이면? SCHEDULE
+    * 원료혼합 공정일 경우? COMPLETION 으로 변경되지 않음
     * */
     @Override
     public OrderState findOrderStateByOrderAmountAndProductAmount(int orderAmount, int productAmount) {
-        OrderState orderState;
-        if (productAmount >= orderAmount) orderState = COMPLETION;
-        else if (productAmount == 0) orderState = SCHEDULE;
-        else  orderState = ONGOING;
-        return orderState;
+        if (productAmount >= orderAmount) return COMPLETION;
+        else if (productAmount == 0) return SCHEDULE;
+        else return ONGOING;
     }
 
     // 제조오더에 해당하는 가장 최근 등록된 작업지시의 orderState

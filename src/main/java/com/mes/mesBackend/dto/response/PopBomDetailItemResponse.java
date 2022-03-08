@@ -1,6 +1,8 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.enumeration.GoodsType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,4 +43,7 @@ public class PopBomDetailItemResponse {
 
     @Schema(description = "bomDetail 단위")
     String bomDetailUnitCodeName;
+
+//    @JsonIgnore
+    GoodsType goodsType;
 }

@@ -24,6 +24,7 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
     final QLotMaster lotMaster = QLotMaster.lotMaster;
     final QBadItem badItem = QBadItem.badItem;
     final QWorkProcess workProcess = QWorkProcess.workProcess;
+    final QLotEquipmentConnect lotEquipmentConnect = QLotEquipmentConnect.lotEquipmentConnect;
 
     @Override
     public Optional<BadItemEnrollmentResponse> findWorkOrderEnrollmentResponseById(Long id) {
@@ -171,6 +172,35 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                         workOrderBadItem.deleteYn.isFalse()
                 )
                 .fetch();
+    }
+
+    // dummyLot 에 해당되는 불량수량 모두
+    @Override
+    public List<Integer> findBadItemAmountByDummyLotMaster(Long dummyLotId) {
+        return jpaQueryFactory
+                .select(workOrderBadItem.badItemAmount)
+                .from(workOrderBadItem)
+                .leftJoin(lotMaster).on(lotMaster.id.eq(workOrderBadItem.lotMaster.id))
+                .leftJoin(lotEquipmentConnect).on(lotEquipmentConnect.childLot.id.eq(lotMaster.id))
+                .where(
+                        lotEquipmentConnect.parentLot.id.eq(dummyLotId),
+                        workOrderBadItem.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+
+    // 공정에 해당하는 첫번째 불량유형
+    @Override
+    public Optional<BadItem> findByWorkOrderIdLimitOne(Long workProcessId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(badItem)
+                        .where(
+                                badItem.workProcess.id.eq(workProcessId),
+                                badItem.deleteYn.isFalse()
+                        )
+                        .fetchFirst()
+        );
     }
 
     private BooleanExpression isWorkProcessIdEq(Long workProcessId) {

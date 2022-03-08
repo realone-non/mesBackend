@@ -24,14 +24,18 @@ public interface WorkCenterCheckService {
 
     /* 작업장별 점검유형 세부항목 */
 
-    // 작업장별 점검유형 세부 생성
-    WorkCenterCheckDetailResponse updateWorkCenterCheckDetail(Long workCenterCheckId, Long workCenterCheckDetailId, WorkCenterCheckDetailRequest workCenterCheckDetailRequest) throws NotFoundException;
-    // 작업장별 점검유형 세부 단일 조회 api
+    // 작업장별 점검유형 세부 수정
+    WorkCenterCheckDetailResponse updateWorkCenterCheckDetail(Long workCenterCheckId, Long workCenterCheckDetailId, WorkCenterCheckDetailRequest workCenterCheckDetailRequest, String userCode) throws NotFoundException;
+    // 작업장별 점검유형 세부 삭제
     void deleteWorkCenterCheck(Long id) throws NotFoundException;
     // 작업장별 점검유형 세부 리스트 조회
     List<WorkCenterCheckDetailResponse> getWorkCenterCheckDetails(Long workCenterCheckId) throws NotFoundException;
-    // 작업장별 점검유형 세부 수정
+    // 작업장별 점검유형 세부 조회
     WorkCenterCheckDetailResponse getWorkCenterCheckDetail(Long workCenterCheckId, Long workCenterCheckDetailId) throws NotFoundException;
-    // 작업장별 점검유형 세부 삭제
-    WorkCenterCheckDetailResponse createWorkCenterCheckDetail(Long workCenterCheckId, WorkCenterCheckDetailRequest workCenterCheckDetailRequest) throws NotFoundException, BadRequestException;
+    // 작업장별 점검유형 세부 생성
+    WorkCenterCheckDetailResponse createWorkCenterCheckDetail(
+            Long workCenterCheckId,
+            WorkCenterCheckDetailRequest workCenterCheckDetailRequest,
+            String userCode
+    ) throws NotFoundException, BadRequestException;
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static javax.persistence.FetchType.LAZY;
@@ -87,10 +88,20 @@ public class Equipment extends BaseTimeEntity {
     @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '작업공정'")
     private WorkProcess workProcess;
 
+    @Column(name = "LIFE", columnDefinition = "varchar(255) COMMENT '수명(월)정보'")
+    private String life;
+
+    @Column(name = "LAST_TEST_DATE", columnDefinition = "date COMMENT '최종점검일자'")
+    private LocalDate lastTestDate;
+
+    @Column(name = "PRODUCE_YN", columnDefinition = "bit(1) COMMENT '원료혼합 공정 반제품 생성 가능 여부'", nullable = false)
+    private boolean produceYn;  // true: 생성가능, false: 생성 불가능
+
     public void addJoin(Client client, WorkLine workLine, WorkProcess workProcess) {
         setClient(client);
         setWorkLine(workLine);
         setWorkProcess(workProcess);
+        setProduceYn(true);
     }
 
     public void update(Equipment newEquipment, Client newClient, WorkLine newWorkLine, WorkProcess workProcess) {
@@ -107,6 +118,8 @@ public class Equipment extends BaseTimeEntity {
         setCheckCycle(newEquipment.checkCycle);
         setUseYn(newEquipment.useYn);
         setWorkProcess(workProcess);
+        setLife(newEquipment.life);
+        setLastTestDate(newEquipment.lastTestDate);
     }
 
     public void delete() {

@@ -39,11 +39,11 @@ public class LotTrackingController {
     @ResponseBody
     @Operation(
             summary = "LOT Tracking",
-            description = "검색조건: LOT 번호, 추적유형, 품명|품번"
+            description = "검색조건: LOT 번호(필수값), 추적유형(필수값), 품명|품번"
     )
     public ResponseEntity<List<LotTrackingResponse>> getLotTrackings(
-            @RequestParam(required = false) @Parameter(description = "LOT 번호") String lotNo,
-            @RequestParam(required = false) @Parameter(description = "추적유형") Boolean trackingType,
+            @RequestParam @Parameter(description = "LOT 번호(필수값)") String lotNo,
+            @RequestParam @Parameter(description = "추적유형(필수값) true: 정방향, false: 역방향") boolean trackingType,
             @RequestParam(required = false) @Parameter(description = "품명|품목") String itemNoAndItemName,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {

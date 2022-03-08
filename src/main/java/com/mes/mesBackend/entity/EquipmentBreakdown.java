@@ -56,7 +56,7 @@ public class EquipmentBreakdown extends BaseTimeEntity {
     @Column(name = "REPORT_DATE", columnDefinition = "datetime COMMENT '신고일시'", nullable = false)
     private LocalDateTime reportDate;       // 신고일시
 
-    @Column(name = "REQUEST_BREAK_TYPE", columnDefinition = "varchar(255) COMMENT '요청시 고장유형'", nullable = false)
+    @Column(name = "REQUEST_BREAK_TYPE", columnDefinition = "varchar(255) COMMENT '요청시 고장유형'")
     private String requestBreakType;            // 요청시 고장유형
 
     @Column(name = "BREAK_NOTE", columnDefinition = "varchar(255) COMMENT '요청비고'")
@@ -66,7 +66,7 @@ public class EquipmentBreakdown extends BaseTimeEntity {
     @Column(name = "BREAK_REASON", columnDefinition = "varchar(255) COMMENT '고장유형'", nullable = false)
     private BreakReason breakReason;     // 고장유형
 
-    @Column(name = "CAUSE_OF_FAILURE", columnDefinition = "varchar(255) COMMENT '고장원인'", nullable = false)
+    @Column(name = "CAUSE_OF_FAILURE", columnDefinition = "varchar(255) COMMENT '고장원인'")
     private String causeOfFailure;  // 고장원인
 
     @Column(name = "ARRIVAL_DATE", columnDefinition = "datetime COMMENT '보전원 도착일시'")
@@ -82,11 +82,15 @@ public class EquipmentBreakdown extends BaseTimeEntity {
     private String note;        // 비고
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "WORK_CENTER", columnDefinition = "bigint COMMENT '작업장'", nullable = false)
+    @JoinColumn(name = "WORK_CENTER", columnDefinition = "bigint COMMENT '작업장'")
     private WorkCenter workCenter;          // 작업장
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;
+
+    // TODO: equipmentBreakdownServiceImpl 에서 true 인건 안보이게 바꿔야함
+    @Column(name = "VISIBLE_YN", columnDefinition = "bit(1) COMMENT '숨김여부'")
+    private boolean visibleYn;  // pop 충진공정에서 등록한 설비고장내역은 true 로 들어가고 mes 에서 등록된건 false 로만 보여짐
 
     public void add(Equipment equipment, WorkCenter workCenter) {
         setEquipment(equipment);

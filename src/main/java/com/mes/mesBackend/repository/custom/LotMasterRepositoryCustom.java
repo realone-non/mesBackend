@@ -1,9 +1,7 @@
 package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.*;
-import com.mes.mesBackend.entity.ItemAccountCode;
-import com.mes.mesBackend.entity.LotMaster;
-import com.mes.mesBackend.entity.OutSourcingInput;
+import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
@@ -67,4 +65,24 @@ public interface LotMasterRepositoryCustom {
     // 생성날짜가 오늘이고, lotDivision 이 dummny 인 걸 찾아옴
     Optional<String> findDummyNoByDivision(LotMasterDivision lotMasterDivision, LocalDate startDate);
     Optional<BadItemWorkOrderResponse.subDto> findLotMaterByDummyLotIdAndWorkProcessId(Long dummyLotId, Long workProcessId);
+    // 생성날짜가 오늘이고, 공정구분, inputEquipment 가 같은거
+    Optional<LotMaster> findByTodayAndWorkProcessDivisionEqAndInputEquipmentEq(
+            LocalDate now,
+            WorkProcessDivision workProcessDivision,
+            Long inputEquipmentId
+    );
+
+    // ========================== 7-2. Lot Tracking
+    // == 정방향
+    // 입력된 LOT NO 로 등록된 LotConnect 모두
+    List<LotEquipmentConnect> findExhaustLotByLotNoAndTrackTypeTrue(String realLotNo);
+    // lotTracking 검색조건: 추적유형(필수값), 품명|품번 -> 정방향
+    List<LotTrackingResponse> findLotTrackingResponseByTrackingTypeTrue(Long lotEquipmentConnectId, String itemNoAndItemName);
+
+    // == 역방향
+    // 분할 lotNo 로 설비 LOT id 하나 찾음
+    Optional<LotMaster> findEquipmentLotMasterByRealLotNo(String realLotNo);
+    // lotTracking 검색조건: 추적유형(필수값), 품명|품번 -> 역방향
+    List<LotTrackingResponse> findLotTrackingResponseByTrackingTypeFalse(Long equipmentLotId, String itemNoAndItemName);
+
 }

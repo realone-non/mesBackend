@@ -57,9 +57,10 @@ public class WorkDocumentController {
             @RequestBody @Valid WorkDocumentRequest workDocumentRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        WorkDocumentResponse workDocument = workDocumentService.createWorkDocument(workDocumentRequest);
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        WorkDocumentResponse workDocument = workDocumentService.createWorkDocument(workDocumentRequest, userCode);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + workDocument.getId() + " from createWorkDocument.");
+        cLogger.info(userCode + " is created the " + workDocument.getId() + " from createWorkDocument.");
         return new ResponseEntity<>(workDocument, OK);
     }
 

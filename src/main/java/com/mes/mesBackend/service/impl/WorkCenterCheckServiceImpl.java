@@ -3,18 +3,18 @@ package com.mes.mesBackend.service.impl;
 import com.mes.mesBackend.dto.request.WorkCenterCheckDetailRequest;
 import com.mes.mesBackend.dto.response.WorkCenterCheckDetailResponse;
 import com.mes.mesBackend.dto.response.WorkCenterCheckResponse;
-import com.mes.mesBackend.entity.CheckType;
-import com.mes.mesBackend.entity.WorkCenter;
-import com.mes.mesBackend.entity.WorkCenterCheck;
-import com.mes.mesBackend.entity.WorkCenterCheckDetail;
+import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.ModifiedDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.ModifiedLogHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.WorkCenterCheckDetailRepository;
 import com.mes.mesBackend.repository.WorkCenterCheckRepository;
 import com.mes.mesBackend.service.CheckTypeService;
 import com.mes.mesBackend.service.WorkCenterCheckService;
 import com.mes.mesBackend.service.WorkCenterService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,18 +22,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.ModifiedDivision.WORK_CENTER_CHECK_DETAIL;
+
 @Service
+@RequiredArgsConstructor
 public class WorkCenterCheckServiceImpl implements WorkCenterCheckService {
-    @Autowired
-    WorkCenterCheckRepository workCenterCheckRepository;
-    @Autowired
-    WorkCenterCheckDetailRepository workCenterCheckDetailRepository;
-    @Autowired
-    WorkCenterService workCenterService;
-    @Autowired
-    CheckTypeService checkTypeService;
-    @Autowired
-    ModelMapper mapper;
+    private final WorkCenterCheckRepository workCenterCheckRepository;
+    private final WorkCenterCheckDetailRepository workCenterCheckDetailRepository;
+    private final WorkCenterService workCenterService;
+    private final CheckTypeService checkTypeService;
+    private final ModelMapper mapper;
+    private final ModifiedLogHelper modifiedLogHelper;
 
     // 작업장별 점검유형 생성
     @Override
@@ -113,7 +112,8 @@ public class WorkCenterCheckServiceImpl implements WorkCenterCheckService {
     @Override
     public WorkCenterCheckDetailResponse createWorkCenterCheckDetail(
             Long workCenterCheckId,
-            WorkCenterCheckDetailRequest workCenterCheckDetailRequest
+            WorkCenterCheckDetailRequest workCenterCheckDetailRequest,
+            String userCode
     ) throws NotFoundException, BadRequestException {
         // lsl, usl 소수점 검증
         checkDecimalPoint(workCenterCheckDetailRequest.getLsl(), "lsl decimal point is 3 decimal places.");
@@ -122,6 +122,7 @@ public class WorkCenterCheckServiceImpl implements WorkCenterCheckService {
         WorkCenterCheckDetail workCenterCheckDetail = mapper.toEntity(workCenterCheckDetailRequest, WorkCenterCheckDetail.class);
         workCenterCheckDetail.add(workCenterCheck);
         workCenterCheckDetailRepository.save(workCenterCheckDetail);
+        modifiedLogHelper.createInsertLog(userCode, WORK_CENTER_CHECK_DETAIL, workCenterCheckDetail);   // insert 로그 생성
         return mapper.toResponse(workCenterCheckDetail, WorkCenterCheckDetailResponse.class);
     }
 
@@ -161,7 +162,14 @@ public class WorkCenterCheckServiceImpl implements WorkCenterCheckService {
     public List<WorkCenterCheckDetailResponse> getWorkCenterCheckDetails(Long workCenterCheckId) throws NotFoundException {
         WorkCenterCheck workCenterCheck = getWorkCenterCheckOrThrow(workCenterCheckId);
         List<WorkCenterCheckDetail> workCenterCheckDetails = workCenterCheckDetailRepository.findAllByWorkCenterCheckAndDeleteYnFalse(workCenterCheck);
-        return mapper.toListResponses(workCenterCheckDetails, WorkCenterCheckDetailResponse.class);
+        List<WorkCenterCheckDetailResponse> responses = mapper.toListResponses(workCenterCheckDetails, WorkCenterCheckDetailResponse.class);
+        for (WorkCenterCheckDetailResponse r : responses) {
+            ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(WORK_CENTER_CHECK_DETAIL, r.getId());
+            ModifiedLog insertLog = modifiedLogHelper.getInsertLog(WORK_CENTER_CHECK_DETAIL, r.getId());
+            if (modifiedLog != null) r.modifiedLog(modifiedLog);
+            if (insertLog != null) r.insertLog(insertLog);
+        }
+        return responses;
     }
 
     // 작업장별 점검유형 세부 수정
@@ -169,14 +177,15 @@ public class WorkCenterCheckServiceImpl implements WorkCenterCheckService {
     public WorkCenterCheckDetailResponse updateWorkCenterCheckDetail(
             Long workCenterCheckId,
             Long workCenterCheckDetailId,
-            WorkCenterCheckDetailRequest workCenterCheckDetailRequest
+            WorkCenterCheckDetailRequest workCenterCheckDetailRequest,
+            String userCode
     ) throws NotFoundException {
         checkWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailId);
         WorkCenterCheckDetail findWorkCenterCheckDetail = getWorkCenterDetailOrThrow(workCenterCheckDetailId);
         WorkCenterCheckDetail newWorkCenterCheckDetail = mapper.toEntity(workCenterCheckDetailRequest, WorkCenterCheckDetail.class);
         findWorkCenterCheckDetail.put(newWorkCenterCheckDetail);
         workCenterCheckDetailRepository.save(findWorkCenterCheckDetail);
-
+        modifiedLogHelper.createModifiedLog(userCode, WORK_CENTER_CHECK_DETAIL, findWorkCenterCheckDetail);     // 업데이트 로그 생성
         return mapper.toResponse(findWorkCenterCheckDetail, WorkCenterCheckDetailResponse.class);
     }
 

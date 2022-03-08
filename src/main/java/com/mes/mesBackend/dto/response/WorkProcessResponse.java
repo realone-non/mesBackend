@@ -59,7 +59,7 @@ public class WorkProcessResponse {
 
     public void modifiedLog(ModifiedLog modifiedLog) {
         setUserCode(modifiedLog.getUserCode());
-        setUpdateDate(modifiedLog.getModifiedDate());
+        setUpdateDate(modifiedLog.getDate());
         setUserLevel(modifiedLog.getUserLevel());
     }
 }

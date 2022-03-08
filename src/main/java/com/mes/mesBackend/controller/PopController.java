@@ -1,6 +1,7 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.*;
+import com.mes.mesBackend.entity.enumeration.BreakReason;
 import com.mes.mesBackend.entity.enumeration.ProcessStatus;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -110,13 +111,14 @@ public class PopController {
     @ResponseBody
     @Operation(
             summary = "(pop) 작업지시 진행상태 변경",
-            description = "[원자재 등록: MATERIAL_REGISTRATION, 중간 검사: MIDDLE_TEST, 로트 분할: LOT_DIVIDE]"
+            description = "[원자재 등록: MATERIAL_REGISTRATION, 중간 검사: MIDDLE_TEST, 로트 분할: LOT_DIVIDE] <br />" +
+                    "설비로트의 생산공정이 충진이고, 상태값이 MIDDLE_TEST 이면 원료혼합의 반제품이 소진된다."
     )
     public ResponseEntity updatePopWorkOrderState(
             @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
             @RequestParam @Parameter(description = "상태 값") ProcessStatus processStatus,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         popService.updatePopWorkOrderState(lotMasterId, processStatus);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from updatePopWorkOrderState.");
@@ -124,6 +126,7 @@ public class PopController {
     }
 
     // 작업완료 수량 입력
+    // 원료혼합 공정에서만 fillingEquipmentId 값이 들어오는데, 다음 공정인 충진공정에서 사용할 설비를 지정해주는 값이다.
     @SecurityRequirement(name = AUTHORIZATION)
     @PostMapping("/work-orders/{work-order-id}")
     @ResponseBody
@@ -421,5 +424,40 @@ public class PopController {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is viewed the list of from deletePopLotMasters.");
         return new ResponseEntity(NO_CONTENT);
+    }
+
+    // 충진 설비 선택 api
+    @SecurityRequirement(name = AUTHORIZATION)
+    @PutMapping("/filling-equipments")
+    @ResponseBody
+    @Operation(summary = "(pop) 충진공정 설비 선택", description = "등록 완료 시 설비의 생산가능 상태가 false 로 변경됨. [생산가능: true, 생산불가능: false]")
+    public ResponseEntity putFillingEquipmentOfRealLot(
+            @RequestParam @Parameter(description = "분할 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "충진공정 설비 id") Long equipmentId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException, BadRequestException {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        popService.putFillingEquipmentOfRealLot(lotMasterId, equipmentId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is putFillingEquipmentOfRealLot.");
+        return new ResponseEntity<>(OK);
+    }
+
+    // 충진공정 설비 고장등록 api
+    @SecurityRequirement(name = AUTHORIZATION)
+    @PostMapping("/filling-equipment-errors")
+    @ResponseBody
+    @Operation(summary = "(pop) 충진공정 설비 고장 등록", description = "")
+    public ResponseEntity createFillingEquipmentError(
+            @RequestParam @Parameter(description = "작업지시 id") Long workOrderId,
+            @RequestParam @Parameter(description = "설비 lotMaster id") Long lotMasterId,
+            @RequestParam @Parameter(description = "고장 사유") BreakReason breakReason,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException, BadRequestException {
+        String userCode = logService.getUserCodeFromHeader(tokenHeader);
+        popService.createFillingEquipmentError(workOrderId, lotMasterId, breakReason);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(userCode + " is viewed the list of from createFillingEquipmentError.");
+        return new ResponseEntity<>(OK);
     }
 }

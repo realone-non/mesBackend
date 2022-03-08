@@ -30,7 +30,8 @@ public class EquipmentRepositoryImpl implements EquipmentRepositoryCustom {
                                 equipment.equipmentCode.as("equipmentCode"),
                                 equipment.equipmentName.as("equipmentName"),
                                 equipment.workProcess.id.as("workProcessId"),
-                                equipment.workProcess.workProcessName.as("workProcessName")
+                                equipment.workProcess.workProcessName.as("workProcessName"),
+                                equipment.produceYn.as("produceYn")
                         )
                 )
                 .from(equipment)
