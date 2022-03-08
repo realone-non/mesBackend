@@ -256,6 +256,10 @@ public class PopServiceImpl implements PopService {
 
             if (orderState.equals(COMPLETION)) {
                 productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
+                if (workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING)) {
+                    workOrder.setOrderState(ONGOING);
+                    workOrderDetailRepository.save(workOrder);
+                }
             }
         } else if (workOrder.getOrderState().equals(ONGOING)) {
             // 기존의 작업지시 상태값이 진행중이면?
@@ -337,6 +341,10 @@ public class PopServiceImpl implements PopService {
                 // produceOrder: ONGOING -> COMPLETION ? orderState update
                 workOrderStateHelper.updateOrderState(workOrderId, orderState);
                 productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
+                if (workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING)) {
+                    workOrder.setOrderState(ONGOING);
+                    workOrderDetailRepository.save(workOrder);
+                }
             }
         }
         workOrder.setProductionAmount(beforeProductionAmount + productAmount);  // productionAmount 변경
@@ -344,6 +352,8 @@ public class PopServiceImpl implements PopService {
 
         // workOrderDetailUserLog: 작업지시에 수량이 update 될 때 마다 insert
         WorkOrderUserLog workOrderUserLog = new WorkOrderUserLog();
+
+        System.out.println(equipmentLot.getId());
         workOrderUserLog.create(workOrder, user, productAmount, equipmentLot);
         workOrderUserLogRepo.save(workOrderUserLog);
 
