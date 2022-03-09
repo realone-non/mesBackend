@@ -4,10 +4,7 @@ import com.mes.mesBackend.entity.enumeration.DevelopStatus;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestCategory;
 import com.mes.mesBackend.entity.enumeration.TestType;
-import com.mes.mesBackend.service.ItemAccountCodeService;
 import com.querydsl.core.annotations.QueryInit;
-import com.sun.imageio.plugins.common.LZWCompressor;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +14,6 @@ import javax.persistence.*;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
-import static lombok.AccessLevel.PROTECTED;
 import static lombok.AccessLevel.PUBLIC;
 
 // 3-2-1. 품목등록
