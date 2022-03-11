@@ -47,6 +47,7 @@ public class ContractItemStateRepositoryImpl implements ContractItemStateReposit
                                 contract.client.clientCode.as("clientNo"),
                                 contract.client.clientName.as("clientName"),
                                 contract.clientOrderNo.as("clientOrderNo"),
+                                contract.user.id.as("userId"),
                                 contract.user.korName.as("userName"),
                                 contractItem.contractType.as("contractType"),
                                 contract.outputWareHouse.wareHouseName.as("outputWareHouse"),

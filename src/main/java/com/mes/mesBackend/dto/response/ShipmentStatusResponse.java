@@ -34,6 +34,9 @@ public class ShipmentStatusResponse {
     @Schema(description = "거래처명")
     String clientName;
 
+    @Schema(description = "담당자 고유아이디")
+    Long userId;
+
     @Schema(description = "담당자")
     String userManager;
 

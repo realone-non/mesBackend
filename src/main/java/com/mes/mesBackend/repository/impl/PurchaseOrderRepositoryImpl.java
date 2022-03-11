@@ -283,6 +283,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 item.inputUnitPrice.multiply(purchaseRequest.orderAmount).as("orderPrice"),
                                 (purchaseRequest.orderAmount.multiply(item.inputUnitPrice).doubleValue()).multiply(0.1).as("vat"),
                                 purchaseRequest.periodDate.as("orderPeriodDate"),
+                                user.id.as("userId"),
                                 user.korName.as("userName"),
                                 purchaseOrder.note.as("note"),
                                 wareHouse.wareHouseName.as("wareHouseName"),
