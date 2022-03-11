@@ -177,22 +177,36 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .fetchOne());
     }
 
-    // 제조오더에 해당하는 작업지시의 orderState 들
+//    // 제조오더에 해당하는 작업지시의 orderState 들
+//    @Override
+//    public Optional<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId) {
+//        return Optional.ofNullable(
+//                jpaQueryFactory
+//                        .select(workOrderDetail.orderState)
+//                        .from(workOrderDetail)
+//                        .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+//                        .where(
+//                                workOrderDetail.produceOrder.id.eq(produceOrderId),
+//                                workOrderDetail.deleteYn.isFalse()
+//                        )
+//                        .orderBy(workOrderDetail.createdDate.desc())
+//                        .limit(1)
+//                        .fetchOne()
+//        );
+//    }
+
+    // 제조오더에 해당하는 모든 작업지시 가져옴
     @Override
-    public Optional<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId) {
-        return Optional.ofNullable(
-                jpaQueryFactory
-                        .select(workOrderDetail.orderState)
-                        .from(workOrderDetail)
-                        .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
-                        .where(
-                                workOrderDetail.produceOrder.id.eq(produceOrderId),
-                                workOrderDetail.deleteYn.isFalse()
-                        )
-                        .orderBy(workOrderDetail.createdDate.desc())
-                        .limit(1)
-                        .fetchOne()
-        );
+    public List<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId) {
+        return jpaQueryFactory
+                .select(workOrderDetail.orderState)
+                .from(workOrderDetail)
+                .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                .where(
+                        workOrderDetail.produceOrder.id.eq(produceOrderId),
+                        isDeleteYnFalse()
+                )
+                .fetch();
     }
 
     // ==================================== 6-2. 작업지시 등록 ====================================

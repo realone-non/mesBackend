@@ -55,10 +55,10 @@ public class WorkOrderStateHelperImpl implements WorkOrderStateHelper {
         else return ONGOING;
     }
 
-    // 제조오더에 해당하는 가장 최근 등록된 작업지시의 orderState
+    // 제조오더에 해당되는 작업지시의 모든 지시상태
     private OrderState getWorkOrderStateDesc(Long produceOrderId) {
-        return workOrderDetailRepo.findOrderStatesByProduceOrderId(produceOrderId)
-                .orElse(SCHEDULE);
+        // TODO:
+        return null;
     }
 
     // 작업지시 단일 조회 및 예외

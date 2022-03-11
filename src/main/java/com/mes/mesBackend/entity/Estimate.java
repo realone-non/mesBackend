@@ -70,8 +70,8 @@ public class Estimate extends BaseTimeEntity {
     @JoinColumn(name = "PAY_TYPE", columnDefinition = "bigint COMMENT '지불조건'", nullable = false)
     private PayType payType;        // 지불조건
 
-    @Column(name = "SURTAX", columnDefinition = "varchar(255) COMMENT '부가세'", nullable = false)
-    private String surtax;              // 부가세
+    @Column(name = "SURTAX", columnDefinition = "bit(1) COMMENT '부가세'", nullable = false)
+    private boolean surtax;              // 부가세
 
     @Column(name = "TRANSPORT_CONDITION", columnDefinition = "varchar(255) COMMENT '운송조건'")
     private String transportCondition;      // 운송조건

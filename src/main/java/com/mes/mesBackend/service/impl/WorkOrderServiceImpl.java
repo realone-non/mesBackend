@@ -65,12 +65,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         // 입력받은 공정이 기존에 제조오더에 등록되어 있는 공정이면 예외(하나의 제조오더에 하나의 작업공정만 등록 가능)
         throwIfWorkProcessByProduceOrder(produceOrderId, workOrderRequest.getWorkProcess());
-        // 사용자가 입력한 지시수량이 수주품목의 수량보다 크면 예외
-        // 지시수량을 수주 수량보다 더 크게 할 수 있음.
-//        throwIfOrderAmountGreaterThanProduceOrderAmount(orderAmount, produceOrder.getContractItem().getAmount());
-        // 사용자가 입력한 생산수량이 지시수량보다 크면 예외
-        // 생상수량이 지시수량보다 클 수 있음.
-//        throwIfProductionAmountGreaterThanOrderAmount(workOrderRequest.getProductionAmount(), orderAmount);
+        // 해당하는 제조오더에 입력한 작업공정이 존재할 경우 예외
+
 
         WorkOrderDetail workOrderDetail = mapper.toEntity(workOrderRequest, WorkOrderDetail.class);
         String workOrderNo = numberAutomatic.createDateTimeNo();
@@ -144,18 +140,18 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         // orderAmount: 사용자가 입력한 지시수량
         int orderAmount = newWorkOrderRequest.getOrderAmount() != 0 ? newWorkOrderRequest.getOrderAmount() : produceOrder.getContractItem().getAmount();
 
-//        if (orderAmount !=  findWorkOrderDetail.getOrderAmount()) {
-//            // 사용자가 입력한 지시수량이 수주품목의 수량보다 크면 예외
-////            throwIfOrderAmountGreaterThanProduceOrderAmount(orderAmount, produceOrder.getContractItem().getAmount());
-//            // 사용자가 입력한 생산수량이 지시수량보다 크면 예외
-////            throwIfProductionAmountGreaterThanOrderAmount(newWorkOrderRequest.getProductionAmount(), orderAmount);
-//        }
-
         if (findWorkOrderDetail.getOrderState().equals(COMPLETION)) {
             if (orderAmount > findWorkOrderDetail.getOrderAmount()) {
                 // 입력받은 지시수량이 현재 작업한 생산수량보다 크면 상태값 ONGOING 으로 변경;;
                 findWorkOrderDetail.setOrderState(ONGOING);
                 produceOrder.setOrderState(ONGOING);
+            }
+        }
+
+        if (findWorkOrderDetail.getOrderState().equals(ONGOING) && findWorkOrderDetail.getOrderState().equals(SCHEDULE)) {
+            // 입력받은 지시수량이 현재 작업한 생산수량이랑 같아지면 COMPLETION 으로 변경
+            if (orderAmount == findWorkOrderDetail.getProductionAmount()) {
+                findWorkOrderDetail.setOrderState(COMPLETION);
             }
         }
 

@@ -98,16 +98,16 @@ public class Contract extends BaseTimeEntity {
     @JoinColumn(name = "PAY_TYPE", columnDefinition = "bigint COMMENT '지불조건'", nullable = false)
     private PayType payType;        // 지불조건
 
-    @Column(name = "FORWADER", columnDefinition = "varchar(255) COMMENT 'Forwader'", nullable = false)
+    @Column(name = "FORWADER", columnDefinition = "varchar(255) COMMENT 'Forwader'")
     private String forwader;                // Forwader
 
-    @Column(name = "TRANSPORT_CONDITION", columnDefinition = "varchar(255) COMMENT '운송조건'", nullable = false)
+    @Column(name = "TRANSPORT_CONDITION", columnDefinition = "varchar(255) COMMENT '운송조건'")
     private String transportCondition;      // 운송조건
 
-    @Column(name = "SHIPMENT_SERVICE", columnDefinition = "varchar(255) COMMENT 'Shipment Service'", nullable = false)
+    @Column(name = "SHIPMENT_SERVICE", columnDefinition = "varchar(255) COMMENT 'Shipment Service'")
     private String shipmentService;         // Shipment Service
 
-    @Column(name = "SHIPMENT_WK", columnDefinition = "varchar(255) COMMENT 'Shipment WK'", nullable = false)
+    @Column(name = "SHIPMENT_WK", columnDefinition = "varchar(255) COMMENT 'Shipment WK'")
     private String shipmentWk;              // Shipment WK
 
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")

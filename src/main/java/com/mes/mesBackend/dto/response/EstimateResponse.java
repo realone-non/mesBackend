@@ -47,7 +47,7 @@ public class EstimateResponse {
     PayTypeResponse payType;
 
     @Schema(description = "부가세")
-    String surtax;
+    boolean surtax;
 
     @Schema(description = "운송조건")
     String transportCondition;
