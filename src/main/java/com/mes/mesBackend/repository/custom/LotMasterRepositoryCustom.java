@@ -1,7 +1,10 @@
 package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.*;
-import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.ItemAccountCode;
+import com.mes.mesBackend.entity.LotEquipmentConnect;
+import com.mes.mesBackend.entity.LotMaster;
+import com.mes.mesBackend.entity.OutSourcingInput;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
@@ -34,7 +37,11 @@ public interface LotMasterRepositoryCustom {
     Optional<String> findLotNoByGoodsType(GoodsType goodsType, LocalDate startDate, LocalDate endDate);
 
     //제품분류에 따른 가장 마지막에 생성된 LOT NO 반환(수정버전)
-    Optional<String> findLotNoByAccountCode(Long itemAccountCodeId, LocalDate startDate);
+    // 제품 분휴에 따는 일에 가장 마지막에 생성된 LOT NO
+    Optional<String> findLotNoByAccountCodeAndDate(GoodsType goodsType, LocalDate now);
+    // 제품분유에 따른 일에 가장 마지막에 생성된 LOT NO
+    Optional<String> findLotNoByAccountCodeAndMonth(GoodsType goodsType, LocalDate now);
+
     //외주입고정보로 LOT정보 가져오기
     List<OutsourcingInputLOTResponse> findLotMastersByOutsourcing(Long inputId);
     //LOT정보 조회

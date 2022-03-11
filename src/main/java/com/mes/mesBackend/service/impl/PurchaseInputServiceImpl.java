@@ -2,8 +2,12 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.LotMasterRequest;
 import com.mes.mesBackend.dto.request.PurchaseInputRequest;
-import com.mes.mesBackend.dto.response.*;
+import com.mes.mesBackend.dto.response.PurchaseInputDetailResponse;
+import com.mes.mesBackend.dto.response.PurchaseInputResponse;
+import com.mes.mesBackend.dto.response.PurchaseOrderStatusResponse;
+import com.mes.mesBackend.dto.response.PurchaseStatusCheckResponse;
 import com.mes.mesBackend.entity.LotMaster;
+import com.mes.mesBackend.entity.LotType;
 import com.mes.mesBackend.entity.PurchaseInput;
 import com.mes.mesBackend.entity.PurchaseRequest;
 import com.mes.mesBackend.entity.enumeration.OrderState;
@@ -11,12 +15,8 @@ import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.LotHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
-import com.mes.mesBackend.repository.LotMasterRepository;
-import com.mes.mesBackend.repository.PurchaseInputRepository;
-import com.mes.mesBackend.repository.PurchaseOrderRepository;
-import com.mes.mesBackend.repository.PurchaseRequestRepository;
+import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.PurchaseInputService;
-import com.mes.mesBackend.service.PurchaseOrderService;
 import com.mes.mesBackend.service.PurchaseRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,6 +38,7 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
     private final PurchaseRequestRepository purchaseRequestRepos;
     private final LotHelper lotHelper;
     private final PurchaseOrderRepository purchaseOrderRepo;
+    private final LotTypeRepository lotTypeRepository;
 
     // 구매입고 리스트 조회, 검색조건: 입고기간 fromDate~toDate, 입고창고, 거래처, 품명|품번
     @Override
@@ -85,6 +86,8 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
             throw new BadRequestException("요청수량보다 입고수량이 클 수 없습니다." +
                     " input 입고수량: " + purchaseInput.getInputAmount()
                     + " , 요청수량 : " + requestAmount);
+        } else {
+            purchaseRequest.setOrdersState(ONGOING);
         }
 
         purchaseInput.setPurchaseRequest(purchaseRequest);
@@ -92,23 +95,23 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
 
         // lot 생성
         LotMasterRequest lotMasterRequest = new LotMasterRequest();
-        lotMasterRequest.putPurchaseInput(
+        lotMasterRequest.putPurchaseInputLotRequest(
                 purchaseInput.getPurchaseRequest().getItem(),
                 purchaseInput.getPurchaseRequest().getPurchaseOrder().getWareHouse(),
-                purchaseInput.getId(),
+                purchaseInput,
                 purchaseInput.getInputAmount(),
                 purchaseInput.getInputAmount(),
-                purchaseInputRequest.getLotType(),
+                getLotTypeOrThrow(purchaseInputRequest.getLotType()),
                 purchaseInputRequest.isProcessYn()
         );
 
-        String lotMaster = lotHelper.createLotMaster(lotMasterRequest).getLotNo();
+        lotHelper.createLotMaster(lotMasterRequest);
 //        lotMasterService.createLotMaster(lotMasterRequest).getLotNo();      // lotMaster 생성
 
-        if (lotMaster == null) {
-            purchaseInputRepo.deleteById(purchaseInput.getId());
-            throw new BadRequestException("lot 번호가 생성되지 않았습니다.");
-        }
+//        if (lotMaster == null) {
+//            purchaseInputRepo.deleteById(purchaseInput.getId());
+//            throw new BadRequestException("lot 번호가 생성되지 않았습니다.");
+//        }
 
         // 구매요청에 입고일시 생성
         putInputDateToPurchaseRequest(purchaseRequest);
@@ -210,6 +213,11 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
         LocalDate inputDate = findInputDate != null ? LocalDate.from(findInputDate) : null;
         purchaseRequest.setInputDate(inputDate);
         purchaseRequestRepos.save(purchaseRequest);
+    }
+
+    private LotType getLotTypeOrThrow(Long id) throws NotFoundException {
+        return lotTypeRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("lotType does not exist. input id: " + id));
     }
 
     // ================================================= 9-4. 구매현황조회 =================================================
