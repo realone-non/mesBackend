@@ -1,9 +1,7 @@
 package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.*;
-import com.mes.mesBackend.entity.ItemAccountCode;
-import com.mes.mesBackend.entity.LotMaster;
-import com.mes.mesBackend.entity.OutSourcingInput;
+import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
@@ -73,4 +71,18 @@ public interface LotMasterRepositoryCustom {
             WorkProcessDivision workProcessDivision,
             Long inputEquipmentId
     );
+
+    // ========================== 7-2. Lot Tracking
+    // == 정방향
+    // 입력된 LOT NO 로 등록된 LotConnect 모두
+    List<LotEquipmentConnect> findExhaustLotByLotNoAndTrackTypeTrue(String realLotNo);
+    // lotTracking 검색조건: 추적유형(필수값), 품명|품번 -> 정방향
+    List<LotTrackingResponse> findLotTrackingResponseByTrackingTypeTrue(Long lotEquipmentConnectId, String itemNoAndItemName);
+
+    // == 역방향
+    // 분할 lotNo 로 설비 LOT id 하나 찾음
+    Optional<LotMaster> findEquipmentLotMasterByRealLotNo(String realLotNo);
+    // lotTracking 검색조건: 추적유형(필수값), 품명|품번 -> 역방향
+    List<LotTrackingResponse> findLotTrackingResponseByTrackingTypeFalse(Long equipmentLotId, String itemNoAndItemName);
+
 }

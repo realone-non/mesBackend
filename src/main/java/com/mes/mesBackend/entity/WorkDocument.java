@@ -47,7 +47,7 @@ public class WorkDocument extends BaseTimeEntity {
     @Column(name = "ORDERS", nullable = false, columnDefinition = "int COMMENT '순번'")
     private int orders;                     // 순번
 
-    @Column(name = "FILE_NAME_URL", columnDefinition = "varchar(255) COMMENT '파일명'", nullable = false)
+    @Column(name = "FILE_NAME_URL", columnDefinition = "varchar(255) COMMENT '파일명'")
     private String fileNameUrl;             // 파일명
 
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")

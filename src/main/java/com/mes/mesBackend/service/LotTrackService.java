@@ -8,5 +8,5 @@ import java.util.List;
 public interface LotTrackService {
     // Lot Tracking
     // 검색조건: LOT 번호, 추적유형, 품명|품번
-    List<LotTrackingResponse> getTrackings(String lotNo, Boolean trackingType, String itemNoAndItemName);
+    List<LotTrackingResponse> getTrackings(String lotNo, boolean trackingType, String itemNoAndItemName);
 }

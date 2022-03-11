@@ -1,20 +1,12 @@
 package com.mes.mesBackend.repository.impl;
 
-import com.mes.mesBackend.dto.response.MaterialStockInspectRequestResponse;
 import com.mes.mesBackend.dto.response.MaterialStockInspectResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.MaterialStockInspectRepositoryCustom;
-import com.mes.mesBackend.repository.custom.MaterialStockInspectRequestRepositoryCustom;
-import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.annotations.Case;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -3,6 +3,7 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.LotType;
+import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,15 +32,10 @@ public class LotTrackingResponse {
     @Schema(description = "품명")
     String itemName;
 
-    // 처리유형 보류
-
     @Schema(description = "등록유형")
-    LotType lotType;
+    EnrollmentType enrollmentType;
 
     @Schema(description = "발생일자")
     @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime createdDate;
-
-    @Schema(description = "참조정보")
-    String note;
 }
