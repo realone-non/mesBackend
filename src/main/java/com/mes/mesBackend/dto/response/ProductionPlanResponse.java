@@ -3,7 +3,9 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.Item;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +15,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
+import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 @Getter
 @Setter
@@ -62,7 +66,7 @@ public class ProductionPlanResponse {
     String contractNo;
 
     @Schema(description = "납기일자")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate periodDate;
 
     @Schema(description = "수주처")
@@ -83,10 +87,25 @@ public class ProductionPlanResponse {
     @JsonIgnore
     LocalDateTime endDateTime;
 
+    @JsonIgnore
+    WorkProcessDivision workProcessDivision;
+
+    @JsonIgnore
+    Long itemId;
+
+    @JsonIgnore
+    Long workProcessId;
+
     public void setCostTime() {
         if (startDateTime != null && endDateTime != null) {
             long costTime = ChronoUnit.MINUTES.between(startDateTime, endDateTime);
             setCostTime(costTime);
         }
+    }
+
+    public void setItems(Item item) {
+        setItemNo(item.getItemNo());
+        setItemName(item.getItemName());
+        setItemAccount(item.getItemAccount().getAccount());
     }
 }
