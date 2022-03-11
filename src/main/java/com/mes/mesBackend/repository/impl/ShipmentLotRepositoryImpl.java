@@ -156,6 +156,7 @@ public class ShipmentLotRepositoryImpl implements ShipmentLotRepositoryCustom {
                                 shipment.shipmentNo.as("shipmentNo"),
                                 client.clientCode.as("clientCode"),
                                 client.clientName.as("clientName"),
+                                user.id.as("userId"),
                                 user.korName.as("userManager"),
                                 wareHouse.wareHouseName.as("wareHouseName"),
                                 contract.surtax.as("surtax"),

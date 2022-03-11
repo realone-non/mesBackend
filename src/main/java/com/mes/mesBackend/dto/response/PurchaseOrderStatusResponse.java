@@ -61,6 +61,9 @@ public class PurchaseOrderStatusResponse {
     @Schema(description = "구매납기일자")
     LocalDate orderPeriodDate;
 
+    @Schema(description = "담당자 고유아이디")
+    Long userId;
+
     @Schema(description = "담당자")
     String userName;
 
