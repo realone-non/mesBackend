@@ -13,10 +13,8 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.LotLogHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.*;
-import com.mes.mesBackend.service.ItemService;
 import com.mes.mesBackend.service.LotMasterService;
 import com.mes.mesBackend.service.LotTypeService;
-import com.mes.mesBackend.service.WareHouseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -41,82 +39,6 @@ public class LotMasterServiceImpl implements LotMasterService {
     private final ItemRepository itemRepository;
     private final WorkProcessRepository workProcessRepository;
     private final LotLogHelper lotLogHelper;
-
-
-    // LOT master 생성
-    @Override
-    public LotMaster createLotMaster(LotMasterRequest lotMasterRequest) throws NotFoundException, BadRequestException {
-        LotType lotType = lotMasterRequest.getLotTypeId() != null ? lotTypeService.getLotTypeOrThrow(lotMasterRequest.getLotTypeId()) : null;
-        PurchaseInput purchaseInput = lotMasterRequest.getPurchaseInputId() != null ? getPurchaseInputOrThrow(lotMasterRequest.getPurchaseInputId()) : null;
-        OutSourcingInput outSourcingInput = lotMasterRequest.getOutsourcingInputId() != null ? getOutsourcingInputOrThrow(lotMasterRequest.getOutsourcingInputId()) : null;
-        Long workProcessId = lotMasterRequest.getWorkProcessDivision() != null ? lotLogHelper.getWorkProcessByDivisionOrThrow(lotMasterRequest.getWorkProcessDivision()) : null;
-        WorkProcess workProcess = workProcessId != null ? getWorkProcessIdOrThrow(workProcessId) : null;
-//        LotMaster lotMaster = modelMapper.toEntity(lotMasterRequest, LotMaster.class);
-
-        LotMaster lotMaster = new LotMaster();
-        lotMaster.setItem(lotMasterRequest.getItem());
-        lotMaster.setWareHouse(lotMasterRequest.getWareHouse());
-        lotMaster.setLotType(lotType);
-        lotMaster.setSerialNo(lotMasterRequest.getSerialNo());
-        lotMaster.setEnrollmentType(lotMasterRequest.getEnrollmentType());
-        lotMaster.setProcessYn(lotMasterRequest.isProcessYn());
-        lotMaster.setStockAmount(lotMasterRequest.getStockAmount());
-        lotMaster.setCreatedAmount(lotMasterRequest.getCreatedAmount());
-        lotMaster.setBadItemAmount(lotMasterRequest.getBadItemAmount());
-        lotMaster.setInputAmount(lotMasterRequest.getInputAmount());
-        lotMaster.setPurchaseInput(purchaseInput);
-        lotMaster.setWorkProcess(workProcess);
-
-
-        GoodsType goodsType = null;
-
-        // 구매입고
-        if (purchaseInput != null) {
-            Long itemId = purchaseInputRepo.findItemIdByPurchaseInputId(purchaseInput.getId());
-            String lotNo = createLotNo(itemId, purchaseInput.getId());
-            ItemAccountCode itemAccountCode = lotMasterRepo.findCodeByItemId(itemId);
-            switch (itemAccountCode.getItemAccount().getAccount()){
-                case "원자재":
-                    goodsType = GoodsType.RAW_MATERIAL;
-                    break;
-                case "부자재":
-                    goodsType = GoodsType.SUB_MATERIAL;
-                    break;
-                case "반제품":
-                    goodsType = GoodsType.HALF_PRODUCT;
-                    break;
-                case "완제품":
-                    goodsType = GoodsType.PRODUCT;
-                default:
-                    goodsType = GoodsType.NONE;
-            }
-            lotMaster.putPurchaseInput(lotType, purchaseInput, lotNo, workProcess); // 등록유형 PURCHASE_INPUT
-        }
-        else if(outSourcingInput != null) {
-            Long itemId = outsourcingInputRepo.findItemIdByInputId(outSourcingInput.getId());
-            String lotNo = createLotNo(itemId, outSourcingInput.getId());
-            ItemAccountCode itemAccountCode = lotMasterRepo.findCodeByItemId(itemId);
-            switch (itemAccountCode.getItemAccount().getAccount()){
-                case "원자재":
-                    goodsType = GoodsType.RAW_MATERIAL;
-                    break;
-                case "부자재":
-                    goodsType = GoodsType.SUB_MATERIAL;
-                    break;
-                case "반제품":
-                    goodsType = GoodsType.HALF_PRODUCT;
-                    break;
-                case "완제품":
-                    goodsType = GoodsType.PRODUCT;
-                default:
-                    goodsType = GoodsType.NONE;
-            }
-            lotMaster.putOutsourcingInput(lotType, outSourcingInput, lotNo);
-        }
-
-        lotMasterRepo.save(lotMaster);
-        return lotMaster;
-    }
 
     // lot 번호 생성
     private String createLotNo(Long itemId, Long deleteId) throws BadRequestException {

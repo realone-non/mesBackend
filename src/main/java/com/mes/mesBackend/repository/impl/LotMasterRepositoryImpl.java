@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +42,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     final QWorkOrderDetail workOrderDetail = QWorkOrderDetail.workOrderDetail;
     final QLotEquipmentConnect lotEquipmentConnect = QLotEquipmentConnect.lotEquipmentConnect;
     final QLotConnect lotConnect = QLotConnect.lotConnect;
+    final QEquipment equipment = QEquipment.equipment;
 
     // id 로 itemAccountCode 의 code 조회
     @Override
@@ -93,22 +95,42 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     }
 
     @Transactional(readOnly = true)
-    public Optional<String> findLotNoByAccountCode(Long itemAccountCodeId, LocalDate startDate){
+    public Optional<String> findLotNoByAccountCodeAndDate(GoodsType goodsType, LocalDate now){
         return Optional.ofNullable(jpaQueryFactory
                     .select(lotMaster.lotNo)
                     .from(lotMaster)
                         .leftJoin(item).on(item.id.eq(lotMaster.item.id))
                         .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
-                        .leftJoin(itemAccountCode).on(itemAccountCode.id.eq(itemAccountCode.id))
                     .where(
-                            lotMaster.createdDate.between(startDate.atStartOfDay(), LocalDateTime.of(startDate, LocalTime.MAX).withNano(0)),
-                            itemAccountCode.id.eq(itemAccountCodeId),
+                            lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0)),
+                            itemAccount.goodsType.eq(goodsType),
                             lotMaster.lotMasterDivision.eq(REAL_LOT),
                             lotMaster.deleteYn.isFalse()
                     )
                     .orderBy(lotMaster.createdDate.desc())
                     .limit(1)
                     .fetchOne());
+    }
+
+    // 제품분유에 따른 달에 가장 마지막에 생성된 LOT NO
+    @Override
+    public Optional<String> findLotNoByAccountCodeAndMonth(GoodsType goodsType, LocalDate now) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(lotMaster.lotNo)
+                        .from(lotMaster)
+                        .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                        .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                        .where(
+                                lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0)),
+                                lotMaster.deleteYn.isFalse(),
+                                lotMaster.lotMasterDivision.eq(REAL_LOT),
+                                itemAccount.goodsType.eq(goodsType)
+                        )
+                        .orderBy(lotMaster.createdDate.desc())
+                        .limit(1)
+                        .fetchOne()
+        );
     }
 
     // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 유효여부
