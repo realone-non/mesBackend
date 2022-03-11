@@ -51,7 +51,7 @@ public class ProductionPlanController {
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업예정일 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업예정일 toDate") LocalDate toDate,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
+    ) throws NotFoundException {
         List<ProductionPlanResponse> productionPlans = productionPlanService.getProductionPlans(workLineId, fromDate, toDate);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProductionPlans.");

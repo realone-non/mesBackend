@@ -3,7 +3,6 @@ package com.mes.mesBackend.helper.impl;
 import com.mes.mesBackend.entity.ProduceOrder;
 import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.OrderState;
-import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.WorkOrderStateHelper;
 import com.mes.mesBackend.repository.ProduceOrderRepository;
@@ -11,8 +10,9 @@ import com.mes.mesBackend.repository.WorkOrderDetailRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
-import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL_MIXING;
 
 // 작업지시 orderState 변경
 @Component
@@ -55,10 +55,17 @@ public class WorkOrderStateHelperImpl implements WorkOrderStateHelper {
         else return ONGOING;
     }
 
-    // 제조오더에 해당하는 가장 최근 등록된 작업지시의 orderState
-    private OrderState getWorkOrderStateDesc(Long produceOrderId) {
-        return workOrderDetailRepo.findOrderStatesByProduceOrderId(produceOrderId)
-                .orElse(SCHEDULE);
+    // 제조오더에 해당되는 작업지시의 모든 지시상태
+    @Override
+    public OrderState getWorkOrderStateDesc(Long produceOrderId) {
+        List<OrderState> orderStates = workOrderDetailRepo.findOrderStatesByProduceOrderId(produceOrderId);
+
+        // 모든 상태값이 COMPLETION 이면 COMPLETION
+        // 하나라도 ONGOING 이면 ONGOING
+        // 모두 SCHEDULE 이면 SCHEDULE
+        return orderStates.stream().allMatch(a -> a.equals(COMPLETION)) ? COMPLETION
+                : orderStates.stream().anyMatch(o -> o.equals(ONGOING)) ? ONGOING
+                : SCHEDULE;
     }
 
     // 작업지시 단일 조회 및 예외
