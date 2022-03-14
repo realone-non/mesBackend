@@ -62,7 +62,7 @@ public interface LotMasterRepositoryCustom {
     PopRecycleResponse findBadAmountByWorkProcess(Long workProcessId, Long itemId);
 
     //재사용 생성 가능 LOT검색
-    List<LotMaster> findBadLotByItemIdAndWorkProcess(Long itemId, Long workProcessId);
+    List<LotMaster> findBadLotByItemIdAndWorkProcess(Long itemId, Long workProcessId, LotMasterDivision division);
 
     // 품목 id 에 해당되는 lotMaster 조회
     List<PopBomDetailLotMasterResponse> findAllByItemIdAndLotNo(Long itemId, String lotNo);

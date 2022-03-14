@@ -19,8 +19,7 @@ import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.FAMILY;
-import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.DUMMY_LOT;
-import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.*;
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 
@@ -393,6 +392,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .where(
                         lotMaster.workProcess.id.eq(workProcessId),
                         //workOrderDetail.orderState.eq(COMPLETION),
+                        lotMaster.lotMasterDivision.eq(DUMMY_LOT),
                         lotMaster.deleteYn.eq(false),
                         lotMaster.useYn.eq(true)
                 )
@@ -419,7 +419,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .leftJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
                 .where(
                         lotMaster.workProcess.id.eq(workProcessId),
-                        lotMaster.item.id.eq(itemId)
+                        lotMaster.item.id.eq(itemId),
+                        lotMaster.lotMasterDivision.eq(DUMMY_LOT)
                 )
                 .groupBy(lotMaster.item.id)
                 .fetchOne();
@@ -427,7 +428,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
 
     //재사용 가능한 LOT검색
     @Transactional(readOnly = true)
-    public List<LotMaster> findBadLotByItemIdAndWorkProcess(Long itemId, Long workProcessId){
+    public List<LotMaster> findBadLotByItemIdAndWorkProcess(Long itemId, Long workProcessId, LotMasterDivision division){
         return jpaQueryFactory
                 .selectFrom(lotMaster)
                 .leftJoin(item).on(item.id.eq(lotMaster.item.id))
@@ -437,7 +438,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         lotMaster.workProcess.id.eq(workProcessId),
                         lotMaster.badItemAmount.gt(0),
                         lotMaster.deleteYn.eq(false),
-                        lotMaster.useYn.eq(true)
+                        lotMaster.useYn.eq(true),
+                        lotMaster.lotMasterDivision.eq(division)
                 )
                 .orderBy(lotMaster.createdDate.desc())
                 .fetch();
