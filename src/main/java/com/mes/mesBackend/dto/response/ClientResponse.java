@@ -1,6 +1,8 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.Currency;
+import com.mes.mesBackend.entity.PayType;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -35,10 +37,10 @@ public class ClientResponse {
     String pccc;            // 통관고유번호
     CountryCodeResponse countryCode;     // 국가코드
     String area;        // 지역
-    String currencyUnit;    // 거래화폐단위
+    CurrencyResponse.idAndUnit currencyUnit;    // 거래화폐단위
     String companyCharge;  // 회사담당자
     String companyChargeDept;  // 회사담당부서
-    String paymentMethod;   // 대금결제방법
+    PayTypeResponse paymentMethod;   // 대금결제방법
     String paymentDate;     // 결제일자
     String transitMethod;   // 운송방법
     InspectionType inspectionType;      // 검사방법

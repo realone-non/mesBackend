@@ -71,4 +71,7 @@ public class EquipmentResponse {
     @Schema(description = "최종점검일자")
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate lastTestDate;
+
+    @Schema(description = "로트 생성 용 코드")
+    String lotCode;
 }

@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.response.PayTypeResponse;
+import com.mes.mesBackend.entity.PayType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 
@@ -17,4 +18,6 @@ public interface PayTypeService {
     PayTypeResponse updatePayType(Long id, String payTypeRequest) throws NotFoundException, BadRequestException;
     // 결제조건 삭제
     void deletePayType(Long id) throws NotFoundException;
+    // 결제조건 단일 조회 및 예외
+    PayType getPayTypeOrThrow(Long id) throws NotFoundException;
 }

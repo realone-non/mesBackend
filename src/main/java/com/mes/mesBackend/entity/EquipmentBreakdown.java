@@ -88,13 +88,13 @@ public class EquipmentBreakdown extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;
 
-    // TODO: equipmentBreakdownServiceImpl 에서 true 인건 안보이게 바꿔야함
     @Column(name = "VISIBLE_YN", columnDefinition = "bit(1) COMMENT '숨김여부'")
     private boolean visibleYn;  // pop 충진공정에서 등록한 설비고장내역은 true 로 들어가고 mes 에서 등록된건 false 로만 보여짐
 
     public void add(Equipment equipment, WorkCenter workCenter) {
         setEquipment(equipment);
         setWorkCenter(workCenter);
+        setVisibleYn(false);
     }
 
     public void update(EquipmentBreakdown newEquipmentBreakdown, Equipment newEquipment, WorkCenter newWorkCenter) {

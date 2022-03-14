@@ -4,6 +4,7 @@ import com.mes.mesBackend.entity.LotLog;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.WorkProcess;
+import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.LotLogHelper;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.DUMMY_LOT;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.SHIPMENT;
 
 // lotLog

@@ -2,20 +2,15 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.ClientRequest;
 import com.mes.mesBackend.dto.response.ClientResponse;
-import com.mes.mesBackend.entity.BusinessType;
-import com.mes.mesBackend.entity.Client;
-import com.mes.mesBackend.entity.ClientType;
-import com.mes.mesBackend.entity.CountryCode;
+import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.impl.S3UploaderImpl;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.ClientRepository;
-import com.mes.mesBackend.service.BusinessTypeService;
-import com.mes.mesBackend.service.ClientService;
-import com.mes.mesBackend.service.ClientTypeService;
-import com.mes.mesBackend.service.CountryCodeService;
+import com.mes.mesBackend.service.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,25 +21,16 @@ import java.util.List;
 import static com.mes.mesBackend.entity.enumeration.InspectionType.NONE;
 
 @Service
+@RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
-
-    @Autowired
-    ClientRepository clientRepository;
-
-    @Autowired
-    BusinessTypeService businessTypeService;
-
-    @Autowired
-    ClientTypeService clientTypeService;
-
-    @Autowired
-    CountryCodeService countryCodeService;
-
-    @Autowired
-    S3UploaderImpl s3Service;
-
-    @Autowired
-    ModelMapper modelMapper;
+    private final ClientRepository clientRepository;
+    private final BusinessTypeService businessTypeService;
+    private final ClientTypeService clientTypeService;
+    private final CountryCodeService countryCodeService;
+    private final S3UploaderImpl s3Service;
+    private final ModelMapper modelMapper;
+    private final CurrencyService currencyService;
+    private final PayTypeService payTypeService;
 
     public Client getClientOrThrow(Long id) throws NotFoundException {
         return clientRepository.findByIdAndDeleteYnFalse(id)
@@ -56,11 +42,13 @@ public class ClientServiceImpl implements ClientService {
         BusinessType businessType = clientRequest.getBusinessType() != null ? businessTypeService.getBusinessTypeOrThrow(clientRequest.getBusinessType()) : null;
         CountryCode countryCode = clientRequest.getCountryCode() != null ? countryCodeService.getCountryCodeOrThrow(clientRequest.getCountryCode()) : null;
         ClientType clientType = clientTypeService.getClientTypeOrThrow(clientRequest.getClientType());
+        Currency currency = clientRequest.getCurrencyUnit() != null ? currencyService.getCurrencyOrThrow(clientRequest.getCurrencyUnit()) : null;
+        PayType payType = clientRequest.getPaymentMethod() != null ? payTypeService.getPayTypeOrThrow(clientRequest.getPaymentMethod()) : null;
         Client client = modelMapper.toEntity(clientRequest, Client.class);
 
         if(clientRequest.getInspectionType().equals(NONE)) client.setInspectionType(null);
 
-        client.addJoin(businessType, countryCode, clientType);
+        client.addJoin(businessType, countryCode, clientType, currency, payType);
         clientRepository.save(client);
         return modelMapper.toResponse(client, ClientResponse.class);
     }
@@ -89,8 +77,10 @@ public class ClientServiceImpl implements ClientService {
         BusinessType newBusinessType = clientRequest.getBusinessType() != null ? businessTypeService.getBusinessTypeOrThrow(clientRequest.getBusinessType()) : null;
         CountryCode newCountryCode = clientRequest.getCountryCode() != null ? countryCodeService.getCountryCodeOrThrow(clientRequest.getCountryCode()) : null;
         ClientType newClientType = clientTypeService.getClientTypeOrThrow(clientRequest.getClientType());
+        Currency currency = clientRequest.getCurrencyUnit() != null ? currencyService.getCurrencyOrThrow(clientRequest.getCurrencyUnit()) : null;
+        PayType payType = clientRequest.getPaymentMethod() != null ? payTypeService.getPayTypeOrThrow(clientRequest.getPaymentMethod()) : null;
 
-        findClient.put(newClient, newBusinessType, newCountryCode, newClientType);
+        findClient.put(newClient, newBusinessType, newCountryCode, newClientType, currency, payType);
         clientRepository.save(findClient);
         return modelMapper.toResponse(findClient, ClientResponse.class);
     }

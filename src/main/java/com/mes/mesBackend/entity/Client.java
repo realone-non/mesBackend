@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 
 import static javax.persistence.EnumType.STRING;
+import static javax.persistence.FetchType.LAZY;
 
 /*
  * 거래처등록
@@ -61,7 +62,7 @@ public class Client extends BaseTimeEntity {
     private String shortName;      // 약어
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "CLIENT_TYPE", nullable = false, columnDefinition = "bigint COMMENT '거래처 유형'")
     private ClientType clientType;   // 거래처 유형
 
@@ -84,7 +85,7 @@ public class Client extends BaseTimeEntity {
     private String detailAddress;   // 상세주소
 
     // 다대일 단방향
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "BUSINESS_TYPE", columnDefinition = "bigint COMMENT '업태'")
     private BusinessType businessType;      // 업태
 
@@ -112,15 +113,16 @@ public class Client extends BaseTimeEntity {
     @Column(name = "PCCC", columnDefinition = "varchar(255) COMMENT '통관고유번호'")
     private String pccc;            // 통관고유번호
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "COUNTRY_CODE", columnDefinition = "bigint COMMENT '국가코드'")
     private CountryCode countryCode;     // 국가코드
 
     @Column(name = "AREA", columnDefinition = "varchar(255) COMMENT '지역'")
     private String area;        // 지역
 
-    @Column(name = "CURRENCY_UNIT", columnDefinition = "varchar(255) COMMENT '거래화폐단위'")
-    private String currencyUnit;    // 거래화폐단위
+    @ManyToOne(fetch =LAZY)
+    @JoinColumn(name = "CURRENCY_UNIT", columnDefinition = "bigint(1) COMMENT '거래화폐단위'")
+    private Currency currencyUnit;    // 거래화폐단위
 
     @Column(name = "COMPANY_CHARGE", columnDefinition = "varchar(255) COMMENT '회사담당자'")
     private String companyCharge;  // 회사담당자
@@ -128,8 +130,9 @@ public class Client extends BaseTimeEntity {
     @Column(name = "COMPANY_CHARGE_DEPT", columnDefinition = "varchar(255) COMMENT '회사담당부서'")
     private String companyChargeDept;  // 회사담당부서
 
-    @Column(name = "PAYMENT_METHOD", columnDefinition = "varchar(255) COMMENT '대금결제방법'")
-    private String paymentMethod;   // 대금결제방법
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "PAYMENT_METHOD", columnDefinition = "bigint(1) COMMENT '대금결제방법'")
+    private PayType paymentMethod;   // 대금결제방법
 
     @Column(name = "PAYMENT_DATE", columnDefinition = "varchar(255) COMMENT '결제일자'")
     private String paymentDate;     // 결제일자
@@ -157,7 +160,9 @@ public class Client extends BaseTimeEntity {
     public void put(Client newClient,
                     BusinessType newBusinessType,
                     CountryCode newCountryCode,
-                    ClientType newClientType
+                    ClientType newClientType,
+                    Currency newCurrency,
+                    PayType newPayType
     ) {
         setClientCode(newClient.clientCode);
         setClientName(newClient.clientName);
@@ -180,10 +185,10 @@ public class Client extends BaseTimeEntity {
         setPccc(newClient.pccc);
         setCountryCode(newCountryCode);
         setArea(newClient.area);
-        setCurrencyUnit(newClient.currencyUnit);
+        setCurrencyUnit(newCurrency);
         setCompanyCharge(newClient.companyCharge);
         setCompanyChargeDept(newClient.companyChargeDept);
-        setPaymentMethod(newClient.paymentMethod);
+        setPaymentMethod(newPayType);
         setPaymentDate(newClient.paymentDate);
         setTransitMethod(newClient.transitMethod);
         setInspectionType(inspectionType);
@@ -194,11 +199,15 @@ public class Client extends BaseTimeEntity {
     public void addJoin(
             BusinessType businessType,
             CountryCode countryCode,
-            ClientType clientType
+            ClientType clientType,
+            Currency currency,
+            PayType payType
     ) {
         setBusinessType(businessType);
         setCountryCode(countryCode);
         setClientType(clientType);
+        setCurrencyUnit(currency);
+        setPaymentMethod(payType);
     }
 
     public void delete() {

@@ -7,17 +7,16 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.LotTypeRepository;
 import com.mes.mesBackend.service.LotTypeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class LotTypeServiceImpl implements LotTypeService {
-    @Autowired
-    LotTypeRepository lotTypeRepository;
-    @Autowired
-    ModelMapper mapper;
+    private final LotTypeRepository lotTypeRepository;
+    private final ModelMapper mapper;
 
     // Lot유형 생성
     @Override
