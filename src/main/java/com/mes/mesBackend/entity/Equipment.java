@@ -97,7 +97,7 @@ public class Equipment extends BaseTimeEntity {
     @Column(name = "PRODUCE_YN", columnDefinition = "bit(1) COMMENT '원료혼합 공정 반제품 생성 가능 여부'", nullable = false)
     private boolean produceYn;  // true: 생성가능, false: 생성 불가능
 
-    @Column(name = "LOT_CODE", columnDefinition = "varchar(255) COMMENT '로트생성 설비 코드'", nullable = false)
+    @Column(name = "LOT_CODE", columnDefinition = "varchar(255) COMMENT '로트생성 설비 코드'")
     private String lotCode;
 
     public void addJoin(Client client, WorkLine workLine, WorkProcess workProcess) {
