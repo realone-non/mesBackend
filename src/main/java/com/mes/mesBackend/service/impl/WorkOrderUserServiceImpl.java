@@ -1,15 +1,11 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.response.WorkOrderUserResponse;
-import com.mes.mesBackend.entity.ProduceOrder;
 import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.WorkOrderStateHelper;
-import com.mes.mesBackend.repository.ProduceOrderRepository;
-import com.mes.mesBackend.repository.ProductionPerformanceRepository;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
 import com.mes.mesBackend.service.UserService;
 import com.mes.mesBackend.service.WorkOrderUserService;
@@ -20,7 +16,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.mes.mesBackend.entity.enumeration.OrderState.*;
+import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
+import static com.mes.mesBackend.entity.enumeration.OrderState.ONGOING;
 
 // 8-2. 작업자 투입 수정
 @Service
@@ -28,9 +25,6 @@ import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 public class WorkOrderUserServiceImpl implements WorkOrderUserService {
     private final WorkOrderDetailRepository workOrderDetailRepository;
     private final UserService userService;
-    private final ProduceOrderRepository produceOrderRepo;
-    private final WorkOrderDetailRepository workOrderDetailRepo;
-
     @Override
     public List<WorkOrderUserResponse> getWorkOrderUsers(
             Long workLineId,
@@ -72,56 +66,22 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
 
         if (!workOrderDetail.getOrderState().equals(COMPLETION)) {  // 작업지시 상태가 완료가 아닌데
             if (workOrderDetail.getStartDate() != newStartDate && workOrderDetail.getEndDate() != newEndDate) {     // 기존 작업지시의 시작날짜 종료일자와 입력받은 데이터가 다를경우 예외
-                throw new BadRequestException("작업지시의 지시상태가 완료일 경우에만 시작일시, 종료일시를 변경 또는 입력 할 수 있습니다.");
+                throw new BadRequestException("작업지시의 지시상태가 완료일 경우에만 시작일시, 종료일시를 변경 또는 입력할수 있습니다.");
             }
         } else {
             // 작업지시의 상태가 완료인데 입력받은 newStartDate, newEndDate 가 null 이면 예외
             if (newStartDate == null || newEndDate == null) {
-                throw new BadRequestException("작업지시의 지시상태가 완료일 경우에는 시작일시, 종료일시를 삭제할 수 없습니다.");
+                throw new BadRequestException("작업지시의 지시상태가 완료일 경우에는 시작일시, 종료일시를 값을 삭제할수 없습니다.");
             }
-        }
-
-        OrderState orderState;
-        if (newStartDate != null && newEndDate != null) {
-            orderState = COMPLETION;
-        } else if (newStartDate != null) {
-            orderState = ONGOING;
-        } else if (newEndDate != null) {
-            throw new BadRequestException("startDate cannot be null if endDate exists.");
-        } else {
-            throw new BadRequestException("startDate, endDate cannot be null.");
         }
 
         User newUser = userService.getUserOrThrow(newUserId);
         workOrderDetail.setUser(newUser);
-        workOrderDetail.setOrderState(orderState);
         workOrderDetail.setStartDate(newStartDate);
         workOrderDetail.setEndDate(newEndDate);
         workOrderDetailRepository.save(workOrderDetail);
 
-        // produceOrder(제조오더): 제조오더에 해당하는 workOrderDetail(작업지시) 의 orderState 상태값 별로 제조오더의 상태값도 변경됨.
-//        ProduceOrder produceOrder = getProduceOrderOrThrow(workOrderDetail.getProduceOrder().getId());
-//        produceOrder.setOrderState(getWorkOrderStateDesc(produceOrder.getId()));
-//        produceOrderRepo.save(produceOrder);
-
-        // 생산실적: 작업지시에 해당하는 생산실적 없으면 새로 생성, 있으면 공정에 해당하는 컬럼에 update
-//        ProductionPerformance productionPerformance = workOrderStateHelper.getProductionPerformanceOrCreate(workOrderDetail);
-//        productionPerformance.updateProcessDateTime(workOrderDetail.getWorkProcess(), workOrderDetail.getOrderState());
-//        productionPerformanceRepo.save(productionPerformance);
-
         return getWorkOrderUserResponseOrThrow(workOrderDetailId);
-    }
-
-    // 제조오더 단일 조회 및 예외
-    private ProduceOrder getProduceOrderOrThrow(Long id) throws NotFoundException {
-        return produceOrderRepo.findByIdAndDeleteYnFalse(id)
-                .orElseThrow(() -> new NotFoundException("[workOrderStateHelperError] produceOrder does not exist. produceOrderId: " + id));
-    }
-
-    // 제조오더에 해당하는 가장 최근 등록된 작업지시의 orderState
-    private OrderState getWorkOrderStateDesc(Long produceOrderId) {
-        return workOrderDetailRepo.findOrderStatesByProduceOrderId(produceOrderId)
-                .orElse(SCHEDULE);
     }
 
 //     시작날짜, 종료날자 둘다 입력 받았을 시 endDate 가 startDate 보다 과거면 badRequestException.

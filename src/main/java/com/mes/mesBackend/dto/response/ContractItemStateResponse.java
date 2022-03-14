@@ -9,6 +9,8 @@ import lombok.*;
 import java.time.LocalDate;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
+import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 @Getter
 @Setter
@@ -17,7 +19,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class ContractItemStateResponse {
     @Schema(description = "수주일자")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate contractDate;     // 수주일자
 
     @Schema(description = "JOB No")
@@ -34,6 +36,9 @@ public class ContractItemStateResponse {
 
     @Schema(description = "고객발주번호")
     String clientOrderNo;
+
+    @Schema(description = "담당자 고유아이디")
+    Long userId;
 
     @Schema(description = "담당자")
     String userName;
@@ -75,7 +80,7 @@ public class ContractItemStateResponse {
     double surtax;
 
     @Schema(description = "납기일자")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDate periodDate;       // 납기일자
 
     @Schema(description = "비고")

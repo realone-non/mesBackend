@@ -65,8 +65,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         // 입력받은 공정이 기존에 제조오더에 등록되어 있는 공정이면 예외(하나의 제조오더에 하나의 작업공정만 등록 가능)
         throwIfWorkProcessByProduceOrder(produceOrderId, workOrderRequest.getWorkProcess());
-        // 해당하는 제조오더에 입력한 작업공정이 존재할 경우 예외
-
 
         WorkOrderDetail workOrderDetail = mapper.toEntity(workOrderRequest, WorkOrderDetail.class);
         String workOrderNo = numberAutomatic.createDateTimeNo();
@@ -134,31 +132,16 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         WorkLine newWorkLine = workLineService.getWorkLineOrThrow(newWorkOrderRequest.getWorkLine());
         User newUser = newWorkOrderRequest.getUser() != null ? userService.getUserOrThrow(newWorkOrderRequest.getUser()) : null;
-        ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
 
-        // orderAmount 가 0 이면 제조오더 정보의(productOrder) 수주품목수량(contractItem.amount) 으로 저장
-        // orderAmount: 사용자가 입력한 지시수량
-        int orderAmount = newWorkOrderRequest.getOrderAmount() != 0 ? newWorkOrderRequest.getOrderAmount() : produceOrder.getContractItem().getAmount();
-
-        if (findWorkOrderDetail.getOrderState().equals(COMPLETION)) {
-            if (orderAmount > findWorkOrderDetail.getOrderAmount()) {
-                // 입력받은 지시수량이 현재 작업한 생산수량보다 크면 상태값 ONGOING 으로 변경;;
-                findWorkOrderDetail.setOrderState(ONGOING);
-                produceOrder.setOrderState(ONGOING);
-            }
-        }
-
-        if (findWorkOrderDetail.getOrderState().equals(ONGOING) && findWorkOrderDetail.getOrderState().equals(SCHEDULE)) {
-            // 입력받은 지시수량이 현재 작업한 생산수량이랑 같아지면 COMPLETION 으로 변경
-            if (orderAmount == findWorkOrderDetail.getProductionAmount()) {
-                findWorkOrderDetail.setOrderState(COMPLETION);
-            }
-        }
-
-        newWorkOrderRequest.setOrderAmount(orderAmount);
         WorkOrderDetail newWorkOrderDetail = mapper.toEntity(newWorkOrderRequest, WorkOrderDetail.class);
+
+        // 작업지시의 상태값 구하기
+        OrderState orderState = workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(newWorkOrderRequest.getOrderAmount(), findWorkOrderDetail.getProductionAmount());
+        findWorkOrderDetail.setOrderState(orderState);
         findWorkOrderDetail.update(newWorkOrderDetail, newWorkLine, newUser);
         workOrderDetailRepo.save(findWorkOrderDetail);
+
+        // 작업지시 상태값, 제조오더 상태값 변경
         workOrderStateHelper.updateOrderState(findWorkOrderDetail.getId(), findWorkOrderDetail.getOrderState());
 
         return getWorkOrderResponseOrThrow(produceOrderId, workOrderId);
@@ -174,8 +157,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         if (!workOrderDetail.getOrderState().equals(SCHEDULE)) {
             throw new BadRequestException("진행중이거나 완료가 된 작업지시는 삭제 할 수 없습니다.");
         }
-            workOrderDetail.delete();
-            workOrderDetailRepo.save(workOrderDetail);
+        workOrderDetail.delete();
+        workOrderDetailRepo.save(workOrderDetail);
     }
 
 
@@ -185,55 +168,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
         return workOrderDetailRepo.findByIdAndProduceOrderAndDeleteYnFalse(id, produceOrder)
                 .orElseThrow(() -> new NotFoundException("workOrderDetail does not exist. input id: " + id));
-    }
-
-
-//     produceOrder(제조오더): 제조오더에 해당하는 workOrderDetail(작업지시) 의 orderState 상태값 별로 제조오더의 상태값도 변경됨.
-//    @Override
-//    public void changeOrderStateOfProduceOrder(ProduceOrder produceOrder) {
-//        OrderState orderState = workOrderDetailRepo.findOrderStatesByProduceOrderId(produceOrder.getId())
-//                .orElse(SCHEDULE);
-//        switch (orderState) {
-//            case SCHEDULE: produceOrder.setOrderState(SCHEDULE);
-//                break;
-//            case ONGOING: produceOrder.setOrderState(ONGOING);
-//                break;
-//            case COMPLETION: produceOrder.setOrderState(COMPLETION);
-//                break;
-//        }
-//    }
-
-        // 수주품목의 수주품목수량(오더수량) 보다 여태 저장된 지시수량 + 입력받은 지시수량이 크면 예외
-//    private void throwIfTotalOrderAmountGreaterThanAmountOfProduceOrder(Long produceOrderId, int orderAmount, int amountOfProduceOrder) throws BadRequestException {
-//        List<Integer> orderAmounts = workOrderDetailRepo.findOrderAmountsByProduceOrderId(produceOrderId);
-//        int orderAmountSum = orderAmounts.stream().mapToInt(Integer::intValue).sum();
-//        if (orderAmountSum + orderAmount > amountOfProduceOrder) {
-//            throw new BadRequestException("total orderAmount must not be greater than the amount of produceOrder. " +
-//                    "input orderAmount: " + orderAmount + ", " +
-//                    "total orderAmount: " + orderAmountSum + ", " +
-//                    "amount of produceOrder: " + amountOfProduceOrder
-//            );
-//        }
-//    }
-
-    // 사용자가 입력한 지시수량이 수주품목의 수량보다 크면 예외
-    private void throwIfOrderAmountGreaterThanProduceOrderAmount(int orderAmount, int orderAmountOfProduceOrder) throws BadRequestException {
-        if (orderAmount > orderAmountOfProduceOrder) {
-            throw new BadRequestException("input orderAmount must not be greater than amount of produceOrder." +
-                    " input orderAmount: " + orderAmount + ", " +
-                    "amount of produceOrder: " + orderAmountOfProduceOrder
-            );
-        }
-    }
-
-    // 사용자가 입력한 생산수량이 지시수량보다 크면 예외
-    private void throwIfProductionAmountGreaterThanOrderAmount(int productionAmount, int orderAmount) throws BadRequestException {
-        if (productionAmount > orderAmount) {
-            throw new BadRequestException("input productionAmount must not be greater than orderAmount. " +
-                    "input productionAmount: " + productionAmount + ", " +
-                    "orderAmount: " + orderAmount
-            );
-        }
     }
 
     // 입력받은 공정이 기존에 제조오더에 등록되어 있는 공정이면 예외(하나의 제조오더에 하나의 작업공정만 등록 가능)

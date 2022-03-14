@@ -14,7 +14,6 @@ import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.LotMasterService;
 import com.mes.mesBackend.service.OutsourcingService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -31,7 +30,6 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     private final OutsourcingReturnRepository outsourcingReturnRepository;
     private final BomMasterRepository bomMasterRepository;
     private final BomItemDetailRepository bomItemDetailRepository;
-    private final LotMasterService lotMasterService;
     private final LotMasterRepository lotMasterRepository;
     private final WareHouseRepository wareHouseRepository;
     private final LotTypeRepository lotTypeRepository;
@@ -154,19 +152,25 @@ public class OutsourcingServiceImpl implements OutsourcingService {
         outsourcingInputRepository.save(input);
     }
 
+    private LotType getLotTypeOrThrow(Long id) throws NotFoundException {
+        return lotTypeRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("lotType does not exist. input id: " + id));
+    }
+
     //외주 입고 LOT정보 등록
     public OutsourcingInputLOTResponse createOutsourcingInputLOT(Long id, OutsourcingInputLOTRequest request)
             throws NotFoundException, BadRequestException {
         Optional<OutSourcingInput> input = outsourcingInputRepository.findById(id);
 
+
         //Lot 생성
         LotMasterRequest lotMasterRequest = new LotMasterRequest();
-        lotMasterRequest.putOutsourcingInput(
+        lotMasterRequest.putOutsourcingInputLotRequest(
                 input.get().getProductionRequest().getBomMaster().getItem(),
                 input.get().getInputWareHouse(),
-                input.get().getId(),
+                input.get(),
                 request.getInputAmount(),
-                request.getLotType()
+                getLotTypeOrThrow(request.getLotType())
         );
 
         String lotNo = lotHelper.createLotMaster(lotMasterRequest).getLotNo();

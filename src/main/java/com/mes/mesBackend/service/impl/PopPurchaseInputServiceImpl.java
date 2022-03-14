@@ -5,7 +5,6 @@ import com.mes.mesBackend.dto.response.PopPurchaseOrderResponse;
 import com.mes.mesBackend.dto.response.PopPurchaseRequestResponse;
 import com.mes.mesBackend.entity.PurchaseInput;
 import com.mes.mesBackend.entity.PurchaseRequest;
-import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -13,9 +12,7 @@ import com.mes.mesBackend.helper.LotHelper;
 import com.mes.mesBackend.repository.PurchaseInputRepository;
 import com.mes.mesBackend.repository.PurchaseOrderRepository;
 import com.mes.mesBackend.repository.PurchaseRequestRepository;
-import com.mes.mesBackend.service.LotMasterService;
 import com.mes.mesBackend.service.PopPurchaseInputService;
-import com.mongodb.MongoNamespace;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -107,23 +104,23 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
 
         int allInputAmount = purchaseInputAmount + inputAmount;   // 현재 입고된 수량 + 입력된 입고수량
 
-        // orderState 변경: 구매요청의 발주수량 만큼 모두 입고 완료 햇을때 구매요청의 지시상태값을 완료(COMPLETION) 으로 변경한다.
-        purchaseRequest.setOrdersState(ONGOING);    // 입고되면 ONGOING 으로
-        if (allInputAmount >= purchaseRequest.getOrderAmount()) purchaseRequest.putOrderStateChangedCompletion();
 
         PurchaseInput purchaseInput = new PurchaseInput();
         purchaseInput.setPurchaseRequest(purchaseRequest);
         purchaseInput.setInputAmount(inputAmount);
         purchaseInputRepo.save(purchaseInput);
 
+        // orderState 변경: 구매요청의 발주수량 만큼 모두 입고 완료 햇을때 구매요청의 지시상태값을 완료(COMPLETION) 으로 변경한다.
+        purchaseRequest.setOrdersState(ONGOING);    // 입고되면 ONGOING 으로
+        if (allInputAmount >= purchaseRequest.getOrderAmount()) purchaseRequest.putOrderStateChangedCompletion();   // 모든수량 입고되면 COMPLETION
         putInputDateToPurchaseRequest(purchaseRequest);
         purchaseRequestRepo.save(purchaseRequest);
 
         // lot 생성
         LotMasterRequest lotMasterRequest = new LotMasterRequest();
-        lotMasterRequest.setPurchaseInputId(purchaseInput.getId()); // 구매입고
+        lotMasterRequest.setPurchaseInput(purchaseInput); // 구매입고
         lotMasterRequest.setItem(purchaseRequest.getItem());        // 품목
-        lotMasterRequest.setLotTypeId(purchaseRequest.getItem().getLotType().getId());      // Lot 유형
+        lotMasterRequest.setLotType(purchaseRequest.getItem().getLotType());      // Lot 유형
         lotMasterRequest.setEnrollmentType(PURCHASE_INPUT); // 등록유형
         lotMasterRequest.setCreatedAmount(inputAmount);     // lotMaster 생성수량
         lotMasterRequest.setStockAmount(inputAmount);       // lotMaster 재고수량

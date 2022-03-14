@@ -1,7 +1,6 @@
 package com.mes.mesBackend.dto.request;
 
-import com.mes.mesBackend.entity.Item;
-import com.mes.mesBackend.entity.WareHouse;
+import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.QualityLevel;
@@ -12,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import static com.mes.mesBackend.entity.enumeration.EnrollmentType.OUTSOURCING_INPUT;
+import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PURCHASE_INPUT;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.*;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL_INPUT;
 
@@ -23,7 +24,7 @@ import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL
 public class LotMasterRequest {
     Item item;
     WareHouse wareHouse;
-    Long lotTypeId;        // lot 타입
+    LotType lotType;        // lot 타입
     String serialNo;        // 시리얼번호
     EnrollmentType enrollmentType;      // 등록유형
     boolean processYn;      // 공정용
@@ -41,8 +42,8 @@ public class LotMasterRequest {
     int recycleAmount;          // 재사용 수량
     QualityLevel qualityLevel;      // 품질등급
 
-    Long purchaseInputId;       //구매입고 ID
-    Long outsourcingInputId;        //외주입고 ID
+    PurchaseInput purchaseInput;       //구매입고
+    OutSourcingInput outSourcingInput;        //외주입고
 
     Long workProcessId;
 
@@ -51,42 +52,45 @@ public class LotMasterRequest {
 
     LotMasterDivision lotMasterDivision;
 
-    public void putPurchaseInput(
+    // 자재입고 lot
+    public void putPurchaseInputLotRequest(
             Item item,
             WareHouse wareHouse,
-            Long purchaseInputId,
+            PurchaseInput purchaseInput,
             int stockAmount,
             int createdAmount,
-            Long lotType,
+            LotType lotType,
             boolean processYn
     ) {
         setItem(item);
         setWareHouse(wareHouse);
-        setPurchaseInputId(purchaseInputId);
+        setPurchaseInput(purchaseInput);
         setStockAmount(stockAmount);
         setCreatedAmount(createdAmount);
-        setLotTypeId(lotType);
+        setLotType(lotType);
         setProcessYn(processYn);
         setWorkProcessDivision(MATERIAL_INPUT);
         setLotMasterDivision(REAL_LOT);
+        setEnrollmentType(PURCHASE_INPUT);
     }
 
-    public void putOutsourcingInput(
+    // 외주입고 lot
+    public void putOutsourcingInputLotRequest(
             Item item,
             WareHouse wareHouse,
-            Long outsourcingInputId,
+            OutSourcingInput outSourcingInput,
             int stockAmount,
-            Long lotType
+            LotType lotType
     ) {
         setItem(item);
         setWareHouse(wareHouse);
-        setOutsourcingInputId(outsourcingInputId);
+        setOutSourcingInput(outSourcingInput);
         setStockAmount(stockAmount);
         setCreatedAmount(stockAmount);
-        setCreatedAmount(stockAmount);
-        setLotTypeId(lotType);
+        setLotType(lotType);
         setLotMasterDivision(REAL_LOT);
         setWorkProcessDivision(MATERIAL_INPUT);
+        setEnrollmentType(OUTSOURCING_INPUT);
     }
 
     public void putPopWorkOrder(
