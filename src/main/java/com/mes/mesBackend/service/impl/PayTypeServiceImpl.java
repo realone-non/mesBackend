@@ -58,7 +58,8 @@ public class PayTypeServiceImpl implements PayTypeService {
     }
 
     // 결제조건 단일 조회 및 예외
-    private PayType getPayTypeOrThrow(Long id) throws NotFoundException {
+    @Override
+    public PayType getPayTypeOrThrow(Long id) throws NotFoundException {
         return payTypeRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("payType does not exist. input id: " + id));
     }

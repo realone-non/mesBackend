@@ -16,4 +16,6 @@ public class UserLogin {
     String userCode;
     @NotBlank(message = NOT_NULL)
     String password;
+    @NotBlank(message = NOT_NULL)
+    String userIp;
 }

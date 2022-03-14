@@ -392,7 +392,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .innerJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
                 .where(
                         lotMaster.workProcess.id.eq(workProcessId),
-                        workOrderDetail.orderState.eq(COMPLETION),
+                        //workOrderDetail.orderState.eq(COMPLETION),
                         lotMaster.deleteYn.eq(false),
                         lotMaster.useYn.eq(true)
                 )
@@ -484,11 +484,11 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 )
                 .from(lotMaster)
                 .innerJoin(item).on(item.id.eq(lotMaster.item.id))
-                .innerJoin(lotLog).on(lotLog.lotMaster.id.eq(lotMaster.id))
+                .leftJoin(lotLog).on(lotLog.lotMaster.id.eq(lotMaster.id))
                 .innerJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
                 .innerJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
                 .where(
-                        workOrderDetail.orderState.eq(COMPLETION),
+                        //workOrderDetail.orderState.eq(COMPLETION),
                         lotMaster.deleteYn.eq(false),
                         lotMaster.stockAmount.gt(0),
                         lotMaster.useYn.eq(true),

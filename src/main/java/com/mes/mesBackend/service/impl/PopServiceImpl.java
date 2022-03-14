@@ -12,7 +12,6 @@ import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.LotMasterService;
 import com.mes.mesBackend.service.PopService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -252,7 +251,9 @@ public class PopServiceImpl implements PopService {
             workOrderStateHelper.updateOrderState(workOrderId, orderState);
 
             // lotLog 생성
-            lotLogHelper.createLotLog(dummyLot.getId(), workOrderId, workProcess.getId());
+            if (dummyLot.getLotMasterDivision().equals(DUMMY_LOT)) {
+                lotLogHelper.createLotLog(dummyLot.getId(), workOrderId, workProcess.getId());
+            }
 
             if (orderState.equals(COMPLETION)) {
                 productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
@@ -699,7 +700,6 @@ public class PopServiceImpl implements PopService {
 
         LotMasterRequest realLotRequest = new LotMasterRequest();
         LotMaster realLot;
-
 
         realLotRequest.putPopWorkOrder(
                 equipmentLot.getItem(),

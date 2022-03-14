@@ -86,8 +86,8 @@ public class ClientRequest {
     @Schema(description = "지역")
     String area;
 
-    @Schema(description = "거래화폐단위")
-    String currencyUnit;
+    @Schema(description = "거래화폐단위 (화폐 고유아이디)")
+    Long currencyUnit;
 
     @Schema(description = "회사담당자")
     String companyCharge;
@@ -95,8 +95,8 @@ public class ClientRequest {
     @Schema(description = "회사담당부서")
     String companyChargeDept;
 
-    @Schema(description = "대금결제방법")
-    String paymentMethod;
+    @Schema(description = "대금결제방법 (결제방법 고유아이디)")
+    Long paymentMethod;
 
     @Schema(description = "결제일자")
     String paymentDate;
