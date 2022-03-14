@@ -392,7 +392,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .innerJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
                 .where(
                         lotMaster.workProcess.id.eq(workProcessId),
-                        workOrderDetail.orderState.eq(COMPLETION),
+                        //workOrderDetail.orderState.eq(COMPLETION),
                         lotMaster.deleteYn.eq(false),
                         lotMaster.useYn.eq(true)
                 )
