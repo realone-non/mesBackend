@@ -49,6 +49,7 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
                         .selectFrom(lotEquipmentConnect)
                         .leftJoin(lotMaster).on(lotMaster.id.eq(lotEquipmentConnect.childLot.id))
                         .where(lotMaster.id.eq(childLotId))
+                        .limit(1)
                         .fetchOne()
         );
     }
