@@ -4,12 +4,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static com.mes.mesBackend.exception.Message.*;
+import static com.mes.mesBackend.exception.Message.NOT_NULL;
 
 @Getter
 @Setter
@@ -22,8 +22,8 @@ public class EquipmentRequest {
     @NotBlank(message = NOT_NULL)
     String equipmentName;
 
-    @Schema(description = "설비유형")
-    String equipmentType;
+//    @Schema(description = "설비유형")
+//    String equipmentType;
 
     @Schema(description = "규격&모델")
     String model;
@@ -58,4 +58,13 @@ public class EquipmentRequest {
 
     @Schema(description = "작업공정")
     Long workProcessId;
+
+    @Schema(description = "수명(월)정보")
+    String life;
+
+    @Schema(description = "최종점검일자")
+    LocalDate lastTestDate;
+
+    @Schema(description = "로트 생성 용 코드")
+    String lotCode;
 }

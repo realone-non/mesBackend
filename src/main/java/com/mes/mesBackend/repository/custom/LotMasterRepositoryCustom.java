@@ -2,6 +2,7 @@ package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.ItemAccountCode;
+import com.mes.mesBackend.entity.LotEquipmentConnect;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.OutSourcingInput;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
@@ -36,7 +37,11 @@ public interface LotMasterRepositoryCustom {
     Optional<String> findLotNoByGoodsType(GoodsType goodsType, LocalDate startDate, LocalDate endDate);
 
     //제품분류에 따른 가장 마지막에 생성된 LOT NO 반환(수정버전)
-    Optional<String> findLotNoByAccountCode(Long itemAccountCodeId, LocalDate startDate);
+    // 제품 분휴에 따는 일에 가장 마지막에 생성된 LOT NO
+    Optional<String> findLotNoByAccountCodeAndDate(GoodsType goodsType, LocalDate now);
+    // 제품분유에 따른 일에 가장 마지막에 생성된 LOT NO
+    Optional<String> findLotNoByAccountCodeAndMonth(GoodsType goodsType, LocalDate now);
+
     //외주입고정보로 LOT정보 가져오기
     List<OutsourcingInputLOTResponse> findLotMastersByOutsourcing(Long inputId);
     //LOT정보 조회
@@ -57,7 +62,7 @@ public interface LotMasterRepositoryCustom {
     PopRecycleResponse findBadAmountByWorkProcess(Long workProcessId, Long itemId);
 
     //재사용 생성 가능 LOT검색
-    List<LotMaster> findBadLotByItemIdAndWorkProcess(Long itemId, Long workProcessId);
+    List<LotMaster> findBadLotByItemIdAndWorkProcess(Long itemId, Long workProcessId, LotMasterDivision division);
 
     // 품목 id 에 해당되는 lotMaster 조회
     List<PopBomDetailLotMasterResponse> findAllByItemIdAndLotNo(Long itemId, String lotNo);
@@ -67,4 +72,24 @@ public interface LotMasterRepositoryCustom {
     // 생성날짜가 오늘이고, lotDivision 이 dummny 인 걸 찾아옴
     Optional<String> findDummyNoByDivision(LotMasterDivision lotMasterDivision, LocalDate startDate);
     Optional<BadItemWorkOrderResponse.subDto> findLotMaterByDummyLotIdAndWorkProcessId(Long dummyLotId, Long workProcessId);
+    // 생성날짜가 오늘이고, 공정구분, inputEquipment 가 같은거
+    Optional<LotMaster> findByTodayAndWorkProcessDivisionEqAndInputEquipmentEq(
+            LocalDate now,
+            WorkProcessDivision workProcessDivision,
+            Long inputEquipmentId
+    );
+
+    // ========================== 7-2. Lot Tracking
+    // == 정방향
+    // 입력된 LOT NO 로 등록된 LotConnect 모두
+    List<LotEquipmentConnect> findExhaustLotByLotNoAndTrackTypeTrue(String realLotNo);
+    // lotTracking 검색조건: 추적유형(필수값), 품명|품번 -> 정방향
+    List<LotTrackingResponse> findLotTrackingResponseByTrackingTypeTrue(Long lotEquipmentConnectId, String itemNoAndItemName);
+
+    // == 역방향
+    // 분할 lotNo 로 설비 LOT id 하나 찾음
+    Optional<LotMaster> findEquipmentLotMasterByRealLotNo(String realLotNo);
+    // lotTracking 검색조건: 추적유형(필수값), 품명|품번 -> 역방향
+    List<LotTrackingResponse> findLotTrackingResponseByTrackingTypeFalse(Long equipmentLotId, String itemNoAndItemName);
+
 }

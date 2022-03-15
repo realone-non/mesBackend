@@ -37,6 +37,9 @@ public class LotConnect extends BaseTimeEntity {
     @Column(name = "DIVISION", columnDefinition = "varchar(255) COMMENT '데이터 타입 구분'", nullable = false)
     private LotConnectDivision division;
 
+    @Column(name = "ERROR_YN", columnDefinition = "bit(1) COMMENT '고장 여부'", nullable = false)
+    private boolean errorYn;
+
     public void create(
             LotEquipmentConnect parentLot,
             LotMaster childLot,

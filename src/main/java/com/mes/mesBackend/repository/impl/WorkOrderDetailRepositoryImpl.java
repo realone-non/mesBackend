@@ -18,8 +18,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mes.mesBackend.entity.enumeration.GoodsType.HALF_PRODUCT;
-import static com.mes.mesBackend.entity.enumeration.GoodsType.PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.*;
 
@@ -37,10 +35,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     final QWorkLine workLine = QWorkLine.workLine;
     final QWorkProcess workProcess = QWorkProcess.workProcess;
     final QUser user = QUser.user;
-    final QUnit unit = QUnit.unit;
     final QBomItemDetail qBomItemDetail = QBomItemDetail.bomItemDetail;
     final QBomMaster bomMaster = QBomMaster.bomMaster;
-    final QWorkCenter workCenter = QWorkCenter.workCenter;
     final QItemGroup itemGroup = QItemGroup.itemGroup;
 
 
@@ -98,9 +94,9 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.id.as("id"),
                                 workOrderDetail.orderNo.as("orderNo"),
                                 workOrderDetail.orders.as("orders"),
-                                item.itemNo.as("itemNo"),
-                                item.itemName.as("itemName"),
-                                itemAccount.account.as("itemAccount"),
+//                                item.itemNo.as("itemNo"),
+//                                item.itemName.as("itemName"),
+//                                itemAccount.account.as("itemAccount"),
                                 workLine.workLineName.as("workLine"),
                                 workOrderDetail.expectedWorkDate.as("expectedWorkDate"),
                                 workOrderDetail.expectedWorkTime.as("expectedWorkTime"),
@@ -110,11 +106,15 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 contract.contractNo.as("contractNo"),
                                 contractItem.periodDate.as("periodDate"),
                                 client.clientName.as("cName"),
-                                produceOrder.orderState.as("orderState"),
+//                                produceOrder.orderState.as("orderState"),
                                 workOrderDetail.productionAmount.as("productionAmount"),
                                 workOrderDetail.startDate.as("startDateTime"),
                                 workOrderDetail.endDate.as("endDateTime"),
-                                workLine.workLineName.as("workLineName")
+                                workLine.workLineName.as("workLineName"),
+                                workOrderDetail.workProcess.workProcessDivision.as("workProcessDivision"),
+                                item.id.as("itemId"),
+                                workOrderDetail.workProcess.id.as("workProcessId"),
+                                workOrderDetail.orderState.as("orderState")
                         )
                 )
                 .from(workOrderDetail)
@@ -177,22 +177,18 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .fetchOne());
     }
 
-    // 제조오더에 해당하는 작업지시의 orderState 들
+    // 제조오더에 해당하는 모든 작업지시 가져옴
     @Override
-    public Optional<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId) {
-        return Optional.ofNullable(
-                jpaQueryFactory
-                        .select(workOrderDetail.orderState)
-                        .from(workOrderDetail)
-                        .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
-                        .where(
-                                workOrderDetail.produceOrder.id.eq(produceOrderId),
-                                workOrderDetail.deleteYn.isFalse()
-                        )
-                        .orderBy(workOrderDetail.createdDate.desc())
-                        .limit(1)
-                        .fetchOne()
-        );
+    public List<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId) {
+        return jpaQueryFactory
+                .select(workOrderDetail.orderState)
+                .from(workOrderDetail)
+                .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                .where(
+                        workOrderDetail.produceOrder.id.eq(produceOrderId),
+                        isDeleteYnFalse()
+                )
+                .fetch();
     }
 
     // ==================================== 6-2. 작업지시 등록 ====================================
@@ -547,7 +543,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     }
 
     @Override
-    public Optional<Item> findPopWorkOrderItem(Long workProcessId, LocalDate fromDate) {
+    public Optional<Item> findPopWorkOrderItem(Long workProcessId, LocalDate fromDate, Long workOrderId) {
         return Optional.ofNullable(jpaQueryFactory
                 .select(item)
                 .from(workOrderDetail)
@@ -559,7 +555,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .where(
                         isWorkProcessIdEq(workProcessId),
                         workOrderDetail.expectedWorkDate.eq(fromDate),
-                        workOrderDetail.deleteYn.isFalse()
+                        workOrderDetail.deleteYn.isFalse(),
+                        workOrderDetail.id.eq(workOrderId)
                 )
                 .fetchOne());
     }
@@ -603,7 +600,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .fetchOne();
     }
 
-    // 여기서 [javax.persistence.NonUniqueResultException: query did not return a unique result: 2] 에러가 난다면
+    // 여기서 [javax.persistence.NonUniqueResultException: query did not return a unique result: ] 에러가 난다면
     // BomMaster 에 같은 item 이 2 개 이상 등록되어 있어서 나는 에러임
     @Override
     public Optional<Item> findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(Long itemId, Long workProcessId, GoodsType goodsType) {
@@ -642,6 +639,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .where(
                         bomMaster.item.id.eq(bomMasterItemId),
                         qBomItemDetail.deleteYn.isFalse(),
+                        bomMaster.deleteYn.isFalse(),
                         isWorkProcessDivision(workProcessDivision)
 //                        workProcess.workProcessDivision.eq(workProcessDivision) // 원료혼합
 //                        workProcess.workProcessDivision.eq(FILLING),         // 충진
@@ -669,6 +667,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         bomMaster.item.id.eq(bomMasterItemId),
                         bomMaster.deleteYn.isFalse(),
                         qBomItemDetail.deleteYn.isFalse(),
+                        bomMaster.deleteYn.isFalse(),
                         workProcess.workProcessDivision.eq(LABELING).or(workProcess.workProcessDivision.eq(PACKAGING))           // 라벨링
                 )
                 .fetch();

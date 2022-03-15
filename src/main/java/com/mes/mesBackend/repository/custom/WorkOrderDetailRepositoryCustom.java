@@ -37,7 +37,9 @@ public interface WorkOrderDetailRepositoryCustom {
     // 생산계획 수립 단일 조회
     Optional<ProductionPlanResponse> findProductionPlanByIdAndDeleteYnFalse(Long id);
     // 제조오더에 해당하는 가장 마지막 등록 된 orderState
-    Optional<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId);
+//    Optional<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId);
+    // 제조오더에 해당하는 모든 작업지시 가져옴
+    List<OrderState> findOrderStatesByProduceOrderId(Long produceOrderId);
 
     // ==================================== 6-2. 작업지시 등록 ====================================
     // 작업지시 리스트 조회
@@ -85,7 +87,7 @@ public interface WorkOrderDetailRepositoryCustom {
     // =============================================== pop ===============================================
     // 작업지시 정보 리스트, 조건: 작업자, 작업공정
     List<PopWorkOrderResponse> findPopWorkOrderResponsesByCondition(Long workProcessId, LocalDate fromDate);
-    Optional<Item> findPopWorkOrderItem(Long workProcessId, LocalDate fromDate);
+    Optional<Item> findPopWorkOrderItem(Long workProcessId, LocalDate fromDate, Long workOrderId);
     // 작업지시 상세 정보
     List<PopWorkOrderDetailResponse> findPopWorkOrderDetailResponsesByItemId(Long itemId);
     // 수주수량

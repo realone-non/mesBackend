@@ -1,7 +1,5 @@
 package com.mes.mesBackend.helper;
 
-import com.mes.mesBackend.entity.ProductionPerformance;
-import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.NotFoundException;
 
@@ -15,4 +13,6 @@ public interface WorkOrderStateHelper {
     void updateOrderState(Long workOrderDetailId, OrderState orderState) throws NotFoundException;
     // 작업수량, 지시수량으로 상태값 구하기
     OrderState findOrderStateByOrderAmountAndProductAmount(int orderAmount, int productAmount);
+    // 제조오더에 해당되는 작업지시의 모든 지시상태
+    OrderState getWorkOrderStateDesc(Long produceOrderId);
 }

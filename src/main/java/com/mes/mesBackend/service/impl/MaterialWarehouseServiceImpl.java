@@ -161,12 +161,12 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
     }
 
     //재고실사 승인 등록
-    public List<MaterialStockInspectResponse> createStockInspectApproval(Long requestId, Long userId) throws NotFoundException {
+    public List<MaterialStockInspectResponse> createStockInspectApproval(Long requestId, String userCode) throws NotFoundException {
         MaterialStockInspectRequest dbRequest = materialStockInspectRequestRepository.findByIdAndDeleteYnFalse(requestId)
                 .orElseThrow(() -> new NotFoundException("inspectRequest does not exist. input id: " + requestId));
         List<MaterialStockInspect> dbInspect = materialStockInspectRepository.findAllByDeleteYnFalseAndMaterialStockInspectRequest(dbRequest);
-        User user = userRepository.findByIdAndDeleteYnFalse(userId)
-                .orElseThrow(() -> new NotFoundException("user does not exist. input id: " + userId));
+        User user = userRepository.findByUserCode(userCode)
+                .orElseThrow(() -> new NotFoundException("user does not exist. input userCode: " + userCode));
         for (MaterialStockInspect inspect: dbInspect) {
                 inspect.approval(user);
         }

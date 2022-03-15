@@ -45,7 +45,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
 
     // 구매요청 생성
     @Override
-    public PurchaseRequestResponse createPurchaseRequest(PurchaseRequestRequest purchaseRequestRequest) throws NotFoundException, BadRequestException {
+    public PurchaseRequestResponse createPurchaseRequest(PurchaseRequestRequest purchaseRequestRequest, String userCode) throws NotFoundException, BadRequestException {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(purchaseRequestRequest.getProduceOrder());
 
         // 총 구매요청수량이 수주수량을 초과하면 예외
@@ -76,6 +76,8 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         purchaseRequest.setOrdersState(SCHEDULE);
 
         PurchaseRequest save = purchaseRequestRepo.save(purchaseRequest);
+
+        modifiedLogHelper.createInsertLog(userCode, PURCHASE_REQUEST, purchaseRequest);
         return getPurchaseRequestResponseOrThrow(save.getId());
     }
 
@@ -93,7 +95,9 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         List<PurchaseRequestResponse> responses = purchaseRequestRepo.findAllByCondition(fromDate, toDate, produceOrderNo, itemGroupId, itemNoAndName, manufacturerPartNo, orderCompletion);
         for (PurchaseRequestResponse r : responses) {
             ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(PURCHASE_REQUEST, r.getId());
+            ModifiedLog insertLog = modifiedLogHelper.getInsertLog(PURCHASE_REQUEST, r.getId());
             if (modifiedLog != null) r.modifiedLog(modifiedLog);
+            if (insertLog != null) r.insertLog(insertLog);
         }
         return responses;
     }

@@ -37,13 +37,15 @@ public class WorkDocumentServiceImpl implements WorkDocumentService {
 
     // 작업표준서 생성
     @Override
-    public WorkDocumentResponse createWorkDocument(WorkDocumentRequest workDocumentRequest) throws NotFoundException {
+    public WorkDocumentResponse createWorkDocument(WorkDocumentRequest workDocumentRequest, String userCode) throws NotFoundException {
         WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(workDocumentRequest.getWorkProcess());
         WorkLine workLine = workLineService.getWorkLineOrThrow(workDocumentRequest.getWorkLine());
         Item item = itemService.getItemOrThrow(workDocumentRequest.getItem());
         WorkDocument workDocument = mapper.toEntity(workDocumentRequest, WorkDocument.class);
         workDocument.addJoin(workProcess, workLine, item);
         workDocumentRepository.save(workDocument);
+
+        modifiedLogHelper.createInsertLog(userCode, WORK_DOCUMENT, workDocument);   // 생성 기록
         return mapper.toResponse(workDocument, WorkDocumentResponse.class);
     }
 
@@ -67,7 +69,9 @@ public class WorkDocumentServiceImpl implements WorkDocumentService {
         List<WorkDocumentResponse> documentResponses = mapper.toListResponses(workDocuments, WorkDocumentResponse.class);
         for (WorkDocumentResponse response : documentResponses) {
             ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(WORK_DOCUMENT, response.getId());
+            ModifiedLog insertLog = modifiedLogHelper.getInsertLog(WORK_DOCUMENT, response.getId());
             if (modifiedLog != null) response.modifiedLog(modifiedLog);
+            if (insertLog != null) response.insertLog(insertLog);
         }
         return documentResponses;
     }

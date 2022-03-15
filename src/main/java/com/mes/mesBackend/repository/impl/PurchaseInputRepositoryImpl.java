@@ -176,7 +176,8 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                                 item.inspectionType.as("inspectionType"),   // 검사방법 ex) 샘플링
                                 purchaseInput.urgentYn.as("urgentYn"),
                                 purchaseInput.testReportYn.as("testReportYn"),
-                                purchaseInput.coc.as("coc")
+                                purchaseInput.coc.as("coc"),
+                                purchaseInput.clientLotNo.as("clientLotNo")
                         )
                 )
                 .from(purchaseInput)
@@ -239,7 +240,8 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                                 purchaseInput.id.as("purchaseInputNo"),
                                 unit.unitCodeName.as("orderUnitCodeName"),
                                 (purchaseInput.inputAmount.multiply(item.inputUnitPrice).doubleValue()).multiply(0.1).as("vat"),
-                                lotMaster.lotNo.as("lotNo")
+                                lotMaster.lotNo.as("lotNo"),
+                                purchaseOrder.id.as("purchaseOrderId")
                         )
                 )
                 .from(purchaseInput)

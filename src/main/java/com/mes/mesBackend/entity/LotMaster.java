@@ -1,5 +1,6 @@
 package com.mes.mesBackend.entity;
 
+import com.mes.mesBackend.dto.request.LotMasterRequest;
 import com.mes.mesBackend.entity.enumeration.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +9,7 @@ import javax.persistence.*;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.OUTSOURCING_INPUT;
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PURCHASE_INPUT;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -152,6 +154,13 @@ public class LotMaster extends BaseTimeEntity {
     @JoinColumn(name = "EQUIPMENT", columnDefinition = "bigint COMMENT '설비'")
     private Equipment equipment;        // 설비
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "INPUT_EQUIPMENT", columnDefinition = "bigint COMMENT '충진 투입 설비'")
+    private Equipment inputEquipment;       // 원료혼합에서 생성된 반제품이 쓰일 충진 공정 투입 설비
+
+    @Column(name = "EXHAUST", columnDefinition = "bit(1) COMMENT '폐기 여부'", nullable = false)
+    private boolean exhaustYn;
+
 //    @Column(name = "END_YN", columnDefinition = "bit(1) COMMENT '로트 엔드'")
 //    private boolean endYn;      // 로트엔드
 
@@ -159,17 +168,59 @@ public class LotMaster extends BaseTimeEntity {
 //    @JoinColumn(name = "CONTRACTS")
 //    private List<Contract> contracts = new ArrayList<>();
 
-    public void putPurchaseInput(
-            LotType lotType,
-            PurchaseInput purchaseInput,
+//    public void createPurchaseInputLot(
+//            LotType lotType,
+//            PurchaseInput purchaseInput,
+//            String lotNo,
+//            WorkProcess workProcess
+//    ) {
+//        setLotType(lotType);
+//        setPurchaseInput(purchaseInput);
+//        setEnrollmentType(PURCHASE_INPUT);
+//        setLotNo(lotNo);
+//        setWorkProcess(workProcess);
+//    }
+
+    // 자재입고
+    public void createPurchaseInputLot(
+            LotMasterRequest request,
             String lotNo,
             WorkProcess workProcess
     ) {
-        setLotType(lotType);
-        setPurchaseInput(purchaseInput);
-        setEnrollmentType(PURCHASE_INPUT);
-        setLotNo(lotNo);
+        setItem(request.getItem());
+        setWareHouse(request.getWareHouse());
+        setPurchaseInput(request.getPurchaseInput());
+        setStockAmount(request.getStockAmount());
+        setStockAmount(request.getCreatedAmount());
+        setLotType(request.getLotType());
+        setProcessYn(request.isProcessYn());
         setWorkProcess(workProcess);
+        setLotNo(lotNo);
+        setEnrollmentType(request.getEnrollmentType());
+        setLotMasterDivision(request.getLotMasterDivision());
+    }
+
+    // 외주입고
+    public void createOutsourcingInputLot(
+            LotMasterRequest request,
+            String lotNo,
+            WorkProcess workProcess
+    ) {
+        setItem(request.getItem());
+        setWareHouse(request.getWareHouse());
+        setOutSourcingInput(request.getOutSourcingInput());
+        setStockAmount(request.getStockAmount());
+        setCreatedAmount(request.getCreatedAmount());
+        setLotType(request.getLotType());
+        setLotMasterDivision(request.getLotMasterDivision());
+        setWorkProcess(workProcess);
+        setEnrollmentType(request.getEnrollmentType());
+        setLotNo(lotNo);
+
+//        setLotType(request.getLotType());
+//        setOutSourcingInput(request.getOutSourcingInput());
+//        setEnrollmentType(OUTSOURCING_INPUT);
+//        setLotNo(lotNo);
     }
 
     public void updatePurchaseInput(int inputAmount) {
@@ -177,14 +228,38 @@ public class LotMaster extends BaseTimeEntity {
         setCreatedAmount(inputAmount);
     }
 
-    public void putOutsourcingInput(
-            LotType lotType,
-            OutSourcingInput input,
+//    public void createOutsourcingInputLot(
+//            LotType lotType,
+//            OutSourcingInput input,
+//            String lotNo
+//    ) {
+//        setLotType(lotType);
+//        setOutSourcingInput(input);
+//        setEnrollmentType(OUTSOURCING_INPUT);
+//        setLotNo(lotNo);
+//    }
+
+
+    public void createWorkProcessLot(
+            LotMasterRequest lotMasterRequest,
+            WorkProcess workProcess,
+            Equipment equipment,
             String lotNo
     ) {
-        setLotType(lotType);
-        setOutSourcingInput(input);
-        setEnrollmentType(OUTSOURCING_INPUT);
+        setItem(lotMasterRequest.getItem());
+        setWareHouse(lotMasterRequest.getWareHouse());
+        setLotType(lotMasterRequest.getLotType());
+        setSerialNo(lotMasterRequest.getSerialNo());
+        setEnrollmentType(lotMasterRequest.getEnrollmentType());
+        setProcessYn(lotMasterRequest.isProcessYn());
+        setStockAmount(lotMasterRequest.getStockAmount());
+        setCreatedAmount(lotMasterRequest.getCreatedAmount());
+        setBadItemAmount(lotMasterRequest.getBadItemAmount());
+        setInputAmount(lotMasterRequest.getInputAmount());
+        setRecycleAmount(lotMasterRequest.getRecycleAmount());
+        setWorkProcess(workProcess);
+        setLotMasterDivision(lotMasterRequest.getLotMasterDivision());
+        setEquipment(equipment);
         setLotNo(lotNo);
     }
 

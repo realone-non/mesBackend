@@ -19,9 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.RECYCLE;
-import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.*;
 
 @Service
 public class PopRecycleServiceImpl implements PopRecycleService {
@@ -42,6 +43,8 @@ public class PopRecycleServiceImpl implements PopRecycleService {
     WorkProcessRepository workProcessRepository;
     @Autowired
     LotLogHelper lotLogHelper;
+    @Autowired
+    LotEquipmentConnectRepository lotEquipmentConnectRepository;
 
     //재사용 목록 조회
     public List<PopRecycleResponse> getRecycles(WorkProcessDivision workProcessDivision) throws NotFoundException {
@@ -59,12 +62,12 @@ public class PopRecycleServiceImpl implements PopRecycleService {
                 .orElseThrow(() -> new NotFoundException("해당 공정이 존재하지 않습니다. 입력 id: " + recycle.getWorkProcessId()));
         WareHouse wareHouse = wareHouseRepository.findByWorkProcessYnIsTrueAndDeleteYnFalse()
                 .orElseThrow(() -> new NotFoundException("공정용 창고가 존재하지 않습니다. "));
-        List<LotMaster> usableLotList = lotMasterRepository.findBadLotByItemIdAndWorkProcess(request.getItemId(), recycle.getWorkProcessId());
+        List<LotMaster> usableEquipmentLotList = lotMasterRepository.findBadLotByItemIdAndWorkProcess(request.getItemId(), recycle.getWorkProcessId(), EQUIPMENT_LOT);
+
         int createAmount = request.getAmount();
         LotMasterRequest lotRequest = new LotMasterRequest();
         lotRequest.setCreatedAmount(createAmount);
         lotRequest.setStockAmount(createAmount);
-        lotRequest.setRecycleAmount(createAmount);
         lotRequest.setEnrollmentType(RECYCLE);
         lotRequest.setWareHouse(wareHouse);
         lotRequest.setLotMasterDivision(REAL_LOT);
@@ -73,16 +76,35 @@ public class PopRecycleServiceImpl implements PopRecycleService {
 
         LotMaster lotmaster = lotHelper.createLotMaster(lotRequest);
 
-        for (LotMaster dbLotMaster:usableLotList) {
+        for (LotMaster dbLotMaster:usableEquipmentLotList) {
+            LotEquipmentConnect dummyLotEquipment = lotEquipmentConnectRepository.findByChildId(dbLotMaster.getId())
+                    .orElseThrow(() -> new NotFoundException("DummyLot가 존재하지 않습니다. "));
+            LotMaster dummyLot = lotMasterRepository.findByIdAndDeleteYnFalse(dummyLotEquipment.getParentLot().getId())
+                    .orElseThrow(() -> new NotFoundException("해당 Lot가 존재하지 않습니다. "));
             if(createAmount <= dbLotMaster.getBadItemAmount()){
-                dbLotMaster.setBadItemAmount(dbLotMaster.getBadItemAmount() - createAmount);
-                createAmount = 0;
+                    dbLotMaster.setBadItemAmount(dbLotMaster.getBadItemAmount() - createAmount);
+                    dbLotMaster.setRecycleAmount(dbLotMaster.getRecycleAmount() + createAmount);
+                    dummyLot.setBadItemAmount(dummyLot.getBadItemAmount() - createAmount);
+                    dummyLot.setRecycleAmount(dummyLot.getRecycleAmount() + createAmount);
+
+                    createAmount = 0;
             }
             else if(createAmount > dbLotMaster.getBadItemAmount()){
-                createAmount = createAmount - dbLotMaster.getBadItemAmount();
+                int tempAmount = createAmount - dbLotMaster.getBadItemAmount();
+                dbLotMaster.setRecycleAmount(dbLotMaster.getBadItemAmount());
                 dbLotMaster.setBadItemAmount(0);
+                if(createAmount > dummyLot.getBadItemAmount()){
+                    dummyLot.setRecycleAmount(dummyLot.getBadItemAmount());
+                    dummyLot.setBadItemAmount(0);
+                }
+                else{
+                    dummyLot.setRecycleAmount(dummyLot.getRecycleAmount() + createAmount);
+                    dummyLot.setBadItemAmount(dummyLot.getBadItemAmount() - createAmount);
+                }
+                createAmount = createAmount - dbLotMaster.getBadItemAmount();
             }
             lotMasterRepository.save(dbLotMaster);
+            lotMasterRepository.save(dummyLot);
 
             if(createAmount == 0){
                 break;

@@ -38,4 +38,13 @@ public class PurchaseRequestRequest {
 
     @Schema(description = "비고")
     String note;
+
+    @Schema(description = "재고단위요청수량")
+    int stockUnitRequestAmount;
+
+    @Schema(description = "재고단위발주수량")
+    int stockUnitOrderAmount;
+
+    @Schema(description = "수입검사여부")
+    boolean inputTestYn;
 }

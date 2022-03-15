@@ -50,8 +50,8 @@ public class EstimateRequest {
     Long payType;
 
     @Schema(description = "부가세")
-    @NotBlank(message = NOT_EMPTY)
-    String surtax;
+    @NotNull(message = NOT_NULL)
+    boolean surtax;
 
     @Schema(description = "운송조건")
     String transportCondition;      // 운송조건

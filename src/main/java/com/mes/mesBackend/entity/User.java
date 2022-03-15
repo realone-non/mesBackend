@@ -87,6 +87,7 @@ public class User extends BaseTimeEntity implements UserDetails {
         setMail(newUser.mail);
         setPhoneNumber(newUser.phoneNumber);
         setUseYn(newUser.useYn);
+        setDescription(newUser.description);
     }
 
     public void addJoin(Department department) {

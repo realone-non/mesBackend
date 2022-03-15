@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,8 +8,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.helper.Constants.*;
 
 // 9-3. 발주현황조회
 @Getter
@@ -58,6 +61,9 @@ public class PurchaseOrderStatusResponse {
     @Schema(description = "구매납기일자")
     LocalDate orderPeriodDate;
 
+    @Schema(description = "담당자 고유아이디")
+    Long userId;
+
     @Schema(description = "담당자")
     String userName;
 
@@ -78,4 +84,8 @@ public class PurchaseOrderStatusResponse {
 
     @Schema(description = "지시상태")
     OrderState orderState;
+
+    @Schema(description = "수주일시")
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM_SS, timezone = ASIA_SEOUL)
+    LocalDateTime createdDate;
 }

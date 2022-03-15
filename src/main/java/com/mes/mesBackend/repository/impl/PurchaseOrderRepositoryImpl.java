@@ -283,12 +283,14 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 item.inputUnitPrice.multiply(purchaseRequest.orderAmount).as("orderPrice"),
                                 (purchaseRequest.orderAmount.multiply(item.inputUnitPrice).doubleValue()).multiply(0.1).as("vat"),
                                 purchaseRequest.periodDate.as("orderPeriodDate"),
+                                user.id.as("userId"),
                                 user.korName.as("userName"),
                                 purchaseOrder.note.as("note"),
                                 wareHouse.wareHouseName.as("wareHouseName"),
                                 currency.currency.as("currencyUnit"),
                                 purchaseRequest.cancelAmount.as("cancelAmount"),
-                                purchaseRequest.ordersState.as("orderState")
+                                purchaseRequest.ordersState.as("orderState"),
+                                purchaseOrder.createdDate.as("createdDate")
                         )
                 )
                 .from(purchaseRequest)
@@ -308,6 +310,57 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                         isDeleteYnFalse()
                 )
                 .fetch();
+    }
+
+    // 9-3. 발주현황조회 단일 조회
+    // 검색조건: 화폐 id, 담당자 id, 거래처 id, 입고창고 id, 발주기간 fromDate~toDate
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<PurchaseOrderStatusResponse> findPurchaseOrderStatusResponse(Long purchaseOrderId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(
+                                Projections.fields(
+                                        PurchaseOrderStatusResponse.class,
+                                        purchaseRequest.id.as("id"),
+                                        purchaseOrder.purchaseOrderNo.as("purchaseOrderNo"),
+                                        client.clientCode.as("clientCode"),
+                                        client.clientName.as("clientName"),
+                                        item.itemNo.as("itemNo"),
+                                        item.itemName.as("itemName"),
+                                        item.standard.as("itemStandard"),
+                                        item.manufacturerPartNo.as("itemManufacturerPartNo"),
+                                        purchaseRequest.orderAmount.as("orderAmount"),
+                                        unit.unitCodeName.as("orderUnitCodeName"),
+                                        item.inputUnitPrice.as("unitPrice"),
+                                        item.inputUnitPrice.multiply(purchaseRequest.orderAmount).as("orderPrice"),
+                                        (purchaseRequest.orderAmount.multiply(item.inputUnitPrice).doubleValue()).multiply(0.1).as("vat"),
+                                        purchaseRequest.periodDate.as("orderPeriodDate"),
+                                        user.korName.as("userName"),
+                                        purchaseOrder.note.as("note"),
+                                        wareHouse.wareHouseName.as("wareHouseName"),
+                                        currency.currency.as("currencyUnit"),
+                                        purchaseRequest.cancelAmount.as("cancelAmount"),
+                                        purchaseRequest.ordersState.as("orderState"),
+                                        purchaseOrder.createdDate.as("createdDate")
+                                )
+                        )
+                        .from(purchaseRequest)
+                        .leftJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.purchaseOrder.id))
+                        .leftJoin(item).on(item.id.eq(purchaseRequest.item.id))
+                        .leftJoin(unit).on(unit.id.eq(item.unit.id))
+                        .leftJoin(client).on(client.id.eq(purchaseOrder.client.id))
+                        .leftJoin(user).on(user.id.eq(purchaseOrder.user.id))
+                        .leftJoin(wareHouse).on(wareHouse.id.eq(purchaseOrder.wareHouse.id))
+                        .leftJoin(currency).on(currency.id.eq(purchaseOrder.currency.id))
+                        .where(
+                                isDeleteYnFalse(),
+                                purchaseOrder.id.eq(purchaseOrderId)
+                        )
+                        .orderBy(purchaseRequest.createdDate.desc())
+                        .limit(1)
+                        .fetchOne()
+        );
     }
 
     // pop
@@ -336,6 +389,22 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                 .groupBy(purchaseOrder.id)
                 .orderBy(purchaseOrder.purchaseOrderDate.desc())
                 .fetch();
+    }
+
+    // 구매발주에 등록된 구매요청 하나 조회
+    @Override
+    public Optional<Long> findOneByPurchaseRequestId(Long purchaseOrderId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(purchaseRequest.id)
+                        .from(purchaseRequest)
+                        .where(
+                                purchaseRequest.purchaseOrder.id.eq(purchaseOrderId)
+                        )
+                        .orderBy(purchaseRequest.createdDate.asc())
+                        .limit(1)
+                        .fetchOne()
+        );
     }
 
     private BooleanExpression isClientNameContain(String clientName) {

@@ -86,7 +86,17 @@ public class PurchaseInputReturnRepositoryImpl implements PurchaseInputReturnRep
                                 purchaseInputReturn.note.as("note"),
                                 purchaseInputReturn.returnDivision.as("returnDivision"),
                                 lotMaster.stockAmount.as("stockAmountPossibleAmount"),
-                                lotMaster.badItemAmount.as("badItemAmountPossibleAmount")
+                                lotMaster.badItemAmount.as("badItemAmountPossibleAmount"),
+                                lotMaster.inputAmount.as("lotInputAmount"),
+                                lotMaster.inputAmount.multiply(item.inputUnitPrice).as("lotInputPrice"),
+                                (lotMaster.inputAmount.multiply(item.inputUnitPrice).doubleValue()).multiply(0.1).as("lotInputPriceSurtax"),
+                                purchaseInput.clientLotNo.as("clientLotNo"),
+                                purchaseInput.manufactureDate.as("manufactureDate"),
+                                purchaseInput.validDate.as("validDate"),
+                                item.testCriteria.testCriteria.as("testCriteria"),
+                                purchaseInput.testReportYn.as("testReportYn"),
+                                purchaseInputReturn.returnAmount.multiply(item.inputUnitPrice).as("returnPrice"),
+                                purchaseInputReturn.returnAmount.multiply(item.inputUnitPrice).as("returnPriceWon")
                         )
                 )
                 .from(purchaseInputReturn)

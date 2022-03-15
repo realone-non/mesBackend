@@ -68,7 +68,7 @@ public class ShipmentResponse {
     @Schema(description = "비고")
     String note;
 
-    @JsonIgnore
+    @Schema(description = "담당자 고유아이디")
     Long userId;
 
     @JsonIgnore

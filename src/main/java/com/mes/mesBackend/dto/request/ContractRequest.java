@@ -75,19 +75,15 @@ public class ContractRequest {
     Long payType;
 
     @Schema(description = "Forwader")
-    @NotBlank(message = NOT_EMPTY)
     String forwader;
 
     @Schema(description = "운송조건")
-    @NotBlank(message = NOT_EMPTY)
     String transportCondition;
 
     @Schema(description = "Shipment Service")
-    @NotBlank(message = NOT_EMPTY)
     String shipmentService;
 
     @Schema(description = "Shipment WK")
-    @NotBlank(message = NOT_EMPTY)
     String shipmentWk;
 
     @Schema(description = "비고")

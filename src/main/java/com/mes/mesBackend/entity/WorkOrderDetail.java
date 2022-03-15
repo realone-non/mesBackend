@@ -1,7 +1,6 @@
 package com.mes.mesBackend.entity;
 
 import com.mes.mesBackend.entity.enumeration.OrderState;
-import com.mes.mesBackend.entity.enumeration.TestType;
 import com.querydsl.core.annotations.QueryInit;
 import lombok.AllArgsConstructor;
 import lombok.Data;

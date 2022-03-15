@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.WareHouseRequest;
 import com.mes.mesBackend.dto.response.WareHouseResponse;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -52,7 +53,7 @@ public class WareHouseController {
     public ResponseEntity<WareHouseResponse> createWareHouse(
             @RequestBody @Valid WareHouseRequest wareHouseRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         WareHouseResponse wareHouse = wareHouseService.createWareHouse(wareHouseRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + wareHouse.getId() + " from createWareHouse.");

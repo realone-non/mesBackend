@@ -54,9 +54,9 @@ public class ProductionPerformanceResponse {
     @Schema(description = "생산량")
     int productionAmount;
 
-    @Schema(description = "자재입고")
-    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
-    LocalDateTime materialInput;
+//    @Schema(description = "자재입고")
+//    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
+//    LocalDateTime materialInput;
 
     @Schema(description = "원료혼합")
     @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
@@ -78,9 +78,9 @@ public class ProductionPerformanceResponse {
     @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime packaging;
 
-    @Schema(description = "출하")
-    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
-    LocalDateTime shipment;
+//    @Schema(description = "출하")
+//    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
+//    LocalDateTime shipment;
 
     @Schema(description = "단가")
     int unitPrice;

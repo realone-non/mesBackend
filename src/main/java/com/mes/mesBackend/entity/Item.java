@@ -4,10 +4,7 @@ import com.mes.mesBackend.entity.enumeration.DevelopStatus;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestCategory;
 import com.mes.mesBackend.entity.enumeration.TestType;
-import com.mes.mesBackend.service.ItemAccountCodeService;
 import com.querydsl.core.annotations.QueryInit;
-import com.sun.imageio.plugins.common.LZWCompressor;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +14,6 @@ import javax.persistence.*;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
-import static lombok.AccessLevel.PROTECTED;
 import static lombok.AccessLevel.PUBLIC;
 
 // 3-2-1. 품목등록
@@ -143,6 +139,9 @@ public class Item extends BaseTimeEntity {
     @Column(name = "INSPECTION_TYPE", columnDefinition = "varchar(255) COMMENT '검사방법'")
     private InspectionType inspectionType;  // 검사방법: ex) Sampling, 전수
 
+    @Column(name = "ITEM_SHORT_NAME", columnDefinition = "varchar(255) COMMENT '약어명'")
+    private String itemShortName;
+
     public void mapping(
             ItemAccount itemAccount,
             ItemGroup itemGroup,
@@ -207,6 +206,7 @@ public class Item extends BaseTimeEntity {
         setTestCategory(newItem.testCategory);
         setTestType(newItem.testType);
         setInspectionType(newItem.inspectionType);
+        setItemShortName(newItem.itemShortName);
     }
 
     public void delete() {

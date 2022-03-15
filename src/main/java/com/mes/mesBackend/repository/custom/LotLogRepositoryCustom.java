@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.response.LotLogResponse;
 import com.mes.mesBackend.entity.LotLog;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,4 +29,8 @@ public interface LotLogRepositoryCustom {
     Optional<LotLog> findByLotMasterIdAndWorkProcessId(Long lotMasterId, Long workProcessId);
     // 검색조건: workOrderDetailId, 반환: LotLog
     Optional<LotLog> findByWorkOrderDetailId(Long workOrderDetailId);
+    // 조건: lorMasterId, 작업공정, 오늘
+    Optional<LotLog> findByLotMasterIdAndWorkProcessDivision(Long lotMasterId, WorkProcessDivision workProcessDivision, LocalDate now);
+    // 검색조건: lotMasterId, workProcessDivision, 반환: LotLog
+    Optional<LotLog> findByLotMasterIdAndWorkProcessDivision(Long lotMasterId, WorkProcessDivision workProcessDivision);
 }

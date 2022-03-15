@@ -29,8 +29,8 @@ public class ModifiedLog {
     @Column(name = "MODIFIED_DIVISION", columnDefinition = "varchar(255) COMMENT '구분'", nullable = false)
     private ModifiedDivision modifiedDivision;
 
-    @Column(name = "MODIFIED_DATE", columnDefinition = "datetime COMMENT '수정일'", nullable = false)
-    private LocalDateTime modifiedDate;
+    @Column(name = "DATE", columnDefinition = "datetime COMMENT '수정, 생성일'", nullable = false)
+    private LocalDateTime date;
 
     @Column(name = "USER_LEVEL", columnDefinition = "int COMMENT '유저권한레벨'", nullable = false)
     private int userLevel;
@@ -63,15 +63,23 @@ public class ModifiedLog {
     @JoinColumn(name = "PURCHASE_REQUEST", columnDefinition = "bigint COMMENT '구매요청'")
     private PurchaseRequest purchaseRequest;
 
-    public <T> ModifiedLog created(String userCode, ModifiedDivision modifiedDivision, int userLevel, T t) {
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "WORK_CENTER_CHECK_DETAIL", columnDefinition = "bigint COMMENT '작업장별 점검항목'")
+    private WorkCenterCheckDetail workCenterCheckDetail;
+
+    @Column(name = "DIVISION", columnDefinition = "bit(1) COMMENT '생성, 수정 구분'")
+    private boolean division;   // false: 수정, true: 생성
+
+    public <T> ModifiedLog created(String userCode, ModifiedDivision modifiedDivision, int userLevel, T t, boolean division) {
         setUserCode(userCode);
-        setModifiedDate(LocalDateTime.now());
         setModifiedDivision(modifiedDivision);
         setUserLevel(userLevel);
+        setDivision(division);
+        setDate(LocalDateTime.now());
 
         switch (modifiedDivision) {
             case UNIT: setUnit(t);
-                break;
+               break;
             case ITEM_GROUP: setItemGroup(t);
                 break;
             case WORK_PROCESS: setWorkProcess(t);
@@ -83,6 +91,8 @@ public class ModifiedLog {
             case EQUIPMENT_MAINTENANCE: setEquipmentMaintenance(t);
                 break;
             case PURCHASE_REQUEST: setPurchaseRequest(t);
+                break;
+            case WORK_CENTER_CHECK_DETAIL: setWorkCenterCheckDetail(t);
                 break;
         }
         return this;
@@ -101,4 +111,5 @@ public class ModifiedLog {
     public <T> void setWorkDocument(T t) { this.workDocument = (WorkDocument) t; }
     public <T> void setEquipmentMaintenance(T t) { this.equipmentMaintenance = (EquipmentMaintenance) t; }
     public <T> void setPurchaseRequest(T t) { this.purchaseRequest = (PurchaseRequest) t; }
+    public <T> void setWorkCenterCheckDetail(T t) { this.workCenterCheckDetail = (WorkCenterCheckDetail) t; }
 }

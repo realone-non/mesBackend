@@ -39,7 +39,7 @@ public class WorkLineResponse {
     @Schema(description = "사용여부")
     boolean useYn;
 
-    // ============ 수정 기록
+    // ============ 수정 기록1
     @Schema(description = "사번")
     String userCode;
     @Schema(description = "수정일자")
@@ -80,7 +80,7 @@ public class WorkLineResponse {
 
     public void modifiedLog(ModifiedLog modifiedLog) {
         setUserCode(modifiedLog.getUserCode());
-        setUpdateDate(modifiedLog.getModifiedDate());
+        setUpdateDate(modifiedLog.getDate());
         setUserLevel(modifiedLog.getUserLevel());
     }
 }

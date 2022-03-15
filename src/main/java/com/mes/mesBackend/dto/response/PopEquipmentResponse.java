@@ -26,4 +26,7 @@ public class PopEquipmentResponse {
 
     @Schema(description = "작업공정 명")
     String workProcessName;
+
+    @Schema(description = "생산가능 여부 (true: 생산가능, false: 생산불가능)")
+    boolean produceYn;
 }
