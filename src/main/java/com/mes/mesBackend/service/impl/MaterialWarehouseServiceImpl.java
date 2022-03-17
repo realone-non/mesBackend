@@ -247,7 +247,7 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
                     }
                     else if(detailResponse.getItemId().equals(item.getId())){
                         // TODO: 팀장님 여기수정해주세용
-//                        workAmount = detailResponse.getBomAmount() * detail.getOrderAmount();
+                        workAmount = (int) (detailResponse.getBomAmount() * detail.getOrderAmount());
                         sumAmount = sumAmount + workAmount;
                     }
                 }
