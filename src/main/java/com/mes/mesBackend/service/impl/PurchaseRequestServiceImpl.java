@@ -172,7 +172,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
 
     // 구매요청의 orderState 가 ONGOING, COMPLETION 이면 수정이나 삭제 불가능
     private void throwIfPurchaseRequestOrderStateNotSchedule(OrderState orderState) throws BadRequestException {
-        if (!orderState.equals(SCHEDULE)) throw new BadRequestException("진행중이거나 완료 된 구매요청은 수정이나 삭제를 할 수 없습니다. (예정인 구매요청만 수정, 삭제 할 수 있음)");
+        if (!orderState.equals(SCHEDULE)) throw new BadRequestException("진행중이거나 완료가 된 구매요청은 수정이나 삭제를 할 수 없습니다.");
     }
 
     // 입력받은 itemId 가 findItemIds 에 해당되는지 체크 후 맞다면 item 반환

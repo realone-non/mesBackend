@@ -21,7 +21,7 @@ public interface PurchaseOrderService {
     // 구매발주 수정
     PurchaseOrderResponse updatePurchaseOrder(Long purchaseOrderId, PurchaseOrderRequest purchaseOrderRequest) throws NotFoundException;
     // 구매발주 삭제
-    void deletePurchaseOrder(Long purchaseOrderId) throws NotFoundException;
+    void deletePurchaseOrder(Long purchaseOrderId) throws NotFoundException, BadRequestException;
 
     // ================================================================ 구매발주상세 ================================================================
     // 구매발주상세 생성

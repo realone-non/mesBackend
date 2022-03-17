@@ -139,7 +139,7 @@ public class PurchaseOrderController {
     public ResponseEntity deletePurchaseOrder(
             @PathVariable(value = "purchase-order-id") @Parameter(description = "구매발주 id") Long purchaseOrderId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         purchaseOrderService.deletePurchaseOrder(purchaseOrderId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + purchaseOrderId + " from deletePurchaseOrder.");

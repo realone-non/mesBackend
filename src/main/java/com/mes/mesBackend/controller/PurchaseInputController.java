@@ -138,7 +138,7 @@ public class PurchaseInputController {
             @PathVariable(value = "purchase-input-id") @Parameter(description = "구매입고 상세 id") Long purchaseInputId,
             @RequestBody @Valid PurchaseInputRequest.updateRequest purchaseInputUpdateRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         PurchaseInputDetailResponse purchaseInputDetail = purchaseInputService.updatePurchaseInputDetail(purchaseRequestId, purchaseInputId, purchaseInputUpdateRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + purchaseInputDetail.getId() + " from updatePurchaseInputDetail.");
@@ -159,7 +159,7 @@ public class PurchaseInputController {
             @PathVariable(value = "purchase-request-id") @Parameter(description = "구매입고(구매요청) id") Long purchaseRequestId,
             @PathVariable(value = "purchase-input-id") @Parameter(description = "구매입고 상세 id") Long purchaseInputId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         purchaseInputService.deletePurchaseInputDetail(purchaseRequestId, purchaseInputId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + purchaseInputId + " from deletePurchaseInputDetail.");

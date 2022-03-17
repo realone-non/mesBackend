@@ -145,7 +145,7 @@ public class ContractController {
     public ResponseEntity deleteContract(
             @PathVariable(value = "contract-id") @Parameter(description = "수주 id") Long contractId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         contractService.deleteContract(contractId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + contractId + " from deleteContract.");
@@ -252,7 +252,7 @@ public class ContractController {
             @PathVariable(value = "contract-id") @Parameter(description = "수주 id") Long contractId,
             @PathVariable(value = "contract-item-id") @Parameter(description = "수주 품목 id") Long contractItemId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         contractService.deleteContractItem(contractId, contractItemId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + contractId + " from deleteContractItem.");

@@ -136,14 +136,17 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
             Long purchaseRequestId,
             Long purchaseInputId,
             PurchaseInputRequest.updateRequest purchaseInputUpdateRequest
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         PurchaseInput findPurchaseInput = getPurchaseInputOrThrow(purchaseRequestId, purchaseInputId);
+
+        // 해당하는 lot 의 재고수량, 생성수량 변경
+        LotMaster lotMaster = getLotMasterOrThrow(findPurchaseInput);
+        // 해당 lot 사용된거면 수정 불가능
+        throwIfLotMasterCreateAmountEqualStockAmount(lotMaster);
+
         PurchaseInput newPurchaseInput = mapper.toEntity(purchaseInputUpdateRequest, PurchaseInput.class);
         findPurchaseInput.put(newPurchaseInput);
 
-        // 해당하는 lot 의 재고수량, 생성수량 변경
-        // TODO: 해당 LOT 사용됐으면 수정 불가능
-        LotMaster lotMaster = getLotMasterOrThrow(findPurchaseInput);
         lotMaster.updatePurchaseInput(findPurchaseInput.getInputAmount());
         lotMasterRepo.save(lotMaster);
 
@@ -156,16 +159,21 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
         return getPurchaseInputDetailResponse(purchaseRequestId, purchaseInputId);
     }
 
+    // 해당 lot 사용된거면 수정 불가능
+    private void throwIfLotMasterCreateAmountEqualStockAmount(LotMaster lotMaster) throws BadRequestException {
+        if (lotMaster.getCreatedAmount() != lotMaster.getStockAmount()) throw new BadRequestException("해당 LOT 는 사용된 LOT 이므로 삭제, 수정이 불가합니다.");
+    }
+
     // 구매입고 LOT 삭제
     @Override
-    public void deletePurchaseInputDetail(Long purchaseRequestId, Long purchaseInputId) throws NotFoundException {
+    public void deletePurchaseInputDetail(Long purchaseRequestId, Long purchaseInputId) throws NotFoundException, BadRequestException {
         // 구매입고 삭제
         PurchaseInput purchaseInput = getPurchaseInputOrThrow(purchaseRequestId, purchaseInputId);
-        purchaseInput.delete();
-
-        // 구매입고 등록 시 생성되었던 lotMaster 삭제
-        // TODO: 해당 LOT 사용되었으면 삭제 불가능
         LotMaster lotMaster = getLotMasterOrThrow(purchaseInput);
+        // 해당 LOT 사용되었으면 삭제 불가능
+        throwIfLotMasterCreateAmountEqualStockAmount(lotMaster);
+        purchaseInput.delete();
+        // 구매입고 등록 시 생성되었던 lotMaster 삭제
         lotMaster.delete();
 
         purchaseInputRepo.save(purchaseInput);

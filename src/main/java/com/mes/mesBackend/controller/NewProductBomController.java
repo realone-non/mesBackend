@@ -130,7 +130,7 @@ public class NewProductBomController {
     public ResponseEntity deleteBomMaster(
             @PathVariable(value = "bom-master-id") @Parameter(description = "BOM 마스터 id") Long bomMasterId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         bomMasterService.deleteBomMaster(bomMasterId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + bomMasterId + " from deleteBomMaster.");

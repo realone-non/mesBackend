@@ -1,5 +1,6 @@
 package com.mes.mesBackend.repository;
 
+import com.mes.mesBackend.entity.ProduceOrder;
 import com.mes.mesBackend.entity.PurchaseOrder;
 import com.mes.mesBackend.entity.PurchaseRequest;
 import com.mes.mesBackend.repository.custom.JpaCustomRepository;
@@ -14,5 +15,7 @@ public interface PurchaseRequestRepository extends JpaCustomRepository<PurchaseR
     Optional<PurchaseRequest> findByIdAndPurchaseOrderAndDeleteYnFalse(Long id, PurchaseOrder purchaseOrder);
     // 해당 구매발주에 해당하는 구매요청정보들 조회
     List<PurchaseRequest> findAllByPurchaseOrderAndDeleteYnFalse(PurchaseOrder purchaseOrder);
-
+    boolean existsByProduceOrderAndDeleteYnFalse(ProduceOrder produceOrder);
+    // 구배발주에 해당되는 구매요청이 존재하는지
+    boolean existsByPurchaseOrderAndDeleteYnFalse(PurchaseOrder purchaseOrder);
 }
