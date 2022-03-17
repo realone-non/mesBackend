@@ -123,6 +123,7 @@ public class Equipment extends BaseTimeEntity {
         setWorkProcess(workProcess);
         setLife(newEquipment.life);
         setLastTestDate(newEquipment.lastTestDate);
+        setLotCode(newEquipment.lotCode);
     }
 
     public void delete() {
