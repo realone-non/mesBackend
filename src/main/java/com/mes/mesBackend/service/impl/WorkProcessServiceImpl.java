@@ -43,6 +43,7 @@ public class WorkProcessServiceImpl implements WorkProcessService {
     }
 
     // 작업공정 전체 조회
+    // TODO: orderBy 공정순번
     @Override
     public List<WorkProcessResponse> getWorkProcesses() {
         List<WorkProcess> workProcesses = workProcessRepository.findAllByDeleteYnFalse();

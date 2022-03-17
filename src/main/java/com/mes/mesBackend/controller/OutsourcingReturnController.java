@@ -29,7 +29,6 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
-// 품목형태
 @Tag(name = "outsourcing-return", description = "외주반품관리 API")
 @RequestMapping(value = "/outsourcing-returns")
 @RestController

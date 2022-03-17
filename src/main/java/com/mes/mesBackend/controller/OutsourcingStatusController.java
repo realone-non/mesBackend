@@ -23,7 +23,6 @@ import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.OK;
 
-// 품목형태
 @Tag(name = "outsourcing-status", description = "외주현황조회 API")
 @RequestMapping(value = "/outsourcing-status")
 @RestController

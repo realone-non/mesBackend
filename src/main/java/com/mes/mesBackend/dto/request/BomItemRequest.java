@@ -26,7 +26,7 @@ public class BomItemRequest {
 
     @Schema(description = "수량")
     @NotNull(message = NOT_NULL)
-    int amount;
+    float amount;
 
     @Schema(description = "거래처 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
