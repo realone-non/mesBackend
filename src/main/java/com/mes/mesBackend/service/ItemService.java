@@ -26,7 +26,7 @@ public interface ItemService {
     // 품목 수정
     ItemResponse updateItem(Long id, ItemRequest itemRequest) throws NotFoundException, BadRequestException;
     // 품목 삭제
-    void deleteItem(Long id) throws NotFoundException;
+    void deleteItem(Long id) throws NotFoundException, BadRequestException;
     // 품목 단일 조회 및 예외
     Item getItemOrThrow(Long id) throws NotFoundException;
 

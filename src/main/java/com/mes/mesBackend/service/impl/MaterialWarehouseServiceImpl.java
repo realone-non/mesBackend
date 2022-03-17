@@ -246,7 +246,7 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
                         sumAmount = sumAmount + workAmount;
                     }
                     else if(detailResponse.getItemId().equals(item.getId())){
-                        // TODO: 팀장님 여기수정해주세용
+
                         workAmount = (int) (detailResponse.getBomAmount() * detail.getOrderAmount());
                         sumAmount = sumAmount + workAmount;
                     }
@@ -286,8 +286,8 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
                 workAmount = getDetailRecursive(detail, itemId, workAmount);
             }
             else if(detail.getItemId().equals(itemId)){
-                // TODO: 팀장님 여기두요 ~~
-//                workAmount = workAmount + detail.getReservationAmount();
+
+               workAmount = Integer.parseInt(workAmount + detail.getReservationAmount());
             }
         }
 

@@ -140,7 +140,7 @@ public class ItemController {
     public ResponseEntity deleteItem(
             @PathVariable(value = "item-id") Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         itemService.deleteItem(id);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteItem.");
