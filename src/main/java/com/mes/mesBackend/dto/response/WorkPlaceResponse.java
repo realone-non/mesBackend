@@ -45,7 +45,7 @@ public class WorkPlaceResponse {
     String engAddress2;    // 영문주소2
 
     @Schema(description = "업태")
-    List<BusinessTypeResponse> type;  // 업태
+    String type;  // 업태
 
     @Schema(description = "업종")
     String item;    // 업종

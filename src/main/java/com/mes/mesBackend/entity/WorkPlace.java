@@ -46,8 +46,8 @@ public class WorkPlace extends BaseTimeEntity {
     @Column(name = "ENG_ADDRESS_2", columnDefinition = "varchar(255) COMMENT '영문주소2'")
     private String engAddress2;    // 영문주소2
 
-    @OneToMany(mappedBy = "workPlace", fetch = FetchType.LAZY)
-    private List<WorkPlaceBusinessType> type;   // 업태
+    @Column(name = "BUSINESS_TYPE", columnDefinition = "varchar(255) COMMENT '업태'")
+    private String businessType;
 
     @Column(name = "ITEM", columnDefinition = "varchar(255) COMMENT '업종'")
     private String item;    // 업종
@@ -82,6 +82,7 @@ public class WorkPlace extends BaseTimeEntity {
         setFaxNumber(newWorkPlace.faxNumber);
         setCorporateCode(newWorkPlace.corporateCode);
         setUseYn(newWorkPlace.useYn);
+        setBusinessType(newWorkPlace.businessType);
     }
 
     public void delete() {

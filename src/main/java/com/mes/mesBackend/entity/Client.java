@@ -84,10 +84,8 @@ public class Client extends BaseTimeEntity {
     @Column(name = "DETAIL_ADDRESS", columnDefinition = "varchar(255) COMMENT '상세주소'")
     private String detailAddress;   // 상세주소
 
-    // 다대일 단방향
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "BUSINESS_TYPE", columnDefinition = "bigint COMMENT '업태'")
-    private BusinessType businessType;      // 업태
+    @Column(name = "BUSINESS_TYPE", columnDefinition = "varchar(255) COMMENT '업태'")
+    private String businessType;      // 업태
 
     @Column(name = "ITEM", columnDefinition = "varchar(255) COMMENT '업종'")
     private String item;        // 업종
@@ -157,12 +155,12 @@ public class Client extends BaseTimeEntity {
     private boolean useYn = true;       // 사용여부
 
     // 수정 매핑
-    public void put(Client newClient,
-                    BusinessType newBusinessType,
-                    CountryCode newCountryCode,
-                    ClientType newClientType,
-                    Currency newCurrency,
-                    PayType newPayType
+    public void put(
+            Client newClient,
+            CountryCode newCountryCode,
+            ClientType newClientType,
+            Currency newCurrency,
+            PayType newPayType
     ) {
         setClientCode(newClient.clientCode);
         setClientName(newClient.clientName);
@@ -174,7 +172,7 @@ public class Client extends BaseTimeEntity {
         setPostalCode(newClient.postalCode);
         setAddress(newClient.address);
         setDetailAddress(newClient.detailAddress);
-        setBusinessType(newBusinessType);
+        setBusinessType(newClient.businessType);
         setItem(newClient.item);
         setTelNumber(newClient.telNumber);
         setFaxNumber(newClient.faxNumber);
@@ -197,13 +195,11 @@ public class Client extends BaseTimeEntity {
     }
 
     public void addJoin(
-            BusinessType businessType,
             CountryCode countryCode,
             ClientType clientType,
             Currency currency,
             PayType payType
     ) {
-        setBusinessType(businessType);
         setCountryCode(countryCode);
         setClientType(clientType);
         setCurrencyUnit(currency);

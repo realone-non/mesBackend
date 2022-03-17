@@ -26,7 +26,7 @@ public class ClientResponse {
     String postalCode;      // 우편번호
     String address;     // 주소
     String detailAddress;   // 상세주소
-    BusinessTypeResponse businessType;      // 업태
+    String businessType;      // 업태
     String item;        // 업종
     String telNumber;   // 전화번호
     String faxNumber;   // fax번호 12자

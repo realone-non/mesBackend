@@ -47,8 +47,8 @@ public class WorkPlaceRequest {
     @Schema(description = "영문주소2")
     String engAddress2;    // 영문주소2
 
-    @Schema(description = "업태 ids")
-    List<Long> type;  // 업태
+    @Schema(description = "업태")
+    String type;
 
     @Schema(description = "업종")
     String item;    // 업종
