@@ -42,7 +42,7 @@ public class DevelopmentState extends BaseTimeEntity{
     @JoinColumn(name = "USER", nullable = false, columnDefinition = "bigint COMMENT '등록자'")
     private User user;
 
-    @Column(name = "FILE_URL", nullable = false, columnDefinition = "nvarchar(500) COMMENT '파일URL'")
+    @Column(name = "FILE_URL", columnDefinition = "nvarchar(500) COMMENT '파일URL'")
     private String fileUrl;
 
     @Column(name = "APPROVE_DATE", columnDefinition = "date COMMENT '승인날짜'")
