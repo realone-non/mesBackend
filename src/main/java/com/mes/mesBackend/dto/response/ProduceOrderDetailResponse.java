@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.helper.Constants.DECIMAL_POINT_2;
 
 
 @Getter
@@ -30,13 +31,13 @@ public class ProduceOrderDetailResponse {
     String itemAccount;
 
     @Schema(description = "BOM수량")
-    int bomAmount;
+    float bomAmount;
 
     @Schema(description = "투입공정")
     String workProcess;
 
     @Schema(description = "예약수량")
-    int reservationAmount;
+    String reservationAmount;
 
     @Schema(description = "오더단위")
     String orderUnit;
@@ -46,7 +47,7 @@ public class ProduceOrderDetailResponse {
 
     // 예약수량 메서드
     // bom의 투입수량 * 수주 수량
-    public void setReservationAmount(int bomAmount, int contractItemAmount) {
-        setReservationAmount(bomAmount * contractItemAmount);
+    public void setReservationAmount(float bomAmount, int contractItemAmount) {
+        setReservationAmount(String.format(DECIMAL_POINT_2, bomAmount * contractItemAmount));
     }
 }

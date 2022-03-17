@@ -35,7 +35,8 @@ public class BomItemDetailRepositoryImpl implements BomItemDetailRepositoryCusto
     ) {
         return jpaQueryFactory
                 .select(
-                        Projections.fields(BomItemDetailResponse.class,
+                        Projections.fields(
+                                BomItemDetailResponse.class,
                                 bomItemDetail.id.as("id"),
                                 bomItemDetail.level.as("level"),
                                 item.id.as("itemId"),
@@ -50,7 +51,8 @@ public class BomItemDetailRepositoryImpl implements BomItemDetailRepositoryCusto
                                 bomItemDetail.amount.as("amount"),
                                 client.id.as("toBuyId"),
                                 client.clientName.as("toBuyName"),
-                                bomItemDetail.amount.multiply(item.inputUnitPrice).as("price"),
+//                                (item.inputUnitPrice.multiply(purchaseInput.inputAmount).doubleValue()).multiply(0.1).as("vat"),
+//                                (bomItemDetail.amount.multiply(item.inputUnitPrice)).doubleValue().as("price"),
                                 workProcess.id.as("workProcessId"),
                                 workProcess.workProcessName.as("workProcessName"),
                                 bomItemDetail.useYn.as("useYn"),

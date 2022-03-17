@@ -103,7 +103,7 @@ public class Item extends BaseTimeEntity {
 
     // 다대일 단방향
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "MANUFACTURER", nullable = false,columnDefinition = "bigint COMMENT '제조사'")
+    @JoinColumn(name = "MANUFACTURER", columnDefinition = "bigint COMMENT '제조사'")
     private Client manufacturer;        // 제조사
 
     // 다대일 단방향

@@ -45,7 +45,7 @@ public class BomItemDetailResponse {
     int itemInputUnitPrice;         // 입고단가
 
     @Schema(description = "수량")
-    int amount;
+    float amount;
 
     @Schema(description = "(거래처) 고유아이디")
     Long toBuyId;
@@ -53,8 +53,9 @@ public class BomItemDetailResponse {
     @Schema(description = "(거래처) 거래처명")
     String toBuyName;
 
+    // 소수점 2자리
     @Schema(description = "금액")
-    int price;      // 금액
+    String price;      // 금액
 
     @Schema(description = "(공정) 고유아이디")
     Long workProcessId;

@@ -147,6 +147,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     }
 
     // 구매발주 삭제
+    // TODO: 구매발주에 등록된 상세(구매요청) 가 있을경우 삭제 불가능으로 할것인지 아니면 기존에 구현되어있는 방식으로 할건지
     @Override
     public void deletePurchaseOrder(Long purchaseOrderId) throws NotFoundException {
         PurchaseOrder purchaseOrder = getPurchaseOrderOrThrow(purchaseOrderId);
@@ -191,7 +192,6 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         /*
         * 생성 전 체크 항목
         * if 해당 구매발주에 해당하는 구매요청이 있는지 ?
-        * -> 구매요청에 해당하는 구매발주를 집어넣고 구매요청의 orderState 의 상태값을 SCHEDULE -> ONGOING 으로 변경
         * -> 구매발주의 거래처 생성
         * else if 해당 구매발주에 한개라도 해당하는 구매요청이 있으면 ?
         * -> 구매발주에 등록 된 거래처를 기준으로 삼아서 해당 거래처에 해당하는 구매요청만 등록가능

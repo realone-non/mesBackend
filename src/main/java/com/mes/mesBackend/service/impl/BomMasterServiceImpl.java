@@ -11,11 +11,16 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.BomItemDetailRepository;
 import com.mes.mesBackend.repository.BomMasterRepository;
-import com.mes.mesBackend.service.*;
+import com.mes.mesBackend.service.BomMasterService;
+import com.mes.mesBackend.service.ClientService;
+import com.mes.mesBackend.service.ItemService;
+import com.mes.mesBackend.service.WorkProcessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.mes.mesBackend.helper.Constants.DECIMAL_POINT_2;
 
 @Service
 @RequiredArgsConstructor
@@ -124,7 +129,9 @@ public class BomMasterServiceImpl implements BomMasterService {
     @Override
     public List<BomItemDetailResponse> getBomItems(Long bomMasterId, String itemNoOrItemName) throws NotFoundException {
         BomMaster bomMaster = getBomMasterOrThrow(bomMasterId);
-        return bomItemDetailRepository.findAllByCondition(bomMaster.getId(), itemNoOrItemName);
+        List<BomItemDetailResponse> responses = bomItemDetailRepository.findAllByCondition(bomMaster.getId(), itemNoOrItemName);
+        responses.forEach(m -> m.setPrice(String.format(DECIMAL_POINT_2, m.getAmount() * m.getItemInputUnitPrice())));
+        return responses;
     }
 
     // BOM 품목 수정
@@ -166,9 +173,8 @@ public class BomMasterServiceImpl implements BomMasterService {
     }
 
     // 입력받은 item 이 bomMaster 에 이미 등록되어 있는지 채크
-    private void throwIfNotDuplicateItemInBomMasters(Item item) throws NotFoundException, BadRequestException {
+    private void throwIfNotDuplicateItemInBomMasters(Item item) throws BadRequestException {
         boolean b = bomMasterRepository.existsByItemInBomMasters(item.getId());
         if (b) throw new BadRequestException("입략한 품목이 이미 Bom 에 등록되어 있으므로 중복 등록이 불가능 합니다.");
     }
-
 }

@@ -30,6 +30,7 @@ public class WorkOrderStateServiceImpl implements WorkOrderStateService {
             LocalDate toDate,
             String contractNo
     ) {
+        // TODO: 보여지는 품목정보는 BOM Item 정보여야함
         return workOrderDetailRepo.findWorkOrderStateResponsesByCondition(workProcessId, workLineId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
     }
 

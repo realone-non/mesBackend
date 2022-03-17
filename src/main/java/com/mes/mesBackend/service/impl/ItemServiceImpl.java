@@ -54,7 +54,7 @@ public class ItemServiceImpl implements ItemService {
         Routing routing = itemRequest.getRouting() != null ? routingService.getRoutingOrThrow(itemRequest.getRouting()) : null;
         Unit unit = unitService.getUnitOrThrow(itemRequest.getUnit());
         LotType lotType = lotTypeService.getLotTypeOrThrow(itemRequest.getLotType());
-        Client manufacturer = clientService.getClientOrThrow(itemRequest.getManufacturer());
+        Client manufacturer = itemRequest.getManufacturer() != null ? clientService.getClientOrThrow(itemRequest.getManufacturer()) : null;
         TestCriteria testCriteria = itemRequest.getTestCriteria() != null ? testCriteriaService.getTestCriteriaOrThrow(itemRequest.getTestCriteria()) : null;
         WareHouse wareHouse = itemRequest.getStorageLocation() != null ? wareHouseService.getWareHouseOrThrow(itemRequest.getStorageLocation()) : null;
 
@@ -120,6 +120,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemResponse updateItem(Long id, ItemRequest itemRequest) throws NotFoundException, BadRequestException {
         Item findItem = getItemOrThrow(id);
+        // TODO: 해당 품목이 BOM 에 등록되어 있을경우 수정 불가
 
         ItemAccount newItemAccount = itemAccountService.getItemAccountOrThrow(itemRequest.getItemAccount());
         ItemAccountCode newItemAccountCode = itemAccountCodeService.getItemAccountCodeOrThrow(itemRequest.getItemAccountCode());
@@ -131,7 +132,7 @@ public class ItemServiceImpl implements ItemService {
         Routing newRouting = itemRequest.getRouting() != null ? routingService.getRoutingOrThrow(itemRequest.getRouting()) : null;
         Unit newUnit = unitService.getUnitOrThrow(itemRequest.getUnit());
         LotType newLotType = lotTypeService.getLotTypeOrThrow(itemRequest.getLotType());
-        Client newManufacturer = clientService.getClientOrThrow(itemRequest.getManufacturer());
+        Client newManufacturer = itemRequest.getManufacturer() != null ? clientService.getClientOrThrow(itemRequest.getManufacturer()) : null;
         TestCriteria newTestCriteria = itemRequest.getTestCriteria() != null ? testCriteriaService.getTestCriteriaOrThrow(itemRequest.getTestCriteria()) : null;
         WareHouse newWareHouse = itemRequest.getStorageLocation() != null ? wareHouseService.getWareHouseOrThrow(itemRequest.getStorageLocation()) : null;
 
@@ -146,6 +147,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void deleteItem(Long id) throws NotFoundException {
         Item item = getItemOrThrow(id);
+        // TODO: 해당 품목이 BOM 등록되어 있을 경우 삭제 불가
         List<ItemFile> itemFiles = itemFileRepository.findAllByItemAndDeleteYnFalse(item);
         for (ItemFile itemFile : itemFiles) {
             itemFile.delete();

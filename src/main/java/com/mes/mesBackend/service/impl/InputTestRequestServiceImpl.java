@@ -35,8 +35,6 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     private final ModelMapper modelMapper;
     private final LotMasterRepository lotMasterRepo;
     private final InputTestDetailRepository inputTestDetailRepo;
-    private final LotLogRepository lotLogRepo;
-    private final LotConnectRepository lotConnectRepository;
 
     // 외주수입검사의뢰 생성
     /*
@@ -145,7 +143,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
         int beforeRequestAmount = findInputTestRequest.getRequestAmount();
 
         int newRequestAmount = inputTestRequestUpdateRequest.getRequestAmount();
-        // 입력받은 요청수량이 lot 의 입고수량보다 많은지 체크
+        // 입력받은 요청수량이 lot 의 재고수량 보다 많은지 체크
         throwIfRequestAmountGreaterThanInputAmount(findLotMaster.getId(), (findLotMaster.getCheckRequestAmount() - beforeRequestAmount) + newRequestAmount);
         // 검사방법 (입력받으면 입력받은 검사방법으로 하고, 입력받지 않으면 품목의 검사방법으로 함)
         InspectionType inspectionType = inputTestRequestUpdateRequest.getInspectionType().equals(NONE) ? findLotMaster.getItem().getInspectionType() : inputTestRequestUpdateRequest.getInspectionType();

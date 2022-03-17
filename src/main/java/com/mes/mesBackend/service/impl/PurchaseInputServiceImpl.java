@@ -106,12 +106,6 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
         );
 
         lotHelper.createLotMaster(lotMasterRequest);
-//        lotMasterService.createLotMaster(lotMasterRequest).getLotNo();      // lotMaster 생성
-
-//        if (lotMaster == null) {
-//            purchaseInputRepo.deleteById(purchaseInput.getId());
-//            throw new BadRequestException("lot 번호가 생성되지 않았습니다.");
-//        }
 
         // 구매요청에 입고일시 생성
         putInputDateToPurchaseRequest(purchaseRequest);
@@ -148,6 +142,7 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
         findPurchaseInput.put(newPurchaseInput);
 
         // 해당하는 lot 의 재고수량, 생성수량 변경
+        // TODO: 해당 LOT 사용됐으면 수정 불가능
         LotMaster lotMaster = getLotMasterOrThrow(findPurchaseInput);
         lotMaster.updatePurchaseInput(findPurchaseInput.getInputAmount());
         lotMasterRepo.save(lotMaster);
@@ -169,6 +164,7 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
         purchaseInput.delete();
 
         // 구매입고 등록 시 생성되었던 lotMaster 삭제
+        // TODO: 해당 LOT 사용되었으면 삭제 불가능
         LotMaster lotMaster = getLotMasterOrThrow(purchaseInput);
         lotMaster.delete();
 
