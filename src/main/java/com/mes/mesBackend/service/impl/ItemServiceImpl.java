@@ -9,6 +9,8 @@ import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.S3Uploader;
 import com.mes.mesBackend.mapper.ModelMapper;
+import com.mes.mesBackend.repository.BomItemDetailRepository;
+import com.mes.mesBackend.repository.BomMasterRepository;
 import com.mes.mesBackend.repository.ItemFileRepository;
 import com.mes.mesBackend.repository.ItemRepository;
 import com.mes.mesBackend.service.*;
@@ -38,6 +40,8 @@ public class ItemServiceImpl implements ItemService {
     private final ModelMapper mapper;
     private final S3Uploader s3Uploader;
     private final WareHouseService wareHouseService;
+    private final BomMasterRepository bomMasterRepository;
+    private final BomItemDetailRepository bomItemDetailRepository;
 
 
     // 품목 생성
@@ -120,7 +124,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemResponse updateItem(Long id, ItemRequest itemRequest) throws NotFoundException, BadRequestException {
         Item findItem = getItemOrThrow(id);
-        // TODO: 해당 품목이 BOM 에 등록되어 있을경우 수정 불가
 
         ItemAccount newItemAccount = itemAccountService.getItemAccountOrThrow(itemRequest.getItemAccount());
         ItemAccountCode newItemAccountCode = itemAccountCodeService.getItemAccountCodeOrThrow(itemRequest.getItemAccountCode());
@@ -145,9 +148,14 @@ public class ItemServiceImpl implements ItemService {
 
     // 품목 삭제
     @Override
-    public void deleteItem(Long id) throws NotFoundException {
+    public void deleteItem(Long id) throws NotFoundException, BadRequestException {
         Item item = getItemOrThrow(id);
-        // TODO: 해당 품목이 BOM 등록되어 있을 경우 삭제 불가
+
+        // 품목이 BomMaster 에 등록되어 있는지 체쿠
+        throwIfItemExistsInBomMaster(item);
+        // 품목이 BomItemDetail 에 등록되어 있는지 체크
+        throwIfItemExistsInBomItemDetails(item);
+
         List<ItemFile> itemFiles = itemFileRepository.findAllByItemAndDeleteYnFalse(item);
         for (ItemFile itemFile : itemFiles) {
             itemFile.delete();
@@ -156,6 +164,18 @@ public class ItemServiceImpl implements ItemService {
 
         item.delete();
         itemRepository.save(item);
+    }
+
+    // 품목이 BomMaster 에 등록되어 있는지 체쿠
+    private void throwIfItemExistsInBomMaster(Item item) throws BadRequestException {
+        boolean exist = bomMasterRepository.existsByItemAndDeleteYnIsFalse(item);
+        if (exist) throw new BadRequestException("해당 품목은 BOM 정보에 등록되어 있으므로 삭제가 불가능 합니다. BOM 에서 삭제 후 다시 시도해주세요.");
+    }
+
+    // 품목이 BomItemDetail 에 등록되어 있는지 체크
+    private void throwIfItemExistsInBomItemDetails(Item item) throws BadRequestException {
+        boolean exist = bomItemDetailRepository.existsByItemAndDeleteYnIsFalse(item);
+        if (exist) throw new BadRequestException("해당 품목은 BOM 상세 정보에 등록되어 있으므로 삭제가 불가능 합니다. BOM 상세에서 삭제 후 다시 시도해주세요. ");
     }
 
     // 품목 단일 조회 및 예외
