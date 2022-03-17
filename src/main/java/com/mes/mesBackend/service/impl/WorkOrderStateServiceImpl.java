@@ -2,8 +2,10 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.response.WorkOrderStateDetailResponse;
 import com.mes.mesBackend.dto.response.WorkOrderStateResponse;
+import com.mes.mesBackend.entity.Item;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.repository.ItemRepository;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
 import com.mes.mesBackend.service.WorkOrderStateService;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +14,14 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
+
 // 8-1. 작지상태 확인
 @Service
 @RequiredArgsConstructor
 public class WorkOrderStateServiceImpl implements WorkOrderStateService {
     private final WorkOrderDetailRepository workOrderDetailRepo;
+    private final ItemRepository itemRepository;
 
     // 쟉업지시 정보 조회 , 검색조건: 작업장 id, 작업라인 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
     @Override
@@ -30,8 +35,19 @@ public class WorkOrderStateServiceImpl implements WorkOrderStateService {
             LocalDate toDate,
             String contractNo
     ) {
-        // TODO: 보여지는 품목정보는 BOM Item 정보여야함
-        return workOrderDetailRepo.findWorkOrderStateResponsesByCondition(workProcessId, workLineId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
+        List<WorkOrderStateResponse> responses = workOrderDetailRepo.findWorkOrderStateResponsesByCondition(workProcessId, workLineId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
+        for (WorkOrderStateResponse r : responses) {
+            Item item = r.getWorkProcessDivision().equals(PACKAGING) ? getItemOrNull(r.getItemId())
+                    : workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(r.getItemId(), r.getWorkProcessId(), null)
+                    .orElse(null);
+            if (item != null) r.setItems(item);
+        }
+        return responses;
+    }
+
+    // 품목 조회 및 없으면 null
+    private Item getItemOrNull(Long id) {
+        return itemRepository.findByIdAndDeleteYnFalse(id).orElse(null);
     }
 
     // 작업지시 단일 조회

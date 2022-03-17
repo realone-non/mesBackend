@@ -98,7 +98,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     }
 
     // 작업지시 리스트 조회
-    // TODO: orderBy 공정순번
     @Override
     public List<WorkOrderResponse> getWorkOrders(Long produceOrderId) throws NotFoundException {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);

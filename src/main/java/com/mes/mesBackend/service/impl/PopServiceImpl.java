@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,7 +60,8 @@ public class PopServiceImpl implements PopService {
     // 작업공정 전체 조회
     @Override
     public List<WorkProcessResponse> getPopWorkProcesses(Boolean recycleYn) {
-        List<WorkProcess> workProcesses = workProcessRepository.findAllByDeleteYnFalse();
+        List<WorkProcess> workProcesses = workProcessRepository.findAllByDeleteYnFalse()
+                .stream().sorted(Comparator.comparing(WorkProcess::getOrders)).collect(Collectors.toList());
         List<WorkProcessResponse> workProcessResponses = mapper.toListResponses(workProcesses, WorkProcessResponse.class);
         List<WorkProcessResponse> responses = new ArrayList<>();
         if (recycleYn != null && recycleYn) {
