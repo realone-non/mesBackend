@@ -3,6 +3,7 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.PopPurchaseRequestResponse;
 import com.mes.mesBackend.dto.response.PurchaseRequestResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.PurchaseRequestRepositoryCustom;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
@@ -242,6 +243,19 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                 )
                 .fetchFirst();
         return fetchOne != null;
+    }
+
+    // 제조오더에 해당하는 구매요청의 상태값
+    @Override
+    public List<OrderState> findOrderStateByPurchaseOrder(Long purchaseOrderId) {
+        return jpaQueryFactory
+                .select(purchaseRequest.ordersState)
+                .from(purchaseRequest)
+                .where(
+                        purchaseRequest.purchaseOrder.id.eq(purchaseOrderId),
+                        purchaseRequest.deleteYn.isFalse()
+                )
+                .fetch();
     }
 
     // 요청기간

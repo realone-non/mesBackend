@@ -98,14 +98,18 @@ public class BomMasterServiceImpl implements BomMasterService {
 
     // BOM 마스터 삭제
     @Override
-    public void deleteBomMaster(Long bomMasterId) throws NotFoundException {
+    public void deleteBomMaster(Long bomMasterId) throws NotFoundException, BadRequestException {
         BomMaster bomMaster = getBomMasterOrThrow(bomMasterId);
-        List<BomItemDetail> bomItemDetails = bomItemDetailRepository.findAllByBomMasterAndDeleteYnFalse(bomMaster);
-        bomItemDetails.forEach(BomItemDetail::delete);
-        bomItemDetailRepository.saveAll(bomItemDetails);
-
+        // bomMaster 에 해당되는 BomItemDetail 이 있는지 체크(존재하면 삭제 불가능)
+        throwIfBomMasterExistInBomItemDetail(bomMaster);
         bomMaster.delete();
         bomMasterRepository.save(bomMaster);
+    }
+
+    // bomMaster 에 해당되는 BomItemDetail 이 있는지 체크(존재하면 삭제 불가능)
+    private void throwIfBomMasterExistInBomItemDetail(BomMaster bomMaster) throws BadRequestException {
+        boolean exists = bomItemDetailRepository.existsByBomMasterAndDeleteYnFalse(bomMaster);
+        if (exists) throw new BadRequestException("해당 BOM 에 등록되어있는 상세 정보가 존재하므로 삭제가 불가능 합니다. 상세 정보 삭제 후 다시 시도해주세요.");
     }
 
     // BOM 품목 생성

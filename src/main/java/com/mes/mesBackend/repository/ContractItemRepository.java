@@ -13,4 +13,6 @@ import java.util.Optional;
 public interface ContractItemRepository extends JpaCustomRepository<ContractItem, Long> {
     Optional<ContractItem> findByIdAndContractAndDeleteYnFalse(Long id, Contract contract);
     List<ContractItem> findAllByContractAndDeleteYnFalse(Contract contract);
+    // 수주 삭제 시 해당하는 수주의 수주품목 정보가 존재하면 삭제 불가능
+    boolean existsByContractAndDeleteYnFalse(Contract contract);
 }

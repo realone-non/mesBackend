@@ -28,9 +28,9 @@ public interface PurchaseInputService {
     // 구메입고 LOT 단일 조회
     PurchaseInputDetailResponse getPurchaseInputDetailResponse(Long purchaseRequestId, Long purchaseInputId) throws NotFoundException;
     // 구매입고 LOT 수정
-    PurchaseInputDetailResponse updatePurchaseInputDetail(Long purchaseRequestId, Long purchaseInputId, PurchaseInputRequest.updateRequest purchaseInputUpdateRequest) throws NotFoundException;
+    PurchaseInputDetailResponse updatePurchaseInputDetail(Long purchaseRequestId, Long purchaseInputId, PurchaseInputRequest.updateRequest purchaseInputUpdateRequest) throws NotFoundException, BadRequestException;
     // 구매입고 LOT 삭제
-    void deletePurchaseInputDetail(Long purchaseRequestId, Long purchaseInputId) throws NotFoundException;
+    void deletePurchaseInputDetail(Long purchaseRequestId, Long purchaseInputId) throws NotFoundException, BadRequestException;
 
     // 구매입고 LOT 단일 조회 및 예외
 //    PurchaseInput getPurchaseInputOrThrow(Long id) throws NotFoundException;

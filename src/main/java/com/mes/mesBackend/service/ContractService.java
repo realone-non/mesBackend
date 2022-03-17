@@ -26,7 +26,7 @@ public interface ContractService {
     // 수주 수정
     ContractResponse updateContract(Long contractId, ContractRequest contractRequest) throws NotFoundException;
     // 수주 삭제
-    void deleteContract(Long id) throws NotFoundException;
+    void deleteContract(Long id) throws NotFoundException, BadRequestException;
     // 수주 단일 조회 및 예외
     Contract getContractOrThrow(Long id)throws NotFoundException;
 
@@ -40,7 +40,7 @@ public interface ContractService {
     // 수주 품목 수정
     ContractItemResponse updateContractItem(Long contractId, Long contractItemId, ContractItemRequest contractItemRequest) throws NotFoundException;
     // 수주 품목 삭제
-    void deleteContractItem(Long contractId, Long contractItemId) throws NotFoundException;
+    void deleteContractItem(Long contractId, Long contractItemId) throws NotFoundException, BadRequestException;
     // 수주 품목 단일 조회 및 예외
      ContractItem getContractItemOrThrow(Long contractId, Long contractItemId) throws NotFoundException;
 

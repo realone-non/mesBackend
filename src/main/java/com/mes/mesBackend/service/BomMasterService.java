@@ -24,7 +24,7 @@ public interface BomMasterService {
     // BOM 마스터 수정
     BomMasterResponse updateBomMaster(Long bomMasterId, BomMasterRequest bomMasterRequest) throws NotFoundException;
     // BOM 마스터 삭제
-    void deleteBomMaster(Long bomMasterId) throws NotFoundException;
+    void deleteBomMaster(Long bomMasterId) throws NotFoundException, BadRequestException;
 
 
     // BOM 품목 생성
