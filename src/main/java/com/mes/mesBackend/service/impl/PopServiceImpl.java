@@ -369,7 +369,8 @@ public class PopServiceImpl implements PopService {
     public List<PopEquipmentResponse> getPopEquipments(WorkProcessDivision workProcessDivision) throws NotFoundException {
         Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(workProcessDivision);
         WorkProcess workProcess = getWorkProcessIdOrThrow(workProcessId);
-        return equipmentRepository.findPopEquipmentResponseByWorkProcess(workProcess.getId());
+        return equipmentRepository.findPopEquipmentResponseByWorkProcess(workProcess.getId())
+                .stream().filter(PopEquipmentResponse::isProduceYn).collect(Collectors.toList());
     }
 
     // 해당 품목(반제품)에 대한 원자재, 부자재 정보 가져와야함

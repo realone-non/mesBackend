@@ -81,6 +81,7 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
                 .where(
                         bomMaster.item.id.eq(itemId)
                 )
+                .orderBy(workProcess.orders.asc())
                 .fetch();
     }
     @Transactional(readOnly = true)

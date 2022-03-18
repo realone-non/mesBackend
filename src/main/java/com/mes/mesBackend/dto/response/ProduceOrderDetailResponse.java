@@ -3,6 +3,7 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,6 +45,12 @@ public class ProduceOrderDetailResponse {
 
     @JsonIgnore
     GoodsType goodsType;
+
+    @JsonIgnore
+    WorkProcessDivision workProcessDivision;
+
+    @JsonIgnore
+    Long workProcessId;
 
     // 예약수량 메서드
     // bom의 투입수량 * 수주 수량

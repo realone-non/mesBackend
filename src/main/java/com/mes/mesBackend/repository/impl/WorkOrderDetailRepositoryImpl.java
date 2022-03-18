@@ -234,7 +234,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isDeleteYnFalse(),
                         workOrderDetail.produceOrder.id.eq(produceOrderId)
                 )
-                .orderBy(workProcess.orders.desc())
+                .orderBy(workProcess.orders.asc())
                 .fetch();
     }
 
@@ -269,7 +269,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                         workOrderDetail.note.as("note"),
                                         workOrderDetail.startDate.as("startDateTime"),
                                         workOrderDetail.endDate.as("endDateTime"),
-                                        item.id.as("produceOrderItemId")
+                                        item.id.as("produceOrderItemId"),
+                                        workProcess.workProcessDivision.as("workProcessDivision")
                                 )
                         )
                         .from(workOrderDetail)

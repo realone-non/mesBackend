@@ -286,7 +286,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         // 구매발주에 해당하는 구매요청이 하나라도 없으면 구매발주의 client 를 null 로 변경함
         PurchaseOrder purchaseOrder = getPurchaseOrderOrThrow(purchaseOrderId);
         boolean b = purchaseRequestRepo.existsPurchaseRequestByPurchaseOrder(purchaseOrderId);
-        if (b) purchaseOrder.setClient(null);
+        if (!b) purchaseOrder.setClient(null);
         purchaseOrderRepo.save(purchaseOrder);
     }
 

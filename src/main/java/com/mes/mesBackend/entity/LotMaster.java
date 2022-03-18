@@ -191,7 +191,7 @@ public class LotMaster extends BaseTimeEntity {
         setWareHouse(request.getWareHouse());
         setPurchaseInput(request.getPurchaseInput());
         setStockAmount(request.getStockAmount());
-        setStockAmount(request.getCreatedAmount());
+        setCreatedAmount(request.getCreatedAmount());
         setLotType(request.getLotType());
         setProcessYn(request.isProcessYn());
         setWorkProcess(workProcess);

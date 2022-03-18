@@ -239,7 +239,7 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                 .where(
                         purchaseRequest.purchaseOrder.id.eq(purchaseOrderId),
                         purchaseOrder.deleteYn.isFalse(),
-                        purchaseRequest.purchaseOrder.deleteYn.isFalse()
+                        purchaseRequest.deleteYn.isFalse()
                 )
                 .fetchFirst();
         return fetchOne != null;
