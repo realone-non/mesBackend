@@ -71,7 +71,7 @@ public class BomItemDetailRepositoryImpl implements BomItemDetailRepositoryCusto
                         isItemNoOrItemNameToItemNoOrItemName(itemNoOrItemName),
                         isDeleteYnFalse()
                 )
-                .orderBy(workProcess.orders.desc())
+                .orderBy(workProcess.orders.asc())
                 .fetch();
     }
 

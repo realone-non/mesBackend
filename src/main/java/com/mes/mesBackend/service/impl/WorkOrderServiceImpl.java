@@ -12,6 +12,7 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.NumberAutomatic;
 import com.mes.mesBackend.helper.WorkOrderStateHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
+import com.mes.mesBackend.repository.ItemRepository;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
 import com.mes.mesBackend.service.*;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private final ModelMapper mapper;
     private final NumberAutomatic numberAutomatic;
     private final WorkOrderStateHelper workOrderStateHelper;
+    private final ItemRepository itemRepository;
 
     // 제조오더 정보 리스트 조회
     // 검색조건: 품목그룹 id, 품명|품번, 수주번호, 제조오더번호, 착수예정일 fromDate~endDate, 지시상태
@@ -51,11 +53,26 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return workOrderDetailRepo.findAllByCondition(itemGroupId, itemNoAndName, contractNo, produceOrderNo, fromDate, toDate, orderState);
     }
 
+    // 품목 조회 및 없으면 null
+    private Item getItemOrNull(Long id) {
+        return itemRepository.findByIdAndDeleteYnFalse(id).orElse(null);
+    }
+
     // 작업지시 생성
     @Override
     public WorkOrderResponse createWorkOrder(Long produceOrderId, WorkOrderCreateRequest workOrderRequest) throws NotFoundException, BadRequestException {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(produceOrderId);
         WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(workOrderRequest.getWorkProcess());
+
+        Item item = workProcess.getWorkProcessDivision().equals(PACKAGING) ? getItemOrNull(produceOrder.getContractItem().getItem().getId())
+                : workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(produceOrder.getContractItem().getItem().getId(), workProcess.getId(), null)
+                .orElse(null);
+
+        // 수주품목에 해당하는 품목이 BomMaster 에 없을경우 예외
+        if (item == null) {
+            throw new BadRequestException("수주품목에 해당하는 공정별 BOM 과 BOM 상세정보가 등록되지 않았습니다. 등록 후 다시 시도해주세요.");
+        }
+
         WorkLine workLine = workLineService.getWorkLineOrThrow(workOrderRequest.getWorkLine());
         User user = workOrderRequest.getUser() != null ? userService.getUserOrThrow(workOrderRequest.getUser()) : null;
 
@@ -84,14 +101,15 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         WorkOrderResponse workOrderResponse = workOrderDetailRepo.findWorkOrderResponseByProduceOrderIdAndWorkOrderId(produceOrderId, workOrderId)
                 .orElseThrow(() -> new NotFoundException("workOrderDetail does not exists. input id: " + workOrderId));
 
-        Item bomDetailItem = workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(workOrderResponse.getProduceOrderItemId(), workOrderResponse.getWorkProcessId(), null)
+        Item item = workOrderResponse.getWorkProcessDivision().equals(PACKAGING) ? getItemOrNull(workOrderResponse.getProduceOrderItemId())
+                : workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(workOrderResponse.getProduceOrderItemId(), workOrderResponse.getWorkProcessId(), null)
                 .orElse(null);
 
         workOrderResponse.setCostTime();        // 소요시간
-        if (bomDetailItem != null) {
-            workOrderResponse.setUnitCodeName(bomDetailItem.getUnit().getUnitCode());       // 공정에 해당하는 반제품 품목 단위
-            workOrderResponse.setTestCategory(bomDetailItem.getTestCategory());             // 공정에 해당하는 반제품 품목 검사종류
-            workOrderResponse.setTestType(bomDetailItem.getTestType());                     // 공정에 해당하는 반제품 품목 검사유형
+        if (item != null) {
+            workOrderResponse.setUnitCodeName(item.getUnit().getUnitCode());       // 공정에 해당하는 반제품 품목 단위
+            workOrderResponse.setTestCategory(item.getTestCategory());             // 공정에 해당하는 반제품 품목 검사종류
+            workOrderResponse.setTestType(item.getTestType());                     // 공정에 해당하는 반제품 품목 검사유형
         }
 
         return workOrderResponse;
@@ -104,10 +122,14 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         List<WorkOrderResponse> workOrderDetails = workOrderDetailRepo.findWorkOrderResponseByProduceOrderIdAndDeleteYnFalse(produceOrder.getId());
 
         for (WorkOrderResponse response : workOrderDetails) {
-            Item item = response.getWorkProcessDivision().equals(PACKAGING) ?
-                    produceOrder.getContractItem().getItem()
+            Item item = response.getWorkProcessDivision().equals(PACKAGING) ? getItemOrNull(response.getProduceOrderItemId())
                     : workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(response.getProduceOrderItemId(), response.getWorkProcessId(), null)
                     .orElse(null);
+
+//            Item item = response.getWorkProcessDivision().equals(PACKAGING) ?
+//                    produceOrder.getContractItem().getItem()
+//                    : workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(response.getProduceOrderItemId(), response.getWorkProcessId(), null)
+//                    .orElse(null);
             response.setCostTime();
             if (item != null) {
                 response.setUnitCodeName(item.getUnit().getUnitCode());       // 공정에 해당하는 반제품 품목 단위
