@@ -110,6 +110,9 @@ public class PurchaseRequest extends BaseTimeEntity {
         setStockUnitRequestAmount(newPurchaseRequest.stockUnitRequestAmount);
         setStockUnitOrderAmount(newPurchaseRequest.stockUnitOrderAmount);
         setInputTestYn(newPurchaseRequest.inputTestYn);
+        if (produceOrder != null) {
+            setOrderAmount(requestAmount);
+        }
     }
 
     public void mapping(
