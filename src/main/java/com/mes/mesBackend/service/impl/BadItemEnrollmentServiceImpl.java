@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.DUMMY_LOT;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 
 // 8-5. 불량 등록
@@ -65,7 +66,7 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
 //            response.setBadAmount(lotLog.getLotMaster().getBadItemAmount());        // lotMaster 의 불량수량
 //            response.setProductionAmount(lotLog.getLotMaster().getCreatedAmount()); // lotMaster 의 생성수량
             Long dummyLotId = lotLog.getLotMaster().getId();
-            // TODO: 여기 테스트
+            // TODO: 여기 테스트 불량수량 나오는 부분이 이상함
             BadItemWorkOrderResponse.subDto subDto = lotMasterRepo.findLotMaterByDummyLotIdAndWorkProcessId(dummyLotId, workProcessId)
                     .orElseThrow(() -> new NotFoundException("[데이터오류] lotLog 에 등록된 lotMaster(id: " + dummyLotId + ") 가 lotEquipmentConnect parentLot 로 등록되지 않았습니다."));
             response.setItemNo(subDto.getItemNo());
@@ -99,7 +100,7 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
         throwIfBadItemIdAnyMatchWorkProcess(lotLog.getWorkProcess().getId(), badItemId);
 
         WorkOrderBadItem workOrderBadItem = new WorkOrderBadItem();
-        workOrderBadItem.create(badItem, workOrderDetail, lotMaster, badItemAmount, REAL_LOT);
+        workOrderBadItem.create(badItem, workOrderDetail, lotMaster, badItemAmount, DUMMY_LOT);
 
         lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() + badItemAmount);   // 불량수량 변경
         workOrderBadItemRepo.save(workOrderBadItem);
