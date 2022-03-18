@@ -37,7 +37,7 @@ public class ProduceOrderRequest {
     @NotNull(message = NOT_NULL)
     OrderState orderState;
 
-    @Schema(description = "")
+    @Schema(description = "보정률")
     @NotNull(message = NOT_NULL)
     int rate = 0;
 

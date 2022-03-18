@@ -280,6 +280,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
         // 구매발주에서 제거, orderState 변경 ONGOING -> SCHEDULE
         purchaseRequest.deleteFromPurchaseOrderAndOrderStateChangedSchedule();
+        purchaseRequest.setOrderAmount(0);
         purchaseRequestRepo.save(purchaseRequest);
 
         // 구매발주에 해당하는 구매요청이 하나라도 없으면 구매발주의 client 를 null 로 변경함
