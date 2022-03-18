@@ -31,7 +31,7 @@ public class WareHouseServiceImpl implements WareHouseService {
         WareHouseType wareHouseType = wareHouseTypeService.getWareHouseTypeOrThrow(wareHouseRequest.getWareHouseType());
 
         // 공정용 창고가 2개 이상 등록되면 안됨
-        if (wareHouseRepository.existsByWorkProcessYnTrueAndDeleteYnFalse()) throw new BadRequestException("공정용 창고는 한개만 등록 가능합니다.");
+        if (wareHouseRepository.existsByWorkProcessYnTrueAndDeleteYnTrue()) throw new BadRequestException("공정용 창고는 한개만 등록 가능합니다.");
 
         WareHouse wareHouse = mapper.toEntity(wareHouseRequest, WareHouse.class);
         wareHouse.addJoin(wareHouseType);
