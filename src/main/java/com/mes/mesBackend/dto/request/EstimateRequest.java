@@ -36,12 +36,9 @@ public class EstimateRequest {
     Long currency;
 
     @Schema(description = "납기")
-    @NotBlank(message = NOT_EMPTY)
     String period;
 
     @Schema(description = "유효기간")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
     int validity;
 
     @Schema(description = "지불조건(결제조건) 고유아이디")

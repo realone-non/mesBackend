@@ -9,6 +9,8 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
+import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 // 17-1. 설비정보
 @Getter
@@ -20,7 +22,7 @@ public class EquipmentCheckResponse {
     Long id;
 
     @Schema(description = "등록일자")
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
     LocalDateTime enrollmentDate;   // 설비 createdDate
 
     @Schema(description = "설비코드")
