@@ -25,7 +25,7 @@ public interface WareHouseService {
 //    Page<WareHouseResponse> getWareHouses(Pageable pageable);
 
     // 수정
-    WareHouseResponse updateWareHouse(Long id, WareHouseRequest wareHouseRequest) throws NotFoundException;
+    WareHouseResponse updateWareHouse(Long id, WareHouseRequest wareHouseRequest) throws NotFoundException, BadRequestException;
 
     // 삭제
     void deleteWareHouse(Long id) throws NotFoundException;

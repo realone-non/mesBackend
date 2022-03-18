@@ -31,7 +31,9 @@ public class WareHouseServiceImpl implements WareHouseService {
         WareHouseType wareHouseType = wareHouseTypeService.getWareHouseTypeOrThrow(wareHouseRequest.getWareHouseType());
 
         // 공정용 창고가 2개 이상 등록되면 안됨
-        if (wareHouseRepository.existsByWorkProcessYnTrueAndDeleteYnTrue()) throw new BadRequestException("공정용 창고는 한개만 등록 가능합니다.");
+        if (wareHouseRequest.isWorkProcessYn() && wareHouseRepository.existsByWorkProcessYnTrueAndDeleteYnFalse()) {
+            throw new BadRequestException("공정용 창고는 한개만 등록 가능합니다.");
+        }
 
         WareHouse wareHouse = mapper.toEntity(wareHouseRequest, WareHouse.class);
         wareHouse.addJoin(wareHouseType);
@@ -62,8 +64,14 @@ public class WareHouseServiceImpl implements WareHouseService {
 
     // 수정
     @Override
-    public WareHouseResponse updateWareHouse(Long id, WareHouseRequest wareHouseRequest) throws NotFoundException {
+    public WareHouseResponse updateWareHouse(Long id, WareHouseRequest wareHouseRequest) throws NotFoundException, BadRequestException {
         WareHouse findWareHouse = getWareHouseOrThrow(id);
+
+        // 공정용 창고가 2개 이상 등록되면 안됨
+        if (wareHouseRequest.isWorkProcessYn() && wareHouseRepository.existsByWorkProcessYnTrueAndDeleteYnFalse()) {
+            throw new BadRequestException("공정용 창고는 한개만 등록 가능합니다.");
+        }
+
         WareHouseType newWareHouseType = wareHouseTypeService.getWareHouseTypeOrThrow(wareHouseRequest.getWareHouseType());
         WareHouse newWareHouse = mapper.toEntity(wareHouseRequest, WareHouse.class);
         findWareHouse.put(newWareHouse, newWareHouseType);

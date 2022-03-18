@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface WareHouseRepository extends JpaCustomRepository<WareHouse, Long> {
     Optional<WareHouse> findByWorkProcessYnIsTrueAndDeleteYnFalse();
-    boolean existsByWorkProcessYnTrueAndDeleteYnTrue();
+    boolean existsByWorkProcessYnTrueAndDeleteYnFalse();
 }

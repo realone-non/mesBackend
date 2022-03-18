@@ -108,7 +108,7 @@ public class WareHouseController {
             @PathVariable Long id,
             @RequestBody @Valid WareHouseRequest wareHouseRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         WareHouseResponse wareHouse = wareHouseService.updateWareHouse(id, wareHouseRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + wareHouse.getId() + " from updateWareHouse.");
