@@ -51,8 +51,6 @@ public class BomItemDetailRepositoryImpl implements BomItemDetailRepositoryCusto
                                 bomItemDetail.amount.as("amount"),
                                 client.id.as("toBuyId"),
                                 client.clientName.as("toBuyName"),
-//                                (item.inputUnitPrice.multiply(purchaseInput.inputAmount).doubleValue()).multiply(0.1).as("vat"),
-//                                (bomItemDetail.amount.multiply(item.inputUnitPrice)).doubleValue().as("price"),
                                 workProcess.id.as("workProcessId"),
                                 workProcess.workProcessName.as("workProcessName"),
                                 bomItemDetail.useYn.as("useYn"),
@@ -73,6 +71,7 @@ public class BomItemDetailRepositoryImpl implements BomItemDetailRepositoryCusto
                         isItemNoOrItemNameToItemNoOrItemName(itemNoOrItemName),
                         isDeleteYnFalse()
                 )
+                .orderBy(workProcess.orders.desc())
                 .fetch();
     }
 

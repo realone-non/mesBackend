@@ -60,10 +60,10 @@ public class Estimate extends BaseTimeEntity {
     @JoinColumn(name = "CURRENCY", columnDefinition = "bigint COMMENT '화폐'", nullable = false)
     private Currency currency;            // 화폐
 
-    @Column(name = "PERIOD", columnDefinition = "varchar(255) COMMENT '납기'", nullable = false)
+    @Column(name = "PERIOD", columnDefinition = "varchar(255) COMMENT '납기'")
     private String period;              // 납기
 
-    @Column(name = "VALIDITY", nullable = false, columnDefinition = "int COMMENT '유효기간'")
+    @Column(name = "VALIDITY",  columnDefinition = "int COMMENT '유효기간'")
     private int validity;               // 유효기간
 
     @ManyToOne(fetch = LAZY)
