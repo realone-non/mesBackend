@@ -336,23 +336,25 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
             int testAmount
     ) throws BadRequestException {
         if (incongruityAmount + fairQualityAmount > testAmount) {
-            throw new BadRequestException(
-                    "incongruityAmount and fairQualityAmount cannot be greater than testAmount. " +
-                            "input testAmount: " + testAmount + ", " +
-                            "input fairQualityAmount: " + fairQualityAmount + ", " +
-                            "input incongruityAmount: " + incongruityAmount
-            );
+            throw new BadRequestException("입력한 양품수량과 부적합수량의 합이 입력한 검사수량보다 많습니다. 확인 후 다시 시도해주세요.");
+//            throw new BadRequestException(
+//                    "incongruityAmount and fairQualityAmount cannot be greater than testAmount. " +
+//                            "input testAmount: " + testAmount + ", " +
+//                            "input fairQualityAmount: " + fairQualityAmount + ", " +
+//                            "input incongruityAmount: " + incongruityAmount
+//            );
         }
     }
 
     // 기존 검사수량 + 입력 검사수량 이 검사요청수량보다 크면 예외
     private void throwIfTestAmountGreaterThanCheckRequestAmount(int allTestAmount, int checkRequestAmount, int inputTestAmount) throws BadRequestException {
         if ((inputTestAmount + allTestAmount) > checkRequestAmount) {
-            throw new BadRequestException("testAmount cannot be greater than checkRequestAmount. " +
-                    "input testAmount: " + inputTestAmount + ", " +
-                    "checkRequestAmount: " + checkRequestAmount + ", " +
-                    "allTestAmount: " + allTestAmount
-            );
+            throw new BadRequestException("검사요청한 수량보다 검사등록된 수량이 더 많을 수 없습니다. 확인 후 다시 시도해주세요. ");
+//            throw new BadRequestException("testAmount cannot be greater than checkRequestAmount. " +
+//                    "input testAmount: " + inputTestAmount + ", " +
+//                    "checkRequestAmount: " + checkRequestAmount + ", " +
+//                    "allTestAmount: " + allTestAmount
+//            );
         }
     }
 }

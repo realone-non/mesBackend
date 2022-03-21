@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.ProduceOrderRequest;
+import com.mes.mesBackend.dto.response.ClientResponse;
 import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
 import com.mes.mesBackend.dto.response.ProduceOrderResponse;
 import com.mes.mesBackend.entity.Contract;
@@ -11,6 +12,7 @@ import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.NumberAutomatic;
 import com.mes.mesBackend.mapper.ModelMapper;
+import com.mes.mesBackend.repository.ContractRepository;
 import com.mes.mesBackend.repository.ProduceOrderRepository;
 import com.mes.mesBackend.repository.PurchaseRequestRepository;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
@@ -35,6 +37,7 @@ public class ProduceOrderServiceImpl implements ProduceOrderService {
     private final ProduceOrderRepository produceOrderRepo;
     private final WorkOrderDetailRepository workOrderDetailRepository;
     private final PurchaseRequestRepository purchaseRequestRepository;
+    private final ContractRepository contractRepository;
 
     // 제조 오더 생성
     @Override
@@ -152,5 +155,11 @@ public class ProduceOrderServiceImpl implements ProduceOrderService {
                 orderDetail.setReservationAmount(orderDetail.getBomAmount(), contractItem.getAmount()));
 
         return orderDetails;
+    }
+
+    // 수주 등록된 제조사 list 조회 api
+    @Override
+    public List<ClientResponse.CodeAndName> getContractClients() {
+        return contractRepository.findContractClientResponse();
     }
 }

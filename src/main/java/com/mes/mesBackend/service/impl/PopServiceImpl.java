@@ -366,11 +366,11 @@ public class PopServiceImpl implements PopService {
     // 공정으로 공정에 해당하는 설비정보 가져오기 GET
     // 생산가능 true 만 조회
     @Override
-    public List<PopEquipmentResponse> getPopEquipments(WorkProcessDivision workProcessDivision) throws NotFoundException {
+    public List<PopEquipmentResponse> getPopEquipments(WorkProcessDivision workProcessDivision, Boolean produceYn) throws NotFoundException {
         Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(workProcessDivision);
         WorkProcess workProcess = getWorkProcessIdOrThrow(workProcessId);
-        return equipmentRepository.findPopEquipmentResponseByWorkProcess(workProcess.getId())
-                .stream().filter(PopEquipmentResponse::isProduceYn).collect(Collectors.toList());
+        return equipmentRepository.findPopEquipmentResponseByWorkProcess(workProcess.getId(), produceYn);
+//                .stream().filter(PopEquipmentResponse::isProduceYn).collect(Collectors.toList());
     }
 
     // 해당 품목(반제품)에 대한 원자재, 부자재 정보 가져와야함
@@ -446,13 +446,17 @@ public class PopServiceImpl implements PopService {
 
         // 입력한 사용 lotMaster 의 품목과 입력한 품목이 다르면 예외
        throwIfInputItemAndInputExhaustLotMasterEq(exhaustLotMaster.getItem(), item);
+        // 소진유무가 false 인데 수량 0 이 들어오면 예외
+        throwIfExhaustYnIsFalseCheck(exhaustLotMaster.getItem().getUnit().isExhaustYn(), exhaustAmount);
+        // 소진수량이 재고수량 보다 클 경우 예외
+        throwIfExhaustAmountGreaterThanStockAmount(exhaustLotMaster.getStockAmount(), exhaustAmount);
 
-        throwIfExhaustYnIsFalseCheck(exhaustLotMaster.getItem().getUnit().isExhaustYn(), exhaustAmount); // 소진유무가 false 인데 수량 0 이 들어오면 예외
-        throwIfExhaustAmountGreaterThanStockAmount(exhaustLotMaster.getStockAmount(), exhaustAmount);    // 소진수량이 재고수량 보다 클 경우 예외
-
+        // 사용 LOT 재고수량, 투입수량 변경
         exhaustLotMaster.setStockAmount(beforeLotMasterStockAmount - exhaustAmount);    // 사용한 lotMaster 재고수량 변경
+        exhaustLotMaster.setInputAmount(exhaustLotMaster.getInputAmount() + exhaustAmount); // 소진된 수량만큼 투입수량 변경
         lotMasterRepo.save(exhaustLotMaster);
 
+        // LotConnect 생성
         LotConnect lotConnect = new LotConnect();
         lotConnect.setParentLot(lotEquipmentConnect);    // 만들어진 lot
         lotConnect.setChildLot(exhaustLotMaster);       // 사용한 lot
@@ -460,6 +464,7 @@ public class PopServiceImpl implements PopService {
         lotConnect.setDivision(EXHAUST);
         lotConnectRepo.save(lotConnect);
 
+        // return response
         PopBomDetailLotMasterResponse response = new PopBomDetailLotMasterResponse();
         response.setLotMasterId(exhaustLotMaster.getId());                              // lot id
         response.setLotNo(exhaustLotMaster.getLotNo());                                 // lot no
@@ -468,6 +473,7 @@ public class PopServiceImpl implements PopService {
         response.setExhaustYn(exhaustLotMaster.getItem().getUnit().isExhaustYn());      // 소진유무
         response.setExhaustAmount(lotConnect.getAmount());                              // 소진량
 
+        // amountHelper
         amountHelper.amountUpdate(exhaustLotMaster.getItem().getId(), exhaustLotMaster.getWareHouse().getId(), null, INPUT_AMOUNT, exhaustAmount, false);
 
         return response;
@@ -491,18 +497,24 @@ public class PopServiceImpl implements PopService {
         throwIfInputItemAndInputExhaustLotMasterEq(exhaustLotMaster.getItem(), item);
 
         LotConnect lotConnect = getLotConnectExhaustByOrThrow(lotEquipmentConnect.getChildLot().getId(), exhaustLotMaster.getId());
-        int beforeLotMasterStockAmount = exhaustLotMaster.getStockAmount() + lotConnect.getAmount();        // 수정되기 전 수량
+        int beforeLotMasterStockAmount = exhaustLotMaster.getStockAmount() + lotConnect.getAmount();        // 수정되기 전 재고수량
+        int beforeLotMasterInputAmount = exhaustLotMaster.getInputAmount() - lotConnect.getAmount();        // 수정되기 전 투입수량
 
-        throwIfExhaustYnIsFalseCheck(exhaustLotMaster.getItem().getUnit().isExhaustYn(), exhaustAmount);  // 소진유무가 false 인데 수량 0 이 들어오면 예외
-        throwIfExhaustAmountGreaterThanStockAmount(beforeLotMasterStockAmount, exhaustAmount);      // 소진수량이 재고수량 보다 클 경우 예외
+        // 소진유무가 false 인데 수량 0 이 들어오면 예외
+        throwIfExhaustYnIsFalseCheck(exhaustLotMaster.getItem().getUnit().isExhaustYn(), exhaustAmount);
+        // 소진수량이 재고수량 보다 클 경우 예외
+        throwIfExhaustAmountGreaterThanStockAmount(beforeLotMasterStockAmount, exhaustAmount);
 
-        // 사용한 lotMaster 수량 변경
-        exhaustLotMaster.setStockAmount(beforeLotMasterStockAmount - exhaustAmount);
+        // 사용 lotMaster 재고수량, 투입수량 변경
+        exhaustLotMaster.setStockAmount(beforeLotMasterStockAmount - exhaustAmount);    // 재고수량
+        exhaustLotMaster.setInputAmount(beforeLotMasterInputAmount + exhaustAmount);    // 투입수량
         lotMasterRepo.save(exhaustLotMaster);
+
         // lotConnect 수량변경
         lotConnect.setAmount(exhaustAmount);
         lotConnectRepo.save(lotConnect);
 
+        // return response
         PopBomDetailLotMasterResponse response = new PopBomDetailLotMasterResponse();
         response.setLotMasterId(exhaustLotMaster.getId());                              // lot id
         response.setLotNo(exhaustLotMaster.getLotNo());                                 // lot no
@@ -511,6 +523,7 @@ public class PopServiceImpl implements PopService {
         response.setExhaustYn(exhaustLotMaster.getItem().getUnit().isExhaustYn());      // 소진유무
         response.setExhaustAmount(lotConnect.getAmount());                              // 소진량
 
+        // amountHelper
         amountHelper.amountUpdate(exhaustLotMaster.getItem().getId(), exhaustLotMaster.getWareHouse().getId(), null, INPUT_AMOUNT, beforeLotMasterStockAmount - exhaustAmount, false);
         return response;
     }
@@ -522,12 +535,17 @@ public class PopServiceImpl implements PopService {
         LotEquipmentConnect lotEquipmentConnect = getLotEquipmentConnectByChildLotOrThrow(lotMaster.getId());
         LotMaster exhaustLotMaster = getLotMasterOrThrow(exhaustLotMasterId);    // 사용한 lotMaster
         LotConnect lotConnect = getLotConnectExhaustByOrThrow(lotEquipmentConnect.getChildLot().getId(), exhaustLotMaster.getId());
+        int exhaustAmount = lotConnect.getAmount(); // 소진수량
 
-        exhaustLotMaster.setStockAmount(exhaustLotMaster.getStockAmount() + lotConnect.getAmount());
-
+        // 사용 LOT 재고수량, 투입수량 변경
+        exhaustLotMaster.setStockAmount(exhaustLotMaster.getStockAmount() + exhaustAmount); // 재고수량 변경
+        exhaustLotMaster.setInputAmount(exhaustLotMaster.getInputAmount() - exhaustAmount); // 투입수량 변경
         lotMasterRepo.save(exhaustLotMaster);
+
+        // LotConnect 삭제
         lotConnectRepo.deleteById(lotConnect.getId());
 
+        // amountHelper
         amountHelper.amountUpdate(exhaustLotMaster.getItem().getId(), exhaustLotMaster.getWareHouse().getId(), null, STORE_AMOUNT, exhaustLotMaster.getStockAmount(), false);
     }
 

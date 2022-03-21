@@ -521,8 +521,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         .select(
                                 Projections.fields(
                                         BadItemWorkOrderResponse.subDto.class,
-                                        lotEquipmentConnect.childLot.badItemAmount.max().as("badAmount"),
-                                        lotEquipmentConnect.childLot.createdAmount.max().as("createAmount"),
+                                        lotMaster.badItemAmount.as("badAmount"),
+                                        lotMaster.createdAmount.as("createAmount"),
                                         item.itemName.as("itemNo"),
                                         item.itemName.as("itemName")
                                 )
@@ -537,7 +537,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotMaster.lotMasterDivision.eq(DUMMY_LOT),
                                 lotMaster.deleteYn.isFalse()
                         )
-                        .groupBy(lotMaster.id)
+                        .limit(1)
                         .fetchOne()
         );
     }

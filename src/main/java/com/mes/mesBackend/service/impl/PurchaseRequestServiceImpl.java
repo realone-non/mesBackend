@@ -90,9 +90,10 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
             Long itemGroupId,
             String itemNoAndName,
             String manufacturerPartNo,
-            Boolean orderCompletion
+            Boolean orderCompletion,
+            Boolean purchaseOrderYn
     ) {
-        List<PurchaseRequestResponse> responses = purchaseRequestRepo.findAllByCondition(fromDate, toDate, produceOrderNo, itemGroupId, itemNoAndName, manufacturerPartNo, orderCompletion);
+        List<PurchaseRequestResponse> responses = purchaseRequestRepo.findAllByCondition(fromDate, toDate, produceOrderNo, itemGroupId, itemNoAndName, manufacturerPartNo, orderCompletion, purchaseOrderYn);
         for (PurchaseRequestResponse r : responses) {
             ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(PURCHASE_REQUEST, r.getId());
             ModifiedLog insertLog = modifiedLogHelper.getInsertLog(PURCHASE_REQUEST, r.getId());

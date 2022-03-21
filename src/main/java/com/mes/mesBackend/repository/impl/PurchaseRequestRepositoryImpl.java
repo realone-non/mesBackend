@@ -101,7 +101,8 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
             Long itemGroupId,
             String itemNoAndName,
             String manufacturerPartNo,
-            Boolean orderCompletion
+            Boolean orderCompletion,
+            Boolean purchaseOrderYn
     ) {
         return jpaQueryFactory
                 .select(
@@ -141,10 +142,22 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                         isItemNoAndItemNameContain(itemNoAndName),
                         isManufacturerPartNoContain(manufacturerPartNo),
                         isOrderCompletionEq(orderCompletion),
-                        isDeleteYnFalse()
+                        isDeleteYnFalse(),
+                        isPurchaseOrderYn(purchaseOrderYn)
                 )
                 .orderBy(purchaseRequest.id.asc())
                 .fetch();
+    }
+
+    private BooleanExpression isPurchaseOrderYn(Boolean purchaseOrderYn) {
+        if (purchaseOrderYn != null) {
+            if (purchaseOrderYn) {
+                return null;
+            } else {
+                return purchaseRequest.orderAmount.eq(0);
+            }
+        } else
+            return null;
     }
 
     // 구매발주에 해당하는 구매요청이 있는지.
