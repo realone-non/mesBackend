@@ -117,7 +117,7 @@ public class BomMasterServiceImpl implements BomMasterService {
     public BomItemResponse createBomItem(Long bomMasterId, BomItemRequest bomItemRequest) throws NotFoundException {
         BomMaster bomMaster = getBomMasterOrThrow(bomMasterId);
 
-        Client toBuy = clientService.getClientOrThrow(bomItemRequest.getToBuy());
+        Client toBuy = bomItemRequest.getToBuy() != null ? clientService.getClientOrThrow(bomItemRequest.getToBuy()) : null;
         Item item = itemService.getItemOrThrow(bomItemRequest.getItem());
         WorkProcess workProcess = bomItemRequest.getWorkProcess() != null ?
                 workProcessService.getWorkProcessOrThrow(bomItemRequest.getWorkProcess()) : null;
@@ -143,7 +143,7 @@ public class BomMasterServiceImpl implements BomMasterService {
     public BomItemResponse updateBomItem(Long bomMasterId, Long bomItemId, BomItemRequest bomItemRequest) throws NotFoundException {
         BomItemDetail findBomItemDetail = getBomItemDetailOrThrow(bomMasterId, bomItemId);
 
-        Client newToBuy = clientService.getClientOrThrow(bomItemRequest.getToBuy());
+        Client newToBuy = bomItemRequest.getToBuy() != null ? clientService.getClientOrThrow(bomItemRequest.getToBuy()) : null;
         Item newItem = itemService.getItemOrThrow(bomItemRequest.getItem());
         WorkProcess newWorkProcess = bomItemRequest.getWorkProcess() != null ? workProcessService.getWorkProcessOrThrow(bomItemRequest.getWorkProcess()) : null;
 
