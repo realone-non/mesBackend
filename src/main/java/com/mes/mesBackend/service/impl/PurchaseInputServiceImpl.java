@@ -60,6 +60,7 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
             purchaseRequest.setInputPrice();    // 입고금액
             purchaseRequest.setVat();           // 부가세
             purchaseRequest.setAlreadyInput(purchaseRequest.getOrderAmount(), inputAmountSum);      // 미입고수량 = 발주수량 - 입고수량
+            purchaseRequest.setPartInputTestItemNo(purchaseRequest.getItemName() + " (" + purchaseRequest.getInputDate() + ")");
         }
         return purchaseRequests;
     }

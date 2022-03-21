@@ -84,6 +84,9 @@ public class PurchaseInputResponse {
     @JsonIgnore
     int orderAmount;// 구매요청 발주수량
 
+    @Schema(description = "부품수입검사 의뢰 품명")
+    String partInputTestItemNo;
+
     // 입고금액
     public void setInputPrice() {
         this.inputPrice = this.unitPrice * this.inputAmount;
