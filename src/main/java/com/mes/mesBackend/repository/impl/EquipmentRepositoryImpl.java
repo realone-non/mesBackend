@@ -9,6 +9,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class EquipmentRepositoryImpl implements EquipmentRepositoryCustom {
 
     // 작업공정에 따라 설비 조회
     @Override
-    public List<PopEquipmentResponse> findPopEquipmentResponseByWorkProcess(Long workProcessId) {
+    public List<PopEquipmentResponse> findPopEquipmentResponseByWorkProcess(Long workProcessId, Boolean produceYn) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -38,9 +39,21 @@ public class EquipmentRepositoryImpl implements EquipmentRepositoryCustom {
                 .leftJoin(workProcess).on(workProcess.id.eq(equipment.workProcess.id))
                 .where(
                         equipment.deleteYn.isFalse(),
-                        workProcess.id.eq(workProcessId)
+                        workProcess.id.eq(workProcessId),
+                        isProduceYnEq(produceYn)
                 )
                 .fetch();
+    }
+
+    private BooleanExpression isProduceYnEq(Boolean produceYn) {
+        if (produceYn != null) {
+            if (produceYn) {
+                return equipment.produceYn.isTrue();
+            } else {
+                return equipment.produceYn.isFalse();
+            }
+        } else
+            return null;
     }
 
     //공정으로 설비 찾기

@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.ProduceOrderRequest;
+import com.mes.mesBackend.dto.response.ClientResponse;
 import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
 import com.mes.mesBackend.dto.response.ProduceOrderResponse;
 import com.mes.mesBackend.entity.ProduceOrder;
@@ -35,4 +36,6 @@ public interface ProduceOrderService {
     List<ProduceOrderDetailResponse> getProduceOrderDetails(Long produceOrderId) throws NotFoundException;
     // 제조 오더 단일 조회 및 예외
     ProduceOrder getProduceOrderOrThrow(Long id) throws NotFoundException;
+    // 수주 등록된 제조사 list 조회 api
+    List<ClientResponse.CodeAndName> getContractClients();
 }

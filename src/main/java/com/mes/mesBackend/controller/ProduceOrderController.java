@@ -1,6 +1,8 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.ProduceOrderRequest;
+import com.mes.mesBackend.dto.response.ClientResponse;
+import com.mes.mesBackend.dto.response.ContractResponse;
 import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
 import com.mes.mesBackend.dto.response.ProduceOrderResponse;
 import com.mes.mesBackend.entity.enumeration.OrderState;
@@ -164,5 +166,18 @@ public class ProduceOrderController {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProduceOrderDetails.");
         return new ResponseEntity<>(produceOrderDetails, OK);
+    }
+
+    // 수주 등록된 제조사 list 조회 api
+    @GetMapping("/contract-clients")
+    @ResponseBody
+    @Operation(summary = "수주 등록된 제조사 api")
+    public ResponseEntity<List<ClientResponse.CodeAndName>> getContractClients(
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<ClientResponse.CodeAndName> responses = produceOrderService.getContractClients();
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getContractClients.");
+        return new ResponseEntity<>(responses, OK);
     }
 }

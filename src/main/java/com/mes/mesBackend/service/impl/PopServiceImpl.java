@@ -366,11 +366,11 @@ public class PopServiceImpl implements PopService {
     // 공정으로 공정에 해당하는 설비정보 가져오기 GET
     // 생산가능 true 만 조회
     @Override
-    public List<PopEquipmentResponse> getPopEquipments(WorkProcessDivision workProcessDivision) throws NotFoundException {
+    public List<PopEquipmentResponse> getPopEquipments(WorkProcessDivision workProcessDivision, Boolean produceYn) throws NotFoundException {
         Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(workProcessDivision);
         WorkProcess workProcess = getWorkProcessIdOrThrow(workProcessId);
-        return equipmentRepository.findPopEquipmentResponseByWorkProcess(workProcess.getId())
-                .stream().filter(PopEquipmentResponse::isProduceYn).collect(Collectors.toList());
+        return equipmentRepository.findPopEquipmentResponseByWorkProcess(workProcess.getId(), produceYn);
+//                .stream().filter(PopEquipmentResponse::isProduceYn).collect(Collectors.toList());
     }
 
     // 해당 품목(반제품)에 대한 원자재, 부자재 정보 가져와야함

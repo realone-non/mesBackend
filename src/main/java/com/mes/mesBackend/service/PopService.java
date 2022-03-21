@@ -30,7 +30,7 @@ public interface PopService {
             Long equipmentId
     ) throws NotFoundException, BadRequestException;
     // 공정으로 공정에 해당하는 설비정보 가져오기 GET
-    List<PopEquipmentResponse> getPopEquipments(WorkProcessDivision workProcessDivision) throws NotFoundException;
+    List<PopEquipmentResponse> getPopEquipments(WorkProcessDivision workProcessDivision, Boolean produceYn) throws NotFoundException;
     // 해당 품목(반제품)에 대한 원자재, 부자재 정보 가져와야함
     List<PopBomDetailItemResponse> getPopBomDetailItems(Long lotMasterId) throws NotFoundException;
     // 원자재, 부자재에 해당되는 lotMaster 조회, stockAmount 1 이상

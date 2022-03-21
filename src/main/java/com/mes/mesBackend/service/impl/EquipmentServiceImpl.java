@@ -89,6 +89,6 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     //공정 id로 설비 조회
     public List<PopEquipmentResponse> getEquipmentsByWorkProcess(Long workProcessId) throws NotFoundException {
-        return equipmentRepository.findPopEquipmentResponseByWorkProcess(workProcessId);
+        return equipmentRepository.findPopEquipmentResponseByWorkProcess(workProcessId, null);
     }
 }
