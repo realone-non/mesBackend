@@ -1,6 +1,7 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.LotTrackingResponse;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -47,7 +48,7 @@ public class LotTrackingController {
             @RequestParam @Parameter(description = "추적유형(필수값) true: 정방향, false: 역방향") boolean trackingType,
             @RequestParam(required = false) @Parameter(description = "품명|품목") String itemNoAndItemName,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         List<LotTrackingResponse> lotTrackingResponses =
                 lotTrackService.getTrackings(lotNo, trackingType, itemNoAndItemName);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
