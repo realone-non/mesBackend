@@ -38,4 +38,7 @@ public class LotTrackingResponse {
     @Schema(description = "발생일자")
     @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime createdDate;
+
+    @Schema(description = "투입수량")
+    int inputAmount;
 }
