@@ -1,5 +1,6 @@
 package com.mes.mesBackend.repository.impl;
 
+import com.mes.mesBackend.dto.response.LabelPrintResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputDetailResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputResponse;
 import com.mes.mesBackend.dto.response.PurchaseStatusCheckResponse;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -256,6 +258,28 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                         isClientEq(clientId),
                         isItemNoOrItemNameContain(itemNoAndItemName),
                         isPurchaseInputDeleteYnFalse()
+                )
+                .fetch();
+    }
+
+    // 금일기준 입고된 자재목록
+    @Override
+    public List<LabelPrintResponse> findByTodayAndPurchaseInput(LocalDate now) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                LabelPrintResponse.class,
+                                lotMaster.lotNo.as("lotNo"),
+                                lotMaster.item.itemNo.as("itemNo"),
+                                lotMaster.item.itemName.as("itemName"),
+                                lotMaster.createdAmount.as("amount")
+                        )
+                )
+                .from(purchaseInput)
+                .leftJoin(lotMaster).on(lotMaster.purchaseInput.id.eq(purchaseInput.id))
+                .where(
+                        purchaseInput.deleteYn.isFalse(),
+                        purchaseInput.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0))
                 )
                 .fetch();
     }

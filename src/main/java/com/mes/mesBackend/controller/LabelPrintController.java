@@ -10,10 +10,7 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
-import com.mes.mesBackend.service.EquipmentService;
-import com.mes.mesBackend.service.LotMasterService;
-import com.mes.mesBackend.service.PopShipmentService;
-import com.mes.mesBackend.service.WorkProcessService;
+import com.mes.mesBackend.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,6 +24,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.*;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -50,6 +48,9 @@ public class LabelPrintController {
     EquipmentService equipmentService;
     @Autowired
     PopShipmentService popShipmentService;
+    @Autowired
+    PurchaseInputService purchaseInputService;
+
     private Logger logger = LoggerFactory.getLogger(LabelPrintController.class);
     private CustomLogger cLogger;
 
@@ -117,6 +118,16 @@ public class LabelPrintController {
         List<PopShipmentResponse> responses = popShipmentService.getPopShipments(fromDate, toDate, clientName, completionYn);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info("ShipmentList viewed the list of from getPopShipments!");
+        return new ResponseEntity<>(responses, OK);
+    }
+
+    @GetMapping("/purchase-inputs")
+    @ResponseBody
+    @Operation(summary = "금일 구매입고 목록", description = "")
+    public ResponseEntity<List<LabelPrintResponse>> getPurchaseInputs() {
+        List<LabelPrintResponse> responses = purchaseInputService.getTodayPurchaseInputs();
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info("purchaseInput viewed the list of from getPurchaseInputs!");
         return new ResponseEntity<>(responses, OK);
     }
 }

@@ -1,5 +1,6 @@
 package com.mes.mesBackend.repository.impl;
 
+import com.mes.mesBackend.dto.response.LotTrackingResponse;
 import com.mes.mesBackend.dto.response.PopBomDetailLotMasterResponse;
 import com.mes.mesBackend.dto.response.PopLotMasterResponse;
 import com.mes.mesBackend.entity.*;
@@ -201,6 +202,41 @@ public class LotConnectRepositoryImpl implements LotConnectRepositoryCustom {
                 )
                 .fetchFirst();
         return fetchOne != null;
+    }
+
+    // childLotId 로 parentLotMaster 조회, 조건: division? EXHAUST
+    @Override
+    public List<LotConnect> findByChildLotIdAndDivisionIsExhaust(Long childLotId) {
+        return jpaQueryFactory
+                .selectFrom(lotConnect)
+                .where(
+                        lotConnect.childLot.id.eq(childLotId),
+                        lotConnect.division.eq(EXHAUST)
+                )
+                .fetch();
+    }
+
+    // parentLotId(lotEquipmentId) 로 조회, 조건: division? FAMILY
+    @Override
+    public List<LotTrackingResponse> findByParentLotAndDivisionIsFamily(Long parentLotId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                LotTrackingResponse.class,
+                                lotConnect.childLot.id.as("mainLotMasterId"),
+                                lotConnect.childLot.lotNo.as("mainLotNo"),
+                                lotConnect.childLot.item.itemNo.as("mainItemNo"),
+                                lotConnect.childLot.item.itemName.as("mainItemName"),
+                                lotConnect.childLot.enrollmentType.as("mainEnrollmentType"),
+                                lotConnect.childLot.createdDate.as("createdDate")
+                        )
+                )
+                .from(lotConnect)
+                .where(
+                        lotConnect.parentLot.id.eq(parentLotId),
+                        lotConnect.division.eq(FAMILY)
+                )
+                .fetch();
     }
 
     private BooleanExpression isInputEquipmentIdEq(Long inputEquipmentId) {

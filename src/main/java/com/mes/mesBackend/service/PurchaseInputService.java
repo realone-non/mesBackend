@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.PurchaseInputRequest;
+import com.mes.mesBackend.dto.response.LabelPrintResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputDetailResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputResponse;
 import com.mes.mesBackend.dto.response.PurchaseStatusCheckResponse;
@@ -39,4 +40,7 @@ public interface PurchaseInputService {
     // 구매현황 리스트 조회
     // 검색조건: 거래처 id, 품명|품목, 입고기간 fromDate~toDate
     List<PurchaseStatusCheckResponse> getPurchaseStatusChecks(Long clientId, String itemNoAndItemName, LocalDate fromDate, LocalDate toDate) throws NotFoundException;
+
+    // 금일기준 입고된 자재목록
+    List<LabelPrintResponse> getTodayPurchaseInputs();
 }

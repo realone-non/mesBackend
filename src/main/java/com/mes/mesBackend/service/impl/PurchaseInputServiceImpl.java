@@ -2,10 +2,7 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.LotMasterRequest;
 import com.mes.mesBackend.dto.request.PurchaseInputRequest;
-import com.mes.mesBackend.dto.response.PurchaseInputDetailResponse;
-import com.mes.mesBackend.dto.response.PurchaseInputResponse;
-import com.mes.mesBackend.dto.response.PurchaseOrderStatusResponse;
-import com.mes.mesBackend.dto.response.PurchaseStatusCheckResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.LotType;
 import com.mes.mesBackend.entity.PurchaseInput;
@@ -247,5 +244,11 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
             response.setUserName(purchaseOrderStatusResponse.getUserName());
         }
         return purchaseStatusCheckResponses;
+    }
+
+    // 금일기준 자재입고 된 목록
+    @Override
+    public List<LabelPrintResponse> getTodayPurchaseInputs() {
+        return purchaseInputRepo.findByTodayAndPurchaseInput(LocalDate.now());
     }
 }
