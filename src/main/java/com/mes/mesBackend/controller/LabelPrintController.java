@@ -130,4 +130,20 @@ public class LabelPrintController {
         cLogger.info("purchaseInput viewed the list of from getPurchaseInputs!");
         return new ResponseEntity<>(responses, OK);
     }
+
+//    // 자재 입고 목록 조회
+//    @GetMapping("/material-inputs")
+//    @ResponseBody
+//    @Operation(summary = "자재입고 목록", description = "검색조건: 검색시작날짜(fromDate) ~ 검색종료날짜(toDate), 거래처 명, 완료여부")
+//    public ResponseEntity<List<PopShipmentResponse>> getPopInputs(
+//            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "출하일자 fromDate") LocalDate fromDate,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "출하일자 toDate") LocalDate toDate,
+//            @RequestParam(required = false) @Parameter(description = "거래처 명") String clientName,
+//            @RequestParam(required = false) @Parameter(description = "완료여부(빈값: 전부, true: COMPLETION 만 조회, false: SCHEDULE 만 조회)") Boolean completionYn
+//    ) {
+//        List<PopShipmentResponse> responses = popShipmentService.getInputs(fromDate, toDate, clientName, completionYn);
+//        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+//        cLogger.info("ShipmentList viewed the list of from getPopShipments!");
+//        return new ResponseEntity<>(responses, OK);
+//    }
 }
