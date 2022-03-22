@@ -27,6 +27,7 @@ public class ProductionPerformanceRepositoryImpl implements ProductionPerformanc
     final QUser user = QUser.user;
     final QItemGroup itemGroup = QItemGroup.itemGroup;
     final QClient client = QClient.client;
+    final QLotMaster lotMaster = QLotMaster.lotMaster;
 
     // 생산실적 리스트 조회, 검색조건: 조회기간 fromDate~toDate, 품목그룹 id, 품명|품번
     @Override
@@ -48,7 +49,7 @@ public class ProductionPerformanceRepositoryImpl implements ProductionPerformanc
                                 contractItem.periodDate.as("periodDate"),
                                 user.korName.as("korName"),
                                 contractItem.amount.as("contractItemAmount"),
-                                productionPerformance.productionAmount.as("productionAmount"),
+//                                productionPerformance.productionAmount.as("productionAmount"),
                                 productionPerformance.materialInput.as("materialInput"),
                                 productionPerformance.materialMixing.as("materialMixing"),
                                 productionPerformance.filling.as("filling"),
@@ -57,7 +58,8 @@ public class ProductionPerformanceRepositoryImpl implements ProductionPerformanc
                                 productionPerformance.packaging.as("packaging"),
                                 productionPerformance.shipment.as("shipment"),
                                 item.inputUnitPrice.as("unitPrice"),
-                                item.inputUnitPrice.multiply(contractItem.amount).as("price")
+                                item.inputUnitPrice.multiply(contractItem.amount).as("price"),
+                                lotMaster.createdAmount.as("productionAmount")
                         )
                 )
                 .from(productionPerformance)
@@ -69,6 +71,7 @@ public class ProductionPerformanceRepositoryImpl implements ProductionPerformanc
                 .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
                 .leftJoin(client).on(client.id.eq(contract.client.id))
                 .leftJoin(itemGroup).on(itemGroup.id.eq(item.itemGroup.id))
+                .leftJoin(lotMaster).on(lotMaster.id.eq(productionPerformance.lotMaster.id))
                 .where(
                         isSelectDate(fromDate, toDate),
                         isItemGroupIdEq(itemGroupId),

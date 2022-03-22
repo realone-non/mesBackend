@@ -22,7 +22,7 @@ public class OutsourcingMaterialReleaseResponse {
     String itemName;
 
     @Schema(description = "소요량")
-    int amount;
+    float amount;
 
     @Schema(description = "출고요청량")
     int outputRequestAmount;

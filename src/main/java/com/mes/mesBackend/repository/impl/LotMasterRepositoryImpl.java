@@ -675,7 +675,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotMaster.item.itemNo.as("itemNo"),
                                 lotMaster.item.itemName.as("itemName"),
                                 lotMaster.enrollmentType.as("enrollmentType"),
-                                lotMaster.createdDate.as("createdDate")
+                                lotMaster.createdDate.as("createdDate"),
+                                lotConnect.amount.as("inputAmount")
                         )
                 )
                 .from(lotConnect)

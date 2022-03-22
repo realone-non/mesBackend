@@ -1,10 +1,9 @@
 package com.mes.mesBackend.repository.impl;
 
+import com.mes.mesBackend.dto.response.LotTrackingResponse;
 import com.mes.mesBackend.dto.response.PopBomDetailLotMasterResponse;
 import com.mes.mesBackend.dto.response.PopLotMasterResponse;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
-import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.repository.custom.LotConnectRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -17,7 +16,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mes.mesBackend.entity.enumeration.GoodsType.HALF_PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.FAMILY;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
@@ -201,6 +199,41 @@ public class LotConnectRepositoryImpl implements LotConnectRepositoryCustom {
                 )
                 .fetchFirst();
         return fetchOne != null;
+    }
+
+    // childLotId 로 parentLotMaster 조회, 조건: division? EXHAUST
+    @Override
+    public List<LotConnect> findByChildLotIdAndDivisionIsExhaust(Long childLotId) {
+        return jpaQueryFactory
+                .selectFrom(lotConnect)
+                .where(
+                        lotConnect.childLot.id.eq(childLotId),
+                        lotConnect.division.eq(EXHAUST)
+                )
+                .fetch();
+    }
+
+    // parentLotId(lotEquipmentId) 로 조회, 조건: division? FAMILY
+    @Override
+    public List<LotTrackingResponse> findByParentLotAndDivisionIsFamily(Long parentLotId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                LotTrackingResponse.class,
+                                lotConnect.childLot.id.as("lotMasterId"),
+                                lotConnect.childLot.lotNo.as("lotNo"),
+                                lotConnect.childLot.item.itemNo.as("itemNo"),
+                                lotConnect.childLot.item.itemName.as("itemName"),
+                                lotConnect.childLot.enrollmentType.as("enrollmentType"),
+                                lotConnect.childLot.createdDate.as("createdDate")
+                        )
+                )
+                .from(lotConnect)
+                .where(
+                        lotConnect.parentLot.id.eq(parentLotId),
+                        lotConnect.division.eq(FAMILY)
+                )
+                .fetch();
     }
 
     private BooleanExpression isInputEquipmentIdEq(Long inputEquipmentId) {
