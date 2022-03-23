@@ -729,6 +729,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         workProcess.workProcessDivision.notIn(MATERIAL_INPUT),  // 공정 자제입고 제외
                         workProcess.workProcessDivision.notIn(SHIPMENT)         // 공정 출하 제외
                 )
+                .orderBy(workOrderDetail.startDate.desc())
                 .fetch();
     }
 

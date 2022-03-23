@@ -22,6 +22,7 @@ public class PurchaseInputReturnRepositoryImpl implements PurchaseInputReturnRep
     final QItem item = QItem.item;
     final QClient client = QClient.client;
     final QPurchaseInput purchaseInput = QPurchaseInput.purchaseInput;
+    final QTestCriteria testCriteria = QTestCriteria.testCriteria1;
 
     // 구매입고반품 단일조회
     @Override
@@ -93,7 +94,7 @@ public class PurchaseInputReturnRepositoryImpl implements PurchaseInputReturnRep
                                 purchaseInput.clientLotNo.as("clientLotNo"),
                                 purchaseInput.manufactureDate.as("manufactureDate"),
                                 purchaseInput.validDate.as("validDate"),
-                                item.testCriteria.testCriteria.as("testCriteria"),
+                                testCriteria.testCriteria.as("testCriteria"),
                                 purchaseInput.testReportYn.as("testReportYn"),
                                 purchaseInputReturn.returnAmount.multiply(item.inputUnitPrice).as("returnPrice"),
                                 purchaseInputReturn.returnAmount.multiply(item.inputUnitPrice).as("returnPriceWon")
@@ -104,6 +105,7 @@ public class PurchaseInputReturnRepositoryImpl implements PurchaseInputReturnRep
                 .leftJoin(item).on(item.id.eq(lotMaster.item.id))
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .leftJoin(purchaseInput).on(purchaseInput.id.eq(lotMaster.purchaseInput.id))
+                .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
                 .where(
                         isClientIdEq(clientId),
                         isItemNoAndItemNameContain(itemNoOrItemName),

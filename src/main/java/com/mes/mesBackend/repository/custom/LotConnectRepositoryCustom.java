@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.response.LotTrackingResponse;
 import com.mes.mesBackend.dto.response.PopBomDetailLotMasterResponse;
 import com.mes.mesBackend.dto.response.PopLotMasterResponse;
 import com.mes.mesBackend.entity.LotConnect;
+import com.mes.mesBackend.entity.LotEquipmentConnect;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 
@@ -32,4 +33,6 @@ public interface LotConnectRepositoryCustom {
     List<LotConnect> findByChildLotIdAndDivisionIsExhaust(Long childLotId);
     // parentLotId(lotEquipmentId) 로 조회, 조건: division? FAMILY
     List<LotTrackingResponse> findByParentLotAndDivisionIsFamily(Long parentLotId);
+
+
 }

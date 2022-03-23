@@ -203,6 +203,35 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
         );
     }
 
+    // dummyLot 에 해당하는 불량유형 별 불량수량
+    @Override
+    public List<BadItemEnrollmentResponse> findByDummyLotIdGroupByBadItemType(Long dummyLotId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                BadItemEnrollmentResponse.class,
+                                workOrderBadItem.workOrderDetail.id.as("workOrderId"),
+                                badItem.id.as("badItemId"),
+                                badItem.badItemName.as("badItemName"),
+                                workOrderBadItem.badItemAmount.sum().as("badItemAmount"),
+                                badItem.workProcess.id.as("workProcessId"),
+                                workProcess.workProcessName.as("workProcessName")
+                        )
+                )
+                .from(workOrderBadItem)
+                .leftJoin(lotEquipmentConnect).on(lotEquipmentConnect.childLot.id.eq(workOrderBadItem.lotMaster.id))
+                .leftJoin(badItem).on(badItem.id.eq(workOrderBadItem.badItem.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(badItem.workProcess.id))
+                .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(workOrderBadItem.workOrderDetail.id))
+                .groupBy(lotEquipmentConnect.parentLot.id)
+                .groupBy(workOrderBadItem.badItem.id)
+                .where(
+                        lotEquipmentConnect.parentLot.id.eq(dummyLotId),
+                        workOrderBadItem.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+
     private BooleanExpression isWorkProcessIdEq(Long workProcessId) {
         return workProcessId != null ? workProcess.id.eq(workProcessId) : null;
     }

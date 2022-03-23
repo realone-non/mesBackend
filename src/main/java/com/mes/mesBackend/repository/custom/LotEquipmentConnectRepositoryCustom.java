@@ -5,7 +5,6 @@ import com.mes.mesBackend.entity.LotEquipmentConnect;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -19,4 +18,10 @@ public interface LotEquipmentConnectRepositoryCustom {
     List<PopWorkOrderStates> findPopWorkOrderStates(Long dummyLotId);
     // 작업공정이 원료혼합이고, 오늘 생산된 lotMaster 찾아야함
     Optional<LotEquipmentConnect> findByTodayAndWorkProcessDivision(LocalDate now, WorkProcessDivision workProcessDivision, Long workOrderId);
+    // parentLotId 로 childLot(equipmentLot) 조회
+    List<LotMaster> findChildLotByParentLotId(Long parentLotId);
+    // parentLotId 로 가장 마지막에 생성 된 equipmentLot 조회
+    List<LotMaster> findChildLotByChildLotOfParentLotCreatedDateDesc(Long dummyLotId);
+    // realLotId 로 equipmentLot 조회, 조회조건: 제일 마지막에 생성된 equipmentLot
+    Optional<LotEquipmentConnect> findEquipmentLotByRealLotIdOrderByCreatedDateDesc(Long realLotId);
 }
