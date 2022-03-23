@@ -486,15 +486,18 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 )
                 .from(lotMaster)
                 .innerJoin(item).on(item.id.eq(lotMaster.item.id))
-                .leftJoin(lotLog).on(lotLog.lotMaster.id.eq(lotMaster.id))
-                .innerJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
+                //.leftJoin(lotLog).on(lotLog.lotMaster.id.eq(lotMaster.id))
+                //.innerJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
                 .innerJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
+                .innerJoin(equipment).on(equipment.id.eq(lotMaster.equipment.id))
                 .where(
                         //workOrderDetail.orderState.eq(COMPLETION),
+                        lotMaster.lotMasterDivision.eq(REAL_LOT),
                         lotMaster.deleteYn.eq(false),
                         lotMaster.stockAmount.gt(0),
                         lotMaster.useYn.eq(true),
-                        lotMaster.workProcess.id.eq(workProcessId)
+                        lotMaster.workProcess.id.eq(workProcessId),
+                        lotMaster.equipment.id.eq(equipmentId)
                 )
                 .fetch();
     }
