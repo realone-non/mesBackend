@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -101,47 +103,55 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
         *   불량수량 반영된 equipmentLot 로 workOrderBadItem 생성
         * */
 
-
         // 작업지시로 생산된 모든 realLot
         List<LotMaster> realLots = lotEquipmentConnectRepository.findChildLotByChildLotOfParentLotCreatedDateDesc(dummyLot.getId());
-        // realLots 의 inputAmount 가 하나라도 0이 아닌지 체크
+        // realLots 의 inputAmount 가 하나라도 0 이 아닌지 체크
         boolean noneMatch = realLots.stream().allMatch(n -> n.getInputAmount() == 0);
 
         WorkOrderBadItem workOrderBadItem = new WorkOrderBadItem();
 
-        if (noneMatch) {        // 모든 요소들이 0인가
+        if (noneMatch) {        // 모든 요소들이 0 인가
             LotMaster realLot = realLots.stream().findFirst().orElseThrow(() -> new NotFoundException("[데이터오류] realLot 을 찾을 수 없음."));
-            LotEquipmentConnect lotEquipmentConnect = lotEquipmentConnectRepository.findEquipmentLotByRealLotIdOrderByCreatedDateDesc(realLot.getId())
-                    .orElseThrow(() -> new BadRequestException("[데이터오류] realLot 에 해당하는 equipmentLot(lotEquipmentConnect) 가 없음."));
+//            LotMaster dummyLot = lotEquipmentConnectRepository.findEquipmentLotByRealLotIdOrderByCreatedDateDesc(realLot.getId())
+//                    .orElseThrow(() -> new BadRequestException("[데이터오류] realLot 에 해당하는 equipmentLot(lotEquipmentConnect) 가 없음.")).getParentLot();
 
             // dummyLot 불량수량 변경
-            LotMaster parentLot = lotEquipmentConnect.getParentLot();
-            parentLot.setBadItemAmount(parentLot.getBadItemAmount() + badItemAmount);
+            dummyLot.setBadItemAmount(dummyLot.getBadItemAmount() + badItemAmount);
 //            lotMasterRepo.save(parentLot);
 
-            // equipmentLot 불량수량, 재고수량 변경
-            LotMaster equipmentLot = lotEquipmentConnect.getChildLot();
-            lotMasterRepo.save(equipmentLot);
+//            List<LotEquipmentConnect> lotEquipmentConnects = lotEquipmentConnectRepository.findAllByRealLotIdOrderByCreateDateDesc(realLot.getId());
 
-            int[] arr = new int[badItemAmount];
+            for (int i = 1; i <= badItemAmount; i++) {
+                // equipmentLot: dummyLot 로 분할이 제일 마지막에 생성된 재고수량이 불량수량이 같지 않은거
+                 LotMaster equipmentLot = lotEquipmentConnectRepository.findEquipmentLotByRealLotIdOrderByCreatedDateDesc(realLot.getId())
+                         .orElseThrow(() -> new BadRequestException("[데이터오류] realLot 에 해당하고 조건에 맞는 equipmentLot(lotEquipmentConnect) 가 없음.")).getChildLot();
 
-            for (int i = 1; i <= arr.length; i++) {
-                equipmentLot.setBadItemAmount(equipmentLot.getBadItemAmount() + i);
+                // equipmentLot 불량수량, 재고수량 변경
+                equipmentLot.setBadItemAmount(equipmentLot.getBadItemAmount() + 1);
 
-                if (equipmentLot.getBadItemAmount() == equipmentLot.getCreatedAmount()) {
-                    lotMasterRepo.save(equipmentLot);       // 위에 불량수량과 생성수량이 같으나,
+                List<LotMaster> equipmentLotMaster = new ArrayList<>();
+
+                if (equipmentLot.getStockAmount() > 0) {
+                    equipmentLot.setStockAmount(equipmentLot.getStockAmount() - 1);
                 }
+
+                if (equipmentLot.getStockAmount() == 0) {   // 여기서 realLot 가져와야함
+                    List<LotMaster> notEqLotMaster = new ArrayList<>();
+
+                    for (int f = 1; f <= i; f++) {
+                        // 저 설비로트로 분할 된 재고수량이 0 이 아닌 최근에 생성된 분할로트
+                        LotMaster findRealLot = lotConnectRepository.findByStockAmountAndCreatedDateDesc(equipmentLot.getId())
+                                .orElseThrow(() -> new BadRequestException(""));
+
+                        findRealLot.setStockAmount(findRealLot.getStockAmount() - 1);
+//                        lotMasterRepo.save(findRealLot);
+                    }
+                }
+
             }
-
-
-            // realLot 재고수량 변경
-            for (int i = 1; i <= badItemAmount; ++i) {
-
-            }
-
 
             // workOrderBadItem 생성
-            workOrderBadItem.create(badItem, workOrderDetail, equipmentLot, badItemAmount, EQUIPMENT_LOT);
+//            workOrderBadItem.create(badItem, workOrderDetail, equipmentLot, badItemAmount, EQUIPMENT_LOT);
 //            workOrderBadItemRepo.save(workOrderBadItem);
         } else {
             throw new BadRequestException(workOrderDetail.getWorkProcess().getWorkProcessName() + " 공정에서 생산된 LOT 가 사용 되었으므로 불량 추가등록이 불가능합니다.");

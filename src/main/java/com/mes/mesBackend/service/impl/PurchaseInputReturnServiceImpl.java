@@ -39,7 +39,7 @@ public class PurchaseInputReturnServiceImpl implements PurchaseInputReturnServic
         int inputPossibleAmount = purchaseInputReturnRequest.getReturnPossibleAmount() + purchaseInputReturnRequest.getReturnAmount();
 
         if (inputPossibleAmount > lotMasterPossibleAmount) {
-            throw new BadRequestException("입력한 반품수량 + 반품가능수량이 lotMaster 의 반품가능수량을 초과한다.");
+            throw new BadRequestException("입력한 반품수량 + 반품가능수량이 lotMaster 의 반품가능수량을 초과합니다.");
         }
 
         if (division) {
@@ -90,7 +90,7 @@ public class PurchaseInputReturnServiceImpl implements PurchaseInputReturnServic
         int possibleAmount = response.getPossibleAmount() + response.getReturnAmount();
         int inputPossibleAmount = purchaseInputReturnUpdateRequest.getReturnPossibleAmount() + purchaseInputReturnUpdateRequest.getReturnAmount();
         if (possibleAmount != inputPossibleAmount) {
-            throw new BadRequestException("입력받은 반품가능수량과 lotMaster 의 반품가능수량이 다르다.");
+            throw new BadRequestException("입력받은 반품가능수량과 lotMaster 의 반품가능수량이 다릅니다.");
         }
 
         if (division) {

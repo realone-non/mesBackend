@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.response.LotTrackingResponse;
 import com.mes.mesBackend.dto.response.PopBomDetailLotMasterResponse;
 import com.mes.mesBackend.dto.response.PopLotMasterResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.repository.custom.LotConnectRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -234,6 +235,25 @@ public class LotConnectRepositoryImpl implements LotConnectRepositoryCustom {
                         lotConnect.division.eq(FAMILY)
                 )
                 .fetch();
+    }
+
+    // 설비로트로 분할 된 재고수량이 0 이 아닌 최근에 생성된 분할로트
+    @Override
+    public Optional<LotMaster> findByStockAmountAndCreatedDateDesc(Long equipmentLot) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(lotConnect.childLot)
+                        .from(lotConnect)
+                        .where(
+                                lotConnect.parentLot.childLot.id.eq(equipmentLot),
+                                lotConnect.childLot.lotMasterDivision.eq(REAL_LOT),
+                                lotConnect.childLot.stockAmount.ne(0),
+                                lotConnect.childLot.inputAmount.eq(0)
+                        )
+                        .orderBy(lotConnect.childLot.createdDate.desc())
+                        .limit(1)
+                        .fetchOne()
+        );
     }
 
     private BooleanExpression isInputEquipmentIdEq(Long inputEquipmentId) {
