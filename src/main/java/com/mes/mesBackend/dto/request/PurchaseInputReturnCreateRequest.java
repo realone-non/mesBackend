@@ -31,9 +31,9 @@ public class PurchaseInputReturnCreateRequest {
     @NotNull(message = NOT_NULL)
     int returnAmount;
 
-    @Schema(description = "반품가능수량")
-    @NotNull(message = NOT_NULL)
-    int returnPossibleAmount;
+//    @Schema(description = "반품가능수량")
+//    @NotNull(message = NOT_NULL)
+//    int returnPossibleAmount;
 
     @Schema(description = "비고")
     String note;

@@ -49,8 +49,8 @@ public class PurchaseInputReturnResponse {
     @Schema(description = "반품일시")
     LocalDate returnDate;
 
-    @Schema(description = "가능수량")
-    int possibleAmount;
+    @Schema(description = "전체수량")
+    int stockAmount;
 
     @Schema(description = "반품수량")
     int returnAmount;
@@ -103,8 +103,8 @@ public class PurchaseInputReturnResponse {
 
     public void setPossibleAmount() {
         if (returnDivision) {
-            setPossibleAmount(stockAmountPossibleAmount);
+            setStockAmount(stockAmountPossibleAmount);
         }else
-            setPossibleAmount(badItemAmountPossibleAmount);
+            setStockAmount(badItemAmountPossibleAmount);
     }
 }
