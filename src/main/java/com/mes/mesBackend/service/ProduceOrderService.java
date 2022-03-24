@@ -1,10 +1,12 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.ProduceOrderRequest;
+import com.mes.mesBackend.dto.response.ClientResponse;
 import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
 import com.mes.mesBackend.dto.response.ProduceOrderResponse;
 import com.mes.mesBackend.entity.ProduceOrder;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 
 import java.time.LocalDate;
@@ -27,11 +29,13 @@ public interface ProduceOrderService {
             LocalDate toDate
     );
     // 제조 오더 수정
-    ProduceOrderResponse updateProduceOrder(Long produceOrderId, ProduceOrderRequest produceOrderRequest) throws NotFoundException;
+    ProduceOrderResponse updateProduceOrder(Long produceOrderId, ProduceOrderRequest produceOrderRequest) throws NotFoundException, BadRequestException;
     // 제조 오더 삭제
-    void deleteProduceOrder(Long produceOrderId) throws NotFoundException;
+    void deleteProduceOrder(Long produceOrderId) throws NotFoundException, BadRequestException;
     // 제조 오더 디테일 리스트 조회
     List<ProduceOrderDetailResponse> getProduceOrderDetails(Long produceOrderId) throws NotFoundException;
     // 제조 오더 단일 조회 및 예외
     ProduceOrder getProduceOrderOrThrow(Long id) throws NotFoundException;
+    // 수주 등록된 제조사 list 조회 api
+    List<ClientResponse.CodeAndName> getContractClients();
 }

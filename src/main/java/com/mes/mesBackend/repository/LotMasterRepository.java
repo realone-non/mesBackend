@@ -13,4 +13,5 @@ public interface LotMasterRepository extends JpaCustomRepository<LotMaster, Long
     Optional<LotMaster> findByPurchaseInputAndDeleteYnFalse(PurchaseInput purchaseInput);
 
     LotMaster findByLotNoAndUseYnTrue(String lotNo);
+    Optional<LotMaster> findByLotNoAndDeleteYnFalse(String lotNo);
 }

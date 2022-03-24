@@ -1,5 +1,6 @@
 package com.mes.mesBackend.repository.custom;
 
+import com.mes.mesBackend.dto.response.LabelPrintResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputDetailResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputResponse;
 import com.mes.mesBackend.dto.response.PurchaseStatusCheckResponse;
@@ -43,4 +44,6 @@ public interface PurchaseInputRepositoryCustom {
             LocalDate fromDate,
             LocalDate toDate
     );
+    // 금일기준 입고된 자재목록
+    List<LabelPrintResponse> findByTodayAndPurchaseInput(LocalDate now);
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface EquipmentRepositoryCustom {
     // 작업공정에 따라 설비 조회
-    List<PopEquipmentResponse> findPopEquipmentResponseByWorkProcess(Long workProcessId);
+    List<PopEquipmentResponse> findPopEquipmentResponseByWorkProcess(Long workProcessId, Boolean produceYn);
 
     // 작업공정으로 단일 설비 조회
     Equipment findByWorkProcess(Long workProcessId);

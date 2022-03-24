@@ -73,6 +73,7 @@ public class WareHouse extends BaseTimeEntity {
         setWareHouseType(newWareHouseType);
         setWareHouseGroup(newWareHouse.wareHouseGroup);
         setUseYn(newWareHouse.useYn);
+        setWorkProcessYn(newWareHouse.workProcessYn);
     }
 
     // wareHouseType 추가 매핑 매서드

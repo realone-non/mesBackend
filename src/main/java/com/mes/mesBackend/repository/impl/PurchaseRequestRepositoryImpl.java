@@ -3,6 +3,7 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.PopPurchaseRequestResponse;
 import com.mes.mesBackend.dto.response.PurchaseRequestResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.PurchaseRequestRepositoryCustom;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
@@ -100,7 +101,8 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
             Long itemGroupId,
             String itemNoAndName,
             String manufacturerPartNo,
-            Boolean orderCompletion
+            Boolean orderCompletion,
+            Boolean purchaseOrderYn
     ) {
         return jpaQueryFactory
                 .select(
@@ -140,10 +142,22 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                         isItemNoAndItemNameContain(itemNoAndName),
                         isManufacturerPartNoContain(manufacturerPartNo),
                         isOrderCompletionEq(orderCompletion),
-                        isDeleteYnFalse()
+                        isDeleteYnFalse(),
+                        isPurchaseOrderYn(purchaseOrderYn)
                 )
                 .orderBy(purchaseRequest.id.asc())
                 .fetch();
+    }
+
+    private BooleanExpression isPurchaseOrderYn(Boolean purchaseOrderYn) {
+        if (purchaseOrderYn != null) {
+            if (purchaseOrderYn) {
+                return null;
+            } else {
+                return purchaseRequest.orderAmount.eq(0);
+            }
+        } else
+            return null;
     }
 
     // 구매발주에 해당하는 구매요청이 있는지.
@@ -238,10 +252,23 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                 .where(
                         purchaseRequest.purchaseOrder.id.eq(purchaseOrderId),
                         purchaseOrder.deleteYn.isFalse(),
-                        purchaseRequest.purchaseOrder.deleteYn.isFalse()
+                        purchaseRequest.deleteYn.isFalse()
                 )
                 .fetchFirst();
         return fetchOne != null;
+    }
+
+    // 제조오더에 해당하는 구매요청의 상태값
+    @Override
+    public List<OrderState> findOrderStateByPurchaseOrder(Long purchaseOrderId) {
+        return jpaQueryFactory
+                .select(purchaseRequest.ordersState)
+                .from(purchaseRequest)
+                .where(
+                        purchaseRequest.purchaseOrder.id.eq(purchaseOrderId),
+                        purchaseRequest.deleteYn.isFalse()
+                )
+                .fetch();
     }
 
     // 요청기간

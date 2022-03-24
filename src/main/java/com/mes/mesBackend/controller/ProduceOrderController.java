@@ -1,9 +1,12 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.ProduceOrderRequest;
+import com.mes.mesBackend.dto.response.ClientResponse;
+import com.mes.mesBackend.dto.response.ContractResponse;
 import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
 import com.mes.mesBackend.dto.response.ProduceOrderResponse;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -124,7 +127,7 @@ public class ProduceOrderController {
             @PathVariable(value = "produce-order-id") @Parameter(description = "제조 오더 id") Long produceOrderId,
             @RequestBody @Valid ProduceOrderRequest produceOrderRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         ProduceOrderResponse produceOrder = produceOrderService.updateProduceOrder(produceOrderId, produceOrderRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + produceOrder.getId() + " from updateProduceOrder.");
@@ -144,7 +147,7 @@ public class ProduceOrderController {
     public ResponseEntity deleteProduceOrder(
             @PathVariable(value = "produce-order-id") @Parameter(description = "제조 오더 id") Long produceOrderId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         produceOrderService.deleteProduceOrder(produceOrderId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + produceOrderId + " from deleteProduceOrder.");
@@ -163,5 +166,18 @@ public class ProduceOrderController {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProduceOrderDetails.");
         return new ResponseEntity<>(produceOrderDetails, OK);
+    }
+
+    // 수주 등록된 제조사 list 조회 api
+    @GetMapping("/contract-clients")
+    @ResponseBody
+    @Operation(summary = "수주 등록된 제조사 api")
+    public ResponseEntity<List<ClientResponse.CodeAndName>> getContractClients(
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<ClientResponse.CodeAndName> responses = produceOrderService.getContractClients();
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getContractClients.");
+        return new ResponseEntity<>(responses, OK);
     }
 }

@@ -14,7 +14,7 @@ import static com.mes.mesBackend.exception.Message.*;
 @Schema(description = "작업장별 점검항목")
 public class WorkCenterCheckRequest {
 
-    @Schema(description = "작업장코드 id")
+    @Schema(description = "작업장 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long workCenter;      // 작업장코드

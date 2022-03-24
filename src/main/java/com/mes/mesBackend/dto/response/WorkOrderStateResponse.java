@@ -1,8 +1,11 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.Item;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,4 +57,19 @@ public class WorkOrderStateResponse {
 
     @Schema(description = "수주번호")
     String contractNo;
+
+    @JsonIgnore
+    WorkProcessDivision workProcessDivision;
+
+    @JsonIgnore
+    Long itemId;
+
+    @JsonIgnore
+    Long workProcessId;
+
+    public void setItems(Item item) {
+        setItemNo(item.getItemNo());
+        setItemName(item.getItemName());
+        setItemAccount(item.getItemAccount().getAccount());
+    }
 }

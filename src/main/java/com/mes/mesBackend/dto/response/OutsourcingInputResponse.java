@@ -43,4 +43,12 @@ public class OutsourcingInputResponse {
 
     @Schema(description = "비고")
     String note;
+
+    @Schema(description = "외주 검사의뢰 등록 품목")
+    String outsourcingInputTestItemName;
+
+    public OutsourcingInputResponse setOutSourcingInputTestItemName() {
+        setOutsourcingInputTestItemName(itemName + "(" + inputDate + ")");
+        return this;
+    }
 }

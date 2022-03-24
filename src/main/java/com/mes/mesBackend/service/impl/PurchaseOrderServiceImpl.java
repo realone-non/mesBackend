@@ -148,15 +148,23 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
     // 구매발주 삭제
     @Override
-    public void deletePurchaseOrder(Long purchaseOrderId) throws NotFoundException {
+    public void deletePurchaseOrder(Long purchaseOrderId) throws NotFoundException, BadRequestException {
         PurchaseOrder purchaseOrder = getPurchaseOrderOrThrow(purchaseOrderId);
+        // 구매발주에 해당하는 구매요청이 존재하는지
+        throwIfPurchasRequestExistsInPurchaseOrder(purchaseOrder);
         // 구매발주에서만 제거 orderState 변경 ONGOING -> SCHEDULE
-        List<PurchaseRequest> purchaseRequests = purchaseRequestRepo.findAllByPurchaseOrderAndDeleteYnFalse(purchaseOrder);
-        purchaseRequests.forEach(PurchaseRequest::deleteFromPurchaseOrderAndOrderStateChangedSchedule);
-        purchaseRequestRepo.saveAll(purchaseRequests);
+//        List<PurchaseRequest> purchaseRequests = purchaseRequestRepo.findAllByPurchaseOrderAndDeleteYnFalse(purchaseOrder);
+//        purchaseRequests.forEach(PurchaseRequest::deleteFromPurchaseOrderAndOrderStateChangedSchedule);
+//        purchaseRequestRepo.saveAll(purchaseRequests);
         // 구매발주 삭제, client null
         purchaseOrder.delete();
         purchaseOrderRepo.save(purchaseOrder);
+    }
+
+    // 구매발주에 해당하는 구매요청이 존재하는지
+    private void throwIfPurchasRequestExistsInPurchaseOrder(PurchaseOrder purchaseOrder) throws BadRequestException {
+        boolean b = purchaseRequestRepo.existsByPurchaseOrderAndDeleteYnFalse(purchaseOrder);
+        if (b) throw new BadRequestException("구매발주에 해당하는 구매발주상세 정보가 존재하므로 삭제할수 없습니다. 구매발주 상세정보를 삭제 후 다시 시도해주세요.");
     }
 
     // 구매발주 단일 조회 및 예외
@@ -191,7 +199,6 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         /*
         * 생성 전 체크 항목
         * if 해당 구매발주에 해당하는 구매요청이 있는지 ?
-        * -> 구매요청에 해당하는 구매발주를 집어넣고 구매요청의 orderState 의 상태값을 SCHEDULE -> ONGOING 으로 변경
         * -> 구매발주의 거래처 생성
         * else if 해당 구매발주에 한개라도 해당하는 구매요청이 있으면 ?
         * -> 구매발주에 등록 된 거래처를 기준으로 삼아서 해당 거래처에 해당하는 구매요청만 등록가능
@@ -269,14 +276,17 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     @Override
     public void deletePurchaseOrderDetail(Long purchaseOrderId, Long purchaseOrderDetailId) throws NotFoundException, BadRequestException {
         PurchaseRequest purchaseRequest = getPurchaseRequestOrThrow(purchaseOrderId, purchaseOrderDetailId);
+        if (!purchaseRequest.getOrdersState().equals(SCHEDULE)) throw new BadRequestException("진행중이거나 완료된 정보는 삭제할수없습니다.");
+
         // 구매발주에서 제거, orderState 변경 ONGOING -> SCHEDULE
         purchaseRequest.deleteFromPurchaseOrderAndOrderStateChangedSchedule();
+        purchaseRequest.setOrderAmount(0);
         purchaseRequestRepo.save(purchaseRequest);
 
         // 구매발주에 해당하는 구매요청이 하나라도 없으면 구매발주의 client 를 null 로 변경함
         PurchaseOrder purchaseOrder = getPurchaseOrderOrThrow(purchaseOrderId);
         boolean b = purchaseRequestRepo.existsPurchaseRequestByPurchaseOrder(purchaseOrderId);
-        if (b) purchaseOrder.setClient(null);
+        if (!b) purchaseOrder.setClient(null);
         purchaseOrderRepo.save(purchaseOrder);
     }
 

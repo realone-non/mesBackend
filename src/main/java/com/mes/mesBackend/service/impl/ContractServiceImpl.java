@@ -11,10 +11,7 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.NumberAutomatic;
 import com.mes.mesBackend.helper.S3Uploader;
 import com.mes.mesBackend.mapper.ModelMapper;
-import com.mes.mesBackend.repository.ContractItemFileRepository;
-import com.mes.mesBackend.repository.ContractItemRepository;
-import com.mes.mesBackend.repository.ContractRepository;
-import com.mes.mesBackend.repository.PayTypeRepository;
+import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,6 +37,7 @@ public class ContractServiceImpl implements ContractService {
     private final ContractItemFileRepository contractItemFileRepo;
     private final NumberAutomatic numberAutomatic;
     private final PayTypeRepository payTypeRepository;
+    private final ProduceOrderRepository produceOrderRepository;
     // ======================================== 수주 ===============================================
     // 수주 생성
     @Override
@@ -87,21 +85,32 @@ public class ContractServiceImpl implements ContractService {
 
     // 수주 삭제
     @Override
-    public void deleteContract(Long id) throws NotFoundException {
+    public void deleteContract(Long id) throws NotFoundException, BadRequestException {
         Contract contract = getContractOrThrow(id);
+        // 수주 삭제 시 해당하는 수주의 수주품목 정보가 존재하면 삭제 불가능
+        throwIfContractExistsInContractItem(contract);
+        // 수주 삭제 시 해당하는 수주가 제조오더에 등록되어 있으면 삭제 불가능
+        throwIfContractExistsInProduceOrder(contract);
+
         contract.delete();
         contractRepo.save(contract);
-        List<ContractItem> contractItems = contractItemRepo.findAllByContractAndDeleteYnFalse(contract);
-        // 해당 수주에 해당하는 수주품목, 수주품목파일 같이 삭제
-        for (ContractItem contractItem : contractItems) {
-            // 수주품목 삭제
-            contractItem.delete();
-            contractItemRepo.save(contractItem);
-            // 수주품목 파일 삭제
-            List<ContractItemFile> itemFiles = contractItemFileRepo.findAllByContractItemAndDeleteYnFalse(contractItem);
-            itemFiles.forEach(ContractItemFile::delete);
-            contractItemFileRepo.saveAll(itemFiles);
-        }
+//        List<ContractItem> contractItems = contractItemRepo.findAllByContractAndDeleteYnFalse(contract);
+//        // 해당 수주에 해당하는 수주품목, 수주품목파일 같이 삭제
+//        for (ContractItem contractItem : contractItems) {
+//            // 수주품목 삭제
+//            contractItem.delete();
+//            contractItemRepo.save(contractItem);
+//            // 수주품목 파일 삭제
+//            List<ContractItemFile> itemFiles = contractItemFileRepo.findAllByContractItemAndDeleteYnFalse(contractItem);
+//            itemFiles.forEach(ContractItemFile::delete);
+//            contractItemFileRepo.saveAll(itemFiles);
+//        }
+    }
+
+    // 수주 삭제 시 해당하는 수주의 수주품목 정보가 존재하면 삭제 불가능
+    private void throwIfContractExistsInContractItem(Contract contract) throws BadRequestException {
+        boolean exist = contractItemRepo.existsByContractAndDeleteYnFalse(contract);
+        if (exist) throw new BadRequestException("수주에 해당하는 수주품목 정보가 존재하므로 삭제가 불가능합니다. 수주품목 삭제 후 다시 시도해주세요.");
     }
 
     // 수주 단일 조회 및 예외
@@ -152,10 +161,24 @@ public class ContractServiceImpl implements ContractService {
 
     // 수주 품목 삭제
     @Override
-    public void deleteContractItem(Long contractId, Long contractItemId) throws NotFoundException {
+    public void deleteContractItem(Long contractId, Long contractItemId) throws NotFoundException, BadRequestException {
         ContractItem contractItem = getContractItemOrThrow(contractId, contractItemId);
+        // 제조오더에 등록되어 있으면 삭제 불가능
+        throwIfContractItemExistsInProduceOrder(contractItem);
         contractItem.delete();
         contractItemRepo.save(contractItem);
+    }
+
+    // 수주품목이 제조오더에 등록되어 있으면 삭제 불가능
+    private void throwIfContractItemExistsInProduceOrder(ContractItem contractItem) throws BadRequestException {
+        boolean exist = produceOrderRepository.existsByContractItemAndDeleteYnFalse(contractItem);
+        if (exist) throw new BadRequestException("해당 수주품목이 제조오더에 등록되어 있으므로 삭제가 불가능합니다. 제조오더 삭제 후 다시 시도해주세요.");
+    }
+
+    // 수주가 제조오더에 등록되어 있으면 삭제 불가능
+    private void throwIfContractExistsInProduceOrder(Contract contract) throws BadRequestException {
+        boolean exist = produceOrderRepository.existsByContractAndDeleteYnFalse(contract);
+        if (exist) throw new BadRequestException("해당 수주가 제조오더에 등록되어 있으므로 삭제가 불가능합니다. 제조오더 삭제 후 다시 시도해주세요.");
     }
 
     // 수주 품목 단일 조회 및 예외

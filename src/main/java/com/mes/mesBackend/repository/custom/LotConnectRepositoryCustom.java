@@ -1,8 +1,11 @@
 package com.mes.mesBackend.repository.custom;
 
+import com.mes.mesBackend.dto.response.LotTrackingResponse;
 import com.mes.mesBackend.dto.response.PopBomDetailLotMasterResponse;
 import com.mes.mesBackend.dto.response.PopLotMasterResponse;
 import com.mes.mesBackend.entity.LotConnect;
+import com.mes.mesBackend.entity.LotEquipmentConnect;
+import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 
 import java.time.LocalDate;
@@ -26,4 +29,10 @@ public interface LotConnectRepositoryCustom {
     Optional<LotConnect> findByTodayProduceOrderAndEquipmentIdEqAndLotStockAmountOneLoe(Long produceOrderId, Long equipmentId, LocalDate now);
     // 제조오더에 해당되고, 입력한 충진 설비 lot 가 고장이었는지
     boolean existsByProduceOrderLotConnectIsError(Long produceOrderId, Long fillingEquLotMasterId);
+    // childLotId 로 parentLotMaster 조회, 조건: division? EXHAUST
+    List<LotConnect> findByChildLotIdAndDivisionIsExhaust(Long childLotId);
+    // parentLotId(lotEquipmentId) 로 조회, 조건: division? FAMILY
+    List<LotTrackingResponse> findByParentLotAndDivisionIsFamily(Long parentLotId);
+    // 설비로트로 분할 된 재고수량이 0 이 아닌 최근에 생성된 분할로트
+    Optional<LotMaster> findByStockAmountAndCreatedDateDesc(Long equipmentLot);
 }

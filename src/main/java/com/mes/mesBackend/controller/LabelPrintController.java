@@ -10,10 +10,7 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
-import com.mes.mesBackend.service.EquipmentService;
-import com.mes.mesBackend.service.LotMasterService;
-import com.mes.mesBackend.service.PopShipmentService;
-import com.mes.mesBackend.service.WorkProcessService;
+import com.mes.mesBackend.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,6 +24,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.*;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -50,6 +48,9 @@ public class LabelPrintController {
     EquipmentService equipmentService;
     @Autowired
     PopShipmentService popShipmentService;
+    @Autowired
+    PurchaseInputService purchaseInputService;
+
     private Logger logger = LoggerFactory.getLogger(LabelPrintController.class);
     private CustomLogger cLogger;
 
@@ -119,4 +120,30 @@ public class LabelPrintController {
         cLogger.info("ShipmentList viewed the list of from getPopShipments!");
         return new ResponseEntity<>(responses, OK);
     }
+
+    @GetMapping("/purchase-inputs")
+    @ResponseBody
+    @Operation(summary = "금일 구매입고 목록", description = "")
+    public ResponseEntity<List<LabelPrintResponse>> getPurchaseInputs() {
+        List<LabelPrintResponse> responses = purchaseInputService.getTodayPurchaseInputs();
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info("purchaseInput viewed the list of from getPurchaseInputs!");
+        return new ResponseEntity<>(responses, OK);
+    }
+
+//    // 자재 입고 목록 조회
+//    @GetMapping("/material-inputs")
+//    @ResponseBody
+//    @Operation(summary = "자재입고 목록", description = "검색조건: 검색시작날짜(fromDate) ~ 검색종료날짜(toDate), 거래처 명, 완료여부")
+//    public ResponseEntity<List<PopShipmentResponse>> getPopInputs(
+//            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "출하일자 fromDate") LocalDate fromDate,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "출하일자 toDate") LocalDate toDate,
+//            @RequestParam(required = false) @Parameter(description = "거래처 명") String clientName,
+//            @RequestParam(required = false) @Parameter(description = "완료여부(빈값: 전부, true: COMPLETION 만 조회, false: SCHEDULE 만 조회)") Boolean completionYn
+//    ) {
+//        List<PopShipmentResponse> responses = popShipmentService.getInputs(fromDate, toDate, clientName, completionYn);
+//        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+//        cLogger.info("ShipmentList viewed the list of from getPopShipments!");
+//        return new ResponseEntity<>(responses, OK);
+//    }
 }

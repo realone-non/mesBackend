@@ -26,15 +26,15 @@ public class BomItemRequest {
 
     @Schema(description = "수량")
     @NotNull(message = NOT_NULL)
-    int amount;
+    float amount;
 
-    @Schema(description = "거래처 id")
+    @Schema(description = "구매처(거래처 id)")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
     Long toBuy;
 
     @Schema(description = "공정 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
     Long workProcess;
 
     @Schema(description = "사용여부")

@@ -60,4 +60,7 @@ public class PurchaseInputDetailResponse {
 
     @Schema(description = "거래처 LOT 번호")
     String clientLotNo;
+
+    @Schema(description = "LOT 타입")
+    String lotType;
 }

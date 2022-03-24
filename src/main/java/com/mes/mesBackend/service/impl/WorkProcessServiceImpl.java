@@ -12,7 +12,9 @@ import com.mes.mesBackend.service.WorkProcessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.mes.mesBackend.entity.enumeration.ModifiedDivision.ITEM_GROUP;
 import static com.mes.mesBackend.entity.enumeration.ModifiedDivision.WORK_PROCESS;
@@ -51,7 +53,7 @@ public class WorkProcessServiceImpl implements WorkProcessService {
             ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(WORK_PROCESS, r.getId());
             if (modifiedLog != null) r.modifiedLog(modifiedLog);
         }
-        return responses;
+        return responses.stream().sorted(Comparator.comparing(WorkProcessResponse::getOrders)).collect(Collectors.toList());
     }
 
     // 작업공정 페이징 조회

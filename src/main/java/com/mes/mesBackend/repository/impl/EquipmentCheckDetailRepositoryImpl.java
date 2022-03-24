@@ -43,16 +43,15 @@ public class EquipmentCheckDetailRepositoryImpl implements EquipmentCheckDetailR
                                 equipment.createdDate.as("enrollmentDate"),
                                 equipment.equipmentCode.as("equipmentCode"),
                                 equipment.equipmentName.as("equipmentName"),
-                                workLine.workLineName.as("workCenterName"),
+                                workLine.workLineName.as("workLineName"),
                                 workProcess.workProcessName.as("workProcessName"),
-                                workCenter.workCenterName.as("workLineName")
+                                workLine.workLineName.as("workCenterName")
                         )
                 )
                 .from(equipment)
-                .leftJoin(workLine).on(workLine.id.eq(equipment.workLine.id))
-                .leftJoin(workProcess).on(workProcess.id.eq(workLine.workProcess.id))
-                .leftJoin(workCenter).on(workCenter.id.eq(workLine.workCenter.id))
                 .leftJoin(equipmentCheckDetail).on(equipmentCheckDetail.equipment.id.eq(equipment.id))
+                .leftJoin(workLine).on(workLine.id.eq(equipment.workLine.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(equipment.workProcess.id))
                 .where(
                         isEquipmentTypeContain(workLineId),
                         isWorkDateBetween(fromDate, toDate),

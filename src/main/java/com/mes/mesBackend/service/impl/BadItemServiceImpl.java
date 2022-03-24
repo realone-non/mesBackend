@@ -39,7 +39,7 @@ public class BadItemServiceImpl implements BadItemService {
     // 동일한 badItemCode가 존재하면 예외
     private void checkExistBadItemCode(String badItemCode) throws BadRequestException {
         boolean existByBadItemCode = badItemRepository.existsByBadItemCodeAndDeleteYnFalse(badItemCode);
-        if (existByBadItemCode) throw new BadRequestException("same badItemCode exists. input badItemCode: " + badItemCode);
+        if (existByBadItemCode) throw new BadRequestException("입력한 불량코드는 이미 등록되어있습니다. 다른 불량코드를 입력해주세요.");
     }
 
     // 불량항목 단일 조회

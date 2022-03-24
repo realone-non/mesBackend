@@ -19,7 +19,8 @@ public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
 
     final QEstimate estimate = QEstimate.estimate;
 
-    @Override @Transactional(readOnly = true)
+    @Override
+    @Transactional(readOnly = true)
     public List<Estimate> findAllByCondition(
             String clientName,
             LocalDate fromDate,
@@ -56,7 +57,7 @@ public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
 
     // 담당자명 조회
     private BooleanExpression isChargeNameContaining(String chargeName) {
-        return chargeName != null ? estimate.client.companyCharge.contains(chargeName) : null;
+        return chargeName != null ? estimate.user.korName.contains(chargeName) : null;
     }
 
     private BooleanExpression isDeleteYnFalse() {

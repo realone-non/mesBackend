@@ -48,16 +48,16 @@ public class BomItemDetail extends BaseTimeEntity {
     @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목'", nullable = false)
     private Item item;
 
-    @Column(name = "AMOUNT", columnDefinition = "int COMMENT '수량'", nullable = false)
-    private int amount;     // 수량
+    @Column(name = "AMOUNT", columnDefinition = "float COMMENT '수량'", nullable = false)
+    private float amount;     // 수량
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '구매처'", nullable = false)
+    @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '구매처'")
     private Client toBuy;
 
     // 다대일 단방향
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '공정'")
+    @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '공정'", nullable = false)
     private WorkProcess workProcess;     // 공정
 
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")

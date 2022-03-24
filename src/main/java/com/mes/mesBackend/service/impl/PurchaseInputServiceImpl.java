@@ -2,10 +2,7 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.LotMasterRequest;
 import com.mes.mesBackend.dto.request.PurchaseInputRequest;
-import com.mes.mesBackend.dto.response.PurchaseInputDetailResponse;
-import com.mes.mesBackend.dto.response.PurchaseInputResponse;
-import com.mes.mesBackend.dto.response.PurchaseOrderStatusResponse;
-import com.mes.mesBackend.dto.response.PurchaseStatusCheckResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.LotType;
 import com.mes.mesBackend.entity.PurchaseInput;
@@ -60,6 +57,7 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
             purchaseRequest.setInputPrice();    // 입고금액
             purchaseRequest.setVat();           // 부가세
             purchaseRequest.setAlreadyInput(purchaseRequest.getOrderAmount(), inputAmountSum);      // 미입고수량 = 발주수량 - 입고수량
+            purchaseRequest.setPartInputTestItemNo(purchaseRequest.getItemName() + " (" + purchaseRequest.getInputDate() + ")");
         }
         return purchaseRequests;
     }
@@ -101,17 +99,11 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
                 purchaseInput,
                 purchaseInput.getInputAmount(),
                 purchaseInput.getInputAmount(),
-                getLotTypeOrThrow(purchaseInputRequest.getLotType()),
+//                getLotTypeOrThrow(purchaseInputRequest.getLotType()),
                 purchaseInputRequest.isProcessYn()
         );
 
         lotHelper.createLotMaster(lotMasterRequest);
-//        lotMasterService.createLotMaster(lotMasterRequest).getLotNo();      // lotMaster 생성
-
-//        if (lotMaster == null) {
-//            purchaseInputRepo.deleteById(purchaseInput.getId());
-//            throw new BadRequestException("lot 번호가 생성되지 않았습니다.");
-//        }
 
         // 구매요청에 입고일시 생성
         putInputDateToPurchaseRequest(purchaseRequest);
@@ -142,13 +134,17 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
             Long purchaseRequestId,
             Long purchaseInputId,
             PurchaseInputRequest.updateRequest purchaseInputUpdateRequest
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         PurchaseInput findPurchaseInput = getPurchaseInputOrThrow(purchaseRequestId, purchaseInputId);
-        PurchaseInput newPurchaseInput = mapper.toEntity(purchaseInputUpdateRequest, PurchaseInput.class);
-        findPurchaseInput.put(newPurchaseInput);
 
         // 해당하는 lot 의 재고수량, 생성수량 변경
         LotMaster lotMaster = getLotMasterOrThrow(findPurchaseInput);
+        // 해당 lot 사용된거면 수정 불가능
+        throwIfLotMasterCreateAmountEqualStockAmount(lotMaster);
+
+        PurchaseInput newPurchaseInput = mapper.toEntity(purchaseInputUpdateRequest, PurchaseInput.class);
+        findPurchaseInput.put(newPurchaseInput);
+
         lotMaster.updatePurchaseInput(findPurchaseInput.getInputAmount());
         lotMasterRepo.save(lotMaster);
 
@@ -161,15 +157,21 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
         return getPurchaseInputDetailResponse(purchaseRequestId, purchaseInputId);
     }
 
+    // 해당 lot 사용된거면 수정 불가능
+    private void throwIfLotMasterCreateAmountEqualStockAmount(LotMaster lotMaster) throws BadRequestException {
+        if (lotMaster.getCreatedAmount() != lotMaster.getStockAmount()) throw new BadRequestException("해당 LOT 는 사용된 LOT 이므로 삭제, 수정이 불가합니다.");
+    }
+
     // 구매입고 LOT 삭제
     @Override
-    public void deletePurchaseInputDetail(Long purchaseRequestId, Long purchaseInputId) throws NotFoundException {
+    public void deletePurchaseInputDetail(Long purchaseRequestId, Long purchaseInputId) throws NotFoundException, BadRequestException {
         // 구매입고 삭제
         PurchaseInput purchaseInput = getPurchaseInputOrThrow(purchaseRequestId, purchaseInputId);
-        purchaseInput.delete();
-
-        // 구매입고 등록 시 생성되었던 lotMaster 삭제
         LotMaster lotMaster = getLotMasterOrThrow(purchaseInput);
+        // 해당 LOT 사용되었으면 삭제 불가능
+        throwIfLotMasterCreateAmountEqualStockAmount(lotMaster);
+        purchaseInput.delete();
+        // 구매입고 등록 시 생성되었던 lotMaster 삭제
         lotMaster.delete();
 
         purchaseInputRepo.save(purchaseInput);
@@ -242,5 +244,11 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
             response.setUserName(purchaseOrderStatusResponse.getUserName());
         }
         return purchaseStatusCheckResponses;
+    }
+
+    // 금일기준 자재입고 된 목록
+    @Override
+    public List<LabelPrintResponse> getTodayPurchaseInputs() {
+        return purchaseInputRepo.findByTodayAndPurchaseInput(LocalDate.now());
     }
 }

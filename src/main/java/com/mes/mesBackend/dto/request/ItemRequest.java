@@ -99,7 +99,6 @@ public class ItemRequest {
 
     @Schema(description = "제조사 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
     Long manufacturer;
 
     @Schema(description = "검사기준 id")

@@ -234,6 +234,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isDeleteYnFalse(),
                         workOrderDetail.produceOrder.id.eq(produceOrderId)
                 )
+                .orderBy(workProcess.orders.asc())
                 .fetch();
     }
 
@@ -268,7 +269,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                         workOrderDetail.note.as("note"),
                                         workOrderDetail.startDate.as("startDateTime"),
                                         workOrderDetail.endDate.as("endDateTime"),
-                                        item.id.as("produceOrderItemId")
+                                        item.id.as("produceOrderItemId"),
+                                        workProcess.workProcessDivision.as("workProcessDivision")
                                 )
                         )
                         .from(workOrderDetail)
@@ -332,7 +334,10 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 contract.periodDate.as("periodDate"),
                                 workOrderDetail.orderAmount.as("orderAmount"),
                                 workOrderDetail.productionAmount.as("productionAmount"),
-                                contract.contractNo.as("contractNo")
+                                contract.contractNo.as("contractNo"),
+                                workProcess.workProcessDivision.as("workProcessDivision"),
+                                workProcess.id.as("workProcessId"),
+                                item.id.as("itemId")
                         )
                 )
                 .from(workOrderDetail)
@@ -724,6 +729,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         workProcess.workProcessDivision.notIn(MATERIAL_INPUT),  // 공정 자제입고 제외
                         workProcess.workProcessDivision.notIn(SHIPMENT)         // 공정 출하 제외
                 )
+                .orderBy(workOrderDetail.startDate.desc())
                 .fetch();
     }
 

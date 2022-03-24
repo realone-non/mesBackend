@@ -51,9 +51,8 @@ public class ClientRequest {
     @Schema(description = "상세주소")
     String detailAddress;
 
-    @Schema(description = "업태 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    Long businessType;
+    @Schema(description = "업태")
+    String businessType;
 
     @Schema(description = "업종")
     String item;

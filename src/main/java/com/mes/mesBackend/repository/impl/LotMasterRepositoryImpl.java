@@ -486,15 +486,18 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 )
                 .from(lotMaster)
                 .innerJoin(item).on(item.id.eq(lotMaster.item.id))
-                .leftJoin(lotLog).on(lotLog.lotMaster.id.eq(lotMaster.id))
-                .innerJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
+                //.leftJoin(lotLog).on(lotLog.lotMaster.id.eq(lotMaster.id))
+                //.innerJoin(workOrderDetail).on(workOrderDetail.id.eq(lotLog.workOrderDetail.id))
                 .innerJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
+                .innerJoin(equipment).on(equipment.id.eq(lotMaster.equipment.id))
                 .where(
                         //workOrderDetail.orderState.eq(COMPLETION),
+                        lotMaster.lotMasterDivision.eq(REAL_LOT),
                         lotMaster.deleteYn.eq(false),
                         lotMaster.stockAmount.gt(0),
                         lotMaster.useYn.eq(true),
-                        lotMaster.workProcess.id.eq(workProcessId)
+                        lotMaster.workProcess.id.eq(workProcessId),
+                        lotMaster.equipment.id.eq(equipmentId)
                 )
                 .fetch();
     }
@@ -521,8 +524,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         .select(
                                 Projections.fields(
                                         BadItemWorkOrderResponse.subDto.class,
-                                        lotEquipmentConnect.childLot.badItemAmount.max().as("badAmount"),
-                                        lotEquipmentConnect.childLot.createdAmount.max().as("createAmount"),
+                                        lotMaster.badItemAmount.as("badAmount"),
+                                        lotMaster.createdAmount.as("createAmount"),
                                         item.itemName.as("itemNo"),
                                         item.itemName.as("itemName")
                                 )
@@ -537,7 +540,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotMaster.lotMasterDivision.eq(DUMMY_LOT),
                                 lotMaster.deleteYn.isFalse()
                         )
-                        .groupBy(lotMaster.id)
+                        .limit(1)
                         .fetchOne()
         );
     }
@@ -675,7 +678,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotMaster.item.itemNo.as("itemNo"),
                                 lotMaster.item.itemName.as("itemName"),
                                 lotMaster.enrollmentType.as("enrollmentType"),
-                                lotMaster.createdDate.as("createdDate")
+                                lotMaster.createdDate.as("createdDate"),
+                                lotConnect.amount.as("inputAmount")
                         )
                 )
                 .from(lotConnect)

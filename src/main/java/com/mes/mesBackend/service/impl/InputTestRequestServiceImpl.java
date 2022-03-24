@@ -35,8 +35,6 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     private final ModelMapper modelMapper;
     private final LotMasterRepository lotMasterRepo;
     private final InputTestDetailRepository inputTestDetailRepo;
-    private final LotLogRepository lotLogRepo;
-    private final LotConnectRepository lotConnectRepository;
 
     // 외주수입검사의뢰 생성
     /*
@@ -52,12 +50,12 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
         LotMaster lotMaster = lotMasterService.getLotMasterOrThrow(inputTestRequestRequest.getLotId());
 
         if (inputTestDivision.equals(PART)) {
-            if (lotMaster.getPurchaseInput() == null) throw new BadRequestException("구매입고만 등록할 수 있음.");
+            if (lotMaster.getPurchaseInput() == null) throw new BadRequestException("구매입고만 등록할 수 있습니다.");
         } else if (inputTestDivision.equals(OUT_SOURCING)) {
-            if (lotMaster.getOutSourcingInput() == null) throw new BadRequestException("외주입고만 등록할 수 있음");
+            if (lotMaster.getOutSourcingInput() == null) throw new BadRequestException("외주입고만 등록할 수 있습니다.");
         } else if (inputTestDivision.equals(PRODUCT)) {
             if (!lotMaster.getItem().getItemAccount().getAccount().equals(PRODUCT_ITEM_ACCOUNT)) {
-                throw new BadRequestException("완제품만 등록할 수 있음.");
+                throw new BadRequestException("완제품만 등록할 수 있습니다.");
             }
         }
 
@@ -71,8 +69,10 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
         inputTest.createInputTestRequest(lotMaster, inputTestDivision, inputTestRequestRequest.getTestCompletionRequestDate(), inspectionType);
         inputTestRequestRepo.save(inputTest);       // lotMaster, 요청유형, 요청수량, 검사유형, 상태값 생성
 
+        // LOT 검사요청수량 변경
         lotMaster.setCheckRequestAmount(beforeCheckRequestAmount + requestAmount);
         lotMasterRepo.save(lotMaster);
+
         return getInputTestRequestResponse(inputTest.getId(), inputTestDivision);
     }
 
@@ -143,18 +143,23 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
         InputTestRequest findInputTestRequest = getInputTestRequestOrThrow(id, inputTestDivision);
         LotMaster findLotMaster = findInputTestRequest.getLotMaster();
         int beforeRequestAmount = findInputTestRequest.getRequestAmount();
-
         int newRequestAmount = inputTestRequestUpdateRequest.getRequestAmount();
-        // 입력받은 요청수량이 lot 의 입고수량보다 많은지 체크
+
+        // 입력받은 요청수량이 lot 의 재고수량 보다 많은지 체크
         throwIfRequestAmountGreaterThanInputAmount(findLotMaster.getId(), (findLotMaster.getCheckRequestAmount() - beforeRequestAmount) + newRequestAmount);
         // 검사방법 (입력받으면 입력받은 검사방법으로 하고, 입력받지 않으면 품목의 검사방법으로 함)
         InspectionType inspectionType = inputTestRequestUpdateRequest.getInspectionType().equals(NONE) ? findLotMaster.getItem().getInspectionType() : inputTestRequestUpdateRequest.getInspectionType();
         inputTestRequestUpdateRequest.setInspectionType(inspectionType);
+
+        // inputTestRequest 수정
         InputTestRequest newInputTestRequest = modelMapper.toEntity(inputTestRequestUpdateRequest, InputTestRequest.class);
         findInputTestRequest.update(newInputTestRequest, inputTestDivision);
-        findLotMaster.setCheckRequestAmount((findLotMaster.getCheckRequestAmount() - beforeRequestAmount) + inputTestRequestUpdateRequest.getRequestAmount());
         inputTestRequestRepo.save(findInputTestRequest);
+
+        // LOT 검사요청수량 변경
+        findLotMaster.setCheckRequestAmount((findLotMaster.getCheckRequestAmount() - beforeRequestAmount) + inputTestRequestUpdateRequest.getRequestAmount());
         lotMasterRepo.save(findLotMaster);
+
         return getInputTestRequestResponse(id, inputTestDivision);
     }
 
@@ -172,7 +177,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
         // 검사요청에 대한 검사등록 정보가 있을 시 삭제 불가
         List<Integer> inputTest = inputTestDetailRepo.findTestAmountByInputTestRequestId(findInputTestRequest.getId());
         if (!inputTest.isEmpty()) {
-            throw new BadRequestException("입력한 검사요청에 대한 검사등록이 존재하므로 삭제할 수 없음.");
+            throw new BadRequestException("검사등록 정보가 존재하므로 삭제가 불가능합니다. 검사정보 삭제 후 다시 시도해주세요.");
         }
 
         LotMaster findLotMaster = findInputTestRequest.getLotMaster();
@@ -186,7 +191,6 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
     private void throwIfRequestAmountGreaterThanInputAmount(Long lotId, int requestAmount) throws BadRequestException {
         Integer stockAmountFromLotMaster = inputTestRequestRepo.findLotMasterStockAmountByLotMasterId(lotId);
         if (requestAmount > stockAmountFromLotMaster)
-            throw new BadRequestException("input requestAmount must not be greater than stockAmount. " +
-                    "input requestAmount: " + requestAmount + ", stockAmount: " + stockAmountFromLotMaster);
+            throw new BadRequestException("입력한 요청수량은 LOT 의 재고수량보다 많으므로 생성할 수 없습니다. 요청수량을 LOT 재고수량보다 같거나 적게 입력해주세요.");
     }
 }

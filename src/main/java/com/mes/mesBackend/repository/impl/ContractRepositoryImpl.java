@@ -1,8 +1,10 @@
 package com.mes.mesBackend.repository.impl;
 
+import com.mes.mesBackend.dto.response.ClientResponse;
 import com.mes.mesBackend.entity.Contract;
 import com.mes.mesBackend.entity.QContract;
 import com.mes.mesBackend.repository.custom.ContractRepositoryCustom;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,26 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
                         isContractDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
+                .fetch();
+    }
+
+    // 수주 등록된 제조사 list 조회 api
+    @Override
+    public List<ClientResponse.CodeAndName> findContractClientResponse() {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                ClientResponse.CodeAndName.class,
+                                contract.client.id.as("id"),
+                                contract.client.clientCode.as("clientCode"),
+                                contract.client.clientName.as("clientName")
+                        )
+                )
+                .from(contract)
+                .where(
+                        contract.deleteYn.isFalse()
+                )
+                .distinct()
                 .fetch();
     }
 

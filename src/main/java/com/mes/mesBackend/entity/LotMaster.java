@@ -134,14 +134,6 @@ public class LotMaster extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;
 
-//    @ManyToOne(fetch = LAZY)
-//    @JoinColumn(name = "BEFORE_LOT_NO", columnDefinition = "bigint(1) COMMENT '직전 로트번호'")
-//    private LotMaster beforeLotNo;     // 직전 로트번호
-//
-//    @ManyToOne(fetch = LAZY)
-//    @JoinColumn(name = "NEXT_LOT_NO", columnDefinition = "bigint(1) COMMENT '다음 로트번호'")
-//    private LotMaster nextLotNo;     // 다음 로트번호
-
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint(1) COMMENT '작업 공정'")
     private WorkProcess workProcess;
@@ -161,26 +153,6 @@ public class LotMaster extends BaseTimeEntity {
     @Column(name = "EXHAUST", columnDefinition = "bit(1) COMMENT '폐기 여부'", nullable = false)
     private boolean exhaustYn;
 
-//    @Column(name = "END_YN", columnDefinition = "bit(1) COMMENT '로트 엔드'")
-//    private boolean endYn;      // 로트엔드
-
-//    @ManyToMany(mappedBy = "lotMasters")
-//    @JoinColumn(name = "CONTRACTS")
-//    private List<Contract> contracts = new ArrayList<>();
-
-//    public void createPurchaseInputLot(
-//            LotType lotType,
-//            PurchaseInput purchaseInput,
-//            String lotNo,
-//            WorkProcess workProcess
-//    ) {
-//        setLotType(lotType);
-//        setPurchaseInput(purchaseInput);
-//        setEnrollmentType(PURCHASE_INPUT);
-//        setLotNo(lotNo);
-//        setWorkProcess(workProcess);
-//    }
-
     // 자재입고
     public void createPurchaseInputLot(
             LotMasterRequest request,
@@ -191,8 +163,8 @@ public class LotMaster extends BaseTimeEntity {
         setWareHouse(request.getWareHouse());
         setPurchaseInput(request.getPurchaseInput());
         setStockAmount(request.getStockAmount());
-        setStockAmount(request.getCreatedAmount());
-        setLotType(request.getLotType());
+        setCreatedAmount(request.getCreatedAmount());
+        setLotType(request.getItem().getLotType());
         setProcessYn(request.isProcessYn());
         setWorkProcess(workProcess);
         setLotNo(lotNo);
@@ -211,34 +183,17 @@ public class LotMaster extends BaseTimeEntity {
         setOutSourcingInput(request.getOutSourcingInput());
         setStockAmount(request.getStockAmount());
         setCreatedAmount(request.getCreatedAmount());
-        setLotType(request.getLotType());
+        setLotType(request.getItem().getLotType());
         setLotMasterDivision(request.getLotMasterDivision());
         setWorkProcess(workProcess);
         setEnrollmentType(request.getEnrollmentType());
         setLotNo(lotNo);
-
-//        setLotType(request.getLotType());
-//        setOutSourcingInput(request.getOutSourcingInput());
-//        setEnrollmentType(OUTSOURCING_INPUT);
-//        setLotNo(lotNo);
     }
 
     public void updatePurchaseInput(int inputAmount) {
         setStockAmount(inputAmount);
         setCreatedAmount(inputAmount);
     }
-
-//    public void createOutsourcingInputLot(
-//            LotType lotType,
-//            OutSourcingInput input,
-//            String lotNo
-//    ) {
-//        setLotType(lotType);
-//        setOutSourcingInput(input);
-//        setEnrollmentType(OUTSOURCING_INPUT);
-//        setLotNo(lotNo);
-//    }
-
 
     public void createWorkProcessLot(
             LotMasterRequest lotMasterRequest,
@@ -248,7 +203,7 @@ public class LotMaster extends BaseTimeEntity {
     ) {
         setItem(lotMasterRequest.getItem());
         setWareHouse(lotMasterRequest.getWareHouse());
-        setLotType(lotMasterRequest.getLotType());
+        setLotType(lotMasterRequest.getItem().getLotType());
         setSerialNo(lotMasterRequest.getSerialNo());
         setEnrollmentType(lotMasterRequest.getEnrollmentType());
         setProcessYn(lotMasterRequest.isProcessYn());
@@ -262,11 +217,6 @@ public class LotMaster extends BaseTimeEntity {
         setEquipment(equipment);
         setLotNo(lotNo);
     }
-
-    public void updateOutsourcingInput(int inputAmount) {
-        setStockAmount(inputAmount);
-    }
-
     public void delete() {
         setDeleteYn(true);
     }

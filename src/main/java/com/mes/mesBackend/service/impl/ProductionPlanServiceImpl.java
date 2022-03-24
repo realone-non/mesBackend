@@ -2,9 +2,7 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.response.ProductionPlanResponse;
 import com.mes.mesBackend.entity.Item;
-import com.mes.mesBackend.entity.QProduceOrder;
 import com.mes.mesBackend.entity.WorkOrderDetail;
-import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.repository.ItemRepository;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
@@ -30,13 +28,18 @@ public class ProductionPlanServiceImpl implements ProductionPlanService {
         List<ProductionPlanResponse> productionPlans = workOrderDetailRepo.findAllProductionPlanByCondition(workLineId, fromDate, toDate);
 
         for (ProductionPlanResponse response : productionPlans) {
-            Item item = response.getWorkProcessDivision().equals(PACKAGING) ? getItemOrThrow(response.getItemId())
+            Item item = response.getWorkProcessDivision().equals(PACKAGING) ? getItemOrNull(response.getItemId())
                     : workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(response.getItemId(), response.getWorkProcessId(), null)
                     .orElse(null);
             response.setCostTime();
             if (item != null) response.setItems(item);
         }
         return productionPlans;
+    }
+
+    // 품목 조회 및 없으면 null
+    private Item getItemOrNull(Long id) {
+        return itemRepository.findByIdAndDeleteYnFalse(id).orElse(null);
     }
 
     // 생산계획 수립 단일조회

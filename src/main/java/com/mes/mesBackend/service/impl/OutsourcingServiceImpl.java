@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -127,7 +128,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
 
     //외주 입고정보 리스트조회
     public List<OutsourcingInputResponse> getOutsourcingInputList(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
-        return outsourcingInputRepository.findAllByCondition(clientId, itemNo, itemName, startDate, endDate);
+        return outsourcingInputRepository.findAllByCondition(clientId, itemNo, itemName, startDate, endDate)
+                .stream().map(OutsourcingInputResponse::setOutSourcingInputTestItemName).collect(Collectors.toList());
     }
 
     //외주 입고정보 조회

@@ -120,7 +120,6 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
         LotMasterRequest lotMasterRequest = new LotMasterRequest();
         lotMasterRequest.setPurchaseInput(purchaseInput); // 구매입고
         lotMasterRequest.setItem(purchaseRequest.getItem());        // 품목
-        lotMasterRequest.setLotType(purchaseRequest.getItem().getLotType());      // Lot 유형
         lotMasterRequest.setEnrollmentType(PURCHASE_INPUT); // 등록유형
         lotMasterRequest.setCreatedAmount(inputAmount);     // lotMaster 생성수량
         lotMasterRequest.setStockAmount(inputAmount);       // lotMaster 재고수량
