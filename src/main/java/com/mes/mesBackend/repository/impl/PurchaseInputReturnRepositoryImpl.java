@@ -114,6 +114,41 @@ public class PurchaseInputReturnRepositoryImpl implements PurchaseInputReturnRep
                 )
                 .fetch();
     }
+    // LotMasterId, 분류로 구매입고반품 찾기
+    public PurchaseInputReturnResponse findPurchaseInputReturnByCondition(Long lotMasterId, boolean returnDivision){
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                PurchaseInputReturnResponse.class,
+                                purchaseInputReturn.id.as("id"),
+                                client.clientName.as("clientName"),
+                                purchaseInput.id.as("purchaseInputId"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                item.standard.as("itemStandard"),
+                                item.manufacturerPartNo.as("itemManufacturerPartNo"),
+                                lotMaster.id.as("lotMasterId"),
+                                lotMaster.lotNo.as("lotNo"),
+                                purchaseInputReturn.returnDate.as("returnDate"),
+                                purchaseInputReturn.returnAmount.as("returnAmount"),
+                                purchaseInputReturn.note.as("note"),
+                                purchaseInputReturn.returnDivision.as("returnDivision"),
+                                lotMaster.stockAmount.as("stockAmountPossibleAmount"),
+                                lotMaster.badItemAmount.as("badItemAmountPossibleAmount")
+                        )
+                )
+                .from(purchaseInputReturn)
+                .innerJoin(lotMaster).on(lotMaster.id.eq(purchaseInputReturn.lotMaster.id))
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(client).on(client.id.eq(item.manufacturer.id))
+                .leftJoin(purchaseInput).on(purchaseInput.id.eq(lotMaster.purchaseInput.id))
+                .where(
+                        purchaseInputReturn.lotMaster.id.eq(lotMasterId),
+                        purchaseInputReturn.returnDivision.eq(returnDivision),
+                        purchaseInputReturn.deleteYn.eq(false)
+                )
+                .fetchOne();
+    }
 
     // 구매입고반품 리스트 검색 조회, 검색조건: 거래처 id, 품명|품목, 반품기간 fromDate~toDate
     private BooleanExpression isClientIdEq(Long clientId) {

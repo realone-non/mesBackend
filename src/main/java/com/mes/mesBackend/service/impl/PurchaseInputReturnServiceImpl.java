@@ -34,19 +34,31 @@ public class PurchaseInputReturnServiceImpl implements PurchaseInputReturnServic
         LotMaster lotMaster = lotMasterService.getLotMasterOrThrow(purchaseInputReturnRequest.getLotMasterId());
         boolean division = purchaseInputReturnRequest.isReturnDivision();
         int inputReturnAmount = purchaseInputReturnRequest.getReturnAmount();
-        int lotMasterPossibleAmount = division ? lotMaster.getStockAmount() : lotMaster.getBadItemAmount();
+        PurchaseInputReturnResponse dbInputReturn = purchaseInputReturnRepo.findPurchaseInputReturnByCondition(lotMaster.getId(), division);
+        if(dbInputReturn != null){
+            throw new BadRequestException("동일한 LOT로 입고반품을 중복 등록 할 수 없습니다.");
+        }
 
-        int inputPossibleAmount = purchaseInputReturnRequest.getReturnPossibleAmount() + purchaseInputReturnRequest.getReturnAmount();
+//        int lotMasterPossibleAmount = division ? lotMaster.getStockAmount() : lotMaster.getBadItemAmount();
+//
+//        int inputPossibleAmount = purchaseInputReturnRequest.getReturnPossibleAmount() + purchaseInputReturnRequest.getReturnAmount();
+//
+//        if (inputPossibleAmount > lotMasterPossibleAmount) {
+//            throw new BadRequestException("입력한 반품수량 + 반품가능수량이 lotMaster 의 반품가능수량을 초과한다.");
+//        }
 
-        if (inputPossibleAmount > lotMasterPossibleAmount) {
-            throw new BadRequestException("입력한 반품수량 + 반품가능수량이 lotMaster 의 반품가능수량을 초과합니다.");
+        if(division == true && purchaseInputReturnRequest.getReturnAmount() > lotMaster.getStockAmount()){
+            throw new BadRequestException("반품수량은 현재 정상 재고 수량을 초과할 수 없습니다.");
+        }
+        else if(division == false && purchaseInputReturnRequest.getReturnAmount() > lotMaster.getBadItemAmount()){
+            throw new BadRequestException("반품수량은 현재 불량 재고 수량을 초과할 수 없습니다.");
         }
 
         if (division) {
-            lotMaster.setStockAmount(lotMasterPossibleAmount - inputReturnAmount);
+            lotMaster.setStockAmount(lotMaster.getStockAmount() - inputReturnAmount);
             lotMaster.setStockReturnAmount(lotMaster.getStockReturnAmount() + inputReturnAmount);
         } else {
-            lotMaster.setBadItemAmount(lotMasterPossibleAmount - inputReturnAmount);
+            lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() - inputReturnAmount);
             lotMaster.setBadItemReturnAmount(lotMaster.getBadItemReturnAmount() + inputReturnAmount);
         }
 
@@ -85,20 +97,33 @@ public class PurchaseInputReturnServiceImpl implements PurchaseInputReturnServic
         LotMaster findLotMaster = lotMasterService.getLotMasterOrThrow(findPurchaseInputReturn.getLotMaster().getId());
 
         boolean division = findPurchaseInputReturn.isReturnDivision();
+        int updateAmount = 0;
 
-        PurchaseInputReturnResponse response = getPurchaseInputReturnResponse(purchaseInputReturnId);
-        int possibleAmount = response.getPossibleAmount() + response.getReturnAmount();
-        int inputPossibleAmount = purchaseInputReturnUpdateRequest.getReturnPossibleAmount() + purchaseInputReturnUpdateRequest.getReturnAmount();
-        if (possibleAmount != inputPossibleAmount) {
-            throw new BadRequestException("입력받은 반품가능수량과 lotMaster 의 반품가능수량이 다릅니다.");
+//        PurchaseInputReturnResponse response = getPurchaseInputReturnResponse(purchaseInputReturnId);
+//        int possibleAmount = response.getPossibleAmount() + response.getReturnAmount();
+//        int inputPossibleAmount = purchaseInputReturnUpdateRequest.getReturnPossibleAmount() + purchaseInputReturnUpdateRequest.getReturnAmount();
+
+        //입력받은 반품 수량이 현재 정상품 재고 수량 + 정상품 반품 수량보다 클 경우 Exception
+        if(division == true && purchaseInputReturnUpdateRequest.getReturnAmount() > findLotMaster.getStockAmount() + findLotMaster.getStockReturnAmount()){
+            throw new BadRequestException("반품수량은 전체 재고 수량을 초과할 수 없습니다.");
         }
+        //입력받은 반품 수량이 현재 불량품 재고 수량 + 불량품 반품 수량보다 클 경우 Exception
+        else if(division == false && purchaseInputReturnUpdateRequest.getReturnAmount() > findLotMaster.getBadItemReturnAmount() + findLotMaster.getBadItemAmount()){
+            throw new BadRequestException("반품수량은 전체 불량 재고 수량을 초과할 수 없습니다.");
+        }
+//        if (possibleAmount != inputPossibleAmount) {
+//            throw new BadRequestException("입력받은 반품가능수량과 lotMaster 의 반품가능수량이 다르다.");
+//        }
 
-        if (division) {
-            findLotMaster.setStockAmount(purchaseInputReturnUpdateRequest.getReturnPossibleAmount());
-            findLotMaster.setStockReturnAmount((findLotMaster.getStockReturnAmount() - findPurchaseInputReturn.getReturnAmount()) + purchaseInputReturnUpdateRequest.getReturnAmount());
+        //입력받은 반품 수량으로 현재 재고, 반품 수량 업데이트
+        if (division == true) {
+            updateAmount = findLotMaster.getStockReturnAmount() - purchaseInputReturnUpdateRequest.getReturnAmount();
+            findLotMaster.setStockAmount(findLotMaster.getStockAmount() + updateAmount);
+            findLotMaster.setStockReturnAmount(purchaseInputReturnUpdateRequest.getReturnAmount());
         } else {
-            findLotMaster.setBadItemAmount(purchaseInputReturnUpdateRequest.getReturnPossibleAmount());
-            findLotMaster.setBadItemReturnAmount((findLotMaster.getBadItemReturnAmount() - findPurchaseInputReturn.getReturnAmount()) + purchaseInputReturnUpdateRequest.getReturnAmount());
+            updateAmount = findLotMaster.getBadItemAmount() - purchaseInputReturnUpdateRequest.getReturnAmount();
+            findLotMaster.setBadItemAmount(findLotMaster.getBadItemAmount() + updateAmount);
+            findLotMaster.setBadItemReturnAmount(purchaseInputReturnUpdateRequest.getReturnAmount());
         }
         findPurchaseInputReturn.update(newPurchaseInputReturn);
         lotMasterRepo.save(findLotMaster);
