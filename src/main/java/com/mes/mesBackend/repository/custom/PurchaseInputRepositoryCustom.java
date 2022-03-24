@@ -45,5 +45,5 @@ public interface PurchaseInputRepositoryCustom {
             LocalDate toDate
     );
     // 금일기준 입고된 자재목록
-    List<LabelPrintResponse> findByTodayAndPurchaseInput(LocalDate now);
+    List<LabelPrintResponse> findByTodayAndPurchaseInput(LocalDate fromDate, LocalDate toDate);
 }

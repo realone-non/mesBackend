@@ -248,7 +248,7 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
 
     // 금일기준 자재입고 된 목록
     @Override
-    public List<LabelPrintResponse> getTodayPurchaseInputs() {
-        return purchaseInputRepo.findByTodayAndPurchaseInput(LocalDate.now());
+    public List<LabelPrintResponse> getTodayPurchaseInputs(LocalDate fromDate, LocalDate toDate) {
+        return purchaseInputRepo.findByTodayAndPurchaseInput(fromDate, toDate);
     }
 }

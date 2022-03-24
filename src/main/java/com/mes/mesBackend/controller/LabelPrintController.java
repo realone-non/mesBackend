@@ -123,9 +123,12 @@ public class LabelPrintController {
 
     @GetMapping("/purchase-inputs")
     @ResponseBody
-    @Operation(summary = "금일 구매입고 목록", description = "")
-    public ResponseEntity<List<LabelPrintResponse>> getPurchaseInputs() {
-        List<LabelPrintResponse> responses = purchaseInputService.getTodayPurchaseInputs();
+    @Operation(summary = "구매입고 목록", description = "검색조건: 입고일자 fromDate ~ toDate")
+    public ResponseEntity<List<LabelPrintResponse>> getPurchaseInputs(
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "입고일자 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "입고일자 toDate") LocalDate toDate
+    ) {
+        List<LabelPrintResponse> responses = purchaseInputService.getTodayPurchaseInputs(fromDate, toDate);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info("purchaseInput viewed the list of from getPurchaseInputs!");
         return new ResponseEntity<>(responses, OK);

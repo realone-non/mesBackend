@@ -266,7 +266,7 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
 
     // 금일기준 입고된 자재목록
     @Override
-    public List<LabelPrintResponse> findByTodayAndPurchaseInput(LocalDate now) {
+    public List<LabelPrintResponse> findByTodayAndPurchaseInput(LocalDate fromDate, LocalDate toDate) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -281,7 +281,7 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                 .leftJoin(lotMaster).on(lotMaster.purchaseInput.id.eq(purchaseInput.id))
                 .where(
                         purchaseInput.deleteYn.isFalse(),
-                        purchaseInput.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0))
+                        purchaseInput.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))
                 )
                 .fetch();
     }
