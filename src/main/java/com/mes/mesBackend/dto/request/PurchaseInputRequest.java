@@ -23,7 +23,6 @@ public class PurchaseInputRequest {
     LocalDate manufactureDate;
 
     @Schema(description = "유효일자")
-    @NotNull(message = NOT_NULL)
     LocalDate validDate;
 
     @Schema(description = "긴급여부")
@@ -39,10 +38,10 @@ public class PurchaseInputRequest {
     boolean coc = false;
 
     // lot 관련
-    @Schema(description = "LOT 유형 id")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
-    Long lotType;
+//    @Schema(description = "LOT 유형 id")
+//    @Min(value = ONE_VALUE, message = NOT_ZERO)
+//    @NotNull(message = NOT_NULL)
+//    Long lotType;
 
     @Schema(description = "공정용")
     @NotNull(message = NOT_NULL)

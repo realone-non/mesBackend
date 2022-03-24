@@ -148,11 +148,27 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
                         .where(
                                 lotConnect.childLot.id.eq(realLotId),
                                 lotConnect.childLot.deleteYn.isFalse(),
-                                lotConnect.parentLot.childLot.deleteYn.isFalse()
+                                lotConnect.parentLot.childLot.deleteYn.isFalse(),
+                                lotConnect.childLot.createdAmount.ne(lotConnect.childLot.badItemAmount) // 생성수량이랑 불량수량이 같지 않음
                         )
                         .orderBy(lotConnect.parentLot.createdDate.desc())
                         .limit(1)
                         .fetchOne()
         );
+    }
+
+    // realLotId 로 해당하는 lotEquipmentConnect 모두 조회
+    @Override
+    public List<LotEquipmentConnect> findAllByRealLotIdOrderByCreateDateDesc(Long realLotId) {
+        return jpaQueryFactory
+                        .select(lotConnect.parentLot)
+                        .from(lotConnect)
+                        .where(
+                                lotConnect.childLot.id.eq(realLotId),
+                                lotConnect.childLot.deleteYn.isFalse(),
+                                lotConnect.parentLot.childLot.deleteYn.isFalse()
+                        )
+                        .orderBy(lotConnect.parentLot.createdDate.desc())
+                        .fetch();
     }
 }

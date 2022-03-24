@@ -24,4 +24,6 @@ public interface LotEquipmentConnectRepositoryCustom {
     List<LotMaster> findChildLotByChildLotOfParentLotCreatedDateDesc(Long dummyLotId);
     // realLotId 로 equipmentLot 조회, 조회조건: 제일 마지막에 생성된 equipmentLot
     Optional<LotEquipmentConnect> findEquipmentLotByRealLotIdOrderByCreatedDateDesc(Long realLotId);
+    // realLotId 로 equipmentLot 조회, 조회조건: 제일 마지막에 생성된 순으로 desc
+    List<LotEquipmentConnect> findAllByRealLotIdOrderByCreateDateDesc(Long realLotId);
 }

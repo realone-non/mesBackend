@@ -24,7 +24,7 @@ import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL
 public class LotMasterRequest {
     Item item;
     WareHouse wareHouse;
-    LotType lotType;        // lot 타입
+//    LotType lotType;        // lot 타입
     String serialNo;        // 시리얼번호
     EnrollmentType enrollmentType;      // 등록유형
     boolean processYn;      // 공정용
@@ -59,7 +59,7 @@ public class LotMasterRequest {
             PurchaseInput purchaseInput,
             int stockAmount,
             int createdAmount,
-            LotType lotType,
+//            LotType lotType,
             boolean processYn
     ) {
         setItem(item);
@@ -67,7 +67,7 @@ public class LotMasterRequest {
         setPurchaseInput(purchaseInput);
         setStockAmount(stockAmount);
         setCreatedAmount(createdAmount);
-        setLotType(lotType);
+//        setLotType(lotType);
         setProcessYn(processYn);
         setWorkProcessDivision(MATERIAL_INPUT);
         setLotMasterDivision(REAL_LOT);
@@ -87,7 +87,7 @@ public class LotMasterRequest {
         setOutSourcingInput(outSourcingInput);
         setStockAmount(stockAmount);
         setCreatedAmount(stockAmount);
-        setLotType(lotType);
+//        setLotType(lotType);
         setLotMasterDivision(REAL_LOT);
         setWorkProcessDivision(MATERIAL_INPUT);
         setEnrollmentType(OUTSOURCING_INPUT);

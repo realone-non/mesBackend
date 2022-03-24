@@ -99,7 +99,7 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
                 purchaseInput,
                 purchaseInput.getInputAmount(),
                 purchaseInput.getInputAmount(),
-                getLotTypeOrThrow(purchaseInputRequest.getLotType()),
+//                getLotTypeOrThrow(purchaseInputRequest.getLotType()),
                 purchaseInputRequest.isProcessYn()
         );
 
