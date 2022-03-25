@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
+import static com.mes.mesBackend.entity.enumeration.OrderState.ONGOING;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.*;
 
 @RequiredArgsConstructor
@@ -726,6 +727,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isWorkOrderStartDateBetween(fromDate, toDate),
                         isDeleteYnFalse(),
                         workOrderDetail.orderState.eq(COMPLETION),
+                        workOrderDetail.orderState.eq(ONGOING),
                         workProcess.workProcessDivision.notIn(MATERIAL_INPUT),  // 공정 자제입고 제외
                         workProcess.workProcessDivision.notIn(SHIPMENT)         // 공정 출하 제외
                 )

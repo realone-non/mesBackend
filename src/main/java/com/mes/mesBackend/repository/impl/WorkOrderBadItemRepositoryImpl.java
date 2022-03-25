@@ -3,6 +3,7 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.BadItemEnrollmentResponse;
 import com.mes.mesBackend.dto.response.PopBadItemTypeResponse;
 import com.mes.mesBackend.dto.response.PopTestBadItemResponse;
+import com.mes.mesBackend.dto.response.WorkOrderDetailBadItemResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.WorkOrderBadItemRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -228,6 +229,40 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                 .where(
                         lotEquipmentConnect.parentLot.id.eq(dummyLotId),
                         workOrderBadItem.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+
+    @Override
+    public List<WorkOrderBadItem> findByWorkOrderDetailIdAndBadItemId(Long workOrderDetailId, Long badItemId) {
+        return jpaQueryFactory
+                .selectFrom(workOrderBadItem)
+                .where(
+                        workOrderBadItem.workOrderDetail.id.eq(workOrderDetailId),
+                        workOrderBadItem.badItem.id.eq(badItemId),
+                        workOrderBadItem.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+
+    // 설비 lot 에 해당하는 등록된 불량 전체 조회
+    @Override
+    public List<WorkOrderDetailBadItemResponse> findWorkOrderDetailBadItemResponseByEquipmentLotId(Long equipmentId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                WorkOrderDetailBadItemResponse.class,
+                                workOrderBadItem.id.as("enrollmentBadItemId"),
+                                workOrderBadItem.badItem.id.as("badItemTypeId"),
+                                workOrderBadItem.badItem.badItemName.as("badItemTypeName"),
+                                workOrderBadItem.badItemAmount.as("badItemAmount")
+                        )
+                )
+                .from(workOrderBadItem)
+                .where(
+                        workOrderBadItem.lotMaster.id.eq(equipmentId),
+                        workOrderBadItem.deleteYn.isFalse(),
+                        workOrderBadItem.division.eq(EQUIPMENT_LOT)
                 )
                 .fetch();
     }

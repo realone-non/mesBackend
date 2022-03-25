@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.FAMILY;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.EQUIPMENT_LOT;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 
 @RequiredArgsConstructor
@@ -239,7 +240,7 @@ public class LotConnectRepositoryImpl implements LotConnectRepositoryCustom {
 
     // 설비로트로 분할 된 재고수량이 0 이 아닌 최근에 생성된 분할로트
     @Override
-    public Optional<LotMaster> findByStockAmountAndCreatedDateDesc(Long equipmentLot) {
+    public Optional<LotMaster> findByStockAmountAndCreatedDateDesc(Long equipmentLot, Integer stockAmount, boolean division) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .select(lotConnect.childLot)
@@ -247,8 +248,10 @@ public class LotConnectRepositoryImpl implements LotConnectRepositoryCustom {
                         .where(
                                 lotConnect.parentLot.childLot.id.eq(equipmentLot),
                                 lotConnect.childLot.lotMasterDivision.eq(REAL_LOT),
-                                lotConnect.childLot.stockAmount.ne(0),
-                                lotConnect.childLot.inputAmount.eq(0)
+                                isStockAmountEq(stockAmount),
+                                lotConnect.childLot.inputAmount.eq(0),
+                                isCreateAmountNeStockAmount(division),
+                                lotConnect.division.eq(FAMILY)
                         )
                         .orderBy(lotConnect.childLot.createdDate.desc())
                         .limit(1)
@@ -256,12 +259,11 @@ public class LotConnectRepositoryImpl implements LotConnectRepositoryCustom {
         );
     }
 
-    private BooleanExpression isInputEquipmentIdEq(Long inputEquipmentId) {
-        return inputEquipmentId != null ? lotConnect.childLot.inputEquipment.id.eq(inputEquipmentId) : null;
+    private BooleanExpression isStockAmountEq(Integer stockAmount) {
+        return stockAmount != null ? lotConnect.childLot.stockAmount.ne(stockAmount) : null;
     }
 
-
-    private BooleanExpression isLotMasterIdEq(Long lotMasterId) {
-        return lotMasterId != null ? lotMaster.id.eq(lotMasterId) : null;
+    private BooleanExpression isCreateAmountNeStockAmount(boolean division) {
+        return division ? lotConnect.childLot.stockAmount.ne(lotConnect.childLot.createdAmount) : null;
     }
 }

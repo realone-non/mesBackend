@@ -34,5 +34,5 @@ public interface LotConnectRepositoryCustom {
     // parentLotId(lotEquipmentId) 로 조회, 조건: division? FAMILY
     List<LotTrackingResponse> findByParentLotAndDivisionIsFamily(Long parentLotId);
     // 설비로트로 분할 된 재고수량이 0 이 아닌 최근에 생성된 분할로트
-    Optional<LotMaster> findByStockAmountAndCreatedDateDesc(Long equipmentLot);
+    Optional<LotMaster> findByStockAmountAndCreatedDateDesc(Long equipmentLot, Integer stockAmout, boolean division);
 }
