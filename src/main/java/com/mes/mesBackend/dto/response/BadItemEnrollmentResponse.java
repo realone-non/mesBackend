@@ -30,4 +30,7 @@ public class BadItemEnrollmentResponse {
 
     @Schema(description = "LOT 번호")
     String lotNo;
+
+    @Schema(description = "작업지시 고유아이디")
+    Long workOrderId;
 }

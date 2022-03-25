@@ -228,8 +228,8 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
         List<WorkOrderDetail> workOrderDetails = workOrderDetailRepository.findByWorkDate(stdDate);
         for (Item item:itemList) {
             ShortageReponse shortageResponse = new ShortageReponse();
-            int workAmount = 0;
-            int sumAmount = 0;
+            float workAmount = 0;
+            float sumAmount = 0;
             boolean isEmpty = false;
             for (WorkOrderDetail detail:workOrderDetails) {
 //                ProduceOrder order = produceOrderRepository.findByIdAndDeleteYnFalse(detail.getProduceOrder().getId())
@@ -246,7 +246,6 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
                         sumAmount = sumAmount + workAmount;
                     }
                     else if(detailResponse.getItemId().equals(item.getId())){
-
                         workAmount = (int) (detailResponse.getBomAmount() * detail.getOrderAmount());
                         sumAmount = sumAmount + workAmount;
                     }
@@ -279,15 +278,14 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
         return shortageResponseList;
     }
 
-    public int getDetailRecursive(ProduceOrderDetailResponse response, Long itemId, int workAmount){
+    public float getDetailRecursive(ProduceOrderDetailResponse response, Long itemId, float workAmount){
         List<ProduceOrderDetailResponse> detailList = produceOrderRepository.findAllProduceOrderDetail(response.getItemId());
         for (ProduceOrderDetailResponse detail:detailList) {
             if(detail.getItemAccount().equals("반제품")){
                 workAmount = getDetailRecursive(detail, itemId, workAmount);
             }
             else if(detail.getItemId().equals(itemId)){
-
-               workAmount = Integer.parseInt(workAmount + detail.getReservationAmount());
+               workAmount = Float.parseFloat(String.valueOf(workAmount + detail.getBomAmount()));
             }
         }
 

@@ -45,7 +45,7 @@ public class BadItemEnrollmentController {
     // 작업지시 정보 리스트 조회, 검색조건: 작업장 id, 작업라인 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목
     @Operation(
             summary = "작업지시 정보 리스트 조회(지시상태 완료만 조회)",
-            description = "현재 진행중인 작업지시만 조회, 검색조건: 작업장 id, 작업라인 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목"
+            description = "현재 완료된 작업지시만 조회, 검색조건: 작업장 id, 작업라인 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목"
     )
     @GetMapping
     @ResponseBody
@@ -67,8 +67,8 @@ public class BadItemEnrollmentController {
         return new ResponseEntity<>(badItemWorkOrderResponses, OK);
     }
 
-    // 불량유형 정보 생성
-    @Operation(summary = "불량유형 생성")
+    // 불량 정보 생성
+    @Operation(summary = "불량 생성")
     @PostMapping("/{work-order-id}/bad-item-enrollments")
     @ResponseBody
     @ApiResponses(
@@ -91,7 +91,7 @@ public class BadItemEnrollmentController {
     }
 
     // 불량유형 정보 전체 조회
-    @Operation(summary = "불량유형 전체 조회", description = "")
+    @Operation(summary = "불량 전체 조회", description = "")
     @GetMapping("/{work-order-id}/bad-item-enrollments")
     @ResponseBody
     public ResponseEntity<List<BadItemEnrollmentResponse>> getBadItemEnrollments(
@@ -104,8 +104,8 @@ public class BadItemEnrollmentController {
         return new ResponseEntity<>(badItemEnrollmentResponses, OK);
     }
 
-    // 불량유형 정보 수정 (불량수량)
-    @Operation(summary = "불량유형 수정")
+    // 불량 정보 수정 (불량수량)
+    @Operation(summary = "불량 수정")
     @PatchMapping("/{work-order-id}/bad-item-enrollments/{bad-item-enrollment-id}")
     @ResponseBody
     @ApiResponses(
@@ -127,9 +127,9 @@ public class BadItemEnrollmentController {
         return new ResponseEntity<>(badItemEnrollmentResponse, OK);
     }
 
-    // 불량유형 정보 삭제
+    // 불량 정보 삭제
     @DeleteMapping("/{work-order-id}/bad-item-enrollments/{bad-item-enrollment-id}")
-    @Operation(summary = "불량유형 삭제")
+    @Operation(summary = "불량 삭제")
     @ResponseBody
     @ApiResponses(
             value = {

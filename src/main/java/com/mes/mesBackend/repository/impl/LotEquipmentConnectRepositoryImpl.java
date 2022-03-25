@@ -2,6 +2,8 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.PopWorkOrderStates;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.LotConnectDivision;
+import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.repository.custom.LotEquipmentConnectRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -15,6 +17,9 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.FAMILY;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
+
 @RequiredArgsConstructor
 public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
@@ -23,6 +28,7 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
     final QEquipment equipment = QEquipment.equipment;
     final QLotLog lotLog = QLotLog.lotLog;
     final QWorkProcess workProcess = QWorkProcess.workProcess;
+    final QLotConnect lotConnect = QLotConnect.lotConnect;
 
     // 오늘날짜, 같은 설비 기준으로 equipmentLot 조회
     @Override
@@ -100,5 +106,69 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
                         )
                         .fetchOne()
         );
+    }
+
+    // parentLotId 로 childLot(equipmentLot) 조회
+    @Override
+    public List<LotMaster> findChildLotByParentLotId(Long parentLotId) {
+        return jpaQueryFactory
+                .select(lotEquipmentConnect.childLot)
+                .from(lotEquipmentConnect)
+                .where(
+                        lotEquipmentConnect.parentLot.id.eq(parentLotId)
+                )
+                .fetch();
+    }
+
+    // 해당 작업지시로 생성된 realLot 모두 조회
+    @Override
+    public List<LotMaster> findChildLotByChildLotOfParentLotCreatedDateDesc(Long dummyLotId) {
+        return jpaQueryFactory
+                .select(lotConnect.childLot)
+                .from(lotConnect)
+                .leftJoin(lotEquipmentConnect).on(lotEquipmentConnect.id.eq(lotConnect.parentLot.id))
+                .where(
+                        lotEquipmentConnect.parentLot.id.eq(dummyLotId),
+                        lotConnect.childLot.deleteYn.isFalse(),
+                        lotConnect.childLot.lotMasterDivision.eq(REAL_LOT),
+                        lotConnect.division.eq(FAMILY)
+                )
+                .orderBy(lotConnect.childLot.createdDate.desc())
+                .fetch();
+    }
+
+
+    // realLotId 로 equipmentLot 조회, 조회조건: 제일 마지막에 생성된 equipmentLot
+    @Override
+    public Optional<LotEquipmentConnect> findEquipmentLotByRealLotIdOrderByCreatedDateDesc(Long realLotId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(lotConnect.parentLot)
+                        .from(lotConnect)
+                        .where(
+                                lotConnect.childLot.id.eq(realLotId),
+                                lotConnect.childLot.deleteYn.isFalse(),
+                                lotConnect.parentLot.childLot.deleteYn.isFalse(),
+                                lotConnect.childLot.createdAmount.ne(lotConnect.childLot.badItemAmount) // 생성수량이랑 불량수량이 같지 않음
+                        )
+                        .orderBy(lotConnect.parentLot.createdDate.desc())
+                        .limit(1)
+                        .fetchOne()
+        );
+    }
+
+    // realLotId 로 해당하는 lotEquipmentConnect 모두 조회
+    @Override
+    public List<LotEquipmentConnect> findAllByRealLotIdOrderByCreateDateDesc(Long realLotId) {
+        return jpaQueryFactory
+                        .select(lotConnect.parentLot)
+                        .from(lotConnect)
+                        .where(
+                                lotConnect.childLot.id.eq(realLotId),
+                                lotConnect.childLot.deleteYn.isFalse(),
+                                lotConnect.parentLot.childLot.deleteYn.isFalse()
+                        )
+                        .orderBy(lotConnect.parentLot.createdDate.desc())
+                        .fetch();
     }
 }
