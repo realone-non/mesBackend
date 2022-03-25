@@ -3,7 +3,9 @@ package com.mes.mesBackend.repository.custom;
 import com.mes.mesBackend.dto.response.BadItemEnrollmentResponse;
 import com.mes.mesBackend.dto.response.PopBadItemTypeResponse;
 import com.mes.mesBackend.dto.response.PopTestBadItemResponse;
+import com.mes.mesBackend.dto.response.WorkOrderDetailBadItemResponse;
 import com.mes.mesBackend.entity.BadItem;
+import com.mes.mesBackend.entity.WorkOrderBadItem;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,4 +31,7 @@ public interface WorkOrderBadItemRepositoryCustom {
     List<Integer> findBadItemAmountByDummyLotMaster(Long dummyLotId);
     // dummyLot 에 해당하는 불량유형 별 불량수량
     List<BadItemEnrollmentResponse> findByDummyLotIdGroupByBadItemType(Long dummyLotId);
+    List<WorkOrderBadItem> findByWorkOrderDetailIdAndBadItemId(Long workOrderDetailId, Long badItemId);
+    // 설비 lot 에 해당하는 등록된 불량 전체 조회
+    List<WorkOrderDetailBadItemResponse> findWorkOrderDetailBadItemResponseByEquipmentLotId(Long equipmentId);
 }

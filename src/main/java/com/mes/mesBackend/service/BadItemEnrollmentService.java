@@ -2,6 +2,8 @@ package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.response.BadItemEnrollmentResponse;
 import com.mes.mesBackend.dto.response.BadItemWorkOrderResponse;
+import com.mes.mesBackend.dto.response.WorkOrderDetailBadItemResponse;
+import com.mes.mesBackend.dto.response.WorkOrderDetailResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 
@@ -21,12 +23,24 @@ public interface BadItemEnrollmentService {
             LocalDate toDate,
             String itemNoAndItemName
     ) throws NotFoundException;
-    // 불량유형 정보 생성
-    BadItemEnrollmentResponse createBadItemEnrollment(Long workOrderId, Long badItemId, int badItemAmount) throws NotFoundException, BadRequestException;
-    // 불량유형 정보 전체 조회
-    List<BadItemEnrollmentResponse> getBadItemEnrollments(Long workOrderId) throws NotFoundException;
-    // 불량유형 정보 수정 (불량수량)
-    BadItemEnrollmentResponse updateBadItemEnrollment(Long workOrderId, Long badItemEnrollmentId, int badItemAmount) throws NotFoundException, BadRequestException;
-    // 불량유형 정보 삭제
-    void deleteBadItemEnrollment(Long workOrderId, Long badItemEnrollmentId) throws NotFoundException;
+    // 작업지시 별 작업완료 상세 리스트
+    List<WorkOrderDetailResponse> getWorkOrderDetails(Long workOrderId) throws NotFoundException;
+    // 작업완료 상세 리스트 별 불량정보 조회
+    List<WorkOrderDetailBadItemResponse> getBadItemEnrollments(Long workOrderId, Long equipmentLotId) throws NotFoundException;
+    // 작업완료 상세 리스트 별 불량정보 생성
+    WorkOrderDetailBadItemResponse createBadItemEnrollment(Long workOrderId, Long equipmentLotId, Long badItemId, int badItemAmount) throws NotFoundException, BadRequestException;
+    // 작업완료 상세 리스트 별 불량정보 수정
+    WorkOrderDetailBadItemResponse updateBadItemEnrollment(Long workOrderId, Long equipmentLotId, Long badItemEnrollmentId, int badItemAmount) throws NotFoundException, BadRequestException;
+    // 작업완료 상세 리스트 별 불량정보 삭제
+    void deleteBadItemEnrollment(Long workOrderId, Long equipmentLotId, Long badItemEnrollmentId) throws NotFoundException, BadRequestException;
+
+
+//    // 불량유형 정보 생성
+//    BadItemEnrollmentResponse createBadItemEnrollment(Long workOrderId, Long badItemId, int badItemAmount) throws NotFoundException, BadRequestException;
+//    // 불량유형 정보 전체 조회
+//    List<BadItemEnrollmentResponse> getBadItemEnrollments(Long workOrderId) throws NotFoundException;
+//    // 불량유형 정보 수정 (불량수량)
+//    BadItemEnrollmentResponse updateBadItemEnrollment(Long workOrderId, Long badItemEnrollmentId, int badItemAmount) throws NotFoundException, BadRequestException;
+//    // 불량유형 정보 삭제
+//    void deleteBadItemEnrollment(Long workOrderId, Long badItemId) throws NotFoundException, BadRequestException;
 }
