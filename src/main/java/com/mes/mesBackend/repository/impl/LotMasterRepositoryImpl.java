@@ -195,6 +195,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         lotMaster.lotMasterDivision.eq(REAL_LOT),
                         isDeleteYnFalse()
                 )
+                .orderBy(lotMaster.createdDate.desc())
                 .fetch();
     }
 

@@ -82,6 +82,7 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                         isItemNoOrItemNameContain(itemNoOrItemName),
                         isPurchaseRequestDeleteYnFalse()
                 )
+                .orderBy(purchaseRequest.createdDate.desc())
                 .fetch();
     }
 
@@ -261,6 +262,7 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                         isItemNoOrItemNameContain(itemNoAndItemName),
                         isPurchaseInputDeleteYnFalse()
                 )
+                .orderBy(purchaseInput.createdDate.desc())
                 .fetch();
     }
 

@@ -81,6 +81,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isInstructionStatusEq(orderState),
                         produceOrder.deleteYn.isFalse()
                 )
+                .orderBy(produceOrder.createdDate.desc())
                 .fetch();
     }
 
@@ -131,6 +132,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isExpectedWorkDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
+                .orderBy(workOrderDetail.createdDate.desc())
                 .fetch();
     }
 
@@ -359,6 +361,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isContractNoContain(contractNo),
                         isDeleteYnFalse()
                 )
+                .orderBy(workOrderDetail.createdDate.desc())
                 .fetch();
     }
 
@@ -464,6 +467,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isOrderStateEq(orderState),
                         isDeleteYnFalse()
                 )
+                .orderBy(workOrderDetail.createdDate.desc())
                 .fetch();
     }
 

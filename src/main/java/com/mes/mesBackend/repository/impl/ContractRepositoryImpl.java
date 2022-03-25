@@ -39,6 +39,7 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
                         isContractDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
+                .orderBy(contract.createdDate.desc())
                 .fetch();
     }
 

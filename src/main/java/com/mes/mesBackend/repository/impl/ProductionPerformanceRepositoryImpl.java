@@ -79,6 +79,7 @@ public class ProductionPerformanceRepositoryImpl implements ProductionPerformanc
                         isProductionPerformanceDeleteYnFalse(),
                         isWorkOrderDetailDeleteYnFalse()
                 )
+                .orderBy(productionPerformance.createdDate.desc())
                 .fetch();
     }
 

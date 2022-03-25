@@ -131,6 +131,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                         isPeriodDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
+                .orderBy(purchaseOrder.createdDate.desc())
                 .fetch();
     }
 
@@ -309,6 +310,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                         isPeriodDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
+                .orderBy(purchaseRequest.createdDate.desc())
                 .fetch();
     }
 
