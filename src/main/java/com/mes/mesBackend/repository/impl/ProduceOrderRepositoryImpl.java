@@ -48,6 +48,7 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
                         isExpectedCompletedDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
+                .orderBy(produceOrder.createdDate.desc())
                 .fetch();
     }
 

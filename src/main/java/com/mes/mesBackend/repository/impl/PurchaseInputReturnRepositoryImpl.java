@@ -112,6 +112,7 @@ public class PurchaseInputReturnRepositoryImpl implements PurchaseInputReturnRep
                         isReturnDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
+                .orderBy(purchaseInputReturn.createdDate.desc())
                 .fetch();
     }
     // LotMasterId, 분류로 구매입고반품 찾기

@@ -144,7 +144,7 @@ public class ContractServiceImpl implements ContractService {
     @Override
     public List<ContractItemResponse> getContractItems(Long contractId) throws NotFoundException {
         Contract contract = getContractOrThrow(contractId);
-        List<ContractItem> contractItems = contractItemRepo.findAllByContractAndDeleteYnFalse(contract);
+        List<ContractItem> contractItems = contractItemRepo.findAllByContractAndDeleteYnFalseOrderByCreatedDateDesc(contract);
         return mapper.toListResponses(contractItems, ContractItemResponse.class);
     }
 

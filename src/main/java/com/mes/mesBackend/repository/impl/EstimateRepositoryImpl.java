@@ -37,6 +37,7 @@ public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
                         isChargeNameContaining(chargeName),
                         isDeleteYnFalse()
                 )
+                .orderBy(estimate.createdDate.desc())
                 .fetch();
     }
 

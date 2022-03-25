@@ -145,7 +145,7 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                         isDeleteYnFalse(),
                         isPurchaseOrderYn(purchaseOrderYn)
                 )
-                .orderBy(purchaseRequest.id.asc())
+                .orderBy(purchaseRequest.createdDate.desc())
                 .fetch();
     }
 

@@ -62,6 +62,7 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
                         isShipmentDateBetween(fromDate, toDate),
                         isShipmentDeleteYnFalse()
                 )
+                .orderBy(shipment.createdDate.desc())
                 .fetch();
     }
 

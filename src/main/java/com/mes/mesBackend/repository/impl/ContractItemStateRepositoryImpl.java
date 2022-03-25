@@ -76,6 +76,7 @@ public class ContractItemStateRepositoryImpl implements ContractItemStateReposit
                         isContractTypeEq(contractType),
                         isDeleteYnFalse()
                 )
+                .orderBy(contractItem.createdDate.desc())
                 .fetch();
     }
 
