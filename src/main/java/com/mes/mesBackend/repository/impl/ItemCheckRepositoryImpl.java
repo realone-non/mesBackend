@@ -33,6 +33,7 @@ public class ItemCheckRepositoryImpl implements ItemCheckRepositoryCustom {
                         isItemAccountEq(itemAccount),
                         isDeleteYnFalse()
                 )
+                .orderBy(itemCheck.createdDate.desc())
                 .fetch();
     }
 

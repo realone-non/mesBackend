@@ -2,6 +2,7 @@ package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.BomMaster;
 import com.mes.mesBackend.entity.enumeration.DevelopStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -48,4 +49,26 @@ public class BomMasterResponse {
 
     @Schema(description = "사용")
     Boolean useYn;
+
+    public BomMasterResponse setResponse(BomMaster bomMaster) {
+        setId(bomMaster.getId());
+        if (bomMaster.getItem() != null) {
+            ItemResponse.itemToBomResponse item = new ItemResponse.itemToBomResponse();
+            item.setId(bomMaster.getItem().getId());
+            item.setItemNo(bomMaster.getItem().getItemNo());
+            item.setItemName(bomMaster.getItem().getItemName());
+            item.setItemAccount(bomMaster.getItem().getItemAccount().getAccount());
+            item.setManufacturerPartNo(bomMaster.getItem().getManufacturerPartNo());
+            item.setInputUnitPrice(bomMaster.getItem().getInputUnitPrice());
+            setItem(item);
+        }
+        setBomNo(bomMaster.getBomNo());
+        setStartDate(bomMaster.getStartDate());
+        setEndDate(bomMaster.getEndDate());
+        setDevelopStatus(bomMaster.getDevelopStatus());
+        setNote(bomMaster.getNote());
+        setApprovalDate(bomMaster.getApprovalDate());
+        setUseYn(bomMaster.isUseYn());
+        return this;
+    }
 }

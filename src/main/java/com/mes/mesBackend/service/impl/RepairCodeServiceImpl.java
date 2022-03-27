@@ -37,7 +37,7 @@ public class RepairCodeServiceImpl implements RepairCodeService {
     // 수리코드 리스트 조회
     @Override
     public List<RepairCodeResponse> getRepairCodes() {
-        List<RepairCode> repairCodes = repairCodeRepository.findAllByDeleteYnFalse();
+        List<RepairCode> repairCodes = repairCodeRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return mapper.toListResponses(repairCodes, RepairCodeResponse.class);
     }
 

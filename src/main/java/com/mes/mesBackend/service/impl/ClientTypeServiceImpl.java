@@ -8,8 +8,6 @@ import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.ClientTypeRepository;
 import com.mes.mesBackend.service.ClientTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,7 +41,7 @@ public class ClientTypeServiceImpl implements ClientTypeService {
 
     // 거래처유형 전체 조회
     public List<ClientTypeResponse> getClientTypes() {
-        List<ClientType> clientTypes = clientTypeRepository.findAllByDeleteYnFalse();
+        List<ClientType> clientTypes = clientTypeRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return modelMapper.toListResponses(clientTypes, ClientTypeResponse.class);
     }
 //    public Page<ClientTypeResponse> getClientTypes(Pageable pageable) {

@@ -18,6 +18,7 @@ import com.mes.mesBackend.service.WorkProcessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.DECIMAL_POINT_2;
@@ -44,14 +45,15 @@ public class BomMasterServiceImpl implements BomMasterService {
         bomMaster.addJoin(item);
 
         BomMaster save = bomMasterRepository.save(bomMaster);
-        return mapper.toResponse(save, BomMasterResponse.class);
+        return getBomMaster(save.getId());
     }
 
     // BOM 마스처 단일 조회
     @Override
     public BomMasterResponse getBomMaster(Long bomMasterId) throws NotFoundException {
         BomMaster bomMaster = getBomMasterOrThrow(bomMasterId);
-        return mapper.toResponse(bomMaster, BomMasterResponse.class);
+        BomMasterResponse response = new BomMasterResponse();
+        return response.setResponse(bomMaster);
     }
 
     // BOM 마스처 단일 조회 및 에외
@@ -68,7 +70,13 @@ public class BomMasterServiceImpl implements BomMasterService {
             String itemNoAndItemName
     ) {
         List<BomMaster> bomMasters = bomMasterRepository.findAllByCondition(itemAccountId, itemGroupId, itemNoAndItemName);
-        return mapper.toListResponses(bomMasters, BomMasterResponse.class);
+        List<BomMasterResponse> responses = new ArrayList<>();
+        for (BomMaster bomMaster : bomMasters) {
+            BomMasterResponse response = new BomMasterResponse();
+            response.setResponse(bomMaster);
+            responses.add(response);
+        }
+        return responses;
     }
     // BOM 마스터 페이징 조회 검색조건: 품목계정, 품목그룹, 품번|품명
 //    @Override
@@ -93,7 +101,7 @@ public class BomMasterServiceImpl implements BomMasterService {
         findBomMaster.update(newBomMaster, newItem);
 
         bomMasterRepository.save(findBomMaster);
-        return mapper.toResponse(findBomMaster, BomMasterResponse.class);
+        return getBomMaster(findBomMaster.getId());
     }
 
     // BOM 마스터 삭제

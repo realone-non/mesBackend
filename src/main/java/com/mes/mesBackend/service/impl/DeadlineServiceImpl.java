@@ -38,7 +38,7 @@ public class DeadlineServiceImpl implements DeadlineService {
     // 마감일자 리스트 조회
     @Override
     public List<DeadlineResponse> getDeadlines() {
-        List<Deadline> deadlines = deadlineRepository.findAllByDeleteYnFalse();
+        List<Deadline> deadlines = deadlineRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return mapper.toListResponses(deadlines, DeadlineResponse.class);
     }
 

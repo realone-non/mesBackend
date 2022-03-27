@@ -35,6 +35,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                         isKorNameContaining(korName),
                         isDeleteYnFalse()
                 )
+                .orderBy(user.createdDate.desc())
                 .fetch();
     }
 

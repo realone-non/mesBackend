@@ -37,7 +37,7 @@ public class TestCriteriaServiceImpl implements TestCriteriaService {
     // 검사기준 리스트 조회
     @Override
     public List<TestCriteriaResponse> getTestCriterias() {
-        List<TestCriteria> testCriterias = testCriteriaRepository.findAllByDeleteYnFalse();
+        List<TestCriteria> testCriterias = testCriteriaRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return mapper.toListResponses(testCriterias, TestCriteriaResponse.class);
     }
 

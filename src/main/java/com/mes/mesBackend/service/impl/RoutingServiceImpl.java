@@ -14,9 +14,6 @@ import com.mes.mesBackend.service.WareHouseService;
 import com.mes.mesBackend.service.WorkCenterService;
 import com.mes.mesBackend.service.WorkProcessService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,7 +53,7 @@ public class RoutingServiceImpl implements RoutingService {
     // 라우팅 전체 조회
     @Override
     public List<RoutingResponse> getRoutings() {
-        List<Routing> routings = routingRepository.findAllByDeleteYnFalse();
+        List<Routing> routings = routingRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return mapper.toListResponses(routings, RoutingResponse.class);
     }
 
@@ -81,7 +78,7 @@ public class RoutingServiceImpl implements RoutingService {
     @Override
     public void deleteRouting(Long id) throws NotFoundException {
         Routing routing = getRoutingOrThrow(id);
-        List<RoutingDetail> routingDetails = routingDetailRepository.findAllByRoutingAndDeleteYnFalse(routing);
+        List<RoutingDetail> routingDetails = routingDetailRepository.findAllByRoutingAndDeleteYnFalseOrderByCreatedDateDesc(routing);
         for (RoutingDetail routingDetail : routingDetails) {
             routingDetail.delete();
         }
@@ -113,7 +110,7 @@ public class RoutingServiceImpl implements RoutingService {
     @Override
     public List<RoutingDetailResponse> getRoutingDetails(Long routingId) throws NotFoundException {
         Routing routing = getRoutingOrThrow(routingId);
-        List<RoutingDetail> routingDetails = routingDetailRepository.findAllByRoutingAndDeleteYnFalse(routing);
+        List<RoutingDetail> routingDetails = routingDetailRepository.findAllByRoutingAndDeleteYnFalseOrderByCreatedDateDesc(routing);
         return mapper.toListResponses(routingDetails, RoutingDetailResponse.class);
     }
 

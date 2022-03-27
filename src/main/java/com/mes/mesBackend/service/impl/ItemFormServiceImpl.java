@@ -37,7 +37,7 @@ public class ItemFormServiceImpl implements ItemFormService {
     // 품목형태 리스트 조회
     @Override
     public List<ItemFormResponse> getItemForms() {
-        List<ItemForm> itemForms = itemFormRepository.findAllByDeleteYnFalse();
+        List<ItemForm> itemForms = itemFormRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return mapper.toListResponses(itemForms, ItemFormResponse.class);
     }
 

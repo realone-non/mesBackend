@@ -11,9 +11,6 @@ import com.mes.mesBackend.repository.WareHouseRepository;
 import com.mes.mesBackend.service.WareHouseService;
 import com.mes.mesBackend.service.WareHouseTypeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,7 +48,7 @@ public class WareHouseServiceImpl implements WareHouseService {
     // 전체 리스트 조회
     @Override
     public List<WareHouseResponse> getWareHouses() {
-        List<WareHouse> findWareHouses = wareHouseRepository.findAllByDeleteYnFalse();
+        List<WareHouse> findWareHouses = wareHouseRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return mapper.toListResponses(findWareHouses, WareHouseResponse.class);
     }
 

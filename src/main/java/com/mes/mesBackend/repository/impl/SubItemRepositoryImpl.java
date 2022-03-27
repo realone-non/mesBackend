@@ -36,6 +36,7 @@ public class SubItemRepositoryImpl implements SubItemRepositoryCustom {
                         isItemNameContains(itemName),
                         isDeleteYnFalse()
                 )
+                .orderBy(subItem.createdDate.desc())
                 .fetch();
     }
 

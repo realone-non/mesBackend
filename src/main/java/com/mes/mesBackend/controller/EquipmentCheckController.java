@@ -3,7 +3,6 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.EquipmentCheckDetailRequest;
 import com.mes.mesBackend.dto.response.EquipmentCheckDetailResponse;
 import com.mes.mesBackend.dto.response.EquipmentCheckResponse;
-import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;

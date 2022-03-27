@@ -108,7 +108,7 @@ public class ItemCheckServiceImpl implements ItemCheckService {
     @Override
     public List<ItemCheckDetailResponse> getItemCheckDetails(Long itemCheckId) throws NotFoundException {
         ItemCheck itemCheck = getItemCheckOrThrow(itemCheckId);
-        List<ItemCheckDetail> itemCheckDetails = itemCheckDetailsRepository.findAllByItemCheckCategoryAndDeleteYnFalse(itemCheck);
+        List<ItemCheckDetail> itemCheckDetails = itemCheckDetailsRepository.findAllByItemCheckCategoryAndDeleteYnFalseOrderByCreatedDateDesc(itemCheck);
         return mapper.toListResponses(itemCheckDetails, ItemCheckDetailResponse.class);
     }
 

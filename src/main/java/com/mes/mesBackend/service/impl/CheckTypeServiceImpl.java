@@ -44,7 +44,7 @@ public class CheckTypeServiceImpl implements CheckTypeService {
     // 점검유형 전체 조회
     @Override
     public List<CheckTypeResponse> getCheckTypes() {
-        List<CheckType> checkTypes = checkTypeRepository.findAllByDeleteYnFalse();
+        List<CheckType> checkTypes = checkTypeRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return mapper.toListResponses(checkTypes, CheckTypeResponse.class);
     }
 
