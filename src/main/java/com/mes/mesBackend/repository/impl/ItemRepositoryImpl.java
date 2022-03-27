@@ -38,6 +38,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                         isSearchContaining(searchWord),
                         isDeleteYnFalse()
                 )
+                .orderBy(item.createdDate.desc())
                 .fetch();
     }
 

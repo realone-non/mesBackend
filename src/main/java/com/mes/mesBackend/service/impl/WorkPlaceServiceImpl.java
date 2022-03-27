@@ -42,7 +42,7 @@ public class WorkPlaceServiceImpl implements WorkPlaceService {
 
     // 사업장 전체 조회
     public List<WorkPlaceResponse> getWorkPlaces() {
-        List<WorkPlace> workPlaces = workPlaceRepository.findAllByDeleteYnFalse();
+        List<WorkPlace> workPlaces = workPlaceRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return modelMapper.toListResponses(workPlaces, WorkPlaceResponse.class);
     }
 

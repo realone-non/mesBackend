@@ -35,6 +35,7 @@ public class BomMasterRepositoryImpl implements BomMasterRepositoryCustom {
                         isItemNoOrItemNameToItemNoOrItemName(itemNoOrName),
                         isDeleteYnFalse()
                 )
+                .orderBy(bomMaster.createdDate.desc())
                 .fetch();
     }
 

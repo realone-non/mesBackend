@@ -10,8 +10,6 @@ import com.mes.mesBackend.repository.FactoryRepository;
 import com.mes.mesBackend.service.FactoryService;
 import com.mes.mesBackend.service.WorkPlaceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,7 +45,7 @@ public class FactoryServiceImpl implements FactoryService {
 
     // 공장 전체 조회
     public List<FactoryResponse> getFactories() {
-        List<Factory> factories = factoryRepository.findAllByDeleteYnFalse();
+        List<Factory> factories = factoryRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return modelMapper.toListResponses(factories, FactoryResponse.class);
     }
 //    public Page<FactoryResponse> getFactories(Pageable pageable) {

@@ -6,7 +6,6 @@ import com.mes.mesBackend.entity.ModifiedLog;
 import com.mes.mesBackend.entity.WorkCenter;
 import com.mes.mesBackend.entity.WorkLine;
 import com.mes.mesBackend.entity.WorkProcess;
-import com.mes.mesBackend.entity.enumeration.ModifiedDivision;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.ModifiedLogHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
@@ -54,7 +53,7 @@ public class WorkLineServiceImpl implements WorkLineService {
     // 작업라인 전체 조회
     @Override
     public List<WorkLineResponse> getWorkLines() {
-        List<WorkLine> workLines = workLineRepository.findAllByDeleteYnFalse();
+        List<WorkLine> workLines = workLineRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         List<WorkLineResponse> res = mapper.toListResponses(workLines, WorkLineResponse.class);
         for (WorkLineResponse r : res) {
             ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(WORK_LINE, r.getId());

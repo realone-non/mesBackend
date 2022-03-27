@@ -15,5 +15,5 @@ public interface JpaCustomRepository<T, ID> extends JpaRepository<T,ID> {
 
     Page<T> findAllByDeleteYnFalse(Pageable pageable);
 
-    List<T> findAllByDeleteYnFalse();
+    List<T> findAllByDeleteYnFalseOrderByCreatedDateDesc();
 }

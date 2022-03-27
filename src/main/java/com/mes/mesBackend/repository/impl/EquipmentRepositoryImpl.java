@@ -78,6 +78,8 @@ public class EquipmentRepositoryImpl implements EquipmentRepositoryCustom {
                         isEquipmentNameContain(equipmentName),
                         equipment.deleteYn.isFalse()
                 )
+                .orderBy(equipment.workProcess.orders.asc())
+                .orderBy(equipment.createdDate.desc())
                 .fetch();
     }
     private BooleanExpression isEquipmentNameContain(String equipmentName) {

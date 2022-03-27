@@ -36,7 +36,7 @@ public class HolidayServiceImpl implements HolidayService {
     }
     // 휴일 페이징 조회
     public List<HolidayResponse> getHolidays(){
-        List<Holiday> holidays = holidayRepo.findAllByDeleteYnFalse();
+        List<Holiday> holidays = holidayRepo.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return _mapper.toListResponses(holidays, HolidayResponse.class);
     }
     // 휴일 수정

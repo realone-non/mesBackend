@@ -41,7 +41,7 @@ public class WorkCenterServiceImpl implements WorkCenterService {
     // 전체조회
     @Override
     public List<WorkCenterResponse> getWorkCenters() {
-        List<WorkCenter> workCenters = workCenterRepository.findAllByDeleteYnFalse();
+        List<WorkCenter> workCenters = workCenterRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return mapper.toListResponses(workCenters, WorkCenterResponse.class);
     }
 

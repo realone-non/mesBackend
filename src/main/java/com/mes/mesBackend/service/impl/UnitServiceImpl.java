@@ -43,7 +43,7 @@ public class UnitServiceImpl implements UnitService {
     // 전체조회
     @Override
     public List<UnitResponse> getUnits() {
-        List<Unit> units = unitRepository.findAllByDeleteYnFalse();
+        List<Unit> units = unitRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         List<UnitResponse> response = modelMapper.toListResponses(units, UnitResponse.class);
         for (UnitResponse r : response) {
             ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(UNIT, r.getId());

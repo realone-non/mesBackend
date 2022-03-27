@@ -35,7 +35,7 @@ public class GaugeTypeServiceImpl implements GaugeTypeService {
 
     // Gauge 유형 전체 조회
     public List<GaugeTypeResponse> getGaugeTypes() {
-        List<GaugeType> gaugeTypes = gaugeTypeRepository.findAllByDeleteYnFalse();
+        List<GaugeType> gaugeTypes = gaugeTypeRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return modelMapper.toListResponses(gaugeTypes, GaugeTypeResponse.class);
     }
 

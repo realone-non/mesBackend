@@ -35,6 +35,7 @@ public class WorkDocumentRepositoryImpl implements WorkDocumentRepositoryCustom 
                         isItemNameContaining(itemName),
                         isDeleteYnFalse()
                 )
+                .orderBy(workDocument.createdDate.desc())
                 .fetch();
     }
 

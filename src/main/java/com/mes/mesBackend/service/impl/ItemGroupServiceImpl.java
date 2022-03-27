@@ -4,7 +4,6 @@ import com.mes.mesBackend.dto.request.ItemGroupRequest;
 import com.mes.mesBackend.dto.response.ItemGroupResponse;
 import com.mes.mesBackend.entity.ItemGroup;
 import com.mes.mesBackend.entity.ModifiedLog;
-import com.mes.mesBackend.entity.enumeration.ModifiedDivision;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.ModifiedLogHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
@@ -43,7 +42,7 @@ public class ItemGroupServiceImpl implements ItemGroupService {
     // 품목그룹 리스트 전체 조회
     @Override
     public List<ItemGroupResponse> getItemGroups() {
-        List<ItemGroup> itemGroups = itemGroupRepository.findAllByDeleteYnFalse();
+        List<ItemGroup> itemGroups = itemGroupRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         List<ItemGroupResponse> responses = mapper.toListResponses(itemGroups, ItemGroupResponse.class);
         for (ItemGroupResponse r : responses) {
             ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(ITEM_GROUP, r.getId());

@@ -16,7 +16,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.mes.mesBackend.entity.enumeration.ModifiedDivision.ITEM_GROUP;
 import static com.mes.mesBackend.entity.enumeration.ModifiedDivision.WORK_PROCESS;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.NONE;
 
@@ -47,7 +46,7 @@ public class WorkProcessServiceImpl implements WorkProcessService {
     // 작업공정 전체 조회
     @Override
     public List<WorkProcessResponse> getWorkProcesses() {
-        List<WorkProcess> workProcesses = workProcessRepository.findAllByDeleteYnFalse();
+        List<WorkProcess> workProcesses = workProcessRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         List<WorkProcessResponse> responses = mapper.toListResponses(workProcesses, WorkProcessResponse.class);
         for (WorkProcessResponse r : responses) {
             ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(WORK_PROCESS, r.getId());

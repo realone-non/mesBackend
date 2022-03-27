@@ -17,7 +17,10 @@ import com.mes.mesBackend.service.WorkProcessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 // 3-5-1. 설비등록
 @Service
@@ -45,14 +48,21 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     public EquipmentResponse getEquipment(Long id) throws NotFoundException {
         Equipment equipment = getEquipmentOrThrow(id);
-        return mapper.toResponse(equipment, EquipmentResponse.class);
+        EquipmentResponse response = new EquipmentResponse();
+        return response.setResponse(equipment);
     }
 
     // 설비 전체 조회
     @Override
     public List<EquipmentResponse> getEquipments(String equipmentName) {
         List<Equipment> equipments = equipmentRepository.findByCondition(equipmentName);
-        return mapper.toListResponses(equipments, EquipmentResponse.class);
+        List<EquipmentResponse> responses = new ArrayList<>();
+        for (Equipment equipment : equipments) {
+            EquipmentResponse response = new EquipmentResponse();
+            response.setResponse(equipment);
+            responses.add(response);
+        }
+        return responses;
     }
 //    public Page<EquipmentResponse> getEquipments(Pageable pageable) {
 //        Page<Equipment> equipments = equipmentRepository.findAllByDeleteYnFalse(pageable);

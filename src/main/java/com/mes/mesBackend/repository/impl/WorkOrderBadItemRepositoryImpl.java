@@ -159,6 +159,7 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                         isWorkProcessIdEq(workProcessId),
                         isBadItemDeleteYnFalse()
                 )
+                .orderBy(badItem.createdDate.desc())
                 .fetch();
     }
 

@@ -31,6 +31,7 @@ public class ClientRepositoryImpl implements ClientRepositoryCustom {
                         isNameContaining(name),
                         isDeleteYnFalse()
                 )
+                .orderBy(client.createdDate.desc())
                 .fetch();
     }
 

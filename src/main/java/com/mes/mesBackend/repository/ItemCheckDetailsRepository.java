@@ -11,5 +11,5 @@ import java.util.Optional;
 @Repository
 public interface ItemCheckDetailsRepository extends JpaCustomRepository<ItemCheckDetail, Long> {
     Optional<ItemCheckDetail> findByIdAndItemCheckCategoryAndDeleteYnFalse(Long id, ItemCheck itemCheck);
-    List<ItemCheckDetail> findAllByItemCheckCategoryAndDeleteYnFalse(ItemCheck itemCheck);
+    List<ItemCheckDetail> findAllByItemCheckCategoryAndDeleteYnFalseOrderByCreatedDateDesc(ItemCheck itemCheck);
 }

@@ -8,8 +8,6 @@ import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.DepartmentRepository;
 import com.mes.mesBackend.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,7 +40,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     // 부서 전체 조회
     public List<DepartmentResponse> getDepartments() {
-        List<Department> departments = departmentRepository.findAllByDeleteYnFalse();
+        List<Department> departments = departmentRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return modelMapper.toListResponses(departments, DepartmentResponse.class);
     }
 //    public Page<DepartmentResponse> getDepartments(Pageable pageable) {

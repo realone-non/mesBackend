@@ -40,7 +40,7 @@ public class ItemAccountServiceImpl implements ItemAccountService {
     // 품목계정 리스트 조회
     @Override
     public List<ItemAccountResponse> getItemAccounts() {
-        List<ItemAccount> itemAccounts = itemAccountRepository.findAllByDeleteYnFalse();
+        List<ItemAccount> itemAccounts = itemAccountRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return mapper.toListResponses(itemAccounts, ItemAccountResponse.class);
     }
 

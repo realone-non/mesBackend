@@ -203,7 +203,7 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
 
     //헤더용 창고 목록 조회
     public JSONArray getHeaderWarehouse(){
-        List<WareHouse> wareHouseList = wareHouseRepository.findAllByDeleteYnFalse();
+        List<WareHouse> wareHouseList = wareHouseRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         JSONArray headerList = new JSONArray();
         int seq = 3;
         for (WareHouse wareHouse:wareHouseList) {

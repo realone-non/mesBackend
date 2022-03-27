@@ -36,7 +36,7 @@ public class LotTypeServiceImpl implements LotTypeService {
     // Lot유형 리스트 조회
     @Override
     public List<LotTypeResponse> getLotTypes() {
-        List<LotType> lotTypes = lotTypeRepository.findAllByDeleteYnFalse();
+        List<LotType> lotTypes = lotTypeRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return mapper.toListResponses(lotTypes, LotTypeResponse.class);
     }
 

@@ -35,7 +35,7 @@ public class CurrencyServiceImpl implements CurrencyService {
     // 화폐 리스트 조회
     @Override
     public List<CurrencyResponse> getCurrencies() {
-        List<Currency> currencies = currencyRepository.findAllByDeleteYnFalse();
+        List<Currency> currencies = currencyRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return mapper.toListResponses(currencies, CurrencyResponse.class);
     }
     // 화폐 수정

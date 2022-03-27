@@ -8,8 +8,6 @@ import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.CountryCodeRepository;
 import com.mes.mesBackend.service.CountryCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,7 +40,7 @@ public class CountryCodeServiceImpl implements CountryCodeService {
 
     // 국가코드 전체 조회
     public List<CountryCodeResponse> getCountryCodes() {
-        List<CountryCode> countryCodes = countryCodeRepository.findAllByDeleteYnFalse();
+        List<CountryCode> countryCodes = countryCodeRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return modelMapper.toListResponses(countryCodes, CountryCodeResponse.class);
     }
 //    public Page<CountryCodeResponse> getCountryCodes(Pageable pageable) {
