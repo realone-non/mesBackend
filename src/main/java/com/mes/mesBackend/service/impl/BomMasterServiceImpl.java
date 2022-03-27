@@ -45,7 +45,7 @@ public class BomMasterServiceImpl implements BomMasterService {
         bomMaster.addJoin(item);
 
         BomMaster save = bomMasterRepository.save(bomMaster);
-        return mapper.toResponse(save, BomMasterResponse.class);
+        return getBomMaster(save.getId());
     }
 
     // BOM 마스처 단일 조회
@@ -101,7 +101,7 @@ public class BomMasterServiceImpl implements BomMasterService {
         findBomMaster.update(newBomMaster, newItem);
 
         bomMasterRepository.save(findBomMaster);
-        return mapper.toResponse(findBomMaster, BomMasterResponse.class);
+        return getBomMaster(findBomMaster.getId());
     }
 
     // BOM 마스터 삭제

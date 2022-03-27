@@ -41,7 +41,7 @@ public class EquipmentServiceImpl implements EquipmentService {
         Equipment equipment = mapper.toEntity(equipmentRequest, Equipment.class);
         equipment.addJoin(client, workLine, workProcess);
         equipmentRepository.save(equipment);
-        return mapper.toResponse(equipment, EquipmentResponse.class);
+        return getEquipment(equipment.getId());
     }
 
     // 설비 단일 조회
@@ -79,7 +79,7 @@ public class EquipmentServiceImpl implements EquipmentService {
         Equipment newEquipment = mapper.toEntity(equipmentRequest, Equipment.class);
         findEquipment.update(newEquipment, newClient, newWorkLine, newWorkProcess);
         equipmentRepository.save(findEquipment);
-        return mapper.toResponse(findEquipment, EquipmentResponse.class);
+        return getEquipment(findEquipment.getId());
     }
 
     // 설비 삭제
