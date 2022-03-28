@@ -85,7 +85,11 @@ public class LotHelperImpl implements LotHelper {
                 case RAW_MATERIAL:
                 case SUB_MATERIAL: lotNo = createRawAndSubMaterialLotNo(beforeRealLotNo, itemAccountCode);
                     break;
-                case HALF_PRODUCT: lotNo = createHalfProductLotNo(beforeRealLotNo, itemAccountCode, equipment.getLotCode());
+                case HALF_PRODUCT:
+                    // equipment 가 null 일 경우는 외주생산입고일 경우임
+                        lotNo = equipment != null
+                                ? createHalfProductLotNo(beforeRealLotNo, itemAccountCode, equipment.getLotCode())
+                                : createHalfProductLotNo(beforeRealLotNo, itemAccountCode, "");
                     break;
                 case PRODUCT:
                     // 완제품 중 해당하는 달에 등록된 lot, 조건: 품목계정, 설비, 해당하는 달
