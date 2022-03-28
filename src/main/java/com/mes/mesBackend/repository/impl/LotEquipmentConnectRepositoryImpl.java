@@ -91,7 +91,8 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
                                 lotMaster.createdAmount.as("productionAmount"),
                                 lotMaster.createdAmount.subtract(lotMaster.badItemAmount).as("stockAmount"),
                                 lotMaster.badItemAmount.as("badItemAmount"),
-                                lotMaster.workProcess.workProcessName.as("workProcess")
+                                lotMaster.workProcess.workProcessName.as("workProcess"),
+                                lotMaster.workProcess.id.as("workProcessId")
                         )
                 )
                 .from(lotEquipmentConnect)
