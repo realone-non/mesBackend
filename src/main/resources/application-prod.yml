@@ -63,16 +63,27 @@ spring:
     check-template-location: false
 
 # aws s3 bucket
+# aws s3 bucket
 cloud:
   aws:
     credentials:
-      accessKey: AKIAX57N42SFQYJJQMMH
-      secretKey: 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
+      accessKey: AKIAQFOAKXS7ACQ2KTMD
+      secretKey: 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
     region:
       static: ap-northeast-2
-    bucketName: non-s3
+    bucketName: mes-develop
     stack:
       auto: false
+#cloud:
+#  aws:
+#    credentials:
+#      accessKey: AKIAX57N42SFQYJJQMMH
+#      secretKey: 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
+#    region:
+#      static: ap-northeast-2
+#    bucketName: non-s3
+#    stack:
+#      auto: false
 logging:
   level:
     com:
