@@ -283,9 +283,14 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                 .leftJoin(lotMaster).on(lotMaster.purchaseInput.id.eq(purchaseInput.id))
                 .where(
                         purchaseInput.deleteYn.isFalse(),
-                        purchaseInput.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))
+                        isCreatedDateBetween(fromDate, toDate)
+//                        purchaseInput.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))
                 )
                 .fetch();
+    }
+
+    private BooleanExpression isCreatedDateBetween(LocalDate fromDate, LocalDate toDate) {
+        return fromDate != null ? purchaseInput.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)) : null;
     }
 
     // 입고기간
