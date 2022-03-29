@@ -277,9 +277,9 @@ public class ShipmentServiceImpl implements ShipmentService {
         lotMaster.setWorkProcess(workProcess);                      // 작업공정을 shipment 로 변경
 
         // lotLog insert
-        Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(PACKAGING);
-        Long workOrderDetailId = lotLogHelper.getWorkOrderDetailByContractItemAndWorkProcess(shipmentItem.getContractItem().getContract().getId(), workProcessId);
-        lotLogHelper.createLotLog(lotMasterId, workOrderDetailId, workProcessId);
+//        Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(PACKAGING);
+//        Long workOrderDetailId = lotLogHelper.getWorkOrderDetailByContractItemAndWorkProcess(shipmentItem.getContractItem().getContract().getId(), workProcessId);
+//        lotLogHelper.createLotLog(lotMasterId, workOrderDetailId, workProcessId);
 
         // amountHelper insert
         amountHelper.amountUpdate(shipmentItem.getContractItem().getItem().getId(), lotMaster.getWareHouse().getId(), null, SHIPMENT_AMOUNT, stockAmountLotMaster, false);
@@ -323,6 +323,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         // amountHelper insert
         amountHelper.amountUpdate(findShipmentItem.getContractItem().getItem().getId(), lotMaster.getWareHouse().getId(), null, STOCK_AMOUNT, shipmentAmount, false);
+
+        // TODO: lotlog 삭제
 
         shipmentLotRepo.save(findShipmentLot);
         lotMasterRepository.save(lotMaster);
