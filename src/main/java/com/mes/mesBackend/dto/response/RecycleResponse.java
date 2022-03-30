@@ -16,4 +16,7 @@ public class RecycleResponse {
 
     @Schema(description = "재사용 제목")
     String recycleName;
+
+    @Schema(description = "LOT번호")
+    String lotNo;
 }
