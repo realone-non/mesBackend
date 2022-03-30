@@ -527,7 +527,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                         BadItemWorkOrderResponse.subDto.class,
                                         lotMaster.badItemAmount.as("badAmount"),
                                         lotMaster.createdAmount.as("createAmount"),
-                                        item.itemName.as("itemNo"),
+                                        item.itemNo.as("itemNo"),
                                         item.itemName.as("itemName")
                                 )
                         )
