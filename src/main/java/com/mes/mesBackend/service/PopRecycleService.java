@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.PopRecycleRequest;
+import com.mes.mesBackend.dto.response.PopRecycleCreateResponse;
 import com.mes.mesBackend.dto.response.PopRecycleResponse;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -14,5 +15,5 @@ public interface PopRecycleService {
     List<PopRecycleResponse> getRecycles(WorkProcessDivision workProcessDivision) throws NotFoundException;
 
     //재사용 등록
-    PopRecycleResponse createUseRecycle(PopRecycleRequest request) throws NotFoundException, BadRequestException;
+    PopRecycleCreateResponse createUseRecycle(PopRecycleRequest request) throws NotFoundException, BadRequestException;
 }
