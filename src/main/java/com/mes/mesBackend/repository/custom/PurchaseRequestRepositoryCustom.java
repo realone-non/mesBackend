@@ -21,7 +21,8 @@ public interface PurchaseRequestRepositoryCustom {
             String itemNoAndName,
             String manufacturerPartNo,
             Boolean orderCompletion,
-            Boolean purchaseOrderYn
+            Boolean purchaseOrderYn,
+            Long purchaseOrderClientId
     );
 
     // 구매발주에 해당하는 구매요청이 있는지.

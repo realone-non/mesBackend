@@ -77,6 +77,7 @@ public class BomMasterResponse {
             WorkProcessResponse.idAndName workProcess = new WorkProcessResponse.idAndName();
             workProcess.setId(bomMaster.getWorkProcess().getId());
             workProcess.setWorkProcessName(bomMaster.getWorkProcess().getWorkProcessName());
+            setWorkProcess(workProcess);
         }
         return this;
     }
