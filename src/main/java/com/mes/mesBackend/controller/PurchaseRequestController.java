@@ -100,9 +100,10 @@ public class PurchaseRequestController {
             @RequestParam(required = false) @Parameter(description = "제조사 품번") String manufacturerPartNo,
             @RequestParam(required = false) @Parameter(description = "완료포함") Boolean orderCompletion,
             @RequestParam(required = false) @Parameter(description = "구매발주 등록 여부") Boolean purchaseOrderYn,
+            @RequestParam(required = false) @Parameter(description = "구매발주 거래처 고유아이디") Long purchaseOrderClientId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<PurchaseRequestResponse> purchaseRequests = purchaseRequestService.getPurchaseRequests(fromDate, toDate, produceOrderNo, itemGroupId, itemNoAndName, manufacturerPartNo, orderCompletion, purchaseOrderYn);
+        List<PurchaseRequestResponse> purchaseRequests = purchaseRequestService.getPurchaseRequests(fromDate, toDate, produceOrderNo, itemGroupId, itemNoAndName, manufacturerPartNo, orderCompletion, purchaseOrderYn, purchaseOrderClientId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPurchaseRequests.");
         return new ResponseEntity<>(purchaseRequests, OK);

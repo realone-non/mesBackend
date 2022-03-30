@@ -169,8 +169,6 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.save(item);
     }
 
-
-
     // 품목 단일 조회 및 예외
     @Override
     public Item getItemOrThrow(Long id) throws NotFoundException {
@@ -275,9 +273,6 @@ public class ItemServiceImpl implements ItemService {
 
     // 입력한 품목계정이 입력받은 품목계정코드의 품목계정이랑 다를 경우 예외
     private void ifItemAccountDifferentFromItemAccountCodeThrow(Long itemAccountId, Long itemAccountIdFromItemAccountCode) throws BadRequestException {
-        if (!itemAccountId.equals(itemAccountIdFromItemAccountCode)) {
-            throw new BadRequestException("itemAccount included in the itemAccountCode is different from the itemAccount entered." +
-                    " input itemAccount id: " + itemAccountId + ", itemAccount id from itemAccountCode " + itemAccountIdFromItemAccountCode);
-        }
+        if (!itemAccountId.equals(itemAccountIdFromItemAccountCode)) throw new BadRequestException("입력한 품목계정코드가 입력한 품목계정에 해당되지 않습니다. 확인 후 다시 시도해주세요.");
     }
 }
