@@ -77,6 +77,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                                 outSourcingProductionRequest.id.as("outsourcingProductionRequestNo"),   // 외주입고 발주번호
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
+                                item.standard.as("itemStandard"),
 //                                item.clientItemNo.as("itemClientPartNo"), // 고객사품번
                                 item.manufacturerPartNo.as("itemManufacturerPartNo"),    // 제조사품번
 //                                client.clientName.as("clientName"), // 고객사

@@ -59,6 +59,9 @@ public class InputTestRequestInfoResponse {
     @Schema(description = "품명")
     String itemName;
 
+    @Schema(description = "품목 규격")
+    String itemStandard;
+
 //    @Schema(description = "고객사 품번")
 //    String itemClientPartNo;
 

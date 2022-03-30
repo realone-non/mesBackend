@@ -1,5 +1,6 @@
 package com.mes.mesBackend.entity;
 
+import com.mes.mesBackend.entity.enumeration.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Collection;
 
+import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.AUTO;
 
@@ -73,6 +75,10 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Column(name = "IMAGE_URL", columnDefinition = "varchar(255) COMMENT '프로필사진 url'")
     private String imageUrl;
+
+    @Column(name = "USER_TYPE", columnDefinition = "varchar(255) COMMENT '유저유형'")
+    @Enumerated(STRING)
+    private UserType userType;
 //
 //    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 //    private List<UserRole> userRoles = new ArrayList<>();
@@ -89,6 +95,7 @@ public class User extends BaseTimeEntity implements UserDetails {
         setUseYn(newUser.useYn);
         setDescription(newUser.description);
         setLevel(newUser.level);
+        setUserType(newUser.userType);
     }
 
     public void addJoin(Department department) {
