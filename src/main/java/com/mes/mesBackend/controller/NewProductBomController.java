@@ -111,7 +111,7 @@ public class NewProductBomController {
             @PathVariable(value = "bom-master-id") @Parameter(description = "BOM 마스터 id") Long bomMasterId,
             @RequestBody @Valid BomMasterRequest bomMasterRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         BomMasterResponse bomMaster = bomMasterService.updateBomMaster(bomMasterId, bomMasterRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + bomMaster.getId() + " from updateBomMaster.");
