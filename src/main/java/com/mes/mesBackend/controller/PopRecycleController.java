@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.PopRecycleRequest;
 import com.mes.mesBackend.dto.request.RecycleRequest;
+import com.mes.mesBackend.dto.response.PopRecycleCreateResponse;
 import com.mes.mesBackend.dto.response.PopRecycleResponse;
 import com.mes.mesBackend.dto.response.RecycleResponse;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
@@ -80,13 +81,13 @@ public class PopRecycleController {
     @Operation(
             summary = "재사용 등록"
     )
-    public ResponseEntity<PopRecycleResponse> createUseRecycle(
+    public ResponseEntity<PopRecycleCreateResponse> createUseRecycle(
             @RequestBody @Valid PopRecycleRequest request,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException{
-        PopRecycleResponse response = popRecycleService.createUseRecycle(request);
+        PopRecycleCreateResponse response = popRecycleService.createUseRecycle(request);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + response.getId());
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the RecycleLot");
         return new ResponseEntity<>(response, OK);
     }
 }

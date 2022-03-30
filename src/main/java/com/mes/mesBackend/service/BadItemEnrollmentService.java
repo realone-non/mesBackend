@@ -1,6 +1,5 @@
 package com.mes.mesBackend.service;
 
-import com.mes.mesBackend.dto.response.BadItemEnrollmentResponse;
 import com.mes.mesBackend.dto.response.BadItemWorkOrderResponse;
 import com.mes.mesBackend.dto.response.WorkOrderDetailBadItemResponse;
 import com.mes.mesBackend.dto.response.WorkOrderDetailResponse;

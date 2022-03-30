@@ -22,7 +22,7 @@ public interface BomMasterService {
     // Bom 마스터 전체 조회 검색조건: 품목계정, 품목그룹, 품번|품명
     List<BomMasterResponse> getBomMasters(Long itemAccountId, Long itemGroupId, String itemNoAndItemName);
     // BOM 마스터 수정
-    BomMasterResponse updateBomMaster(Long bomMasterId, BomMasterRequest bomMasterRequest) throws NotFoundException;
+    BomMasterResponse updateBomMaster(Long bomMasterId, BomMasterRequest bomMasterRequest) throws NotFoundException, BadRequestException;
     // BOM 마스터 삭제
     void deleteBomMaster(Long bomMasterId) throws NotFoundException, BadRequestException;
 

@@ -51,7 +51,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                                 user.id.as("id"),
                                 user.userCode.as("userCode"),
                                 user.korName.as("korName"),
-                                user.department.deptName.as("deptName")
+                                department.deptName.as("deptName")
                         )
                 )
                 .from(user)
@@ -76,9 +76,9 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
                                 user.id.as("id"),
                                 user.userCode.as("userCode"),
                                 user.korName.as("korName"),
-                                user.department.id.as("deptId"),
-                                user.department.deptCode.as("deptCode"),
-                                user.department.deptName.as("deptName"),
+                                department.id.as("deptId"),
+                                department.deptCode.as("deptCode"),
+                                department.deptName.as("deptName"),
                                 user.useYn.as("useYn")
                         )
                 )

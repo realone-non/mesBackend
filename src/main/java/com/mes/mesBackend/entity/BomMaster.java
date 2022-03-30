@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.mes.mesBackend.entity.enumeration.DevelopStatus.BEFORE;
@@ -47,11 +48,11 @@ public class BomMaster extends BaseTimeEntity {
     @Column(name = "BOM_NO", columnDefinition = "int COMMENT 'BOM번호'", nullable = false)
     private int bomNo;             // BOM번호
 
-    @Column(name = "START_DATE", columnDefinition = "datetime COMMENT '유효시작일'", nullable = false)
-    private LocalDateTime startDate;    // 유효시작일
+    @Column(name = "START_DATE", columnDefinition = "date COMMENT '유효시작일'", nullable = false)
+    private LocalDate startDate;    // 유효시작일
 
-    @Column(name = "END_DATE", columnDefinition = "datetime COMMENT '유효종료일'", nullable = false)
-    private LocalDateTime endDate;      // 유효종료일
+    @Column(name = "END_DATE", columnDefinition = "date COMMENT '유효종료일'", nullable = false)
+    private LocalDate endDate;      // 유효종료일
 
     @Enumerated(STRING)
     @Column(name = "DEVELOP_STATUS", nullable = false, columnDefinition = "varchar(255) COMMENT '개발상태'")
@@ -69,11 +70,16 @@ public class BomMaster extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
-    public void addJoin(Item item) {
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '작업공정'", nullable = false)
+    private WorkProcess workProcess;
+
+    public void addJoin(Item item, WorkProcess workProcess) {
         setItem(item);
+        setWorkProcess(workProcess);
     }
 
-    public void update(BomMaster newBomMaster, Item newItem) {
+    public void update(BomMaster newBomMaster, Item newItem, WorkProcess workProcess) {
         setItem(newItem);
         setBomNo(newBomMaster.bomNo);
         setStartDate(newBomMaster.startDate);
@@ -82,6 +88,7 @@ public class BomMaster extends BaseTimeEntity {
         setNote(newBomMaster.note);
         setApprovalDate(newBomMaster.approvalDate);
         setUseYn(newBomMaster.useYn);
+        setWorkProcess(workProcess);
     }
 
     public void delete() {

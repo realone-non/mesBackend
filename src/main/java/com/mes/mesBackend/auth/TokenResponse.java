@@ -1,6 +1,7 @@
 package com.mes.mesBackend.auth;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.enumeration.UserType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,11 +18,13 @@ public class TokenResponse {
     String accessToken;
     String refreshToken;
     String korName;
+    UserType userType;
 
-    public TokenResponse putToken(String accessToken, String refreshToken, String korName) {
+    public TokenResponse putToken(String accessToken, String refreshToken, String korName, UserType userType) {
         this.setAccessToken(accessToken);
         this.setRefreshToken(refreshToken);
         this.setKorName(korName);
+        this.setUserType(userType);
         return this;
     }
 }

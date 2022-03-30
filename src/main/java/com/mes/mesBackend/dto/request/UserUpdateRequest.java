@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.request;
 
+import com.mes.mesBackend.entity.enumeration.UserType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,4 +56,7 @@ public class UserUpdateRequest {
 
     @Schema(description = "메모")
     String description;
+
+    @Schema(description = "유저유형")
+    UserType userType;
 }

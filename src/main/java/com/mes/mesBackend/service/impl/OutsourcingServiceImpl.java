@@ -164,7 +164,6 @@ public class OutsourcingServiceImpl implements OutsourcingService {
             throws NotFoundException, BadRequestException {
         Optional<OutSourcingInput> input = outsourcingInputRepository.findById(id);
 
-
         //Lot 생성
         LotMasterRequest lotMasterRequest = new LotMasterRequest();
         lotMasterRequest.putOutsourcingInputLotRequest(
@@ -172,7 +171,7 @@ public class OutsourcingServiceImpl implements OutsourcingService {
                 input.get().getInputWareHouse(),
                 input.get(),
                 request.getInputAmount(),
-                getLotTypeOrThrow(request.getLotType())
+                input.get().getProductionRequest().getBomMaster().getItem().getLotType()
         );
 
         String lotNo = lotHelper.createLotMaster(lotMasterRequest).getLotNo();
@@ -208,10 +207,9 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     public OutsourcingInputLOTResponse modifyOutsourcingInputLOT(Long inputId, Long id, OutsourcingInputLOTRequest request) throws NotFoundException {
         OutSourcingInput input = outsourcingInputRepository.findByIdAndDeleteYnFalse(inputId).orElseThrow(()-> new NotFoundException("inputInfo not in db:" + id));
         LotMaster lotInfo = lotMasterRepository.findByIdAndDeleteYnFalse(id).orElseThrow(()-> new NotFoundException("lotinfo not in db:" + id));
-        LotType lotType = lotTypeRepository.findByIdAndDeleteYnFalse(request.getLotType()).orElseThrow(()-> new NotFoundException("lottype not in db:" + id));
         lotInfo.setInputAmount(request.getInputAmount());
         lotInfo.setCreatedAmount(request.getInputAmount());
-        lotInfo.setLotType(lotType);
+        lotInfo.setLotType(input.getProductionRequest().getBomMaster().getItem().getLotType());
         lotMasterRepository.save(lotInfo);
 
         return modelMapper.toResponse(lotInfo, OutsourcingInputLOTResponse.class);

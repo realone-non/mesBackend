@@ -3,11 +3,13 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.BomMaster;
+import com.mes.mesBackend.entity.WorkProcess;
 import com.mes.mesBackend.entity.enumeration.DevelopStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -31,11 +33,11 @@ public class BomMasterResponse {
 
     @Schema(description = "유효시작일")
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
-    LocalDateTime startDate;
+    LocalDate startDate;
 
     @Schema(description = "유효종료일")
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
-    LocalDateTime endDate;
+    LocalDate endDate;
 
     @Schema(description = "개발상태")
     DevelopStatus developStatus;
@@ -49,6 +51,9 @@ public class BomMasterResponse {
 
     @Schema(description = "사용")
     Boolean useYn;
+
+    @Schema(description = "작업공정")
+    WorkProcessResponse.idAndName workProcess;
 
     public BomMasterResponse setResponse(BomMaster bomMaster) {
         setId(bomMaster.getId());
@@ -69,6 +74,12 @@ public class BomMasterResponse {
         setNote(bomMaster.getNote());
         setApprovalDate(bomMaster.getApprovalDate());
         setUseYn(bomMaster.isUseYn());
+        if (bomMaster.getWorkProcess() != null) {
+            WorkProcessResponse.idAndName workProcess = new WorkProcessResponse.idAndName();
+            workProcess.setId(bomMaster.getWorkProcess().getId());
+            workProcess.setWorkProcessName(bomMaster.getWorkProcess().getWorkProcessName());
+            setWorkProcess(workProcess);
+        }
         return this;
     }
 }

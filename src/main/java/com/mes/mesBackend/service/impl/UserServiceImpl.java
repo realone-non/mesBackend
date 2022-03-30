@@ -12,6 +12,7 @@ import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.entity.Department;
 import com.mes.mesBackend.entity.RefreshToken;
 import com.mes.mesBackend.entity.User;
+import com.mes.mesBackend.entity.enumeration.UserType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.CustomJwtException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -36,6 +37,7 @@ import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.UserType.NEW;
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 
 @Service
@@ -50,22 +52,6 @@ public class UserServiceImpl implements UserService {
     private static final String REFRESH_TOKEN = "refreshToken";
     private final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
     private CustomLogger cLogger;
-
-    public User getUserOrThrow(Long id) throws NotFoundException {
-        return userRepository.findByIdAndDeleteYnFalse(id)
-                .orElseThrow(() -> new NotFoundException("user does not exists. input id: " + id));
-    }
-
-    // userCode 가 중복되지 않게 확인
-    private void checkUserCode(String userCode) throws BadRequestException {
-        boolean existsByUserCode = userRepository.existsByUserCodeAndDeleteYnFalse(userCode);
-        if (existsByUserCode) throw new BadRequestException("이미 존재하는 유저코드 입니다. 다른 유저코드를 입력 해주세요.");
-    }
-    // 중복되는 이메일이 있는지 체크
-    private void checkUserEmail(String email) throws BadRequestException {
-        boolean existsByMail = userRepository.existsByMailAndDeleteYnFalse(email);
-        if (existsByMail) throw new BadRequestException("이미 존재하는 이메일 입니다. 다른 이메일을 입력 해주세요.");
-    }
 
     // 직원(작업자) 생성
     public UserResponse createUser(UserCreateRequest userRequest) throws NotFoundException, BadRequestException {
@@ -83,6 +69,7 @@ public class UserServiceImpl implements UserService {
         user.setSalt(salt);
         user.setPassword(passwordHashing(userRequest.getUserCode().getBytes(), salt));
         user.addJoin(department);
+        user.setUserType(NEW);
 
         // 권한 추가
         // RoleUser 테이블에
@@ -163,7 +150,7 @@ public class UserServiceImpl implements UserService {
 
         TokenResponse tokenDto = new TokenResponse();
 
-        tokenDto.putToken(accessToken, refreshToken, user.getKorName());
+        tokenDto.putToken(accessToken, refreshToken, user.getKorName(), user.getUserType());
 
         // 기존 저장소에 있던 RefreshToken False 로 변경
         refreshTokenUseYnTrueToUseYnFalse(authenticationToken);
@@ -218,7 +205,7 @@ public class UserServiceImpl implements UserService {
 
         TokenResponse tokenResponse = new TokenResponse();
 
-        return tokenResponse.putToken(newAccessToken, newRefreshToken, null);
+        return tokenResponse.putToken(newAccessToken, newRefreshToken, null, null);
     }
 
     // salt 값 생성
@@ -340,6 +327,23 @@ public class UserServiceImpl implements UserService {
         User user = getUserOrThrow(id);
         user.delete();
         userRepository.save(user);
+    }
+
+
+    public User getUserOrThrow(Long id) throws NotFoundException {
+        return userRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("user does not exists. input id: " + id));
+    }
+
+    // userCode 가 중복되지 않게 확인
+    private void checkUserCode(String userCode) throws BadRequestException {
+        boolean existsByUserCode = userRepository.existsByUserCodeAndDeleteYnFalse(userCode);
+        if (existsByUserCode) throw new BadRequestException("이미 존재하는 유저코드 입니다. 다른 유저코드를 입력 해주세요.");
+    }
+    // 중복되는 이메일이 있는지 체크
+    private void checkUserEmail(String email) throws BadRequestException {
+        boolean existsByMail = userRepository.existsByMailAndDeleteYnFalse(email);
+        if (existsByMail) throw new BadRequestException("이미 존재하는 이메일 입니다. 다른 이메일을 입력 해주세요.");
     }
 }
 

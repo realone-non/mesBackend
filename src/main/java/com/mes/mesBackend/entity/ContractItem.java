@@ -55,9 +55,9 @@ public class ContractItem extends BaseTimeEntity {
     @Enumerated(STRING)
     @Column(name = "CONTRACT_TYPE", columnDefinition = "varchar(255) COMMENT '수주유형'", nullable = false)
     private ContractType contractType;
-
-    @Column(name = "PERIOD_DATE", columnDefinition = "date COMMENT '납기일자'", nullable = false)
-    private LocalDate periodDate;       // 납기일자
+//
+//    @Column(name = "PERIOD_DATE", columnDefinition = "date COMMENT '납기일자'", nullable = false)
+//    private LocalDate periodDate;       // 납기일자
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "CONTRACT", nullable = false, columnDefinition = "bigint COMMENT '수주'")
@@ -81,7 +81,6 @@ public class ContractItem extends BaseTimeEntity {
         setItem(newItem);
         setAmount(newContractItem.amount);
         setContractType(newContractItem.contractType);
-        setPeriodDate(newContractItem.periodDate);
         setStandardItemNo(newContractItem.standardItemNo);
         setNote(newContractItem.note);
     }
