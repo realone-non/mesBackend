@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -70,13 +71,6 @@ public class ItemServiceImpl implements ItemService {
         return mapper.toResponse(item, ItemResponse.class);
     }
 
-    // 입력한 품목계정이 입력받은 품목계정코드의 품목계정이랑 다를 경우 예외
-    private void ifItemAccountDifferentFromItemAccountCodeThrow(Long itemAccountId, Long itemAccountIdFromItemAccountCode) throws BadRequestException {
-        if (!itemAccountId.equals(itemAccountIdFromItemAccountCode)) {
-            throw new BadRequestException("itemAccount included in the itemAccountCode is different from the itemAccount entered." +
-                    " input itemAccount id: " + itemAccountId + ", itemAccount id from itemAccountCode " + itemAccountIdFromItemAccountCode);
-        }
-    }
 
     // 품목 단일 조회
     @Override
@@ -128,7 +122,16 @@ public class ItemServiceImpl implements ItemService {
         ItemAccount newItemAccount = itemAccountService.getItemAccountOrThrow(itemRequest.getItemAccount());
         ItemAccountCode newItemAccountCode = itemAccountCodeService.getItemAccountCodeOrThrow(itemRequest.getItemAccountCode());
 
+        // 입력한 품목계정이 입력받은 품목계정코드의 품목계정이랑 다를 경우 예외
         ifItemAccountDifferentFromItemAccountCodeThrow(newItemAccount.getId(), newItemAccountCode.getItemAccount().getId());
+
+        // 품목계정이 변경되었을 경우 Bom 과 BomDetail 에 등록되어 있는지 체크
+        if (!findItem.getItemAccount().getId().equals(newItemAccount.getId())) {
+            // BOM 에 등록되어 있을 경우 품목계정 수정 불가능
+            throwItemAccountUpdateIfItemExistsInBomMaster(findItem);
+            // BOM Detail 에 등록되어 있을 경우 품목계정 수정 불가능
+            throwItemAccountUpdateIfItemExistsInBomItemDetails(findItem);
+        }
 
         ItemGroup newItemGroup = itemRequest.getItemGroup() != null ? itemGroupService.getItemGroupOrThrow(itemRequest.getItemGroup()) : null;
         ItemForm newItemForm = itemRequest.getItemForm() != null ? itemFormService.getItemFormOrThrow(itemRequest.getItemForm()) : null;
@@ -152,9 +155,9 @@ public class ItemServiceImpl implements ItemService {
         Item item = getItemOrThrow(id);
 
         // 품목이 BomMaster 에 등록되어 있는지 체쿠
-        throwIfItemExistsInBomMaster(item);
+        throwItemDeleteIfItemExistsInBomMaster(item);
         // 품목이 BomItemDetail 에 등록되어 있는지 체크
-        throwIfItemExistsInBomItemDetails(item);
+        throwItemDeleteIfItemExistsInBomItemDetails(item);
 
         List<ItemFile> itemFiles = itemFileRepository.findAllByItemAndDeleteYnFalse(item);
         for (ItemFile itemFile : itemFiles) {
@@ -166,17 +169,7 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.save(item);
     }
 
-    // 품목이 BomMaster 에 등록되어 있는지 체쿠
-    private void throwIfItemExistsInBomMaster(Item item) throws BadRequestException {
-        boolean exist = bomMasterRepository.existsByItemAndDeleteYnIsFalse(item);
-        if (exist) throw new BadRequestException("해당 품목은 BOM 정보에 등록되어 있으므로 삭제가 불가능 합니다. BOM 에서 삭제 후 다시 시도해주세요.");
-    }
 
-    // 품목이 BomItemDetail 에 등록되어 있는지 체크
-    private void throwIfItemExistsInBomItemDetails(Item item) throws BadRequestException {
-        boolean exist = bomItemDetailRepository.existsByItemAndDeleteYnIsFalse(item);
-        if (exist) throw new BadRequestException("해당 품목은 BOM 상세 정보에 등록되어 있으므로 삭제가 불가능 합니다. BOM 상세에서 삭제 후 다시 시도해주세요. ");
-    }
 
     // 품목 단일 조회 및 예외
     @Override
@@ -254,5 +247,37 @@ public class ItemServiceImpl implements ItemService {
         ItemFile file = getItemFileOrThrow(itemFileId);
         file.delete();
         itemFileRepository.save(file);
+    }
+
+    // 품목이 BomMaster 에 등록되어 있는지 체쿠
+    private void throwItemDeleteIfItemExistsInBomMaster(Item item) throws BadRequestException {
+        boolean exist = bomMasterRepository.existsByItemAndDeleteYnIsFalse(item);
+        if (exist) throw new BadRequestException("해당 품목은 BOM 정보에 등록되어 있으므로 삭제가 불가능 합니다. BOM 에서 삭제 후 다시 시도해주세요.");
+    }
+
+    // 품목이 BomItemDetail 에 등록되어 있는지 체크
+    private void throwItemDeleteIfItemExistsInBomItemDetails(Item item) throws BadRequestException {
+        boolean exist = bomItemDetailRepository.existsByItemAndDeleteYnIsFalse(item);
+        if (exist) throw new BadRequestException("해당 품목은 BOM 상세 정보에 등록되어 있으므로 삭제가 불가능 합니다. BOM 상세에서 삭제 후 다시 시도해주세요. ");
+    }
+
+    // 품목이 BomMaster 에 등록되어 있는지 체쿠
+    private void throwItemAccountUpdateIfItemExistsInBomMaster(Item item) throws BadRequestException {
+        boolean exist = bomMasterRepository.existsByItemAndDeleteYnIsFalse(item);
+        if (exist) throw new BadRequestException("해당 품목은 BOM 정보에 등록되어 있으므로 품목계정 수정이 불가능합니다. BOM 에서 삭제 후 다시 시도해주세요.");
+    }
+
+    // 품목이 BomItemDetail 에 등록되어 있는지 체크
+    private void throwItemAccountUpdateIfItemExistsInBomItemDetails(Item item) throws BadRequestException {
+        boolean exist = bomItemDetailRepository.existsByItemAndDeleteYnIsFalse(item);
+        if (exist) throw new BadRequestException("해당 품목은 BOM 상세 정보에 등록되어 있으므로 품목계정 수정이 불가능 합니다. BOM 상세에서 삭제 후 다시 시도해주세요. ");
+    }
+
+    // 입력한 품목계정이 입력받은 품목계정코드의 품목계정이랑 다를 경우 예외
+    private void ifItemAccountDifferentFromItemAccountCodeThrow(Long itemAccountId, Long itemAccountIdFromItemAccountCode) throws BadRequestException {
+        if (!itemAccountId.equals(itemAccountIdFromItemAccountCode)) {
+            throw new BadRequestException("itemAccount included in the itemAccountCode is different from the itemAccount entered." +
+                    " input itemAccount id: " + itemAccountId + ", itemAccount id from itemAccountCode " + itemAccountIdFromItemAccountCode);
+        }
     }
 }

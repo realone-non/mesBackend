@@ -28,9 +28,9 @@ public class BomItemRequest {
     @NotNull(message = NOT_NULL)
     float amount;
 
-    @Schema(description = "구매처(거래처 id)")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    Long toBuy;
+//    @Schema(description = "구매처(거래처 id)")
+//    @Min(value = ONE_VALUE, message = NOT_ZERO)
+//    Long toBuy;
 
     @Schema(description = "공정 id")
     @Min(value = ONE_VALUE, message = NOT_ZERO)

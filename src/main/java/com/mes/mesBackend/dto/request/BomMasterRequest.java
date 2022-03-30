@@ -48,4 +48,9 @@ public class BomMasterRequest {
     @Schema(description = "사용")
     @NotNull(message = NOT_NULL)
     Boolean useYn;
+
+    @Schema(description = "작업공정 고유아이디")
+    @NotNull(message = NOT_NULL)
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    Long workProcessId;
 }

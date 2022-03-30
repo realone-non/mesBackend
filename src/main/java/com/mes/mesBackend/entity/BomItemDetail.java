@@ -51,9 +51,9 @@ public class BomItemDetail extends BaseTimeEntity {
     @Column(name = "AMOUNT", columnDefinition = "float COMMENT '수량'", nullable = false)
     private float amount;     // 수량
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '구매처'")
-    private Client toBuy;
+//    @ManyToOne(fetch = LAZY)
+//    @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '구매처'")
+//    private Client toBuy;
 
     // 다대일 단방향
     @ManyToOne(fetch = LAZY)
@@ -77,25 +77,21 @@ public class BomItemDetail extends BaseTimeEntity {
     public void addJoin(
             BomMaster bomMaster,
             Item item,
-            Client toBuy,
             WorkProcess workProcess
     ) {
         setBomMaster(bomMaster);
         setItem(item);
-        setToBuy(toBuy);
         setWorkProcess(workProcess);
     }
 
     public void update(
             Item newItem,
-            Client newToBuy,
             WorkProcess newWorkProcess,
             BomItemDetail newBomItemDetail
     ) {
         setLevel(newBomItemDetail.level);
         setItem(newItem);
         setAmount(newBomItemDetail.amount);
-        setToBuy(newToBuy);
         setWorkProcess(newWorkProcess);
         setUseYn(newBomItemDetail.useYn);
         setNote(newBomItemDetail.note);

@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface WorkOrderBadItemRepositoryCustom {
-    Optional<BadItemEnrollmentResponse> findWorkOrderEnrollmentResponseById(Long id);
-    List<BadItemEnrollmentResponse> findWorkOrderEnrollmentResponsesByWorkOrderId(Long workOrderId);
     // 해당하는 lot 의 badItem 모두
     List<Long> findBadItemIdByLotMasterId(Long lotMasterId);
     // 작업공정에 해당하는 badItemId
@@ -34,4 +32,6 @@ public interface WorkOrderBadItemRepositoryCustom {
     List<WorkOrderBadItem> findByWorkOrderDetailIdAndBadItemId(Long workOrderDetailId, Long badItemId);
     // 설비 lot 에 해당하는 등록된 불량 전체 조회
     List<WorkOrderDetailBadItemResponse> findWorkOrderDetailBadItemResponseByEquipmentLotId(Long equipmentId);
+    // 불량유형이 불량등록 정보에 존재하는지
+    boolean existByBadItemAndDeleteYnFalse(Long badItemId);
 }

@@ -47,11 +47,11 @@ public class BomItemDetailResponse {
     @Schema(description = "수량")
     float amount;
 
-    @Schema(description = "(거래처) 고유아이디")
-    Long toBuyId;
+//    @Schema(description = "(거래처) 고유아이디")
+//    Long toBuyId;
 
     @Schema(description = "(거래처) 거래처명")
-    String toBuyName;
+    String toBuyName;   // 품목의 거래처품번
 
     // 소수점 2자리
     @Schema(description = "금액")

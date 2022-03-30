@@ -69,11 +69,16 @@ public class BomMaster extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
-    public void addJoin(Item item) {
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '작업공정'", nullable = false)
+    private WorkProcess workProcess;
+
+    public void addJoin(Item item, WorkProcess workProcess) {
         setItem(item);
+        setWorkProcess(workProcess);
     }
 
-    public void update(BomMaster newBomMaster, Item newItem) {
+    public void update(BomMaster newBomMaster, Item newItem, WorkProcess workProcess) {
         setItem(newItem);
         setBomNo(newBomMaster.bomNo);
         setStartDate(newBomMaster.startDate);
@@ -82,6 +87,7 @@ public class BomMaster extends BaseTimeEntity {
         setNote(newBomMaster.note);
         setApprovalDate(newBomMaster.approvalDate);
         setUseYn(newBomMaster.useYn);
+        setWorkProcess(workProcess);
     }
 
     public void delete() {

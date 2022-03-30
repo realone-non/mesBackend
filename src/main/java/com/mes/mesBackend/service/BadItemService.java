@@ -20,7 +20,7 @@ public interface BadItemService {
     // 불량항목 수정
     BadItemResponse updateBadItem(Long id, BadItemRequest badItemRequest) throws NotFoundException, BadRequestException;
     // 불량항목 삭제
-    void deleteBadItem(Long id) throws NotFoundException;
+    void deleteBadItem(Long id) throws NotFoundException, BadRequestException;
     // 불량항목 단일 조회 및 예외
     BadItem getBadItemOrThrow(Long id) throws NotFoundException;
 }

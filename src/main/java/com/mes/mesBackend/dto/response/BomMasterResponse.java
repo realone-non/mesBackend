@@ -3,6 +3,7 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.BomMaster;
+import com.mes.mesBackend.entity.WorkProcess;
 import com.mes.mesBackend.entity.enumeration.DevelopStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -50,6 +51,9 @@ public class BomMasterResponse {
     @Schema(description = "사용")
     Boolean useYn;
 
+    @Schema(description = "작업공정")
+    WorkProcessResponse.idAndName workProcess;
+
     public BomMasterResponse setResponse(BomMaster bomMaster) {
         setId(bomMaster.getId());
         if (bomMaster.getItem() != null) {
@@ -69,6 +73,11 @@ public class BomMasterResponse {
         setNote(bomMaster.getNote());
         setApprovalDate(bomMaster.getApprovalDate());
         setUseYn(bomMaster.isUseYn());
+        if (bomMaster.getWorkProcess() != null) {
+            WorkProcessResponse.idAndName workProcess = new WorkProcessResponse.idAndName();
+            workProcess.setId(bomMaster.getWorkProcess().getId());
+            workProcess.setWorkProcessName(bomMaster.getWorkProcess().getWorkProcessName());
+        }
         return this;
     }
 }
