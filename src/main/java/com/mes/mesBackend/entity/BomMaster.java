@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.mes.mesBackend.entity.enumeration.DevelopStatus.BEFORE;
@@ -47,11 +48,11 @@ public class BomMaster extends BaseTimeEntity {
     @Column(name = "BOM_NO", columnDefinition = "int COMMENT 'BOM번호'", nullable = false)
     private int bomNo;             // BOM번호
 
-    @Column(name = "START_DATE", columnDefinition = "datetime COMMENT '유효시작일'", nullable = false)
-    private LocalDateTime startDate;    // 유효시작일
+    @Column(name = "START_DATE", columnDefinition = "date COMMENT '유효시작일'", nullable = false)
+    private LocalDate startDate;    // 유효시작일
 
-    @Column(name = "END_DATE", columnDefinition = "datetime COMMENT '유효종료일'", nullable = false)
-    private LocalDateTime endDate;      // 유효종료일
+    @Column(name = "END_DATE", columnDefinition = "date COMMENT '유효종료일'", nullable = false)
+    private LocalDate endDate;      // 유효종료일
 
     @Enumerated(STRING)
     @Column(name = "DEVELOP_STATUS", nullable = false, columnDefinition = "varchar(255) COMMENT '개발상태'")
