@@ -1,6 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestCategory;
 import com.mes.mesBackend.entity.enumeration.TestType;
@@ -101,6 +102,9 @@ public class ItemResponse {
 
     @Schema(description = "약어명")
     String itemShortName;
+
+    @Schema(description = "품목계정타입")
+    GoodsType goodsType;
 
     @Getter
     @Setter

@@ -106,8 +106,7 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                         isWorkProcessIdEq(workProcessId),
                         isBadItemDeleteYnFalse()
                 )
-                .orderBy(workProcess.orders.asc())      // 공정 순번 별 정렬
-                .orderBy(badItem.orders.asc())          // 불량 순번 별 정렬
+                .orderBy(workProcess.orders.asc(), badItem.orders.asc())      // 공정 순번 별 정렬 , 불량 순번 별 정렬
                 .fetch();
     }
 
