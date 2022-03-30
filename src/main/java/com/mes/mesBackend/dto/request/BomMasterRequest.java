@@ -48,7 +48,8 @@ public class BomMasterRequest {
     String note;
 
     @Schema(description = "승인일시")
-    LocalDateTime approvalDate;
+    @DateTimeFormat(pattern = YYYY_MM_DD)
+    LocalDate approvalDate;
 
     @Schema(description = "사용")
     @NotNull(message = NOT_NULL)

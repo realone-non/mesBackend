@@ -3,14 +3,12 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.BomMaster;
-import com.mes.mesBackend.entity.WorkProcess;
 import com.mes.mesBackend.entity.enumeration.DevelopStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
@@ -47,7 +45,7 @@ public class BomMasterResponse {
 
     @Schema(description = "승인일시")
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
-    LocalDateTime approvalDate;
+    LocalDate approvalDate;
 
     @Schema(description = "사용")
     Boolean useYn;
