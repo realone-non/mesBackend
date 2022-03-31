@@ -106,7 +106,7 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                                         purchaseInput.validDate.as("validDate"),
                                         testCriteria.testCriteria.as("testCriteria"),
                                         item.inspectionType.as("inspectionType"),   // 검사방법 ex) 샘플링
-                                        purchaseInput.urgentYn.as("urgentYn"),
+                                        purchaseInput.inputTestYn.as("inputTestYn"),
                                         purchaseInput.testReportYn.as("testReportYn"),
                                         purchaseInput.coc.as("coc"),
                                         item.lotType.lotType.as("lotType")
@@ -178,7 +178,7 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                                 purchaseInput.validDate.as("validDate"),
                                 testCriteria.testCriteria.as("testCriteria"),
                                 item.inspectionType.as("inspectionType"),   // 검사방법 ex) 샘플링
-                                purchaseInput.urgentYn.as("urgentYn"),
+                                purchaseInput.inputTestYn.as("inputTestYn"),
                                 purchaseInput.testReportYn.as("testReportYn"),
                                 purchaseInput.coc.as("coc"),
                                 purchaseInput.clientLotNo.as("clientLotNo"),

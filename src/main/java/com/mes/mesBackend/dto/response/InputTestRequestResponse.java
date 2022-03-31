@@ -72,8 +72,8 @@ public class InputTestRequestResponse {
     @Schema(description = "검사기준")
     String testCriteria;
 
-    @Schema(description = "긴급여부")
-    Boolean urgentYn;
+    @Schema(description = "수입검사여부")
+    Boolean inputTestYn;
 
     @Schema(description = "시험성적서")
     Boolean testReportYn;
@@ -115,7 +115,7 @@ public class InputTestRequestResponse {
 //            setWorkOrderNo(null);
             setCoc(null);
             setTestReportYn(null);
-            setUrgentYn(null);
+            setInputTestYn(null);
         } else if (inputTestDivision.equals(PRODUCT)) {
             setOutsourcingInputNo(null);
             setPurchaseInputNo(null);
@@ -123,7 +123,7 @@ public class InputTestRequestResponse {
             setTestCriteria(null);
             setCoc(null);
             setTestReportYn(null);
-            setUrgentYn(null);
+            setInputTestYn(null);
         }
         return this;
     }

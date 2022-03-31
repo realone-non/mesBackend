@@ -97,7 +97,7 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
                 purchaseInput.getPurchaseRequest().getItem(),
                 purchaseInput.getPurchaseRequest().getPurchaseOrder().getWareHouse(),
                 purchaseInput,
-                purchaseInput.getInputAmount(),
+                purchaseInputRequest.isInputTestYn() ? 0 : purchaseInput.getInputAmount(),      // 수입검사여부가 true 면
                 purchaseInput.getInputAmount(),
                 purchaseInputRequest.isProcessYn()
         );
@@ -139,11 +139,13 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
         LotMaster lotMaster = getLotMasterOrThrow(findPurchaseInput);
         // 해당 lot 사용된거면 수정 불가능
         throwIfLotMasterCreateAmountEqualStockAmount(lotMaster);
+        // 해당 lot 가 부품수입검사에 등록이 되어있으면 inputTestYn 수정 불가능, 부품수입검사에 등록 되어있는지 체크
+        throwIfLotMasterCheckRequestAmount(lotMaster.getCheckRequestAmount(), findPurchaseInput.isInputTestYn(), purchaseInputUpdateRequest.isInputTestYn());
 
         PurchaseInput newPurchaseInput = mapper.toEntity(purchaseInputUpdateRequest, PurchaseInput.class);
         findPurchaseInput.put(newPurchaseInput);
 
-        lotMaster.updatePurchaseInput(findPurchaseInput.getInputAmount());
+        lotMaster.updatePurchaseInput(findPurchaseInput.getInputAmount(), purchaseInputUpdateRequest.isInputTestYn() ? 0 : findPurchaseInput.getInputAmount());
         lotMasterRepo.save(lotMaster);
 
         // 구매요청에 입고일시 생성
@@ -155,9 +157,18 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
         return getPurchaseInputDetailResponse(purchaseRequestId, purchaseInputId);
     }
 
+    // 부품수입검사에 등록 되어있는지 체크
+    private void throwIfLotMasterCheckRequestAmount(int checkRequestAmount, boolean findInputTestYn, boolean newInputTestYn) throws BadRequestException {
+        if (findInputTestYn != newInputTestYn) {
+            if (checkRequestAmount != 0) {
+                throw new BadRequestException("해당 구매입고는 이미 부품검사의뢰에 등록 되어있으므로 수입검사여부 수정 불가능합니다.");
+            }
+        }
+    }
+
     // 해당 lot 사용된거면 수정 불가능
     private void throwIfLotMasterCreateAmountEqualStockAmount(LotMaster lotMaster) throws BadRequestException {
-        if (lotMaster.getCreatedAmount() != lotMaster.getStockAmount()) throw new BadRequestException("해당 LOT 는 사용된 LOT 이므로 삭제, 수정이 불가합니다.");
+        if (lotMaster.getInputAmount() != 0) throw new BadRequestException("해당 LOT 는 사용된 LOT 이므로 삭제, 수정이 불가합니다.");
     }
 
     // 구매입고 LOT 삭제

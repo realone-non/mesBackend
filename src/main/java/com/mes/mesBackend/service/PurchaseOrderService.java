@@ -31,7 +31,7 @@ public interface PurchaseOrderService {
     // 구매발주상세 전체 조회
     List<PurchaseOrderDetailResponse> getPurchaseOrderDetails(Long purchaseOrderId) throws NotFoundException;
     // 구매발주상세 수정
-    PurchaseOrderDetailResponse updatePurchaseOrderDetail(Long purchaseOrderId, Long purchaseOrderDetailId, String note) throws NotFoundException, BadRequestException;
+    PurchaseOrderDetailResponse updatePurchaseOrderDetail(Long purchaseOrderId, Long purchaseOrderDetailId, String note, boolean inputTestYn) throws NotFoundException, BadRequestException;
     // 구매발주상세 삭제
     void deletePurchaseOrderDetail(Long purchaseOrderId, Long purchaseOrderDetailId) throws NotFoundException, BadRequestException;
 

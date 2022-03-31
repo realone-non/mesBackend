@@ -208,7 +208,7 @@ public class PurchaseOrderController {
     // 구매발주상세 수정
     @PatchMapping("/{purchase-order-id}/purchase-order-details/{purchase-order-detail-id}")
     @ResponseBody()
-    @Operation(summary = "구매발주상세 수정", description = "비고 필드만 수정 할 수 있음.")
+    @Operation(summary = "구매발주상세 수정", description = "비고, 수입검사여부 필드만 수정 할 수 있음.")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -220,9 +220,10 @@ public class PurchaseOrderController {
             @PathVariable(value = "purchase-order-id") @Parameter(description = "구매발주 id") Long purchaseOrderId,
             @PathVariable(value = "purchase-order-detail-id") @Parameter(description = "구매발주상세(구매요청) id") Long purchaseOrderDetailId,
             @RequestParam(required = false) @Parameter(description = "비고") String note,
+            @RequestParam(required = false) @Parameter(description = "수입검사여부") boolean inputTestYn,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        PurchaseOrderDetailResponse purchaseOrderDetail = purchaseOrderService.updatePurchaseOrderDetail(purchaseOrderId, purchaseOrderDetailId, note);
+        PurchaseOrderDetailResponse purchaseOrderDetail = purchaseOrderService.updatePurchaseOrderDetail(purchaseOrderId, purchaseOrderDetailId, note, inputTestYn);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + purchaseOrderDetail.getId() + " from updatePurchaseOrderDetail.");
         return new ResponseEntity<>(purchaseOrderDetail, OK);

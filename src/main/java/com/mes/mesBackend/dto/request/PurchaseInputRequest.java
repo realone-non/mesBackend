@@ -25,9 +25,9 @@ public class PurchaseInputRequest {
     @Schema(description = "유효일자")
     LocalDate validDate;
 
-    @Schema(description = "긴급여부")
+    @Schema(description = "수입검사여부")
     @NotNull(message = NOT_NULL)
-    boolean urgentYn = false;
+    boolean inputTestYn;
 
     @Schema(description = "시험성적서")
     @NotNull(message = NOT_NULL)
@@ -69,7 +69,7 @@ public class PurchaseInputRequest {
 
         @Schema(description = "긴급여부")
         @NotNull(message = NOT_NULL)
-        boolean urgentYn = false;
+        boolean inputTestYn;
 
         @Schema(description = "시험성적서")
         @NotNull(message = NOT_NULL)

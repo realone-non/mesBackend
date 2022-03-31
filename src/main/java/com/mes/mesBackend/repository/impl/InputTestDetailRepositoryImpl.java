@@ -86,7 +86,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                                 testCriteria.testCriteria.as("testCriteria"),
                                 wareHouse.wareHouseName.as("warehouse"),
                                 inputTestRequest.requestAmount.as("requestAmount"),
-                                purchaseInput.urgentYn.as("urgentYn"),
+                                purchaseInput.inputTestYn.as("inputTestYn"),
                                 purchaseInput.testReportYn.as("testReportYn"),
                                 purchaseInput.coc.as("coc"),
                                 lotMaster.enrollmentType.as("enrollmentType"),
