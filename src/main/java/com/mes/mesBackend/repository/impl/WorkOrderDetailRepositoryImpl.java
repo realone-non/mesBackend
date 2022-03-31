@@ -726,15 +726,13 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isItemGroupEq(itemGroupId),
                         isProduceOrderNoContain(produceOrderNo),
                         isWorkOrderNoContain(workOrderNo),
-                        isItemNoAndItemNameContain(itemNoAndItemName),
                         isWorkOrderStartDateBetween(fromDate, toDate),
                         isDeleteYnFalse(),
                         workOrderDetail.orderState.ne(SCHEDULE),
-//                        workOrderDetail.orderState.eq(ONGOING),
                         workProcess.workProcessDivision.notIn(MATERIAL_INPUT),  // 공정 자제입고 제외
                         workProcess.workProcessDivision.notIn(SHIPMENT)         // 공정 출하 제외
                 )
-                .orderBy(workOrderDetail.startDate.desc())
+                .orderBy(workOrderDetail.startDate.desc(), workProcess.orders.asc())
                 .fetch();
     }
 
@@ -748,6 +746,46 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 )
                 .fetch();
     }
+
+    @Override
+    public List<WorkOrderBadItemStatusResponse> findWorkOrderBadItemStatusResponseByCondition(
+            Long workProcessId,
+            String workOrderNo,
+            String itemNoAndItemName,
+            Long userId,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                WorkOrderBadItemStatusResponse.class,
+                                workOrderDetail.id.as("workOrderId"),
+                                workOrderDetail.orderNo.as("workOrderNo"),
+                                workProcess.id.as("workProcessId"),
+                                workProcess.workProcessName.as("workProcessName"),
+                                user.id.as("userId"),
+                                user.korName.as("userKorName"),
+                                workOrderDetail.productionAmount.as("productionAmount")
+                        )
+                )
+                .from(workOrderDetail)
+                .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
+                .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
+                .where(
+                        isWorkProcessIdEq(workProcessId),
+                        isWorkOrderNoContain(workOrderNo),
+                        isUserId(userId),
+                        isWorkOrderStartDateBetween(fromDate, toDate),
+                        isDeleteYnFalse(),
+                        workOrderDetail.orderState.ne(SCHEDULE),    // 진행중, 완료만 조회
+                        workProcess.workProcessDivision.notIn(MATERIAL_INPUT),  // 공정 자제입고 제외
+                        workProcess.workProcessDivision.notIn(SHIPMENT)         // 공정 출하 제외
+                )
+                .orderBy(workOrderDetail.startDate.desc(), workProcess.orders.asc())
+                .fetch();
+    }
+
 
     // 작업지시 startDate 조회
     private BooleanExpression isWorkOrderStartDateBetween(LocalDate fromDate, LocalDate toDate) {
@@ -766,7 +804,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
 
     // 작업자
     private BooleanExpression isUserId(Long userId) {
-        return workOrderDetail.user.id.eq(userId);
+        return userId != null ? user.id.eq(userId) : null;
     }
 
     // 작업예정일 기준
