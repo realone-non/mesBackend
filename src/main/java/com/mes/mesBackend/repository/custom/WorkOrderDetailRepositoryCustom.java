@@ -115,4 +115,11 @@ public interface WorkOrderDetailRepositoryCustom {
 
     //Shortage용 날짜 기준 등록된 작업지시 가져오기
     List<WorkOrderDetail> findByWorkDate(LocalDate stdDate);
+
+    // ====================================== 작업지시 불량률 조회 =================================
+
+    // 작업지시 불량률 정보 리스트 조회(지시상태 완료, 진행중만 조회)
+    // 현재 완료, 진행중인 작업지시만 조회, 검색조건: 공정 id, 작업지시 번호, 품번|품명, 작업자 id, 작업기간 fromDate~toDate
+    List<WorkOrderBadItemStatusResponse> findWorkOrderBadItemStatusResponseByCondition(Long workProcessId, String workOrderNo, String itemNoAndItemName, Long userId, LocalDate fromDate, LocalDate toDate);
+
 }

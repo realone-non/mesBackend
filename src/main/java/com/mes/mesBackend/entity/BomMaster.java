@@ -61,8 +61,8 @@ public class BomMaster extends BaseTimeEntity {
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;            // 비고
 
-    @Column(name = "APPROVAL_DATE", columnDefinition = "datetime COMMENT '승인일시'")
-    private LocalDateTime approvalDate;     // 승인일시
+    @Column(name = "APPROVAL_DATE", columnDefinition = "date COMMENT '승인일시'")
+    private LocalDate approvalDate;     // 승인일시
 
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;      //  사용여부

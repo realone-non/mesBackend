@@ -95,6 +95,7 @@ public class ItemServiceImpl implements ItemService {
                 if (res.getId().equals(item.getId())) {
                     res.getItemAccountCode().setItemAccountId(item.getItemAccountCode().getItemAccount().getId());
                     res.getItemAccountCode().setId(item.getItemAccountCode().getId());
+                    res.setGoodsType(item.getItemAccount().getGoodsType());
                 }
             }
         }

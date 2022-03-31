@@ -69,4 +69,11 @@ public class BadItemWorkOrderResponse {
         String itemNo;
         String itemName;
     }
+
+    public void set(BadItemWorkOrderResponse.subDto subDto) {
+        setItemNo(subDto.getItemNo());
+        setItemName(subDto.getItemName());
+        setBadAmount(subDto.getBadAmount());
+        setProductionAmount(subDto.getCreateAmount());
+    }
 }

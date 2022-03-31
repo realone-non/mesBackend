@@ -1,9 +1,6 @@
 package com.mes.mesBackend.repository.impl;
 
-import com.mes.mesBackend.dto.response.BadItemEnrollmentResponse;
-import com.mes.mesBackend.dto.response.PopBadItemTypeResponse;
-import com.mes.mesBackend.dto.response.PopTestBadItemResponse;
-import com.mes.mesBackend.dto.response.WorkOrderDetailBadItemResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.WorkOrderBadItemRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -106,8 +103,7 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                         isWorkProcessIdEq(workProcessId),
                         isBadItemDeleteYnFalse()
                 )
-                .orderBy(workProcess.orders.asc())      // 공정 순번 별 정렬
-                .orderBy(badItem.orders.asc())          // 불량 순번 별 정렬
+                .orderBy(workProcess.orders.asc(), badItem.orders.asc())      // 공정 순번 별 정렬 , 불량 순번 별 정렬
                 .fetch();
     }
 
@@ -155,24 +151,19 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
 
     // dummyLot 에 해당하는 불량유형 별 불량수량
     @Override
-    public List<BadItemEnrollmentResponse> findByDummyLotIdGroupByBadItemType(Long dummyLotId) {
+    public List<WorkOrderBadItemStatusDetailResponse> findByDummyLotIdGroupByBadItemType(Long dummyLotId) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
-                                BadItemEnrollmentResponse.class,
-                                workOrderBadItem.workOrderDetail.id.as("workOrderId"),
+                                WorkOrderBadItemStatusDetailResponse.class,
                                 badItem.id.as("badItemId"),
                                 badItem.badItemName.as("badItemName"),
-                                workOrderBadItem.badItemAmount.sum().as("badItemAmount"),
-                                badItem.workProcess.id.as("workProcessId"),
-                                workProcess.workProcessName.as("workProcessName")
+                                workOrderBadItem.badItemAmount.sum().as("badItemAmount")
                         )
                 )
                 .from(workOrderBadItem)
                 .leftJoin(lotEquipmentConnect).on(lotEquipmentConnect.childLot.id.eq(workOrderBadItem.lotMaster.id))
                 .leftJoin(badItem).on(badItem.id.eq(workOrderBadItem.badItem.id))
-                .leftJoin(workProcess).on(workProcess.id.eq(badItem.workProcess.id))
-                .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(workOrderBadItem.workOrderDetail.id))
                 .groupBy(lotEquipmentConnect.parentLot.id)
                 .groupBy(workOrderBadItem.badItem.id)
                 .where(

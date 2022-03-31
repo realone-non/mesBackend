@@ -1,9 +1,6 @@
 package com.mes.mesBackend.service;
 
-import com.mes.mesBackend.dto.response.BadItemEnrollmentResponse;
-import com.mes.mesBackend.dto.response.BadItemWorkOrderResponse;
-import com.mes.mesBackend.dto.response.WorkOrderDetailBadItemResponse;
-import com.mes.mesBackend.dto.response.WorkOrderDetailResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 
@@ -34,6 +31,11 @@ public interface BadItemEnrollmentService {
     // 작업완료 상세 리스트 별 불량정보 삭제
     void deleteBadItemEnrollment(Long workOrderId, Long equipmentLotId, Long badItemEnrollmentId) throws NotFoundException, BadRequestException;
 
+    // ====================================== 작업지시 불량률 조회 =================================
+    // 작업지시 불량률 조회
+    List<WorkOrderBadItemStatusResponse> getWorkOrderBadItems(Long workProcessId, String workOrderNo, String itemNoAndItemName, Long userId, LocalDate fromDate, LocalDate toDate) throws NotFoundException;
+    // 작업지시 불량률 상세 조회
+    List<WorkOrderBadItemStatusDetailResponse> getWorkOrderBadItemDetails(Long workOrderId) throws NotFoundException;
 
 //    // 불량유형 정보 생성
 //    BadItemEnrollmentResponse createBadItemEnrollment(Long workOrderId, Long badItemId, int badItemAmount) throws NotFoundException, BadRequestException;
