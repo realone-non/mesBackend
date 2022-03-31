@@ -9,19 +9,17 @@ import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.BadItemEnrollmentService;
 import com.mes.mesBackend.service.BadItemService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.tool.schema.extract.internal.SequenceInformationExtractorNoOpImpl;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.DUMMY_LOT;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.EQUIPMENT_LOT;
+import static com.mes.mesBackend.helper.Constants.DECIMAL_POINT_2;
+import static com.mes.mesBackend.helper.Constants.PERCENT;
 
 // 8-5. 불량 등록
 @Service
@@ -67,12 +65,13 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
             Long dummyLotId = lotLog.getLotMaster().getId();
             BadItemWorkOrderResponse.subDto subDto = lotMasterRepo.findLotMaterByDummyLotIdAndWorkProcessId(dummyLotId, workProcessId)
                     .orElseThrow(() -> new NotFoundException("[데이터오류] lotLog 에 등록된 lotMaster(id: " + dummyLotId + ") 가 lotEquipmentConnect parentLot 로 등록되지 않았습니다."));
-            response.setItemNo(subDto.getItemNo());
-            response.setItemName(subDto.getItemName());
-            response.setBadAmount(subDto.getBadAmount());
-            response.setProductionAmount(subDto.getCreateAmount());
+            response.set(subDto);
         }
-        return workOrderResponses;
+
+        if (itemNoAndItemName != null)
+            return workOrderResponses.stream().filter(f -> f.getItemNo().contains(itemNoAndItemName) || f.getItemName().contains(itemNoAndItemName)).collect(Collectors.toList());
+        else
+            return workOrderResponses;
     }
 
     // 작업지시 별 작업완료 상세 리스트
@@ -251,6 +250,59 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
         int dummyLotBadItemSum = workOrderBadItemRepo.findBadItemAmountByDummyLotMaster(dummyLot.getId()).stream().mapToInt(Integer::intValue).sum();
         dummyLot.setBadItemAmount(dummyLotBadItemSum);
         lotMasterRepo.save(dummyLot);
+    }
+
+
+    // ====================================== 작업지시 불량률 조회 =================================
+    // 작업지시 불량률 정보 리스트 조회(지시상태 완료, 진행중만 조회)
+    // 현재 완료, 진행중인 작업지시만 조회, 검색조건: 공정 id, 작업지시 번호, 품번|품명, 작업자 id, 작업기간 fromDate~toDate
+    @Override
+    public List<WorkOrderBadItemStatusResponse> getWorkOrderBadItems(
+            Long workProcessId,
+            String workOrderNo,
+            String itemNoAndItemName,
+            Long userId,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) throws NotFoundException {
+        List<WorkOrderBadItemStatusResponse> responses =
+                workOrderDetailRepo.findWorkOrderBadItemStatusResponseByCondition(workProcessId, workOrderNo, itemNoAndItemName, userId, fromDate, toDate);
+        for (WorkOrderBadItemStatusResponse response : responses) {
+            Long workOrder = response.getWorkOrderId();
+            Long workProcess = response.getWorkProcessId();
+            // dummyLot 를 찾기위한 Lotlog
+            LotLog lotLog = lotLogRepository.findLotLogByWorkOrderIdAndWorkProcessId(workOrder, workProcess)
+                    .orElseThrow(() -> new NotFoundException("[데이터오류] 공정 완료된 작업지시가 LotLog 에 등록되지 않았습니다."));
+            // dummyLot
+            Long dummyLotId = lotLog.getLotMaster().getId();
+            BadItemWorkOrderResponse.subDto subDto = lotMasterRepo.findLotMaterByDummyLotIdAndWorkProcessId(dummyLotId, workProcess)
+                    .orElseThrow(() -> new NotFoundException("[데이터오류] lotLog 에 등록된 lotMaster(id: " + dummyLotId + ") 가 lotEquipmentConnect parentLot 로 등록되지 않았습니다."));
+            // 품목정보 및 불량률 계산
+            response.setRateCalculationAndItem(subDto);
+        }
+
+        // itemNoAndItemName 검색 필터링
+        if (itemNoAndItemName != null) {
+            return responses.stream().filter(f -> f.getItemNo().contains(itemNoAndItemName) || f.getItemName().contains(itemNoAndItemName)).collect(Collectors.toList());
+        } else
+            return responses;
+
+//        return responses.stream().filter(f -> f.getItemNo().contains(itemNoAndItemName)).collect(Collectors.toList());
+    }
+
+    // 작업지시 상세 불량률 조회
+    @Override
+    public List<WorkOrderBadItemStatusDetailResponse> getWorkOrderBadItemDetails(Long workOrderId) throws NotFoundException {
+        WorkOrderDetail workOrder = getWorkOrderDetailOrThrow(workOrderId);
+        // dummyLot 를 찾기위한 Lotlog
+        LotLog lotLog = lotLogRepository.findLotLogByWorkOrderIdAndWorkProcessId(workOrder.getId(), workOrder.getWorkProcess().getId())
+                .orElseThrow(() -> new NotFoundException("[데이터오류] 공정 완료된 작업지시가 LotLog 에 등록되지 않았습니다."));
+        LotMaster dummyLot = lotLog.getLotMaster();
+        List<WorkOrderBadItemStatusDetailResponse> responses = workOrderBadItemRepo.findByDummyLotIdGroupByBadItemType(dummyLot.getId());
+
+        return responses.stream().map(m ->
+                m.setRateCalculation(dummyLot.getCreatedAmount(), dummyLot.getBadItemAmount())
+        ).collect(Collectors.toList());
     }
 
     // 작업지시 불량정보 단일 조회 및 예외

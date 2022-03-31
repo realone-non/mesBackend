@@ -107,10 +107,10 @@ public class PopRecycleServiceImpl implements PopRecycleService {
                 break;
             }
         }
-
+        PopRecycleResponse badAmountByWorkProcess = lotMasterRepository.findBadAmountByWorkProcess(workProcess.getId(), item.getId());
         PopRecycleCreateResponse response = new PopRecycleCreateResponse();
         response.setLotNo(lotmaster.getLotNo());
-        response.setRecycleAmount(request.getAmount());
+        response.setRecycleAmount(badAmountByWorkProcess.getRecycleAmount());
 
         return response;
     }
