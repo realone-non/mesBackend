@@ -3,6 +3,7 @@ package com.mes.mesBackend.service;
 import com.mes.mesBackend.dto.request.InputTestRequestCreateRequest;
 import com.mes.mesBackend.dto.request.InputTestRequestUpdateRequest;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
+import com.mes.mesBackend.dto.response.ItemResponse;
 import com.mes.mesBackend.entity.InputTestRequest;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
@@ -47,4 +48,8 @@ public interface InputTestRequestService {
     void deleteInputTestRequest(Long id, InputTestDivision inputTestDivision) throws NotFoundException, BadRequestException;
     // 검사의뢰 단일 조회 및 예외
     InputTestRequest getInputTestRequestOrThrow(Long id, InputTestDivision inputTestDivision) throws NotFoundException;
+    // 검사의뢰 가능한 품목조회
+    List<ItemResponse.noAndName> getInputTestRequestItems();
+    // 검사의뢰 가능한 lotMaster 조회
+    List<InputTestRequestResponse> getInputTestRequestLotMasters(Long itemId);
 }

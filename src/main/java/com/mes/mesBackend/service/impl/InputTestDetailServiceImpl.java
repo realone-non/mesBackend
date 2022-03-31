@@ -16,7 +16,6 @@ import com.mes.mesBackend.helper.S3Uploader;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.InputTestDetailRepository;
 import com.mes.mesBackend.repository.InputTestRequestRepository;
-import com.mes.mesBackend.repository.LotLogRepository;
 import com.mes.mesBackend.repository.LotMasterRepository;
 import com.mes.mesBackend.service.InputTestDetailService;
 import com.mes.mesBackend.service.InputTestRequestService;
@@ -30,10 +29,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.OUT_SOURCING;
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.PART;
 import static com.mes.mesBackend.entity.enumeration.InputTestState.*;
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.BAD_AMOUNT;
-import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 
 // 14-2. 검사 등록
 // 15-2. 검사 등록
@@ -49,7 +48,6 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
     private final LotMasterRepository lotMasterRepo;
     private final S3Uploader s3Uploader;
     private final AmountHelper amountHelper;
-    private final LotLogRepository lotLogRepository;
 
     // 검사요청정보 리스트 조회
     // 검색조건: 창고 id, 품명|품목, 완료여부, 입고번호, 품목그룹 id, LOT 유형 id, 요청기간 from~toDate, 제조사 id
@@ -123,9 +121,9 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
         // lotMaster 의 검사수량 변경
         // 재고수량(양품수량), 불량수량(부적합수량), 검사수량(총검사수량) 변경
         lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
-                lotMaster.getStockAmount() - inputIncongruityAmount,
-                lotMaster.getBadItemAmount() + inputTestDetail.getIncongruityAmount(),
-                lotMaster.getCheckAmount() + inputTestDetail.getTestAmount()
+                lotMaster.getStockAmount() + inputFairQualityAmount,
+                lotMaster.getBadItemAmount() + inputIncongruityAmount,
+                lotMaster.getCheckAmount() + inputTestAmount
         );
 
         lotMasterRepo.save(lotMaster);
@@ -200,9 +198,6 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
         User newUser = userService.getUserOrThrow(inputTestDetailRequest.getUserId());
         findInputTestDetail.update(newInputTestDetail, newUser);
 
-        int allIncongruityAmount = lotMaster.getBadItemAmount();        // 총 부적합 수량
-        int allFairQualityAmount = lotMaster.getStockAmount();          // 총 양품수량
-
         // 검사요청에 해당하는 총 검사수량이 lotMaster 의 checkRequestAmount 와 같으면 COMPLETION
         if (((allTestAmount - findTestAmount) + newTestAmount) == lotMaster.getCheckRequestAmount()) inputTestRequest.setInputTestState(COMPLETION);
         else inputTestRequest.setInputTestState(ONGOING);
@@ -212,9 +207,10 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
 
         // 3. lotMaster 의 검사수량 변경
         // 재고수량(수정된 양품수량), 불량수량(수정된 부적합수량), 검사수량(수정된 검사수량) 변경
+
         lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
-                (allFairQualityAmount + findIncongruityAmount) - newIncongruityAmount,
-                (allIncongruityAmount - findIncongruityAmount) + newIncongruityAmount,
+                (lotMaster.getStockAmount() - findFairQualityAmount) + newFairQualityAmount,
+                (lotMaster.getBadItemAmount() - findIncongruityAmount) + newIncongruityAmount,
                 (lotMaster.getCheckAmount() - findTestAmount) + newTestAmount
         );
 
@@ -235,13 +231,13 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
         findInputTestDetail.delete();
 
         int findTestAmount = findInputTestDetail.getTestAmount();
-        int findIncongruityAmount = findInputTestDetail.getIncongruityAmount();
-        int findFairQualityAmount = findInputTestDetail.getFairQualityAmount();
+        int findIncongruityAmount = findInputTestDetail.getIncongruityAmount();     // 부적합수량
+        int findFairQualityAmount = findInputTestDetail.getFairQualityAmount();     // 양품수량
 
         // lotMaster 재고수량, 불량수량, 검사수량 변경
         LotMaster lotMaster = inputTestRequest.getLotMaster();
         lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
-                lotMaster.getStockAmount() + findIncongruityAmount,
+                lotMaster.getStockAmount() - findFairQualityAmount,
                 lotMaster.getBadItemAmount() - findIncongruityAmount,
                 lotMaster.getCheckAmount() - findTestAmount
         );

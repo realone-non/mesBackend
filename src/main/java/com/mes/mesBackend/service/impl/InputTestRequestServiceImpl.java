@@ -3,6 +3,7 @@ package com.mes.mesBackend.service.impl;
 import com.mes.mesBackend.dto.request.InputTestRequestCreateRequest;
 import com.mes.mesBackend.dto.request.InputTestRequestUpdateRequest;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
+import com.mes.mesBackend.dto.response.ItemResponse;
 import com.mes.mesBackend.entity.InputTestRequest;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
@@ -23,7 +24,6 @@ import java.util.stream.Collectors;
 
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
 import static com.mes.mesBackend.entity.enumeration.InspectionType.NONE;
-import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 import static com.mes.mesBackend.helper.Constants.PRODUCT_ITEM_ACCOUNT;
 
 // 15-1. 외주수입검사의뢰 등록
@@ -186,11 +186,23 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
         lotMasterRepo.save(findLotMaster);
     }
 
-    // lotMaster 의 재고수량 갯수만큼만 요청수량을 등록 할 수 있음.
-    // 요청수량 재고수량 비교
+    // lotMaster 의 생성수량 갯수만큼만 요청수량을 등록 할 수 있음.
+    // 요청수량 생성수량 비교
     private void throwIfRequestAmountGreaterThanInputAmount(Long lotId, int requestAmount) throws BadRequestException {
-        Integer stockAmountFromLotMaster = inputTestRequestRepo.findLotMasterStockAmountByLotMasterId(lotId);
-        if (requestAmount > stockAmountFromLotMaster)
-            throw new BadRequestException("입력한 요청수량은 LOT 의 재고수량보다 많으므로 생성할 수 없습니다. 요청수량을 LOT 재고수량보다 같거나 적게 입력해주세요.");
+        Integer createAmountFromLotMaster = inputTestRequestRepo.findLotMasterCreataeAmountByLotMasterId(lotId);
+        if (requestAmount > createAmountFromLotMaster)
+            throw new BadRequestException("입력한 요청수량은 LOT 의 생성수량 많으므로 생성할 수 없습니다. 요청수량을 LOT 생성수량 보다 같거나 적게 입력해주세요.");
+    }
+
+    // 검사의뢰 가능한 품목조회
+    @Override
+    public List<ItemResponse.noAndName> getInputTestRequestItems() {
+        return inputTestRequestRepo.findInputTestRequestPossibleItems(PART);
+    }
+
+    // 검사의뢰 가능한 lotMaster 조회
+    @Override
+    public List<InputTestRequestResponse> getInputTestRequestLotMasters(Long itemId) {
+        return inputTestRequestRepo.findInputTestRequestPossibleLotMasters(itemId);
     }
 }
