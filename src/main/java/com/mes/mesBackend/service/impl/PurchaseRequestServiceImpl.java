@@ -217,7 +217,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
             ProduceRequestBomDetail detail = new ProduceRequestBomDetail();
             responses.add(detail.converter(item1));
         }
-        return responses.stream().filter(f -> !f.getGoodsType().equals(HALF_PRODUCT)).collect(Collectors.toList());
+        return responses.stream().filter(f -> !f.getGoodsType().equals(HALF_PRODUCT) && !f.getGoodsType().equals(PRODUCT)).collect(Collectors.toList());
     }
 
     // 제조 오더 단일 조회 및 예외
