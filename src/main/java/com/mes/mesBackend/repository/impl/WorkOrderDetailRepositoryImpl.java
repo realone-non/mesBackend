@@ -330,9 +330,6 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workProcess.workProcessName.as("workProcess"),
                                 workLine.workLineName.as("workLine"),
                                 workOrderDetail.orderState.as("orderState"),
-                                item.itemNo.as("itemNo"),
-                                item.itemName.as("itemName"),
-                                itemAccount.account.as("itemAccount"),
                                 contract.periodDate.as("periodDate"),
                                 workOrderDetail.orderAmount.as("orderAmount"),
                                 workOrderDetail.productionAmount.as("productionAmount"),
@@ -348,13 +345,12 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
                 .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
                 .leftJoin(item).on(item.id.eq(contractItem.item.id))
-                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
                 .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
                 .where(
                         isWorkProcessIdEq(workProcessId),
                         isWorkLineIdEq(workLineId),
                         isProduceOrderNoContain(produceOrderNo),
-                        isItemAccountIdEq(itemAccountId),
+//                        isItemAccountIdEq(itemAccountId),
                         isOrderStateEq(orderState),
                         isWorkDateBetween(fromDate, toDate),
                         isContractNoContain(contractNo),
