@@ -3,6 +3,7 @@ package com.mes.mesBackend.controller;
 import com.mes.mesBackend.dto.request.InputTestRequestCreateRequest;
 import com.mes.mesBackend.dto.request.InputTestRequestUpdateRequest;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
+import com.mes.mesBackend.dto.response.ItemResponse;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -154,5 +155,30 @@ public class OutsourcingInputTestRequestController {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteOutsourcingInputTestRequest.");
         return new ResponseEntity(NO_CONTENT);
+    }
+
+    @GetMapping("/items")
+    @ResponseBody
+    @Operation(summary = "검사의뢰 가능한 품목조회", description = "")
+    public ResponseEntity<List<ItemResponse.noAndName>> getInputTestRequestItems(
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<ItemResponse.noAndName> responses = inputTestRequestService.getInputTestRequestItems(OUT_SOURCING);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getInputTestRequestItems.");
+        return new ResponseEntity<>(responses, OK);
+    }
+
+    @GetMapping("/lot-masters")
+    @ResponseBody
+    @Operation(summary = "검사의뢰 가능한 lotMaster 조회", description = "")
+    public ResponseEntity<List<InputTestRequestResponse>> getInputTestRequestLotMasters(
+            @RequestParam @Parameter(description = "품목 id") Long itemId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<InputTestRequestResponse> responses = inputTestRequestService.getInputTestRequestLotMasters(itemId, OUT_SOURCING);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getInputTestRequestLotMasters.");
+        return new ResponseEntity<>(responses, OK);
     }
 }

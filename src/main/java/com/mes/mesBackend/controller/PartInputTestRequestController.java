@@ -30,6 +30,7 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.InputTestDivision.OUT_SOURCING;
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.PART;
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
@@ -163,7 +164,7 @@ public class PartInputTestRequestController {
     public ResponseEntity<List<ItemResponse.noAndName>> getInputTestRequestItems(
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<ItemResponse.noAndName> responses = inputTestRequestService.getInputTestRequestItems();
+        List<ItemResponse.noAndName> responses = inputTestRequestService.getInputTestRequestItems(PART);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getInputTestRequestItems.");
         return new ResponseEntity<>(responses, OK);
@@ -176,7 +177,7 @@ public class PartInputTestRequestController {
             @RequestParam @Parameter(description = "품목 id") Long itemId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<InputTestRequestResponse> responses = inputTestRequestService.getInputTestRequestLotMasters(itemId);
+        List<InputTestRequestResponse> responses = inputTestRequestService.getInputTestRequestLotMasters(itemId, PART);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getInputTestRequestLotMasters.");
         return new ResponseEntity<>(responses, OK);

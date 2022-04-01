@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import static com.mes.mesBackend.helper.Constants.DECIMAL_POINT_2;
+import static com.mes.mesBackend.helper.Constants.PERCENT;
 
 @Getter
 @Setter
@@ -56,6 +57,6 @@ public class WorkOrderBadItemStatusResponse {
         setBadItemAmount(subDto.getBadAmount());
         setStockAmount(subDto.getCreateAmount() - subDto.getBadAmount());
         // 둘째짜리까지 보여주고 반올림(String.format 으로 소수점 자르면 자동으로 반올림 됨)
-        setBadRatePerProductionAmount(String.format(DECIMAL_POINT_2, (float) badItemAmount / productionAmount * 100));
+        setBadRatePerProductionAmount(String.format(DECIMAL_POINT_2, (float) badItemAmount / productionAmount * 100) + PERCENT);
     }
 }

@@ -60,7 +60,8 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                         payType.id.as("payTypeId"),
                                         payType.payType.as("payType"),
                                         purchaseOrder.requestedShipping.as("requestedShipping"),
-                                        purchaseOrder.specialNote.as("specialNote")
+                                        purchaseOrder.specialNote.as("specialNote"),
+                                        purchaseRequest.inputTestYn.as("inputTestYn")
                                 )
                         )
                         .from(purchaseOrder)
@@ -113,7 +114,8 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 payType.id.as("payTypeId"),
                                 payType.payType.as("payType"),
                                 purchaseOrder.requestedShipping.as("requestedShipping"),
-                                purchaseOrder.specialNote.as("specialNote")
+                                purchaseOrder.specialNote.as("specialNote"),
+                                purchaseRequest.inputTestYn.as("inputTestYn")
                         )
                 )
                 .from(purchaseOrder)

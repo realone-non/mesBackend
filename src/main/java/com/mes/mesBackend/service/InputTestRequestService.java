@@ -49,7 +49,7 @@ public interface InputTestRequestService {
     // 검사의뢰 단일 조회 및 예외
     InputTestRequest getInputTestRequestOrThrow(Long id, InputTestDivision inputTestDivision) throws NotFoundException;
     // 검사의뢰 가능한 품목조회
-    List<ItemResponse.noAndName> getInputTestRequestItems();
+    List<ItemResponse.noAndName> getInputTestRequestItems(InputTestDivision inputTestDivision);
     // 검사의뢰 가능한 lotMaster 조회
-    List<InputTestRequestResponse> getInputTestRequestLotMasters(Long itemId);
+    List<InputTestRequestResponse> getInputTestRequestLotMasters(Long itemId, InputTestDivision inputTestDivision);
 }

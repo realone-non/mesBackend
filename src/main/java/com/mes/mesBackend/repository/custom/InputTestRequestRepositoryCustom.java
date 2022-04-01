@@ -28,14 +28,24 @@ public interface InputTestRequestRepositoryCustom {
             LocalDate toDate,
             InputTestDivision inputTestDivision
     );
-    // LOT Master 의 재고수량
+    // LOT Master 의 생성수량
     Integer findLotMasterCreataeAmountByLotMasterId(Long lotMasterId);
+    // LOT Master 의 재고수량
+    Integer findLotMasterStockAmountByLotMasterId(Long lotMasterId);
     // 검사요청상태값 별 검사요청 조회
     Optional<InputTestRequest> findByIdAndInputTestDivisionAndDeleteYnFalse(Long inputTestRequestId, InputTestDivision inputTestDivision);
     // 해당 lotMasterId 가 검사를 완료 했는지 여부
     boolean findInputTestYnByLotMasterId(Long lotMasterId);
-    // 검사의뢰 가능한 품목정보 조회
-    List<ItemResponse.noAndName> findInputTestRequestPossibleItems(InputTestDivision inputTestDivision);
-    // 검사의뢰 가능한 lotMaster 조회
-    List<InputTestRequestResponse> findInputTestRequestPossibleLotMasters(Long itemId);
+    // 검사의뢰 가능한 품목정보 조회(구매입고)
+    List<ItemResponse.noAndName> findPartInputTestRequestPossibleItems();
+    // 검사의뢰 가능한 품목정보 조회(외주입고)
+    List<ItemResponse.noAndName> findOutsourcingInputTestRequestPossibleItems();
+    // 검사의뢰 가능한 품목정보 조회(제품검사)
+    List<ItemResponse.noAndName> findProductInputTestRequestPossibleItems();
+    // 검사의뢰 가능한 lotMaster 조회(구매입고)
+    List<InputTestRequestResponse> findPartInputTestRequestPossibleLotMasters(Long itemId);
+    // 검사의뢰 가능한 lotMatser 조회(외주입고)
+    List<InputTestRequestResponse> findOutSourcingInputTestRequestPossibleLotMasters(Long itemId);
+    // 검사의뢰 가능한 lotMaster 조회(제품검사)
+    List<InputTestRequestResponse> findProductInputTestRequestPossibleLotMasters(Long itemId);
 }
