@@ -16,7 +16,6 @@ import com.mes.mesBackend.helper.S3Uploader;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.InputTestDetailRepository;
 import com.mes.mesBackend.repository.InputTestRequestRepository;
-import com.mes.mesBackend.repository.LotLogRepository;
 import com.mes.mesBackend.repository.LotMasterRepository;
 import com.mes.mesBackend.service.InputTestDetailService;
 import com.mes.mesBackend.service.InputTestRequestService;
@@ -33,7 +32,6 @@ import java.util.stream.Collectors;
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
 import static com.mes.mesBackend.entity.enumeration.InputTestState.*;
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.BAD_AMOUNT;
-import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 
 // 14-2. 검사 등록
 // 15-2. 검사 등록
@@ -49,7 +47,6 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
     private final LotMasterRepository lotMasterRepo;
     private final S3Uploader s3Uploader;
     private final AmountHelper amountHelper;
-    private final LotLogRepository lotLogRepository;
 
     // 검사요청정보 리스트 조회
     // 검색조건: 창고 id, 품명|품목, 완료여부, 입고번호, 품목그룹 id, LOT 유형 id, 요청기간 from~toDate, 제조사 id
@@ -66,19 +63,13 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
             Long manufactureId,
             InputTestDivision inputTestDivision,
             InspectionType inspectionType
-    ) throws NotFoundException {
+    ) {
         List<InputTestRequestInfoResponse> responses = inputTestDetailRepo.findInputTestRequestInfoResponseByCondition(
                 warehouseId, itemNoAndName, completionYn, purchaseInputNo, itemGroupId, lotTypeId, fromDate, toDate, manufactureId, inputTestDivision, inspectionType
         );
         for (InputTestRequestInfoResponse response : responses) {
             int testAmount = inputTestDetailRepo.findTestAmountByInputTestRequestId(response.getId()).stream().mapToInt(Integer::intValue).sum();
             response.setTestAmount(testAmount);
-//            if (inputTestDivision.equals(PRODUCT)) {
-//                // lotMaster id 로 PACKAGING 끝난 작업지시 가져옴
-//                String workOrderNo = lotLogRepository.findWorkOrderIdByLotMasterIdAndWorkProcessDivision(response.getLotMasterId(), PACKAGING)
-//                        .orElseThrow(() -> new NotFoundException("lot 에 해당하는 작업지시가 없음. 조건: 공정 PACKAGING 이 끝난 작업지시"));
-//                response.setWorkOrderNo(workOrderNo);
-//            }
         }
         return responses.stream().map(res -> res.division(inputTestDivision)).collect(Collectors.toList());
     }
@@ -122,11 +113,19 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
 
         // lotMaster 의 검사수량 변경
         // 재고수량(양품수량), 불량수량(부적합수량), 검사수량(총검사수량) 변경
-        lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
-                lotMaster.getStockAmount() - inputIncongruityAmount,
-                lotMaster.getBadItemAmount() + inputTestDetail.getIncongruityAmount(),
-                lotMaster.getCheckAmount() + inputTestDetail.getTestAmount()
-        );
+        if (inputTestDivision.equals(PART) || inputTestDivision.equals(OUT_SOURCING)) {
+            lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
+                    lotMaster.getStockAmount() + inputFairQualityAmount,
+                    lotMaster.getBadItemAmount() + inputIncongruityAmount,
+                    lotMaster.getCheckAmount() + inputTestAmount
+            );
+        } else if (inputTestDivision.equals(PRODUCT)) {
+            lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
+                    lotMaster.getStockAmount() - inputIncongruityAmount,
+                    lotMaster.getBadItemAmount() + inputTestDetail.getIncongruityAmount(),
+                    lotMaster.getCheckAmount() + inputTestDetail.getTestAmount()
+            );
+        }
 
         lotMasterRepo.save(lotMaster);
         inputTestDetailRepo.save(inputTestDetail);       // 검사상세정보 저장
@@ -212,11 +211,20 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
 
         // 3. lotMaster 의 검사수량 변경
         // 재고수량(수정된 양품수량), 불량수량(수정된 부적합수량), 검사수량(수정된 검사수량) 변경
-        lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
-                (allFairQualityAmount + findIncongruityAmount) - newIncongruityAmount,
-                (allIncongruityAmount - findIncongruityAmount) + newIncongruityAmount,
-                (lotMaster.getCheckAmount() - findTestAmount) + newTestAmount
-        );
+
+        if (inputTestDivision.equals(PART) || inputTestDivision.equals(OUT_SOURCING)) {
+            lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
+                    (lotMaster.getStockAmount() - findFairQualityAmount) + newFairQualityAmount,
+                    (lotMaster.getBadItemAmount() - findIncongruityAmount) + newIncongruityAmount,
+                    (lotMaster.getCheckAmount() - findTestAmount) + newTestAmount
+            );
+        } else if (inputTestDivision.equals(PRODUCT)) {
+            lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
+                    (allFairQualityAmount + findIncongruityAmount) - newIncongruityAmount,
+                    (allIncongruityAmount - findIncongruityAmount) + newIncongruityAmount,
+                    (lotMaster.getCheckAmount() - findTestAmount) + newTestAmount
+            );
+        }
 
         lotMasterRepo.save(lotMaster);
 
@@ -235,16 +243,25 @@ public class InputTestDetailServiceImpl implements InputTestDetailService {
         findInputTestDetail.delete();
 
         int findTestAmount = findInputTestDetail.getTestAmount();
-        int findIncongruityAmount = findInputTestDetail.getIncongruityAmount();
-        int findFairQualityAmount = findInputTestDetail.getFairQualityAmount();
+        int findIncongruityAmount = findInputTestDetail.getIncongruityAmount();     // 부적합수량
+        int findFairQualityAmount = findInputTestDetail.getFairQualityAmount();     // 양품수량
 
         // lotMaster 재고수량, 불량수량, 검사수량 변경
         LotMaster lotMaster = inputTestRequest.getLotMaster();
-        lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
-                lotMaster.getStockAmount() + findIncongruityAmount,
-                lotMaster.getBadItemAmount() - findIncongruityAmount,
-                lotMaster.getCheckAmount() - findTestAmount
-        );
+
+        if (inputTestDivision.equals(PART) || inputTestDivision.equals(OUT_SOURCING)) {
+            lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
+                    lotMaster.getStockAmount() - findFairQualityAmount,
+                    lotMaster.getBadItemAmount() - findIncongruityAmount,
+                    lotMaster.getCheckAmount() - findTestAmount
+            );
+        } else if (inputTestDivision.equals(PRODUCT)) {
+            lotMaster.putStockAmountAndBadItemAmountAndCheckAmount(
+                    lotMaster.getStockAmount() + findIncongruityAmount,
+                    lotMaster.getBadItemAmount() - findIncongruityAmount,
+                    lotMaster.getCheckAmount() - findTestAmount
+            );
+        }
 
         if (lotMaster.getCheckAmount() > 1) inputTestRequest.setInputTestState(ONGOING);
         else inputTestRequest.setInputTestState(SCHEDULE);

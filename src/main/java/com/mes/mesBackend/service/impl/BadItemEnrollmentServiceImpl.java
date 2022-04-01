@@ -286,8 +286,6 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
             return responses.stream().filter(f -> f.getItemNo().contains(itemNoAndItemName) || f.getItemName().contains(itemNoAndItemName)).collect(Collectors.toList());
         } else
             return responses;
-
-//        return responses.stream().filter(f -> f.getItemNo().contains(itemNoAndItemName)).collect(Collectors.toList());
     }
 
     // 작업지시 상세 불량률 조회

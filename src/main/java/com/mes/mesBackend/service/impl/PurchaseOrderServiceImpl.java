@@ -209,14 +209,14 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         // SCHEDULE 로 변경
         purchaseRequest.putPurchaseOrderAndOrderStateChangedOngoing(purchaseOrder);
         purchaseRequest.setOrderAmount(purchaseOrderDetailRequest.getOrderAmount());     // 발주수량 변경
+        purchaseRequest.setInputTestYn(purchaseOrderDetailRequest.isInputTestYn());      // 수입검사여부 변경
 
         if (clientIds.isEmpty()) {
             purchaseRequestRepo.save(purchaseRequest);
             Client manufacturer = purchaseRequest.getItem().getManufacturer();
             purchaseOrder.setClient(manufacturer);
             purchaseOrderRepo.save(purchaseOrder);
-        }
-        else {
+        } else {
             Client purchaseOrderClient = purchaseOrder.getClient();
             Client purchaseRequestClient = purchaseRequest.getItem().getManufacturer();
             if (purchaseRequestClient.equals(purchaseOrderClient))
@@ -263,10 +263,12 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     public PurchaseOrderDetailResponse updatePurchaseOrderDetail(
             Long purchaseOrderId,
             Long purchaseOrderDetailId,
-            String note
+            String note,
+            boolean inputTestYn
     ) throws NotFoundException, BadRequestException {
         PurchaseRequest findPurchaseRequest = getPurchaseRequestOrThrow(purchaseOrderId, purchaseOrderDetailId);
-        findPurchaseRequest.setNote(note);
+        findPurchaseRequest.setNote(note);      // 비고
+        findPurchaseRequest.setInputTestYn(inputTestYn);    // 수입검사여부
         purchaseRequestRepo.save(findPurchaseRequest);
         return getPurchaseOrderDetailResponse(purchaseOrderId, purchaseOrderDetailId);
     }

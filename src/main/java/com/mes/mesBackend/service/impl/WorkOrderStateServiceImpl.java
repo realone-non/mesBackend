@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 
@@ -36,13 +37,18 @@ public class WorkOrderStateServiceImpl implements WorkOrderStateService {
             String contractNo
     ) {
         List<WorkOrderStateResponse> responses = workOrderDetailRepo.findWorkOrderStateResponsesByCondition(workProcessId, workLineId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
-        for (WorkOrderStateResponse r : responses) {
-            Item item = r.getWorkProcessDivision().equals(PACKAGING) ? getItemOrNull(r.getItemId())
-                    : workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(r.getItemId(), r.getWorkProcessId(), null)
+        for (WorkOrderStateResponse response : responses) {
+            Item item = response.getWorkProcessDivision().equals(PACKAGING) ? getItemOrNull(response.getItemId())
+                    : workOrderDetailRepo.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(response.getItemId(), response.getWorkProcessId(), null)
                     .orElse(null);
-            if (item != null) r.setItems(item);
+            if (item != null) response.setItems(item);
         }
-        return responses;
+
+        if (itemAccountId != null) {
+            return responses.stream().filter(f -> f.getItemAccountId().equals(itemAccountId)).collect(Collectors.toList());
+        } else {
+            return responses;
+        }
     }
 
     // 품목 조회 및 없으면 null

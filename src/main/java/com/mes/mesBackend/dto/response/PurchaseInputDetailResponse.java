@@ -50,7 +50,7 @@ public class PurchaseInputDetailResponse {
     InspectionType inspectionType;     // item.inspectionType
 
     @Schema(description = "긴급여부")
-    boolean urgentYn;
+    boolean inputTestYn;
 
     @Schema(description = "시험성적서")
     boolean testReportYn;

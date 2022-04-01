@@ -190,8 +190,8 @@ public class LotMaster extends BaseTimeEntity {
         setLotNo(lotNo);
     }
 
-    public void updatePurchaseInput(int inputAmount) {
-        setStockAmount(inputAmount);
+    public void updatePurchaseInput(int inputAmount, int stockAmount) {
+        setStockAmount(stockAmount);
         setCreatedAmount(inputAmount);
     }
 

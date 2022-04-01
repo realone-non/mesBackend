@@ -1,10 +1,9 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
+import com.mes.mesBackend.dto.response.ItemResponse;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.InputTestDivision;
-import com.mes.mesBackend.entity.enumeration.InspectionType;
-import com.mes.mesBackend.entity.enumeration.TestType;
+import com.mes.mesBackend.entity.enumeration.*;
 import com.mes.mesBackend.repository.custom.InputTestRequestRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -18,7 +17,9 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.EnrollmentType.*;
 import static com.mes.mesBackend.entity.enumeration.InputTestState.COMPLETION;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 
 // 14-1. 검사의뢰 등록
 @RequiredArgsConstructor
@@ -34,6 +35,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     final QPurchaseInput purchaseInput = QPurchaseInput.purchaseInput;
     final QOutSourcingInput outSourcingInput = QOutSourcingInput.outSourcingInput;
     final QOutSourcingProductionRequest outSourcingProductionRequest = QOutSourcingProductionRequest.outSourcingProductionRequest;
+    final QPurchaseRequest purchaseRequest = QPurchaseRequest.purchaseRequest;
 
 
     // 검사의뢰등록 response 단일 조회 및 예외
@@ -61,7 +63,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                         inputTestRequest.inspectionType.as("inspectionType"),
                                         item.testType.as("testType"),
                                         testCriteria.testCriteria.as("testCriteria"),
-                                        purchaseInput.urgentYn.as("urgentYn"),
+                                        purchaseInput.inputTestYn.as("inputTestYn"),
                                         purchaseInput.testReportYn.as("testReportYn"),
                                         purchaseInput.coc.as("coc"),
                                         inputTestRequest.createdDate.as("requestDate"),
@@ -123,7 +125,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                                 wareHouse.wareHouseName.as("warehouse"),
                                 itemForm.form.as("itemForm"),
                                 testCriteria.testCriteria.as("testCriteria"),
-                                purchaseInput.urgentYn.as("urgentY"),
+                                purchaseInput.inputTestYn.as("inputTestYn"),
                                 purchaseInput.testReportYn.as("tesntReportYn"),
                                 purchaseInput.coc.as("coc"),
                                 inputTestRequest.createdDate.as("requestDate"),
@@ -152,24 +154,38 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         isInputTestRequestDeleteYnFalse(),
                         isInputTestRequestDivision(inputTestDivision),
                         isInspectionTypeEq(inspectionType),
-                        isTestTypeEq(testType)
+                        isTestTypeEq(testType),
+                        inputTestRequest.inputTestState.ne(COMPLETION)
                 )
+                .orderBy(inputTestRequest.createdDate.desc())
                 .fetch();
     }
 
-    // LOT Master 의 재고수량 (입고처리 될 때 입고수량과 같이 재고수량 insert 함)
-    // inputTestService.createInputTest
+    // LOT Master 의 생성수량
     @Override
     @Transactional(readOnly = true)
-    public Integer findLotMasterStockAmountByLotMasterId(Long lotMasterId) {
+    public Integer findLotMasterCreataeAmountByLotMasterId(Long lotMasterId) {
         return jpaQueryFactory
-                        .select(lotMaster.stockAmount)
+                        .select(lotMaster.createdAmount)
                         .from(lotMaster)
                         .where(
                                 lotMaster.id.eq(lotMasterId),
                                 lotMaster.deleteYn.isFalse()
                         )
                         .fetchOne();
+    }
+
+    // LOT Master 의 재고수량
+    @Override
+    public Integer findLotMasterStockAmountByLotMasterId(Long lotMasterId) {
+        return jpaQueryFactory
+                .select(lotMaster.stockAmount)
+                .from(lotMaster)
+                .where(
+                        lotMaster.id.eq(lotMasterId),
+                        lotMaster.deleteYn.isFalse()
+                )
+                .fetchOne();
     }
 
     // 검사요청상태값 별 검사요청 조회
@@ -221,17 +237,204 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                  )
                  .fetchFirst();
          return fetchOne != null;
-//        return Optional.ofNullable(
-//                jpaQueryFactory
-//                        .select(inputTestRequest.id)
-//                        .from(inputTestRequest)
-//                        .where(
-//                                inputTestRequest.lotMaster.id.eq(lotMasterId),
-//                                inputTestRequest.inputTestState.eq(COMPLETION),
-//                                inputTestRequest.deleteYn.isFalse()
-//                        )
-//                        .fetchOne()
-//        );
+    }
+
+    // 검사의뢰 가능한 품목정보 조회(구매입고)
+    @Override
+    public List<ItemResponse.noAndName> findPartInputTestRequestPossibleItems() {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                ItemResponse.noAndName.class,
+                                item.id.as("id"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName")
+                        )
+                )
+                .from(purchaseInput)
+                .leftJoin(lotMaster).on(lotMaster.purchaseInput.id.eq(purchaseInput.id))
+                .leftJoin(purchaseRequest).on(purchaseRequest.id.eq(purchaseInput.purchaseRequest.id))
+                .leftJoin(item).on(item.id.eq(purchaseRequest.item.id))
+                .where(
+                        purchaseInput.inputTestYn.isTrue(),
+                        purchaseInput.deleteYn.isFalse(),
+                        lotMaster.inputAmount.eq(0),
+                        lotMaster.createdAmount.ne(lotMaster.checkRequestAmount),    // lotMaster 의 생성수량과 검사요청수량이 같지 않은거
+                        lotMaster.enrollmentType.eq(PURCHASE_INPUT)
+                )
+                .groupBy(item.id)
+                .fetch();
+    }
+
+    // 검사의뢰 가능한 품목정보 조회(외주입고)
+    @Override
+    public List<ItemResponse.noAndName> findOutsourcingInputTestRequestPossibleItems() {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                ItemResponse.noAndName.class,
+                                item.id.as("id"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName")
+                        )
+                )
+                .from(outSourcingInput)
+                .leftJoin(lotMaster).on(lotMaster.outSourcingInput.id.eq(outSourcingInput.id))
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .where(
+//                        outSourcingInput.inputTestYn.isTrue(),
+                        outSourcingInput.deleteYn.isFalse(),
+                        lotMaster.inputAmount.eq(0),
+                        lotMaster.createdAmount.ne(lotMaster.checkRequestAmount),    // lotMaster 의 생성수량과 검사요청수량이 같지 않은거
+                        lotMaster.enrollmentType.eq(OUTSOURCING_INPUT)
+                )
+                .groupBy(item.id)
+                .fetch();
+    }
+
+    // 검사의뢰 가능한 품목정보 조회(제품검사)
+    @Override
+    public List<ItemResponse.noAndName> findProductInputTestRequestPossibleItems() {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                ItemResponse.noAndName.class,
+                                item.id.as("id"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName")
+                        )
+                )
+                .from(lotMaster)
+                .where(
+                        lotMaster.lotMasterDivision.eq(REAL_LOT),
+                        lotMaster.deleteYn.isFalse(),
+                        lotMaster.stockAmount.ne(0),
+                        lotMaster.createdAmount.ne(lotMaster.checkRequestAmount),
+                        lotMaster.enrollmentType.eq(PRODUCTION)
+                )
+                .fetch();
+    }
+
+    // 검사의뢰 가능한 lotMaster 조회(구매입고)
+    @Override
+    public List<InputTestRequestResponse> findPartInputTestRequestPossibleLotMasters(Long itemId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                InputTestRequestResponse.class,
+                                lotMaster.id.as("lotId"),
+                                lotMaster.lotNo.as("lotNo"),
+                                purchaseInput.id.as("purchaseInputNo"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                item.manufacturerPartNo.as("itemManufacturerPartNo"), // 제조사품번: 품목의 제조사품번
+                                client.clientName.as("manufacturerName"),   // 제조사: 품목의 제조사
+                                wareHouse.wareHouseName.as("warehouse"),
+                                itemForm.form.as("itemForm"),
+                                item.testType.as("testType"),
+                                testCriteria.testCriteria.as("testCriteria"),
+                                purchaseInput.inputTestYn.as("inputTestYn"),
+                                purchaseInput.testReportYn.as("testReportYn"),
+                                purchaseInput.coc.as("coc"),
+                                lotMaster.checkRequestAmount.as("requestAmount"),
+                                lotMaster.checkAmount.as("checkAmount")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(purchaseInput).on(purchaseInput.id.eq(lotMaster.purchaseInput.id))
+                .leftJoin(purchaseRequest).on(purchaseRequest.id.eq(purchaseInput.purchaseRequest.id))
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(client).on(client.id.eq(item.manufacturer.id))
+                .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
+                .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))
+                .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
+                .where(
+                        item.id.eq(itemId),
+                        lotMaster.deleteYn.isFalse(),
+                        lotMaster.createdAmount.ne(lotMaster.checkRequestAmount),
+                        lotMaster.inputAmount.eq(0),
+                        lotMaster.enrollmentType.eq(PURCHASE_INPUT)
+                )
+                .fetch();
+    }
+
+    // 검사의뢰 가능한 lotMatser 조회(외주입고)
+    @Override
+    public List<InputTestRequestResponse> findOutSourcingInputTestRequestPossibleLotMasters(Long itemId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                InputTestRequestResponse.class,
+                                lotMaster.id.as("lotId"),
+                                lotMaster.lotNo.as("lotNo"),
+                                outSourcingInput.id.as("outsourcingInputNo"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                item.manufacturerPartNo.as("itemManufacturerPartNo"), // 제조사품번: 품목의 제조사품번
+                                client.clientName.as("manufacturerName"),   // 제조사: 품목의 제조사
+                                wareHouse.wareHouseName.as("warehouse"),
+                                itemForm.form.as("itemForm"),
+                                item.testType.as("testType"),
+                                testCriteria.testCriteria.as("testCriteria"),
+                                lotMaster.checkRequestAmount.as("requestAmount"),
+                                lotMaster.checkAmount.as("checkAmount")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
+                .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
+                .leftJoin(outSourcingProductionRequest).on(outSourcingProductionRequest.id.eq(outSourcingInput.productionRequest.id))
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(client).on(client.id.eq(item.manufacturer.id))
+                .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
+                .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))
+                .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
+                .where(
+                        item.id.eq(itemId),
+                        lotMaster.deleteYn.isFalse(),
+                        lotMaster.createdAmount.ne(lotMaster.checkRequestAmount),
+                        lotMaster.inputAmount.eq(0),
+                        lotMaster.enrollmentType.eq(OUTSOURCING_INPUT)
+                )
+                .fetch();
+    }
+
+    // 검사의뢰 가능한 lotMatser 조회(제품검사)
+    @Override
+    public List<InputTestRequestResponse> findProductInputTestRequestPossibleLotMasters(Long itemId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                InputTestRequestResponse.class,
+                                lotMaster.id.as("lotId"),
+                                lotMaster.lotNo.as("lotNo"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                item.manufacturerPartNo.as("itemManufacturerPartNo"), // 제조사품번: 품목의 제조사품번
+                                client.clientName.as("manufacturerName"),   // 제조사: 품목의 제조사
+                                wareHouse.wareHouseName.as("warehouse"),
+                                itemForm.form.as("itemForm"),
+                                item.testType.as("testType"),
+                                lotMaster.checkRequestAmount.as("requestAmount"),
+                                lotMaster.checkAmount.as("checkAmount")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(client).on(client.id.eq(item.manufacturer.id))
+                .leftJoin(wareHouse).on(wareHouse.id.eq(lotMaster.wareHouse.id))
+                .leftJoin(itemForm).on(itemForm.id.eq(item.itemForm.id))
+                .leftJoin(testCriteria).on(testCriteria.id.eq(item.testCriteria.id))
+                .where(
+                        item.id.eq(itemId),
+                        lotMaster.deleteYn.isFalse(),
+                        lotMaster.createdAmount.ne(lotMaster.checkRequestAmount),
+                        lotMaster.inputAmount.eq(0),
+                        lotMaster.lotMasterDivision.eq(REAL_LOT),
+                        lotMaster.stockAmount.ne(0),
+                        lotMaster.enrollmentType.eq(PRODUCTION)
+                )
+                .fetch();
     }
 
     // 창고 id
