@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
+import com.mes.mesBackend.dto.response.ProductionPerformanceResponse;
 import com.mes.mesBackend.entity.ProduceOrder;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 
@@ -22,4 +23,12 @@ public interface ProduceOrderRepositoryCustom {
 
     //제조 오더 조회(Shortage)
     ProduceOrder findByIdforShortage(Long id);
+
+    // 생산실적 조회
+    List<ProductionPerformanceResponse> findProductionPerformanceResponseByCondition(
+            LocalDate fromDate,
+            LocalDate toDate,
+            Long itemGroupId,
+            String itemNoOrItemName
+    );
 }

@@ -42,7 +42,7 @@ public class PopServiceImpl implements PopService {
     private final ItemRepository itemRepository;
     private final LotMasterService lotMasterService;
     private final WorkOrderStateHelper workOrderStateHelper;
-    private final ProductionPerformanceHelper productionPerformanceHelper;
+//    private final ProductionPerformanceHelper productionPerformanceHelper;
     private final LotLogHelper lotLogHelper;
     private final WorkOrderUserLogRepository workOrderUserLogRepo;
     private final EquipmentRepository equipmentRepository;
@@ -188,9 +188,9 @@ public class PopServiceImpl implements PopService {
 
         // 작업지시의 상태가 COMPLETION 일 경우 더 이상 추가 할 수 없음. 추가하려면 workOrderDetail 의 productionAmount(지시수량) 을 늘려야함
         // 원료혼합 공정은 제외
-        if (!workOrder.getWorkProcess().getWorkProcessDivision().equals(MATERIAL_MIXING)) {
-            throwIfWorkOrderStateIsCompletion(workOrder.getOrderState());
-        }
+//        if (!workOrder.getWorkProcess().getWorkProcessDivision().equals(MATERIAL_MIXING)) {       <- 2022.04.01 로직 없앰
+        throwIfWorkOrderStateIsCompletion(workOrder.getOrderState());
+//        }
         // 작업수량이 0 이면 예외
         throwIfProductAmountIsNotZero(productAmount);
         // 생산수량 체크
@@ -249,7 +249,7 @@ public class PopServiceImpl implements PopService {
             // workOrderDetail: 상태값 변경 및 startDate 및 endDate 변경
             // productOrder: 상태값 변경
             OrderState orderState =
-                    workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(workOrder.getOrderAmount(), productAmount + beforeProductionAmount);
+                    workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(workOrder.getOrderAmount(), productAmount + beforeProductionAmount, workProcess.getWorkProcessDivision());
             workOrderStateHelper.updateOrderState(workOrderId, orderState);
 
             // lotLog 생성
@@ -258,10 +258,19 @@ public class PopServiceImpl implements PopService {
             }
 
             if (orderState.equals(COMPLETION)) {
-                productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
+//                productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
                 if (workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING)) {
                     workOrder.setOrderState(ONGOING);
+                    workOrder.changeOrderStateDate(workOrder.getOrderState());
                     workOrderDetailRepository.save(workOrder);
+                }
+                if (workProcess.getWorkProcessDivision().equals(FILLING)) {     // 완료된 작업공정이 충진일 경우 원료혼합 지시상태도 완료로 바꾼다.
+                    WorkOrderDetail materialMixingWorkOrder = workOrderDetailRepository.findWorkOrderIsFillingByProduceOrderId(workOrder.getProduceOrder().getId())
+                            .orElseThrow(() -> new BadRequestException("해당 작업지시로 생성 된 원료혼합 공정의 작업지시가 존재하지 않습니다."));
+                    materialMixingWorkOrder.setOrderState(COMPLETION);
+                    materialMixingWorkOrder.changeOrderStateDate(materialMixingWorkOrder.getOrderState());  // 완료날짜도 변경
+                    workOrderDetailRepository.save(workOrder);
+                    workOrderStateHelper.updateOrderState(materialMixingWorkOrder.getId(), materialMixingWorkOrder.getOrderState());
                 }
             }
         } else if (workOrder.getOrderState().equals(ONGOING)) {
@@ -334,7 +343,7 @@ public class PopServiceImpl implements PopService {
 
             // workOrderDetail
             OrderState orderState =
-                    workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(workOrder.getOrderAmount(), beforeProductionAmount + productAmount);
+                    workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(workOrder.getOrderAmount(), beforeProductionAmount + productAmount, workProcess.getWorkProcessDivision());
 
             // workOrderDetail: ONGOING -> COMPLETION ? orderState update 및 endDate update
             // produceOrder: ONGOING -> COMPLETION ? orderState update
@@ -343,10 +352,19 @@ public class PopServiceImpl implements PopService {
                 // workOrderDetail: ONGOING -> COMPLETION ? orderState update 및 endDate update
                 // produceOrder: ONGOING -> COMPLETION ? orderState update
                 workOrderStateHelper.updateOrderState(workOrderId, orderState);
-                productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
+//                productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
                 if (workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING)) {
                     workOrder.setOrderState(ONGOING);
+                    workOrder.changeOrderStateDate(workOrder.getOrderState());
                     workOrderDetailRepository.save(workOrder);
+                }
+                if (workProcess.getWorkProcessDivision().equals(FILLING)) {     // 완료된 작업공정이 충진일 경우 원료혼합 지시상태도 완료로 바꾼다.
+                    WorkOrderDetail materialMixingWorkOrder = workOrderDetailRepository.findWorkOrderIsFillingByProduceOrderId(workOrder.getProduceOrder().getId())
+                            .orElseThrow(() -> new BadRequestException("해당 작업지시로 생성 된 원료혼합 공정의 작업지시가 존재하지 않습니다."));
+                    materialMixingWorkOrder.setOrderState(COMPLETION);
+                    materialMixingWorkOrder.changeOrderStateDate(materialMixingWorkOrder.getOrderState());
+                    workOrderDetailRepository.save(workOrder);
+                    workOrderStateHelper.updateOrderState(materialMixingWorkOrder.getId(), materialMixingWorkOrder.getOrderState());
                 }
             }
         }

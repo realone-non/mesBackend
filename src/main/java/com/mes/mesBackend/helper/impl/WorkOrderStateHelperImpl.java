@@ -3,6 +3,7 @@ package com.mes.mesBackend.helper.impl;
 import com.mes.mesBackend.entity.ProduceOrder;
 import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.OrderState;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.WorkOrderStateHelper;
 import com.mes.mesBackend.repository.ProduceOrderRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.MATERIAL_MIXING;
 
 // 작업지시 orderState 변경
 @Component
@@ -49,9 +51,10 @@ public class WorkOrderStateHelperImpl implements WorkOrderStateHelper {
     * 원료혼합 공정일 경우? COMPLETION 으로 변경되지 않음
     * */
     @Override
-    public OrderState findOrderStateByOrderAmountAndProductAmount(int orderAmount, int productAmount) {
+    public OrderState findOrderStateByOrderAmountAndProductAmount(int orderAmount, int productAmount, WorkProcessDivision workProcessDivision) {
         if (productAmount >= orderAmount) return COMPLETION;
         else if (productAmount == 0) return SCHEDULE;
+        else if (workProcessDivision.equals(MATERIAL_MIXING)) return ONGOING;
         else return ONGOING;
     }
 

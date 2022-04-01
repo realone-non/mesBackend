@@ -10,19 +10,22 @@ import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.NumberAutomatic;
+import com.mes.mesBackend.helper.ProductionPerformanceHelper;
 import com.mes.mesBackend.helper.WorkOrderStateHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.ItemRepository;
+import com.mes.mesBackend.repository.LotLogRepository;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
 import com.mes.mesBackend.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
-import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.*;
 
 // 6-2. 작업지시 등록
 @Service
@@ -37,6 +40,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private final NumberAutomatic numberAutomatic;
     private final WorkOrderStateHelper workOrderStateHelper;
     private final ItemRepository itemRepository;
+    private final ProductionPerformanceHelper productionPerformanceHelper;
+    private final LotLogRepository lotLogRepository;
 
     // 제조오더 정보 리스트 조회
     // 검색조건: 품목그룹 id, 품명|품번, 수주번호, 제조오더번호, 착수예정일 fromDate~endDate, 지시상태
@@ -149,8 +154,11 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             Long produceOrderId,
             Long workOrderId,
             WorkOrderUpdateRequest newWorkOrderRequest
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         WorkOrderDetail findWorkOrderDetail = getWorkOrderDetailOrThrow(workOrderId, produceOrderId);
+
+        // 생산수량이 0 일경우 지시수량을 0으로 변경 할 수 없음.
+        throwIfProductAmount(newWorkOrderRequest.getOrderAmount(), findWorkOrderDetail.getProductionAmount());
 
         WorkLine newWorkLine = workLineService.getWorkLineOrThrow(newWorkOrderRequest.getWorkLine());
         User newUser = newWorkOrderRequest.getUser() != null ? userService.getUserOrThrow(newWorkOrderRequest.getUser()) : null;
@@ -158,15 +166,38 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         WorkOrderDetail newWorkOrderDetail = mapper.toEntity(newWorkOrderRequest, WorkOrderDetail.class);
 
         // 작업지시의 상태값 구하기
-        OrderState orderState = workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(newWorkOrderRequest.getOrderAmount(), findWorkOrderDetail.getProductionAmount());
+        OrderState orderState = workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(newWorkOrderRequest.getOrderAmount(), findWorkOrderDetail.getProductionAmount(), findWorkOrderDetail.getWorkProcess().getWorkProcessDivision());
+
         findWorkOrderDetail.setOrderState(orderState);
         findWorkOrderDetail.update(newWorkOrderDetail, newWorkLine, newUser);
         workOrderDetailRepo.save(findWorkOrderDetail);
+
+        if (findWorkOrderDetail.getOrderState().equals(COMPLETION)) {
+            // 충진 공정일 경우 작업지시의 상태값이 완료로 변경 되면 같은 제조오더의 원료혼합 작업지시의 상태값도 완료로 변경한다.
+            if (findWorkOrderDetail.getWorkProcess().getWorkProcessDivision().equals(FILLING)) {
+                // 찾은 원료혼합 공정 작업지시 상태값 COMPLETION 으로 변경
+                WorkOrderDetail materialMixingWorkOrder = workOrderDetailRepo.findWorkOrderIsFillingByProduceOrderId(findWorkOrderDetail.getProduceOrder().getId())
+                        .orElse(null);
+                if (materialMixingWorkOrder != null) {      // 충진공정의 변경된 지시상태랑 원료혼합의 지시상태랑 같게 변경
+                    materialMixingWorkOrder.setOrderState(findWorkOrderDetail.getOrderState());
+                    materialMixingWorkOrder.changeOrderStateDate(materialMixingWorkOrder.getOrderState());  // 완료날짜도 변경
+                    workOrderDetailRepo.save(materialMixingWorkOrder);
+                    workOrderStateHelper.updateOrderState(materialMixingWorkOrder.getId(), materialMixingWorkOrder.getOrderState());
+                }
+            }
+        }
 
         // 작업지시 상태값, 제조오더 상태값 변경
         workOrderStateHelper.updateOrderState(findWorkOrderDetail.getId(), findWorkOrderDetail.getOrderState());
 
         return getWorkOrderResponseOrThrow(produceOrderId, workOrderId);
+    }
+
+    // 생산수량이 0 일경우 지시수량을 0으로 변경 할 수 없음.
+    private void throwIfProductAmount(int newOrderAmount, int productAmount) throws BadRequestException {
+        if (productAmount == 0) {
+            if (newOrderAmount == 0) throw new BadRequestException("생산수량이 0 일 경우 지시수량을 0으로 변경 할 수 없습니다.");
+        }
     }
 
     // 작업지시 삭제
