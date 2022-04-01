@@ -10,7 +10,7 @@ import lombok.Setter;
 @Schema(description = "생산현황, 수주현황, 출하현황, 출하완료")
 public class OperationStatusResponse {
     @Schema(description = "생산현황(작업 오더 수)")
-    int productAmount;      // 진행중인 제조오더만 갯수
+    int ongoingProduceOrderAmount;      // 진행중인 제조오더만 갯수
 
     @Schema(description = "수주현황")
     int contractAmount;      // 납기일자 오늘보다 지난거면 조회 X

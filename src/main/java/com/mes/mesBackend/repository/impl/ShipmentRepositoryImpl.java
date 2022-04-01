@@ -187,6 +187,26 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
         );
     }
 
+    // 출하일자가 오늘인거 갯수
+    @Override
+    public Optional<Long> findShipmentCountByToday(OrderState orderState) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(shipment.id.count())
+                        .from(shipment)
+                        .where(
+                                shipment.deleteYn.isFalse(),
+                                shipment.shipmentDate.between(LocalDate.now(), LocalDate.now()),
+                                isOrderStateEq(orderState)
+                        )
+                        .fetchOne()
+        );
+    }
+
+    private BooleanExpression isOrderStateEq(OrderState orderState) {
+        return orderState != null ? shipment.orderState.eq(orderState) : null;
+    }
+
     // shipment id eq
     private BooleanExpression isShipmentIdEq(Long shipmentId) {
         return shipment.id.eq(shipmentId);

@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class ContractRepositoryImpl implements ContractRepositoryCustom {
@@ -61,6 +63,21 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
                 )
                 .distinct()
                 .fetch();
+    }
+
+    // 납기일자 남은거(오늘 이후)
+    @Override
+    public Optional<Long> findContractPeriodDateByTodayAmountSum() {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(contract.id.count())
+                        .from(contract)
+                        .where(
+                                contract.deleteYn.isFalse(),
+                                contract.periodDate.after(LocalDate.now().minusDays(1))
+                        )
+                        .fetchOne()
+        );
     }
 
     // 거래처명 조회

@@ -125,14 +125,15 @@ public interface WorkOrderDetailRepositoryCustom {
     // 작업지시 불량률 정보 리스트 조회(지시상태 완료, 진행중만 조회)
     // 현재 완료, 진행중인 작업지시만 조회, 검색조건: 공정 id, 작업지시 번호, 품번|품명, 작업자 id, 작업기간 fromDate~toDate
     List<WorkOrderBadItemStatusResponse> findWorkOrderBadItemStatusResponseByCondition(Long workProcessId, String workOrderNo, String itemNoAndItemName, Long userId, LocalDate fromDate, LocalDate toDate);
-
     // 대시보드
     // 현재 진행중인 제조오더의 생상수량
-    Integer findProduceOrderStateOngoingProductionAmountSum();
-
+    Optional<Long> findProduceOrderStateOngoingProductionAmountSum();
     // 제조오더에 해당하는 공정 별 endDate 조회
     LocalDateTime findWorkOrderEndDateByProduceOrderIdAndWorkProcessDivision(Long produceOrderId, WorkProcessDivision workProcessDivision);
-
     // 포장공정의 생산량
     Optional<Integer> findPackagingProductAmountByProduceOrderId(Long produceOrderId);
+    // 작업공정별 생산 정보
+    Optional<Long> findOrderStateCountByWorkProcessDivisionAndOrderState(WorkProcessDivision workProcessDivision, OrderState orderState);
+    // 작업공절별 생산수량
+    Integer findProductionAmountByWorkProcessDivision(WorkProcessDivision workProcessDivision);
 }
