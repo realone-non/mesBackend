@@ -130,4 +130,21 @@ public class LotMasterResponse {
         @Schema(description = "재고수량")
         int stockAmount;
     }
+
+    @Getter
+    @Setter
+    @Schema(description = "LOT 불량수량, 재고수량 정보")
+    public static class stockAmountAndBadItemAmount {
+        @Schema(description = "고유아이디")
+        Long id;
+
+        @Schema(description = "LOT 번호")
+        String lotNo;
+
+        @Schema(description = "재고수량")
+        int stockAmount;
+
+        @Schema(description = "불량수량")
+        int badItemAmount;
+    }
 }

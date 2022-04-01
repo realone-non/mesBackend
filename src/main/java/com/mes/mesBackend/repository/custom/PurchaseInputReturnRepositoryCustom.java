@@ -1,6 +1,8 @@
 package com.mes.mesBackend.repository.custom;
 
+import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputReturnResponse;
+import com.mes.mesBackend.entity.LotMaster;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,4 +16,6 @@ public interface PurchaseInputReturnRepositoryCustom {
     List<PurchaseInputReturnResponse> findPurchaseInputReturnResponsesByCondition(Long clientId, String itemNoOrItemName, LocalDate fromDate, LocalDate toDate);
     // LotMasterId, 분류로 구매입고반품 찾기
     PurchaseInputReturnResponse findPurchaseInputReturnByCondition(Long lotMasterId, boolean returnDivistion);
+    // 구매입고반품 가능한 lotMatser 조회
+    List<LotMasterResponse.stockAmountAndBadItemAmount> findPurchaseInputReturnPossbleLotMasters();
 }

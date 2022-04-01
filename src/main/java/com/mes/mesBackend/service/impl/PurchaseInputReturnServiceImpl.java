@@ -2,6 +2,7 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.PurchaseInputReturnCreateRequest;
 import com.mes.mesBackend.dto.request.PurchaseInputReturnUpdateRequest;
+import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputReturnResponse;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.PurchaseInputReturn;
@@ -162,5 +163,11 @@ public class PurchaseInputReturnServiceImpl implements PurchaseInputReturnServic
     private PurchaseInputReturn getPurchaseInputReturnOrThrow(Long id) throws NotFoundException {
         return purchaseInputReturnRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("purchaseInputReturn does not exist. input id: " + id));
+    }
+
+    // 구매입고반품 가능한 lotMaster 리스트 조회
+    @Override
+    public List<LotMasterResponse.stockAmountAndBadItemAmount> getPurchaseInputReturnPossibleLotMasters() {
+        return purchaseInputReturnRepo.findPurchaseInputReturnPossbleLotMasters();
     }
 }

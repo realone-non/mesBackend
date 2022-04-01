@@ -2,6 +2,7 @@ package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.PurchaseInputReturnCreateRequest;
 import com.mes.mesBackend.dto.request.PurchaseInputReturnUpdateRequest;
+import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputReturnResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -21,5 +22,6 @@ public interface PurchaseInputReturnService {
     PurchaseInputReturnResponse updatePurchaseInputReturn(Long purchaseInputReturnId, PurchaseInputReturnUpdateRequest purchaseInputReturnUpdateRequest) throws NotFoundException, BadRequestException;
     // 구매입고반품 삭제
     void deletePurchaseInputReturn(Long purchaseInputReturnId) throws NotFoundException;
-
+    // 구매입고반품 가능한 lotMaster 리스트 조회
+    List<LotMasterResponse.stockAmountAndBadItemAmount> getPurchaseInputReturnPossibleLotMasters();
 }

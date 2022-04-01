@@ -1,7 +1,9 @@
 package com.mes.mesBackend.repository.impl;
 
+import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputReturnResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.repository.custom.PurchaseInputReturnRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -12,6 +14,8 @@ import org.springframework.data.jpa.repository.query.JpaQueryCreator;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PURCHASE_INPUT;
 
 // 9-6. 구매입고 반품 등록
 @RequiredArgsConstructor
@@ -149,6 +153,29 @@ public class PurchaseInputReturnRepositoryImpl implements PurchaseInputReturnRep
                         purchaseInputReturn.deleteYn.eq(false)
                 )
                 .fetchOne();
+    }
+
+    // 구매입고반품 가능한 lotMatser 조회
+    @Override
+    public List<LotMasterResponse.stockAmountAndBadItemAmount> findPurchaseInputReturnPossbleLotMasters() {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                LotMasterResponse.stockAmountAndBadItemAmount.class,
+                                lotMaster.id.as("id"),
+                                lotMaster.lotNo.as("lotNo"),
+                                lotMaster.stockAmount.as("stockAmount"),
+                                lotMaster.badItemAmount.as("badItemAmount")
+                        )
+                )
+                .from(lotMaster)
+                .where(
+                        lotMaster.enrollmentType.eq(PURCHASE_INPUT),
+                        lotMaster.stockAmount.ne(0).or(lotMaster.badItemAmount.ne(0)),
+                        lotMaster.deleteYn.isFalse()
+
+                )
+                .fetch();
     }
 
     // 구매입고반품 리스트 검색 조회, 검색조건: 거래처 id, 품명|품목, 반품기간 fromDate~toDate
