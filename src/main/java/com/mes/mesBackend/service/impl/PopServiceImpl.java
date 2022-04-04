@@ -259,18 +259,18 @@ public class PopServiceImpl implements PopService {
 
             if (orderState.equals(COMPLETION)) {
 //                productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
-                if (workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING)) {
-                    workOrder.setOrderState(ONGOING);
-                    workOrder.changeOrderStateDate(workOrder.getOrderState());
-                    workOrderDetailRepository.save(workOrder);
-                }
-                if (workProcess.getWorkProcessDivision().equals(FILLING)) {     // 완료된 작업공정이 충진일 경우 원료혼합 지시상태도 완료로 바꾼다.
+//                if (workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING)) {
+//                    workOrder.setOrderState(ONGOING);
+//                    workOrder.changeOrderStateDate(workOrder.getOrderState());
+//                    workOrderDetailRepository.save(workOrder);
+//                }
+                // 충진공정 일 경우
+                if (workProcess.getWorkProcessDivision().equals(FILLING)) {
                     WorkOrderDetail materialMixingWorkOrder = workOrderDetailRepository.findWorkOrderIsFillingByProduceOrderId(workOrder.getProduceOrder().getId())
-                            .orElseThrow(() -> new BadRequestException("해당 작업지시로 생성 된 원료혼합 공정의 작업지시가 존재하지 않습니다."));
-                    materialMixingWorkOrder.setOrderState(COMPLETION);
-                    materialMixingWorkOrder.changeOrderStateDate(materialMixingWorkOrder.getOrderState());  // 완료날짜도 변경
-                    workOrderDetailRepository.save(workOrder);
-                    workOrderStateHelper.updateOrderState(materialMixingWorkOrder.getId(), materialMixingWorkOrder.getOrderState());
+                            .orElseThrow(() -> new BadRequestException("해당하는 제조오더에 대한 원료혼합 공정 작업지시가 존재하지 않습니다."));
+                    materialMixingWorkOrder.setOrderState(workOrder.getOrderState());
+                    materialMixingWorkOrder.changeOrderStateDate(materialMixingWorkOrder.getOrderState());
+                    workOrderDetailRepository.save(materialMixingWorkOrder);
                 }
             }
         } else if (workOrder.getOrderState().equals(ONGOING)) {
@@ -353,19 +353,19 @@ public class PopServiceImpl implements PopService {
                 // produceOrder: ONGOING -> COMPLETION ? orderState update
                 workOrderStateHelper.updateOrderState(workOrderId, orderState);
 //                productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
-                if (workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING)) {
-                    workOrder.setOrderState(ONGOING);
-                    workOrder.changeOrderStateDate(workOrder.getOrderState());
-                    workOrderDetailRepository.save(workOrder);
-                }
-                if (workProcess.getWorkProcessDivision().equals(FILLING)) {     // 완료된 작업공정이 충진일 경우 원료혼합 지시상태도 완료로 바꾼다.
-                    WorkOrderDetail materialMixingWorkOrder = workOrderDetailRepository.findWorkOrderIsFillingByProduceOrderId(workOrder.getProduceOrder().getId())
-                            .orElseThrow(() -> new BadRequestException("해당 작업지시로 생성 된 원료혼합 공정의 작업지시가 존재하지 않습니다."));
-                    materialMixingWorkOrder.setOrderState(COMPLETION);
-                    materialMixingWorkOrder.changeOrderStateDate(materialMixingWorkOrder.getOrderState());
-                    workOrderDetailRepository.save(workOrder);
-                    workOrderStateHelper.updateOrderState(materialMixingWorkOrder.getId(), materialMixingWorkOrder.getOrderState());
-                }
+//                if (workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING)) {
+//                    workOrder.setOrderState(ONGOING);
+//                    workOrder.changeOrderStateDate(workOrder.getOrderState());
+//                    workOrderDetailRepository.save(workOrder);
+//                }
+//                if (workProcess.getWorkProcessDivision().equals(FILLING)) {     // 완료된 작업공정이 충진일 경우 원료혼합 지시상태도 완료로 바꾼다.
+//                    WorkOrderDetail materialMixingWorkOrder = workOrderDetailRepository.findWorkOrderIsFillingByProduceOrderId(workOrder.getProduceOrder().getId())
+//                            .orElseThrow(() -> new BadRequestException("해당 작업지시로 생성 된 원료혼합 공정의 작업지시가 존재하지 않습니다."));
+//                    materialMixingWorkOrder.setOrderState(COMPLETION);
+//                    materialMixingWorkOrder.changeOrderStateDate(materialMixingWorkOrder.getOrderState());
+//                    workOrderDetailRepository.save(workOrder);
+//                    workOrderStateHelper.updateOrderState(materialMixingWorkOrder.getId(), materialMixingWorkOrder.getOrderState());
+//                }
             }
         }
         workOrder.setProductionAmount(beforeProductionAmount + productAmount);  // productionAmount 변경

@@ -40,8 +40,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private final NumberAutomatic numberAutomatic;
     private final WorkOrderStateHelper workOrderStateHelper;
     private final ItemRepository itemRepository;
-    private final ProductionPerformanceHelper productionPerformanceHelper;
-    private final LotLogRepository lotLogRepository;
 
     // 제조오더 정보 리스트 조회
     // 검색조건: 품목그룹 id, 품명|품번, 수주번호, 제조오더번호, 착수예정일 fromDate~endDate, 지시상태
@@ -172,19 +170,14 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         findWorkOrderDetail.update(newWorkOrderDetail, newWorkLine, newUser);
         workOrderDetailRepo.save(findWorkOrderDetail);
 
-        if (findWorkOrderDetail.getOrderState().equals(COMPLETION)) {
-            // 충진 공정일 경우 작업지시의 상태값이 완료로 변경 되면 같은 제조오더의 원료혼합 작업지시의 상태값도 완료로 변경한다.
-            if (findWorkOrderDetail.getWorkProcess().getWorkProcessDivision().equals(FILLING)) {
-                // 찾은 원료혼합 공정 작업지시 상태값 COMPLETION 으로 변경
-                WorkOrderDetail materialMixingWorkOrder = workOrderDetailRepo.findWorkOrderIsFillingByProduceOrderId(findWorkOrderDetail.getProduceOrder().getId())
-                        .orElse(null);
-                if (materialMixingWorkOrder != null) {      // 충진공정의 변경된 지시상태랑 원료혼합의 지시상태랑 같게 변경
-                    materialMixingWorkOrder.setOrderState(findWorkOrderDetail.getOrderState());
-                    materialMixingWorkOrder.changeOrderStateDate(materialMixingWorkOrder.getOrderState());  // 완료날짜도 변경
-                    workOrderDetailRepo.save(materialMixingWorkOrder);
-                    workOrderStateHelper.updateOrderState(materialMixingWorkOrder.getId(), materialMixingWorkOrder.getOrderState());
-                }
-            }
+        // 충진공정 일 경우
+        if (findWorkOrderDetail.getWorkProcess().getWorkProcessDivision().equals(FILLING)) {
+            WorkOrderDetail materialMixingWorkOrder = workOrderDetailRepo.findWorkOrderIsFillingByProduceOrderId(findWorkOrderDetail.getProduceOrder().getId())
+                    .orElseThrow(() -> new BadRequestException("해당하는 제조오더에 대한 원료혼합 공정 작업지시가 존재하지 않습니다."));
+            materialMixingWorkOrder.setOrderState(findWorkOrderDetail.getOrderState());
+            workOrderStateHelper.updateOrderState(materialMixingWorkOrder.getId(), materialMixingWorkOrder.getOrderState());
+//            materialMixingWorkOrder.changeOrderStateDate(materialMixingWorkOrder.getOrderState(), materialMixingWorkOrder.getOrderState());
+//            workOrderDetailRepo.save(materialMixingWorkOrder);
         }
 
         // 작업지시 상태값, 제조오더 상태값 변경

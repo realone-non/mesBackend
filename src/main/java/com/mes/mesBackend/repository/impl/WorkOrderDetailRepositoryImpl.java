@@ -755,7 +755,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         .where(
                                 produceOrder.id.eq(produceOrderId),                         // 제조오더 같은거
                                 workOrderDetail.deleteYn.isFalse(),                         // 삭제된거
-                                workProcess.workProcessDivision.eq(FILLING) // 충진공정만 조회
+                                workProcess.workProcessDivision.eq(MATERIAL_MIXING) // 원료혼합 공정 조회
                         )
                         .fetchOne()
         );
