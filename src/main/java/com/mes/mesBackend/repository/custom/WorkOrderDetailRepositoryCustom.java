@@ -8,6 +8,7 @@ import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -116,10 +117,23 @@ public interface WorkOrderDetailRepositoryCustom {
     //Shortage용 날짜 기준 등록된 작업지시 가져오기
     List<WorkOrderDetail> findByWorkDate(LocalDate stdDate);
 
+    // 제조오더로 원료혼합 공정인 작업지시 조회
+    Optional<WorkOrderDetail> findWorkOrderIsFillingByProduceOrderId(Long produceOrderId);
+
     // ====================================== 작업지시 불량률 조회 =================================
 
     // 작업지시 불량률 정보 리스트 조회(지시상태 완료, 진행중만 조회)
     // 현재 완료, 진행중인 작업지시만 조회, 검색조건: 공정 id, 작업지시 번호, 품번|품명, 작업자 id, 작업기간 fromDate~toDate
     List<WorkOrderBadItemStatusResponse> findWorkOrderBadItemStatusResponseByCondition(Long workProcessId, String workOrderNo, String itemNoAndItemName, Long userId, LocalDate fromDate, LocalDate toDate);
-
+    // 대시보드
+    // 현재 진행중인 제조오더의 생상수량
+    Optional<Long> findProduceOrderStateOngoingProductionAmountSum();
+    // 제조오더에 해당하는 공정 별 endDate 조회
+    LocalDateTime findWorkOrderEndDateByProduceOrderIdAndWorkProcessDivision(Long produceOrderId, WorkProcessDivision workProcessDivision);
+    // 포장공정의 생산량
+    Optional<Integer> findPackagingProductAmountByProduceOrderId(Long produceOrderId);
+    // 작업공정별 생산 정보
+    Optional<Long> findOrderStateCountByWorkProcessDivisionAndOrderState(WorkProcessDivision workProcessDivision, OrderState orderState);
+    // 작업공절별 생산수량
+    Integer findProductionAmountByWorkProcessDivision(WorkProcessDivision workProcessDivision);
 }

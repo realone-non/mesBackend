@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.PopShipmentResponse;
+import com.mes.mesBackend.dto.response.SalesRelatedStatusResponse;
 import com.mes.mesBackend.dto.response.ShipmentResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
@@ -30,6 +31,8 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
     final QShipmentItem shipmentItem = QShipmentItem.shipmentItem;
     final QShipmentLot shipmentLot = QShipmentLot.shipmentLot;
     final QLotMaster lotMaster = QLotMaster.lotMaster;
+    final QItem item = QItem.item;
+    final QContractItem contractItem = QContractItem.contractItem;
 
     // 출하 등록 리스트 조회 검색조건 : 거래처 명, 출하기간, 화폐 id, 담당자 명
     @Override
@@ -185,6 +188,83 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
                         .limit(1)
                         .fetchOne()
         );
+    }
+
+    // 출하일자가 오늘인거 갯수
+    @Override
+    public Optional<Long> findShipmentCountByToday(OrderState orderState) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(shipment.id.count())
+                        .from(shipment)
+                        .where(
+                                shipment.deleteYn.isFalse(),
+                                shipment.shipmentDate.between(LocalDate.now(), LocalDate.now()),
+                                isOrderStateEq(orderState)
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // 매출관련현황 - 제품 출고
+    // 현재 달에 가장 많이 출고 된 품목 5개
+    @Override
+    public List<SalesRelatedStatusResponse> findSalesRelatedStatusResponseByShipmentItems(LocalDate fromDate, LocalDate toDate) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                SalesRelatedStatusResponse.class,
+                                item.id.as("itemId"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName")
+                        )
+                )
+                .from(shipment)
+                .leftJoin(shipmentItem).on(shipmentItem.shipment.id.eq(shipment.id))
+                .leftJoin(shipmentLot).on(shipmentLot.shipmentItem.id.eq(shipmentItem.id))
+                .leftJoin(lotMaster).on(lotMaster.id.eq(shipmentLot.lotMaster.id))
+                .leftJoin(contractItem).on(contractItem.id.eq(shipmentItem.contractItem.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                .where(
+                        shipment.shipmentDate.between(fromDate, toDate),
+                        shipment.deleteYn.isFalse(),
+                        shipment.orderState.eq(COMPLETION),
+                        shipmentLot.deleteYn.isFalse(),
+                        shipmentItem.deleteYn.isFalse()
+                )
+                .groupBy(item.id)
+                .orderBy(lotMaster.shipmentAmount.sum().desc())
+                .limit(5)
+                .fetch();
+    }
+
+    // 주 별로 출하 된 품목 갯수
+    @Override
+    public Optional<Integer> findShipmentAmountByWeekDate(LocalDate fromDate, LocalDate toDate, Long itemId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(shipmentLot.lotMaster.shipmentAmount.sum())
+                        .from(shipment)
+                        .leftJoin(shipmentItem).on(shipmentItem.shipment.id.eq(shipment.id))
+                        .leftJoin(shipmentLot).on(shipmentLot.shipmentItem.id.eq(shipmentItem.id))
+                        .leftJoin(lotMaster).on(lotMaster.id.eq(shipmentLot.lotMaster.id))
+                        .leftJoin(contractItem).on(contractItem.id.eq(shipmentItem.contractItem.id))
+                        .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                        .where(
+                                shipment.shipmentDate.between(fromDate, toDate),
+                                shipment.deleteYn.isFalse(),
+                                shipment.orderState.eq(COMPLETION),
+                                shipmentLot.deleteYn.isFalse(),
+                                shipmentItem.deleteYn.isFalse(),
+                                lotMaster.item.id.eq(itemId)
+                        )
+                        .groupBy(item.id)
+                        .fetchOne()
+        );
+    }
+
+    private BooleanExpression isOrderStateEq(OrderState orderState) {
+        return orderState != null ? shipment.orderState.eq(orderState) : null;
     }
 
     // shipment id eq

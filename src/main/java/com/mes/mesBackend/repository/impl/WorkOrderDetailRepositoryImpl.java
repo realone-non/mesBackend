@@ -743,6 +743,24 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .fetch();
     }
 
+    // 제조오더로 원료혼합 공정인 작업지시 조회
+    @Override
+    public Optional<WorkOrderDetail> findWorkOrderIsFillingByProduceOrderId(Long produceOrderId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(workOrderDetail)
+                        .from(workOrderDetail)
+                        .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                        .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
+                        .where(
+                                produceOrder.id.eq(produceOrderId),                         // 제조오더 같은거
+                                workOrderDetail.deleteYn.isFalse(),                         // 삭제된거
+                                workProcess.workProcessDivision.eq(MATERIAL_MIXING) // 원료혼합 공정 조회
+                        )
+                        .fetchOne()
+        );
+    }
+
     @Override
     public List<WorkOrderBadItemStatusResponse> findWorkOrderBadItemStatusResponseByCondition(
             Long workProcessId,
@@ -782,6 +800,78 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .fetch();
     }
 
+    // 현재 진행중인 제조오더 개수
+    @Override
+    public Optional<Long> findProduceOrderStateOngoingProductionAmountSum() {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(produceOrder.id.count())
+                        .from(produceOrder)
+                        .where(
+                                produceOrder.deleteYn.isFalse(),
+                                produceOrder.orderState.eq(ONGOING)
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // 제조오더에 해당하는 공정 별 endDate 조회
+    @Override
+    public LocalDateTime findWorkOrderEndDateByProduceOrderIdAndWorkProcessDivision(Long produceOrderId, WorkProcessDivision workProcessDivision) {
+        return jpaQueryFactory
+                .select(workOrderDetail.endDate)
+                .from(workOrderDetail)
+                .where(
+                        workOrderDetail.produceOrder.id.eq(produceOrderId),
+                        workOrderDetail.deleteYn.isFalse(),
+                        workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision)
+                )
+                .fetchOne();
+    }
+    // 포장공정의 생산량
+    @Override
+    public Optional<Integer> findPackagingProductAmountByProduceOrderId(Long produceOrderId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(workOrderDetail.productionAmount)
+                        .from(workOrderDetail)
+                        .where(
+                                workOrderDetail.produceOrder.id.eq(produceOrderId),
+                                workOrderDetail.deleteYn.isFalse(),
+                                workOrderDetail.workProcess.workProcessDivision.eq(PACKAGING)
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // 작업공정별 생산 정보
+    @Override
+    public Optional<Long> findOrderStateCountByWorkProcessDivisionAndOrderState(WorkProcessDivision workProcessDivision, OrderState orderState) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(workOrderDetail.id.count())
+                        .from(workOrderDetail)
+                        .where(
+                                workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision),
+                                workOrderDetail.orderState.eq(orderState),
+                                workOrderDetail.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // 작업공절별 생산수량
+    @Override
+    public Integer findProductionAmountByWorkProcessDivision(WorkProcessDivision workProcessDivision) {
+        return jpaQueryFactory
+                .select(workOrderDetail.productionAmount.sum())
+                .from(workOrderDetail)
+                .where(
+                        workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision),
+                        workOrderDetail.deleteYn.isFalse()
+                )
+                .fetchOne();
+    }
 
     // 작업지시 startDate 조회
     private BooleanExpression isWorkOrderStartDateBetween(LocalDate fromDate, LocalDate toDate) {
