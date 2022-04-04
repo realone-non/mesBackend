@@ -1,5 +1,6 @@
 package com.mes.mesBackend.repository.impl;
 
+import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
 import com.mes.mesBackend.dto.response.OutsourcingInputResponse;
 import com.mes.mesBackend.dto.response.OutsourcingStatusResponse;
 import com.mes.mesBackend.entity.*;
@@ -34,22 +35,15 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                 .select(
                         Projections.fields(
                                 OutsourcingInputResponse.class,
-                                input.id.as("id"),
+                                request.id.as("id"),
                                 client.clientName.as("clientName"),
-                                request.id.as("requestNo"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
-                                input.inputDate.as("inputDate"),
-                                input.noInputAmount.as("noInputAmount"),
-                                input.inputAmount.as("inputAmount"),
-                                wareHouse.wareHouseName.as("warehouseName"),
-                                input.testRequestType.as("testRequestType"),
-                                input.note.as("note")
+                                request.inputTestYn.as("inputTestYn"),
+                                request.note.as("note")
                         )
                 )
-                .from(input)
-                .leftJoin(wareHouse).on(wareHouse.id.eq(input.inputWareHouse.id))
-                .leftJoin(request).on(request.id.eq(input.productionRequest.id))
+                .from(request)
                 .leftJoin(master).on(master.id.eq(request.bomMaster.id))
                 .leftJoin(item).on(item.id.eq(master.item.id))
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
@@ -58,11 +52,12 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                         isItemNoContaining(itemNo),
                         isItemNameContaining(itemName),
                         dateNull(startDate, endDate),
-                        input.useYn.eq(true),
-                        input.deleteYn.eq(false)
+                        request.deleteYn.isFalse(),
+                        request.useYn.isTrue()
                 )
                 .fetch();
     }
+
 
     //외주생산의뢰 단일 조회
     public Optional<OutsourcingInputResponse> findInputByIdAndDeleteYnAndUseYn(Long id){
@@ -77,7 +72,6 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
                                 input.inputDate.as("inputDate"),
-                                input.noInputAmount.as("noInputAmount"),
                                 input.inputAmount.as("inputAmount"),
                                 wareHouse.wareHouseName.as("warehouseName"),
                                 input.testRequestType.as("testRequestType"),
@@ -97,6 +91,34 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                 )
                 .fetchOne()
             );
+    }
+
+    //외주생산의뢰 ID로 외주입고 조회
+    @Transactional(readOnly = true)
+    public List<OutSourcingInput> findAllByRequestId(Long id){
+        return jpaQueryFactory
+                .selectFrom(input)
+                .where(
+                        input.deleteYn.isFalse(),
+                        input.productionRequest.id.eq(id))
+                .orderBy(input.createdDate.desc())
+                .fetch();
+    }
+
+    //외주생산의뢰 ID로 생산수량 조회
+    @Transactional(readOnly = true)
+    public Integer findAmountByRequestId(Long requestId){
+        return jpaQueryFactory
+                .select(
+                    request.productionAmount.as("amount")
+                )
+                .from(request)
+                .where(
+                        request.id.eq(requestId),
+                        request.useYn.isTrue(),
+                        request.deleteYn.isFalse()
+                )
+                .fetchOne();
     }
 
     //외주재고현황 전체 조회 검색 조건:외주처, 품목, 의뢰기간

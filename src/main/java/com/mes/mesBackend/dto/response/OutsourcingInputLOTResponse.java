@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
+import com.mes.mesBackend.entity.LotType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -26,4 +27,7 @@ public class OutsourcingInputLOTResponse {
 
     @Schema(description = "검사의뢰유형")
     TestType testRequestType;
+
+    @Schema(description = "수입검사여부")
+    Boolean inputTestYn;
 }

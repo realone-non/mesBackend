@@ -79,6 +79,9 @@ public interface LotMasterRepositoryCustom {
             Long inputEquipmentId
     );
 
+    //외주입고로 LOT 조회
+    LotMaster findByOutsourcingInput(Long outsourcingInputId);
+
     // ========================== 7-2. Lot Tracking
     // == 정방향
     // 입력된 LOT NO 로 등록된 LotConnect 모두

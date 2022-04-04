@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -128,8 +129,26 @@ public class OutsourcingServiceImpl implements OutsourcingService {
 
     //외주 입고정보 리스트조회
     public List<OutsourcingInputResponse> getOutsourcingInputList(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
-        return outsourcingInputRepository.findAllByCondition(clientId, itemNo, itemName, startDate, endDate)
-                .stream().map(OutsourcingInputResponse::setOutSourcingInputTestItemName).collect(Collectors.toList());
+        List<OutsourcingInputResponse> allByCondition = outsourcingInputRepository.findAllByCondition(clientId, itemNo, itemName, startDate, endDate);
+        for (OutsourcingInputResponse response : allByCondition) {
+            List<OutSourcingInput> allByRequestId = outsourcingInputRepository.findAllByRequestId(response.getId());
+            if(allByRequestId.size() > 0){
+                response.setInputDate(allByRequestId.get(0).getInputDate());
+                response.setInputAmount(allByRequestId.stream().mapToInt(OutSourcingInput::getInputAmount).sum());
+                if(allByRequestId.get(0).getInputWareHouse() != null){
+                    response.setWarehouseName(allByRequestId.get(0).getInputWareHouse().getWareHouseName());
+                }
+                else{
+                    response.setWarehouseName("");
+                }
+            }
+            Integer amount = outsourcingInputRepository.findAmountByRequestId(response.getId());
+//            response.setInputTestYn(allByRequestId.get(0).get);
+            response.setNoInputAmount(amount - response.getInputAmount());
+        }
+        //.stream().map(OutsourcingInputResponse::setOutSourcingInputTestItemName).collect(Collectors.toList());
+
+        return allByCondition;
     }
 
     //외주 입고정보 조회
@@ -148,37 +167,73 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     }
 
     //외주 입고정보 삭제
-    public void deleteOutsourcingInput(Long id) throws NotFoundException {
-        OutSourcingInput input = outsourcingInputRepository.findByIdAndDeleteYnFalse(id).orElseThrow(()-> new NotFoundException("outsourcingInfo not in db:" + id));;
+    public void deleteOutsourcingInput(Long requestId) throws NotFoundException {
+        OutSourcingInput input = outsourcingInputRepository.findByIdAndDeleteYnFalse(requestId).orElseThrow(()-> new NotFoundException("outsourcingInfo not in db:" + requestId));;
         input.delete();
         outsourcingInputRepository.save(input);
     }
 
-    private LotType getLotTypeOrThrow(Long id) throws NotFoundException {
-        return lotTypeRepository.findByIdAndDeleteYnFalse(id)
-                .orElseThrow(() -> new NotFoundException("lotType does not exist. input id: " + id));
-    }
-
     //외주 입고 LOT정보 등록
-    public OutsourcingInputLOTResponse createOutsourcingInputLOT(Long id, OutsourcingInputLOTRequest request)
+    public OutsourcingInputLOTResponse createOutsourcingInputLOT(Long requestId, OutsourcingInputLOTRequest request)
             throws NotFoundException, BadRequestException {
-        Optional<OutSourcingInput> input = outsourcingInputRepository.findById(id);
+
+        OutSourcingProductionRequest productionRequest = outsourcingProductionRepository.findByIdAndDeleteYnFalse(requestId)
+                .orElseThrow(() -> new NotFoundException("외주생산의뢰가 존재하지 않습니다. id: " + requestId));
+        List<OutSourcingInput> allByRequestId = outsourcingInputRepository.findAllByRequestId(requestId);
+        OutSourcingInput input = new OutSourcingInput();
+        WareHouse wareHouse = wareHouseRepository.findByIdAndDeleteYnFalse(request.getWarehouseId())
+                .orElseThrow(() -> new NotFoundException("해당 창고가 존재하지 않습니다. id: " + requestId));
+        //외주입고 생성
+        //이미 외주입고가 존재 할 경우, 기존 정보와 합침
+        if(allByRequestId.size() > 0){
+            input.setProductionRequest(productionRequest);
+            input.setInputDate(LocalDate.now());
+            input.setInputAmount(allByRequestId.stream().mapToInt(OutSourcingInput::getInputAmount).sum() + request.getInputAmount());
+            input.setInputWareHouse(wareHouse);
+            input.setInputTestYn(request.isInputTestYn());
+        }
+        //외주입고 정보가 존재 하지 않을 경우, 새롭게 생성
+        else{
+            input.setProductionRequest(productionRequest);
+            input.setInputDate(LocalDate.now());
+            input.setInputAmount(request.getInputAmount());
+            input.setInputTestYn(request.isInputTestYn());
+            input.setInputWareHouse(wareHouse);
+        }
+
+        outsourcingInputRepository.save(input);
 
         //Lot 생성
         LotMasterRequest lotMasterRequest = new LotMasterRequest();
-        lotMasterRequest.putOutsourcingInputLotRequest(
-                input.get().getProductionRequest().getBomMaster().getItem(),
-                input.get().getInputWareHouse(),
-                input.get(),
-                request.getInputAmount(),
-                input.get().getProductionRequest().getBomMaster().getItem().getLotType()
-        );
+        //수입검사여부가 true일 경우 재고 수량 0, 아닐 경우 생성 수량과 동일하게
+        if(input.getProductionRequest().isInputTestYn() == true){
+            lotMasterRequest.putOutsourcingInputLotRequest(
+                    input.getProductionRequest().getBomMaster().getItem(),
+                    input.getInputWareHouse(),
+                    input,
+                    0,
+                    request.getInputAmount(),
+                    input.getProductionRequest().getBomMaster().getItem().getLotType()
+            );
+        }
+        else{
+            lotMasterRequest.putOutsourcingInputLotRequest(
+                    input.getProductionRequest().getBomMaster().getItem(),
+                    input.getInputWareHouse(),
+                    input,
+                    request.getInputAmount(),
+                    request.getInputAmount(),
+                    input.getProductionRequest().getBomMaster().getItem().getLotType()
+            );
+        }
 
+        //LOT번호 생성
         String lotNo = lotHelper.createLotMaster(lotMasterRequest).getLotNo();
 
-        LotMaster lotMaster = lotMasterRepository.findByLotNoAndUseYnTrue(lotNo);
+        LotMaster lotMaster = lotMasterRepository.findByLotNoAndDeleteYnFalse(lotNo)
+                .orElseThrow(()-> new NotFoundException("해당 LOT번호가 존재하지 않습니다." + lotNo));
 
-        amountHelper.amountUpdate(lotMaster.getItem().getId(), input.get().getInputWareHouse().getId(), null,   ItemLogType.STORE_AMOUNT, request.getInputAmount(), true);
+        amountHelper.amountUpdate(lotMaster.getItem().getId(), input.getInputWareHouse().getId(), null,   ItemLogType.STORE_AMOUNT, request.getInputAmount(), true);
 
         OutsourcingInputLOTResponse lotResponse = new OutsourcingInputLOTResponse();
 
@@ -186,38 +241,93 @@ public class OutsourcingServiceImpl implements OutsourcingService {
         lotResponse.setLotId(lotMaster.getId());
         lotResponse.setId(lotMaster.getOutSourcingInput().getId());
         lotResponse.setLotType(lotMaster.getLotType().getLotType());
-        lotResponse.setInputAmount(lotMaster.getStockAmount());
+        lotResponse.setInputAmount(lotMaster.getCreatedAmount());
         lotResponse.setTestRequestType(lotMaster.getOutSourcingInput().getTestRequestType());
 
         return lotResponse;
     }
 
     //외주 입고 LOT정보 리스트조회
-    public List<OutsourcingInputLOTResponse> getOutsourcingInputLOTList(Long inputId){
-        return lotMasterRepository.findLotMastersByOutsourcing(inputId);
+    public List<OutsourcingInputLOTResponse> getOutsourcingInputLOTList(Long requestId) throws NotFoundException {
+        List<OutSourcingInput> inputList = outsourcingInputRepository.findAllByRequestId(requestId);
+        List<OutsourcingInputLOTResponse> lotList = new ArrayList<>();
+        for (OutSourcingInput outSourcingInput : inputList) {
+            LotMaster lotMaster = lotMasterRepository.findByOutsourcingInput(outSourcingInput.getId());
+            OutsourcingInputLOTResponse response = new OutsourcingInputLOTResponse();
+            response.setId(outSourcingInput.getId());
+            response.setLotId(lotMaster.getId());
+            response.setLotType(lotMaster.getLotType().getLotType());
+            response.setLotNo(lotMaster.getLotNo());
+            response.setInputAmount(lotMaster.getCreatedAmount());
+            response.setTestRequestType(outSourcingInput.getTestRequestType());
+            response.setInputTestYn(outSourcingInput.isInputTestYn());
+            lotList.add(response);
+        }
+        return lotList;
     }
 
     //외주 입고 LOT정보 조회
-    public OutsourcingInputLOTResponse getOutsourcingInputLOT(Long inputId, Long id) throws NotFoundException {
-        OutSourcingInput input = outsourcingInputRepository.findByIdAndDeleteYnFalse(inputId).orElseThrow(()-> new NotFoundException("outsourcinginput not in db:" + inputId));;
-        return lotMasterRepository.findLotMasterByInputAndId(input, id);
+    public OutsourcingInputLOTResponse getOutsourcingInputLOT(Long requestId, Long inputId) throws NotFoundException, BadRequestException {
+        OutSourcingInput input = outsourcingInputRepository.findByIdAndDeleteYnFalse(inputId).orElseThrow(()-> new NotFoundException("해당 입고 정보가 존재하지 않습니다:" + inputId));;
+        LotMaster lotMaster = lotMasterRepository.findByOutsourcingInput(inputId);
+        if(lotMaster == null){
+            throw new BadRequestException("해당 LOT정보가 존재하지 않습니다.");
+        }
+        OutsourcingInputLOTResponse response = new OutsourcingInputLOTResponse();
+        response.setId(input.getId());
+        response.setLotId(lotMaster.getId());
+        response.setLotType(lotMaster.getLotType().getLotType());
+        response.setLotNo(lotMaster.getLotNo());
+        response.setInputAmount(lotMaster.getCreatedAmount());
+        response.setTestRequestType(input.getTestRequestType());
+        response.setInputTestYn(input.isInputTestYn());
+
+        return response;
     }
 
     //외주 입고 LOT정보 수정
-    public OutsourcingInputLOTResponse modifyOutsourcingInputLOT(Long inputId, Long id, OutsourcingInputLOTRequest request) throws NotFoundException {
-        OutSourcingInput input = outsourcingInputRepository.findByIdAndDeleteYnFalse(inputId).orElseThrow(()-> new NotFoundException("inputInfo not in db:" + id));
-        LotMaster lotInfo = lotMasterRepository.findByIdAndDeleteYnFalse(id).orElseThrow(()-> new NotFoundException("lotinfo not in db:" + id));
-        lotInfo.setInputAmount(request.getInputAmount());
-        lotInfo.setCreatedAmount(request.getInputAmount());
-        lotInfo.setLotType(input.getProductionRequest().getBomMaster().getItem().getLotType());
-        lotMasterRepository.save(lotInfo);
-
-        return modelMapper.toResponse(lotInfo, OutsourcingInputLOTResponse.class);
+    public Long modifyOutsourcingInputLOT(Long requestId, Long inputId, OutsourcingInputLOTRequest request) throws NotFoundException, BadRequestException {
+        OutSourcingInput input = outsourcingInputRepository.findByIdAndDeleteYnFalse(inputId).orElseThrow(()-> new NotFoundException("해당 입고 정보가 존재하지 않습니다:" + inputId));
+        WareHouse wareHouse = wareHouseRepository.findByIdAndDeleteYnFalse(request.getWarehouseId()).orElseThrow(()-> new NotFoundException("해당 창고가 존재하지 않습니다:" + inputId));
+        LotMaster lotInfo = lotMasterRepository.findByOutsourcingInput(inputId);
+        if(lotInfo == null){
+            throw new BadRequestException("해당 입고 LOT정보가 존재하지 않습니다.");
+        }
+        if(input.isInputTestYn() == true){
+            if(lotInfo.getStockAmount() > 0){
+                new BadRequestException("수입검사가 진행중이거나 완료된 입고 건은 수정 할 수 없습니다.");
+            }
+            input.setInputAmount(input.getInputAmount() + (request.getInputAmount() - lotInfo.getCreatedAmount()));
+            lotInfo.setCreatedAmount(request.getInputAmount());
+            lotInfo.setLotType(input.getProductionRequest().getBomMaster().getItem().getLotType());
+            lotInfo.setWareHouse(wareHouse);
+            lotMasterRepository.save(lotInfo);
+        }
+        else{
+            if(lotInfo.getCreatedAmount() != lotInfo.getStockAmount()){
+                new BadRequestException("재고수량과 입고수량이 다를 경우 수정 할 수 없습니다.");
+            }
+            input.setInputAmount(input.getInputAmount() + (request.getInputAmount() - lotInfo.getCreatedAmount()));
+            lotInfo.setCreatedAmount(request.getInputAmount());
+            lotInfo.setStockAmount(request.getInputAmount());
+            lotInfo.setLotType(input.getProductionRequest().getBomMaster().getItem().getLotType());
+            lotInfo.setWareHouse(wareHouse);
+            lotMasterRepository.save(lotInfo);
+        }
+        return inputId;
     }
 
     //외주 입고 LOT정보 삭제
-    public void deleteOutsourcingInputLOT(Long inputId, Long id) throws NotFoundException {
-        LotMaster lotInfo = lotMasterRepository.findByIdAndDeleteYnFalse(id).orElseThrow(()-> new NotFoundException("lotinfo not in db:" + id));
+    public void deleteOutsourcingInputLOT(Long requestId, Long inputId) throws NotFoundException, BadRequestException {
+        LotMaster lotInfo = lotMasterRepository.findByOutsourcingInput(inputId);
+        if(lotInfo == null){
+            throw new BadRequestException("해당 LOT정보가 존재하지 않습니다.");
+        }
+
+        OutSourcingInput input = outsourcingInputRepository.findByIdAndDeleteYnFalse(inputId).orElseThrow(()-> new NotFoundException("외주입고정보가 존재하지 않습니다."));
+        input.setInputAmount(input.getInputAmount() - lotInfo.getCreatedAmount());
+        input.setDeleteYn(true);
+        outsourcingInputRepository.save(input);
         lotInfo.delete();
         lotMasterRepository.save(lotInfo);
     }

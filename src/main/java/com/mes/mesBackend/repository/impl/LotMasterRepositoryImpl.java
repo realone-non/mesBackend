@@ -215,7 +215,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotMaster.id.as("lotId"),
                                 lotType.lotType.as("lotType"),
                                 lotMaster.lotNo.as("lotNo"),
-                                lotMaster.stockAmount.as("inputAmount"),
+                                lotMaster.createdAmount.as("inputAmount"),
                                 outSourcingInput.testRequestType.as("testRequestType")
                         )
                 )
@@ -563,6 +563,20 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         )
                         .fetchOne()
         );
+    }
+
+    //외주입고로 LOT 조회
+    @Transactional(readOnly = true)
+    public LotMaster findByOutsourcingInput(Long outsourcingInputId){
+        return jpaQueryFactory
+                .selectFrom(lotMaster)
+                .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.id))
+                .where(
+                        lotMaster.outSourcingInput.id.eq(outsourcingInputId),
+                        isDeleteYnFalse(),
+                        lotMaster.useYn.isTrue()
+                )
+                .fetchOne();
     }
 
     // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 유효여부

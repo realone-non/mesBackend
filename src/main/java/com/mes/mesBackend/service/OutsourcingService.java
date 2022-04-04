@@ -58,19 +58,19 @@ public interface OutsourcingService {
     void deleteOutsourcingInput(Long id) throws NotFoundException;
 
     //외주 입고 LOT정보 등록
-    OutsourcingInputLOTResponse createOutsourcingInputLOT(Long id, OutsourcingInputLOTRequest request) throws NotFoundException, BadRequestException;
+    OutsourcingInputLOTResponse createOutsourcingInputLOT(Long requestId, OutsourcingInputLOTRequest request) throws NotFoundException, BadRequestException;
 
     //외주 입고 LOT정보 리스트조회
-    List<OutsourcingInputLOTResponse> getOutsourcingInputLOTList(Long inputId);
+    List<OutsourcingInputLOTResponse> getOutsourcingInputLOTList(Long requestId) throws NotFoundException;
 
     //외주 입고 LOT정보 조회
-    OutsourcingInputLOTResponse getOutsourcingInputLOT(Long inputId, Long id) throws NotFoundException;
+    OutsourcingInputLOTResponse getOutsourcingInputLOT(Long requestId, Long inputId) throws NotFoundException, BadRequestException;
 
     //외주 입고 LOT정보 수정
-    OutsourcingInputLOTResponse modifyOutsourcingInputLOT(Long inputId, Long id, OutsourcingInputLOTRequest request) throws NotFoundException;
+    Long modifyOutsourcingInputLOT(Long requestId, Long inputId, OutsourcingInputLOTRequest request) throws NotFoundException, BadRequestException;
 
     //외주 입고 LOT정보 삭제
-    void deleteOutsourcingInputLOT(Long inputId, Long id) throws NotFoundException;
+    void deleteOutsourcingInputLOT(Long requestId, Long inputId) throws NotFoundException, BadRequestException;
 
     //외주 반품 등록
     OutsourcingReturnResponse createOutsourcingReturn(OutsourcingReturnRequest request) throws NotFoundException, BadRequestException;
