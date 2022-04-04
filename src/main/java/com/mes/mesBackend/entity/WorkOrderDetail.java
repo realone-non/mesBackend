@@ -5,12 +5,13 @@ import com.querydsl.core.annotations.QueryInit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.loader.plan.build.internal.returns.AbstractEntityReference;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static com.mes.mesBackend.entity.enumeration.OrderState.SCHEDULE;
+import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -152,14 +153,14 @@ public class WorkOrderDetail extends BaseTimeEntity {
     // 지시상태 별 날짜 변경
     public void changeOrderStateDate(OrderState orderState) {
         LocalDateTime now = LocalDateTime.now();
-        switch (orderState){
+        switch (orderState) {
             case SCHEDULE:
                 setScheduleDate(now);
                 setStartDate(null);
                 setEndDate(null);
                 break;
             case ONGOING:
-                setStartDate(now);
+                if (startDate == null) setStartDate(now);
                 setEndDate(null);
                 break;
             case COMPLETION:

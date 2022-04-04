@@ -18,4 +18,5 @@ public class Constants {
     public static final String YYYYMMDD_HHMMSS_SSS = "yyyyMMdd_HHmmss_SSS";
     public static final String DECIMAL_POINT_2 = "%.2f";
     public static final String PERCENT = "%";
+    public final static String FORMAT_02 = "%02d";
 }
