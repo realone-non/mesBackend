@@ -1,5 +1,6 @@
 package com.mes.mesBackend.helper.impl;
 
+import ch.qos.logback.core.joran.conditional.IfAction;
 import com.mes.mesBackend.entity.ProduceOrder;
 import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.OrderState;
@@ -52,10 +53,12 @@ public class WorkOrderStateHelperImpl implements WorkOrderStateHelper {
     * */
     @Override
     public OrderState findOrderStateByOrderAmountAndProductAmount(int orderAmount, int productAmount, WorkProcessDivision workProcessDivision) {
-        if (productAmount >= orderAmount) return COMPLETION;
-        else if (productAmount == 0) return SCHEDULE;
-        else if (workProcessDivision.equals(MATERIAL_MIXING)) return ONGOING;
-        else return ONGOING;
+        if (workProcessDivision.equals(MATERIAL_MIXING)) return ONGOING;
+        else {
+            if (productAmount >= orderAmount) return COMPLETION;
+            else if (productAmount == 0) return SCHEDULE;
+            else return ONGOING;
+        }
     }
 
     // 제조오더에 해당되는 작업지시의 모든 지시상태

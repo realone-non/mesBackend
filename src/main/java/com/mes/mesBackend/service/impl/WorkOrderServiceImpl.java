@@ -166,6 +166,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         // 작업지시의 상태값 구하기
         OrderState orderState = workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(newWorkOrderRequest.getOrderAmount(), findWorkOrderDetail.getProductionAmount(), findWorkOrderDetail.getWorkProcess().getWorkProcessDivision());
 
+        System.out.println("=======================================================" + orderState);
         findWorkOrderDetail.setOrderState(orderState);
         findWorkOrderDetail.update(newWorkOrderDetail, newWorkLine, newUser);
         workOrderDetailRepo.save(findWorkOrderDetail);
