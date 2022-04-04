@@ -1,11 +1,14 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Getter
 @Setter
@@ -14,11 +17,9 @@ public class OutsourcingInputResponse {
     @Schema(description = "고유번호")
     Long id;
 
+    @JsonInclude(NON_NULL)
     @Schema(description = "외주처")
     String clientName;
-
-    @Schema(description = "생산요청번호")
-    Long requestNo;
 
     @Schema(description = "생산품번")
     String itemNo;
@@ -26,6 +27,7 @@ public class OutsourcingInputResponse {
     @Schema(description = "생산품명")
     String itemName;
 
+    @JsonInclude(NON_NULL)
     @Schema(description = "입고일시")
     LocalDate inputDate;
 
@@ -35,11 +37,12 @@ public class OutsourcingInputResponse {
     @Schema(description = "입고수량")
     int inputAmount;
 
+    @JsonInclude(NON_NULL)
     @Schema(description = "입고창고")
     String warehouseName;
 
-    @Schema(description = "검사의뢰유형")
-    TestType testRequestType;
+    @Schema(description = "수입검사여부")
+    boolean inputTestYn;
 
     @Schema(description = "비고")
     String note;

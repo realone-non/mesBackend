@@ -80,13 +80,14 @@ public class LotMasterRequest {
             WareHouse wareHouse,
             OutSourcingInput outSourcingInput,
             int stockAmount,
+            int createdAmount,
             LotType lotType
     ) {
         setItem(item);
         setWareHouse(wareHouse);
         setOutSourcingInput(outSourcingInput);
         setStockAmount(stockAmount);
-        setCreatedAmount(stockAmount);
+        setCreatedAmount(createdAmount);
 //        setLotType(lotType);
         setLotMasterDivision(REAL_LOT);
         setWorkProcessDivision(MATERIAL_INPUT);

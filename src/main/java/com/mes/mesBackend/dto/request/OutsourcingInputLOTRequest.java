@@ -14,6 +14,15 @@ import static com.mes.mesBackend.exception.Message.*;
 @Setter
 @Schema(description = "외주입고LOT정보")
 public class OutsourcingInputLOTRequest {
+    @Schema(description = "검사의뢰유형")
+    TestType requestTestType;
+
     @Schema(description = "입고수량")
     int inputAmount;
+
+    @Schema(description = "수입검사여부")
+    boolean inputTestYn;
+
+    @Schema(description = "입고창고")
+    Long warehouseId;
 }

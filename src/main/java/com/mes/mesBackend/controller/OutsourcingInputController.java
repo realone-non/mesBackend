@@ -44,27 +44,6 @@ public class OutsourcingInputController {
     private final Logger logger = LoggerFactory.getLogger(OutsourcingInputController.class);
     private CustomLogger cLogger;
 
-    // 외주생산입고 등록
-    @PostMapping
-    @ResponseBody
-    @Operation(summary = "외주생산입고 등록")
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "200", description = "success"),
-                    @ApiResponse(responseCode = "404", description = "not found resource"),
-                    @ApiResponse(responseCode = "400", description = "bad request")
-            }
-    )
-    public ResponseEntity<OutsourcingInputResponse> createOutsourcingInput(
-            @RequestBody @Valid OutsourcingInputRequest request,
-            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
-        OutsourcingInputResponse response = outsourcingService.createOutsourcingInput(request);
-        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + response.getId() + " from createOutsourcingInput.");
-        return new ResponseEntity<>(response, OK);
-    }
-
     // 외주 입고정보 리스트조회
     @GetMapping
     @ResponseBody
@@ -111,51 +90,8 @@ public class OutsourcingInputController {
         return new ResponseEntity<>(response, OK);
     }
 
-    // 외주 입고정보 수정
-    @Operation(summary = "외주 입고정보 수정")
-    @PatchMapping("/{id}")
-    @ResponseBody
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "200", description = "success"),
-                    @ApiResponse(responseCode = "404", description = "not found resource"),
-                    @ApiResponse(responseCode = "400", description = "bad request")
-            }
-    )
-    public ResponseEntity<OutsourcingInputResponse> modifyOutsourcingInput(
-            @PathVariable(value = "id") @Parameter(description = "입고 id") Long id,
-            @RequestBody @Valid OutsourcingInputRequest request,
-            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
-        OutsourcingInputResponse response = outsourcingService.modifyOutsourcingInput(id, request);
-        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + response.getId() + " from modifyOutsourcingInput.");
-        return new ResponseEntity<>(response, OK);
-    }
-
-    // 외주 입고정보 삭제
-    @Operation(summary = "외주 입고정보 삭제")
-    @DeleteMapping("/{id}")
-    @ResponseBody
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "200", description = "success"),
-                    @ApiResponse(responseCode = "404", description = "not found resource"),
-                    @ApiResponse(responseCode = "400", description = "bad request")
-            }
-    )
-    public ResponseEntity deleteOutsourcingInput(
-            @PathVariable(value = "id") @Parameter(description = "입고 id") Long id,
-            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
-        outsourcingService.deleteOutsourcingInput(id);
-        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteOutsourcingInput.");
-        return new ResponseEntity(NO_CONTENT);
-    }
-
     // 외주 입고 LOT 정보 등록
-    @PostMapping("/{input-id}/lot")
+    @PostMapping("/{request-id}/lot")
     @ResponseBody
     @Operation(summary = "외주 입고 LOT 정보 등록")
     @ApiResponses(
@@ -166,18 +102,18 @@ public class OutsourcingInputController {
             }
     )
     public ResponseEntity<OutsourcingInputLOTResponse> createOutsourcingInputLOT(
-            @PathVariable(value = "input-id") @Parameter(description = "입고 id") Long id,
+            @PathVariable(value = "request-id") @Parameter(description = "외주생산의뢰 id") Long requestid,
             @RequestBody @Valid OutsourcingInputLOTRequest request,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        OutsourcingInputLOTResponse response = outsourcingService.createOutsourcingInputLOT(id, request);
+        OutsourcingInputLOTResponse response = outsourcingService.createOutsourcingInputLOT(requestid, request);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + response.getId() + " from createOutsourcingInputLOT.");
         return new ResponseEntity<>(response, OK);
     }
 
     // 외주 입고정보 LOT 리스트조회
-    @GetMapping("/{input-id}/lot")
+    @GetMapping("/{request-id}/lot")
     @ResponseBody
     @Operation(summary = "외주 입고정보 리스트조회")
     @ApiResponses(
@@ -188,18 +124,18 @@ public class OutsourcingInputController {
             }
     )
     public ResponseEntity<List<OutsourcingInputLOTResponse>> getOutsourcingInputLOTList(
-            @PathVariable(value = "input-id") @Parameter(description = "입고 ID") Long id,
+            @PathVariable(value = "request-id") @Parameter(description = "외주생산의뢰 ID") Long requestid,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        List<OutsourcingInputLOTResponse> responseList = outsourcingService.getOutsourcingInputLOTList(id);
+    ) throws NotFoundException {
+        List<OutsourcingInputLOTResponse> responseList = outsourcingService.getOutsourcingInputLOTList(requestid);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of Id: " + id + " from getOutsourcingInputList.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of Id: " + requestid + " from getOutsourcingInputList.");
         return new ResponseEntity<>(responseList, OK);
     }
 
     // 외주 입고정보 LOT 조회
     @Operation(summary = "외주 입고정보 LOT 조회")
-    @GetMapping("/{input-id}/lot/{id}")
+    @GetMapping("/{request-id}/lot/{id}")
     @ResponseBody
     @ApiResponses(
             value = {
@@ -208,11 +144,11 @@ public class OutsourcingInputController {
             }
     )
     public ResponseEntity<OutsourcingInputLOTResponse> getOutsourcingInputLOT(
-            @PathVariable(value = "input-id") @Parameter(description = "입고정보 id") Long inputId,
-            @PathVariable(value = "id") @Parameter(description = "LOT id") Long id,
+            @PathVariable(value = "request-id") @Parameter(description = "외주생산의뢰 id") Long requestid,
+            @PathVariable(value = "id") @Parameter(description = "외주입고 id") Long inputId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
-        OutsourcingInputLOTResponse response = outsourcingService.getOutsourcingInputLOT(inputId, id);
+    ) throws NotFoundException, BadRequestException {
+        OutsourcingInputLOTResponse response = outsourcingService.getOutsourcingInputLOT(requestid, inputId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + response.getId() + " from getOutsourcingInput.");
         return new ResponseEntity<>(response, OK);
@@ -220,7 +156,7 @@ public class OutsourcingInputController {
 
     // 외주 입고정보 LOT 수정
     @Operation(summary = "외주 입고정보 LOT 수정")
-    @PatchMapping("/{input-id}/lot/{id}")
+    @PatchMapping("/{request-id}/lot/{id}")
     @ResponseBody
     @ApiResponses(
             value = {
@@ -229,21 +165,21 @@ public class OutsourcingInputController {
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity<OutsourcingInputLOTResponse> modifyOutsourcingInputLOT(
-            @PathVariable(value = "input-id") @Parameter(description = "입고 id") Long inputId,
-            @PathVariable(value = "id") @Parameter(description = "LOT id") Long id,
+    public ResponseEntity<Long> modifyOutsourcingInputLOT(
+            @PathVariable(value = "request-id") @Parameter(description = "외주생산의뢰 id") Long requestid,
+            @PathVariable(value = "id") @Parameter(description = "외주입고 id") Long inputId,
             @RequestBody @Valid OutsourcingInputLOTRequest request,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
-        OutsourcingInputLOTResponse response = outsourcingService.modifyOutsourcingInputLOT(inputId, id, request);
+    ) throws NotFoundException, BadRequestException {
+        Long response = outsourcingService.modifyOutsourcingInputLOT(requestid, inputId, request);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + response.getId() + " from modifyOutsourcingInputLOT.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + requestid + " from modifyOutsourcingInputLOT.");
         return new ResponseEntity<>(response, OK);
     }
 
     // 외주 입고정보 LOT 삭제
     @Operation(summary = "외주 입고정보 LOT 삭제")
-    @DeleteMapping("/{input-id}/lot/{id}")
+    @DeleteMapping("/{request-id}/lot/{id}")
         @ResponseBody
         @ApiResponses(
                 value = {
@@ -253,13 +189,13 @@ public class OutsourcingInputController {
                 }
         )
         public ResponseEntity deleteOutsourcingInputLOT(
-                @PathVariable(value = "input-id") @Parameter(description = "입고 id") Long inputId,
-                @PathVariable(value = "id") @Parameter(description = "LOT id") Long id,
+                @PathVariable(value = "request-id") @Parameter(description = "외주생산의뢰 id") Long requestid,
+                @PathVariable(value = "id") @Parameter(description = "외주입고 id") Long inputId,
                 @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
-            outsourcingService.deleteOutsourcingInputLOT(inputId, id);
+    ) throws NotFoundException, BadRequestException {
+            outsourcingService.deleteOutsourcingInputLOT(requestid, inputId);
             cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-            cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteOutsourcingInputLOT.");
+            cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + inputId + " from deleteOutsourcingInputLOT.");
         return new ResponseEntity(NO_CONTENT);
     }
 }

@@ -27,7 +27,7 @@ import java.time.LocalDate;
  * 외주 입고 LOT정보 -> 미구현
  * */
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "OUT_SOURCING_INPUT")
 @Data
 public class OutSourcingInput extends BaseTimeEntity {
@@ -43,9 +43,6 @@ public class OutSourcingInput extends BaseTimeEntity {
     @Column(name = "INPUT_DATE", nullable = false, columnDefinition = "date COMMENT '입고일시'")
     private LocalDate inputDate;                // 입고일시
 
-    @Column(name = "NO_INPUT_AMOUNT", columnDefinition = "int COMMENT '미입고수량'")
-    private int noInputAmount;                  // 미입고수량
-
     @Column(name = "INPUT_AMOUNT", columnDefinition = "int COMMENT '입고수량'")
     private int inputAmount;                    // 입고수량
 
@@ -58,6 +55,10 @@ public class OutSourcingInput extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "TEST_REQUEST_TYPE", columnDefinition = "varchar(255) COMMENT '검사의뢰유향'")
     private TestType testRequestType = TestType.NO_TEST;                  // 검사의뢰유형
+
+    //수입검사여부
+    @Column(name = "INPUT_TEST_YN", columnDefinition = "bit(1) COMMENT '수입검사여부'")
+    private boolean inputTestYn;
 
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                        // 비고
@@ -74,7 +75,6 @@ public class OutSourcingInput extends BaseTimeEntity {
         setInputDate(request.getInputDate());
         setInputAmount(request.getInputAmount());
         setNote(request.getNote());
-        setNoInputAmount(request.getNoInputAmount());
     }
 
     public void delete(){
