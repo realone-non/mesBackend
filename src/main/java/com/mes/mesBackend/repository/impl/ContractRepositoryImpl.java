@@ -1,8 +1,11 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.ClientResponse;
+import com.mes.mesBackend.dto.response.SalesRelatedStatusResponse;
 import com.mes.mesBackend.entity.Contract;
 import com.mes.mesBackend.entity.QContract;
+import com.mes.mesBackend.entity.QContractItem;
+import com.mes.mesBackend.entity.QItem;
 import com.mes.mesBackend.repository.custom.ContractRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -11,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +24,8 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     final QContract contract = QContract.contract;
+    final QContractItem contractItem = QContractItem.contractItem;
+    final QItem item = QItem.item;
 
     @Override
     @Transactional(readOnly = true)
@@ -76,6 +80,52 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
                                 contract.deleteYn.isFalse(),
                                 contract.periodDate.after(LocalDate.now().minusDays(1))
                         )
+                        .fetchOne()
+        );
+    }
+
+    // 매출관련현황 - 수주
+    @Override
+    public List<SalesRelatedStatusResponse> findSalesRelatedStatusResponseByContractItems(LocalDate fromDate, LocalDate toDate) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                SalesRelatedStatusResponse.class,
+                                item.id.as("itemId"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName")
+                        )
+                )
+                .from(contractItem)
+                .leftJoin(contract).on(contract.id.eq(contractItem.contract.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                .where(
+                        contractItem.deleteYn.isFalse(),
+                        contract.deleteYn.isFalse(),
+                        contract.contractDate.between(fromDate, toDate)
+                )
+                .groupBy(item.id)
+                .orderBy(contractItem.amount.sum().desc())
+                .limit(5)
+                .fetch();
+    }
+
+    // 주에 해당하는 품목 별 수주 갯수
+    @Override
+    public Optional<Integer> findWeekAmountByWeekDate(LocalDate fromDate, LocalDate toDate, Long itemId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(contractItem.amount.sum())
+                        .from(contractItem)
+                        .leftJoin(contract).on(contract.id.eq(contractItem.contract.id))
+                        .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                        .where(
+                                item.id.eq(itemId),
+                                contract.contractDate.between(fromDate, toDate),
+                                contract.deleteYn.isFalse(),
+                                contractItem.deleteYn.isFalse()
+                        )
+                        .groupBy(item.id)
                         .fetchOne()
         );
     }

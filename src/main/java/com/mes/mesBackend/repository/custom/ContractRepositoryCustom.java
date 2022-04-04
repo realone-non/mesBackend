@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.ClientResponse;
+import com.mes.mesBackend.dto.response.SalesRelatedStatusResponse;
 import com.mes.mesBackend.entity.Contract;
 
 import java.time.LocalDate;
@@ -14,4 +15,10 @@ public interface ContractRepositoryCustom {
     List<ClientResponse.CodeAndName> findContractClientResponse();
     // 납기일자 오늘 까지인 수주 갯수
     Optional<Long> findContractPeriodDateByTodayAmountSum();
+
+    // 매출관련현황
+    // 해당 달
+    List<SalesRelatedStatusResponse> findSalesRelatedStatusResponseByContractItems(LocalDate fromDate, LocalDate toDate);
+    // 주에 해당하는 품목 별 수주수량 갯수
+    Optional<Integer> findWeekAmountByWeekDate(LocalDate fromDate, LocalDate toDate, Long itemId);
 }

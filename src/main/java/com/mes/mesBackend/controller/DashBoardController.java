@@ -39,9 +39,9 @@ public class DashBoardController {
     private CustomLogger cLogger;
 
     @Operation(
-            summary = "생산현황, 수주현황, 출하현황, 출하완료 갯수 조회 api",
+            summary = "생산현황, 수주현황, 출하현황, 출하완료 갯수 조회",
             description = "생산현황: 현재 진행중인 제조오더 목록 갯수\t\n" +
-                    "수주현황: 오늘까지 수주된 목록 갯수 \t\n" +
+                    "수주현황: 납기일자 오늘 이후인거 갯수 \t\n" +
                     "출하현황: 출하일자 오늘인 목록 갯수 \t\n" +
                     "출하완료: 출하일자가 오늘이면서 완료된 목록 갯수"
     )
@@ -90,7 +90,7 @@ public class DashBoardController {
 
     @Operation(
             summary = "매출관련현황 - 수주",
-            description = ""
+            description = "품목 별(최대 5개) 주 단위 수주수량 합계"
     )
     @GetMapping("/contract-sales-related-status")
     @ResponseBody
@@ -105,7 +105,7 @@ public class DashBoardController {
 
     @Operation(
             summary = "매출관련현황 - 제품 생산",
-            description = ""
+            description = "품목 별(최대 5개) 주 단위 제품 생산 수량 합계"
     )
     @GetMapping("/product-sales-related-status")
     @ResponseBody
@@ -120,7 +120,7 @@ public class DashBoardController {
 
     @Operation(
             summary = "매출관련현황 - 제품출고",
-            description = ""
+            description = "품목 별(최대 5개) 출고 수량 합계"
     )
     @GetMapping("/shipment-sales-related-status")
     @ResponseBody
