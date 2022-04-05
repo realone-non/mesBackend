@@ -249,26 +249,27 @@ public class OutsourcingServiceImpl implements OutsourcingService {
 
     //외주 입고 LOT정보 리스트조회
     public List<OutsourcingInputLOTResponse> getOutsourcingInputLOTList(Long requestId) throws NotFoundException {
-        List<OutSourcingInput> inputList = outsourcingInputRepository.findAllByRequestId(requestId);
-        List<OutsourcingInputLOTResponse> lotList = new ArrayList<>();
-        for (OutSourcingInput outSourcingInput : inputList) {
-            LotMaster lotMaster = lotMasterRepository.findByOutsourcingInput(outSourcingInput.getId());
-            if(lotMaster == null){
-                break;
-            }
-            OutsourcingInputLOTResponse response = new OutsourcingInputLOTResponse();
-            response.setId(outSourcingInput.getId());
-            response.setLotId(lotMaster.getId());
-            response.setLotType(lotMaster.getLotType().getLotType());
-            response.setLotNo(lotMaster.getLotNo());
-            response.setInputAmount(lotMaster.getCreatedAmount());
-            response.setTestRequestType(outSourcingInput.getTestRequestType());
-            response.setInputTestYn(outSourcingInput.isInputTestYn());
-            response.setWarehouseId(outSourcingInput.getInputWareHouse().getId());
-            response.setWarehouseName(outSourcingInput.getInputWareHouse().getWareHouseName());
-            lotList.add(response);
-        }
-        return lotList;
+//        List<OutSourcingInput> inputList = outsourcingInputRepository.findAllByRequestId(requestId);
+//        List<OutsourcingInputLOTResponse> lotList = new ArrayList<>();
+//        for (OutSourcingInput outSourcingInput : inputList) {
+//            LotMaster lotMaster = lotMasterRepository.findByOutsourcingInput(outSourcingInput.getId());
+//            if(lotMaster == null){
+//                break;
+//            }
+//            OutsourcingInputLOTResponse response = new OutsourcingInputLOTResponse();
+//            response.setId(outSourcingInput.getId());
+//            response.setLotId(lotMaster.getId());
+//            response.setLotType(lotMaster.getLotType().getLotType());
+//            response.setLotNo(lotMaster.getLotNo());
+//            response.setInputAmount(lotMaster.getCreatedAmount());
+//            response.setTestRequestType(outSourcingInput.getTestRequestType());
+//            response.setInputTestYn(outSourcingInput.isInputTestYn());
+//            response.setWarehouseId(outSourcingInput.getInputWareHouse().getId());
+//            response.setWarehouseName(outSourcingInput.getInputWareHouse().getWareHouseName());
+//            lotList.add(response);
+//        }
+//        return lotList;
+        return outsourcingInputRepository.findOutsourcingInputLotResponseByRequestId(requestId);
     }
 
     //외주 입고 LOT정보 조회

@@ -28,4 +28,6 @@ public interface OutsourcingInputRepositoryCustom {
 
     //아이템 ID조회
     Long findItemIdByInputId(Long inputId);
+    // 외주입고 lot 정보 리스트 조회
+    List<OutsourcingInputLOTResponse> findOutsourcingInputLotResponseByRequestId(Long requestId);
 }

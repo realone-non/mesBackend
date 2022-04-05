@@ -17,6 +17,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.EnrollmentType.OUTSOURCING_INPUT;
+
 @RequiredArgsConstructor
 public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositoryCustom {
 
@@ -28,6 +30,8 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
     final QClient client = QClient.client;
     final QWareHouse wareHouse = QWareHouse.wareHouse;
     final QLotMaster lotMaster = QLotMaster.lotMaster;
+    final QLotType lotType = QLotType.lotType1;
+
 
     //외주 입고 정보 검색 조건:외주처, 품목, 입고기간
     public List<OutsourcingInputResponse> findAllByCondition(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
@@ -147,7 +151,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                         isItemNameContaining(itemName),
                         lotMaster.useYn.eq(true),
                         lotMaster.deleteYn.eq(false),
-                        lotMaster.enrollmentType.eq(EnrollmentType.OUTSOURCING_INPUT)
+                        lotMaster.enrollmentType.eq(OUTSOURCING_INPUT)
                 )
                 .groupBy(item.itemName)
                 .fetch();
@@ -166,6 +170,38 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                     input.id.eq(inputId)
                 )
                 .fetchOne();
+    }
+
+    // 외주입고 lot 정보 리스트 조회
+    @Override
+    public List<OutsourcingInputLOTResponse> findOutsourcingInputLotResponseByRequestId(Long requestId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                OutsourcingInputLOTResponse.class,
+                                input.id.as("id"),
+                                lotMaster.id.as("lotId"),
+                                lotType.lotType.as("lotType"),
+                                lotMaster.lotNo.as("lotNo"),
+                                lotMaster.createdAmount.as("inputAmount"),
+                                input.testRequestType.as("testRequestType"),
+                                input.inputTestYn.as("inputTestYn"),
+                                wareHouse.id.as("warehouseId"),
+                                wareHouse.wareHouseName.as("warehouseName")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(input).on(input.id.eq(lotMaster.outSourcingInput.id))
+                .leftJoin(request).on(request.id.eq(input.productionRequest.id))
+                .leftJoin(wareHouse).on(wareHouse.id.eq(input.inputWareHouse.id))
+                .leftJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
+                .where(
+                        request.id.eq(requestId),
+                        input.deleteYn.isFalse(),
+                        lotMaster.deleteYn.isFalse(),
+                        lotMaster.enrollmentType.eq(OUTSOURCING_INPUT)
+                )
+                .fetch();
     }
 
     private BooleanExpression clientNull(Long clientId){
