@@ -3,7 +3,9 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
 import com.mes.mesBackend.dto.response.ItemResponse;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.*;
+import com.mes.mesBackend.entity.enumeration.InputTestDivision;
+import com.mes.mesBackend.entity.enumeration.InspectionType;
+import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.repository.custom.InputTestRequestRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -282,7 +284,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                 .leftJoin(lotMaster).on(lotMaster.outSourcingInput.id.eq(outSourcingInput.id))
                 .leftJoin(item).on(item.id.eq(lotMaster.item.id))
                 .where(
-//                        outSourcingInput.inputTestYn.isTrue(),
+                        outSourcingInput.inputTestYn.isTrue(),
                         outSourcingInput.deleteYn.isFalse(),
                         lotMaster.inputAmount.eq(0),
                         lotMaster.createdAmount.ne(lotMaster.checkRequestAmount),    // lotMaster 의 생성수량과 검사요청수량이 같지 않은거
@@ -310,7 +312,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         lotMaster.deleteYn.isFalse(),
                         lotMaster.stockAmount.ne(0),
                         lotMaster.createdAmount.ne(lotMaster.checkRequestAmount),
-                        lotMaster.enrollmentType.eq(PRODUCTION)
+                        lotMaster.enrollmentType.eq(PRODUCTION),
+                        lotMaster.lotMasterDivision.eq(REAL_LOT)
                 )
                 .fetch();
     }
@@ -381,7 +384,6 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         )
                 )
                 .from(lotMaster)
-                .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
                 .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
                 .leftJoin(outSourcingProductionRequest).on(outSourcingProductionRequest.id.eq(outSourcingInput.productionRequest.id))
                 .leftJoin(item).on(item.id.eq(lotMaster.item.id))
