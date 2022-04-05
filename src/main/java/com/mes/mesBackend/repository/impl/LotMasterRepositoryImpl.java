@@ -177,7 +177,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotMaster.checkRequestAmount.as("checkRequestAmount"),
                                 lotMaster.checkAmount.as("checkAmount"),
                                 lotMaster.qualityLevel.as("qualityLevel"),
-                                lotMaster.createdDate.as("createdDate")
+                                lotMaster.createdDate.as("createdDate"),
+                                item.itemAccountCode.detail.as("itemAccountCode")
                         )
                 )
                 .from(lotMaster)

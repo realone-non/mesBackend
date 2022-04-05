@@ -93,6 +93,9 @@ public class LotMasterResponse {
     @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime createdDate;
 
+    @Schema(description = "품목계정코드")
+    String itemAccountCode;
+
     @JsonIgnore
     int badItemReturnAmount;       // 반품수량
     @JsonIgnore
