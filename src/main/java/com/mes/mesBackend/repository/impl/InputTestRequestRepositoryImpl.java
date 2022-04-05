@@ -262,7 +262,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         purchaseInput.deleteYn.isFalse(),
                         lotMaster.inputAmount.eq(0),
                         lotMaster.createdAmount.ne(lotMaster.checkRequestAmount),    // lotMaster 의 생성수량과 검사요청수량이 같지 않은거
-                        lotMaster.enrollmentType.eq(PURCHASE_INPUT)
+                        lotMaster.enrollmentType.eq(PURCHASE_INPUT),
+                        lotMaster.deleteYn.isFalse()
                 )
                 .groupBy(item.id)
                 .fetch();
@@ -288,7 +289,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         outSourcingInput.deleteYn.isFalse(),
                         lotMaster.inputAmount.eq(0),
                         lotMaster.createdAmount.ne(lotMaster.checkRequestAmount),    // lotMaster 의 생성수량과 검사요청수량이 같지 않은거
-                        lotMaster.enrollmentType.eq(OUTSOURCING_INPUT)
+                        lotMaster.enrollmentType.eq(OUTSOURCING_INPUT),
+                        lotMaster.deleteYn.isFalse()
                 )
                 .groupBy(item.id)
                 .fetch();
