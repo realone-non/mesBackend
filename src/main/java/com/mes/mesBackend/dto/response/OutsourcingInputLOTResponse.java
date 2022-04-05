@@ -30,4 +30,10 @@ public class OutsourcingInputLOTResponse {
 
     @Schema(description = "수입검사여부")
     Boolean inputTestYn;
+
+    @Schema(description = "입고창고ID")
+    Long warehouseId;
+
+    @Schema(description = "입고창고")
+    String warehouseName;
 }

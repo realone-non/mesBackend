@@ -253,6 +253,9 @@ public class OutsourcingServiceImpl implements OutsourcingService {
         List<OutsourcingInputLOTResponse> lotList = new ArrayList<>();
         for (OutSourcingInput outSourcingInput : inputList) {
             LotMaster lotMaster = lotMasterRepository.findByOutsourcingInput(outSourcingInput.getId());
+            if(lotMaster == null){
+                break;
+            }
             OutsourcingInputLOTResponse response = new OutsourcingInputLOTResponse();
             response.setId(outSourcingInput.getId());
             response.setLotId(lotMaster.getId());
@@ -261,6 +264,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
             response.setInputAmount(lotMaster.getCreatedAmount());
             response.setTestRequestType(outSourcingInput.getTestRequestType());
             response.setInputTestYn(outSourcingInput.isInputTestYn());
+            response.setWarehouseId(outSourcingInput.getInputWareHouse().getId());
+            response.setWarehouseName(outSourcingInput.getInputWareHouse().getWareHouseName());
             lotList.add(response);
         }
         return lotList;
@@ -281,6 +286,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
         response.setInputAmount(lotMaster.getCreatedAmount());
         response.setTestRequestType(input.getTestRequestType());
         response.setInputTestYn(input.isInputTestYn());
+        response.setWarehouseId(input.getInputWareHouse().getId());
+        response.setWarehouseName(input.getInputWareHouse().getWareHouseName());
 
         return response;
     }
