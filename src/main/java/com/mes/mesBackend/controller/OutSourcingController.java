@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.request.OutsourcingMaterialReleaseRequest;
 import com.mes.mesBackend.dto.request.OutsourcingProductionRequestRequest;
 import com.mes.mesBackend.dto.response.OutsourcingMaterialReleaseResponse;
 import com.mes.mesBackend.dto.response.OutsourcingProductionResponse;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -24,14 +25,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
-// 품목형태
 @Tag(name = "outsourcing", description = "외주생산관리 API")
 @RequestMapping(value = "/outsourcings")
 @RestController
@@ -57,7 +56,7 @@ public class OutSourcingController {
     public ResponseEntity<OutsourcingProductionResponse> createOutsourcingProduction(
             @RequestBody @Valid OutsourcingProductionRequestRequest productionRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
+    ) throws NotFoundException, BadRequestException {
         OutsourcingProductionResponse outsourcingProductionResponse = outsourcingService.createOutsourcingProduction(productionRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + outsourcingProductionResponse.getId() + " from createoutsourcingProduction.");
@@ -91,11 +90,11 @@ public class OutSourcingController {
     @GetMapping("/{id}")
     @ResponseBody
     @Operation(summary = "외주생산의뢰 조회")
-    public ResponseEntity<Optional<OutsourcingProductionResponse>> getOutsourcingProduction(
+    public ResponseEntity<OutsourcingProductionResponse> getOutsourcingProduction(
             @PathVariable Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        Optional<OutsourcingProductionResponse> production = outsourcingService.getOutsourcingProduction(id);
+    ) throws NotFoundException {
+        OutsourcingProductionResponse production = outsourcingService.getOutsourcingProductionResponseOrThrow(id);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getItemForms.");
         return new ResponseEntity<>(production, OK);
@@ -116,7 +115,7 @@ public class OutSourcingController {
             @PathVariable Long id,
             @RequestBody @Valid OutsourcingProductionRequestRequest request,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         OutsourcingProductionResponse production = outsourcingService.modifyOutsourcingProduction(id, request);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + production.getId() + " from modifyOutsourcingProduction.");
@@ -136,7 +135,7 @@ public class OutSourcingController {
     public ResponseEntity deleteOutsourcingProduction(
             @PathVariable Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
+    ) throws NotFoundException, BadRequestException {
         outsourcingService.deleteOutsourcingProduction(id);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteOutsourcingProduction.");
@@ -154,14 +153,14 @@ public class OutSourcingController {
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity<Optional<OutsourcingMaterialReleaseResponse>> createOutsourcingMaterialRelease(
+    public ResponseEntity<OutsourcingMaterialReleaseResponse> createOutsourcingMaterialRelease(
             @PathVariable(value = "request-id") @Parameter(description = "외주생산 ID") Long id,
             @RequestBody @Valid OutsourcingMaterialReleaseRequest request,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        Optional<OutsourcingMaterialReleaseResponse> response = outsourcingService.createOutsourcingMaterial(id,request);
+    ) throws NotFoundException, BadRequestException {
+        OutsourcingMaterialReleaseResponse response = outsourcingService.createOutsourcingMaterial(id,request);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + response.get().getId() + " from createOutsourcingMaterialRelase.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + response.getId() + " from createOutsourcingMaterialRelase.");
         return new ResponseEntity<>(response, OK);
     }
 
@@ -194,7 +193,7 @@ public class OutSourcingController {
             @PathVariable(value = "id") @Parameter(description = "원재료 출고 대상 ID") Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        OutsourcingMaterialReleaseResponse response = outsourcingService.getOutsourcingMaterial(requestId,id);
+        OutsourcingMaterialReleaseResponse response = outsourcingService.getOutsourcingMaterialResponseOrThrow(requestId,id);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getItemForms.");
         return new ResponseEntity<>(response, OK);

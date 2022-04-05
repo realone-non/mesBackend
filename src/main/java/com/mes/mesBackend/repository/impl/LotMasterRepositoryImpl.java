@@ -19,6 +19,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.EnrollmentType.OUTSOURCING_INPUT;
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PRODUCTION;
 import static com.mes.mesBackend.entity.enumeration.GoodsType.PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
@@ -572,16 +573,18 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
 
     //외주입고로 LOT 조회
     @Transactional(readOnly = true)
-    public LotMaster findByOutsourcingInput(Long outsourcingInputId){
-        return jpaQueryFactory
-                .selectFrom(lotMaster)
-                .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.id))
-                .where(
-                        lotMaster.outSourcingInput.id.eq(outsourcingInputId),
-                        isDeleteYnFalse(),
-                        lotMaster.useYn.isTrue()
-                )
-                .fetchOne();
+    public Optional<LotMaster> findByOutsourcingInput(Long outsourcingInputId){
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(lotMaster)
+                        .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
+                        .where(
+                                outSourcingInput.id.eq(outsourcingInputId),
+                                isDeleteYnFalse(),
+                                lotMaster.enrollmentType.eq(OUTSOURCING_INPUT)
+                        )
+                        .fetchOne()
+        );
     }
 
     // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 유효여부

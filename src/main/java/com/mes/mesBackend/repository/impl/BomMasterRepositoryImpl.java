@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.entity.BomMaster;
+import com.mes.mesBackend.entity.QBomItemDetail;
 import com.mes.mesBackend.entity.QBomMaster;
 import com.mes.mesBackend.entity.QItem;
 import com.mes.mesBackend.repository.custom.BomMasterRepositoryCustom;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class BomMasterRepositoryImpl implements BomMasterRepositoryCustom {
@@ -19,6 +21,7 @@ public class BomMasterRepositoryImpl implements BomMasterRepositoryCustom {
 
     final QBomMaster bomMaster = QBomMaster.bomMaster;
     final QItem item = QItem.item;
+    final QBomItemDetail bomItemDetail = QBomItemDetail.bomItemDetail;
 
     @Transactional(readOnly = true)
     @Override
@@ -67,6 +70,41 @@ public class BomMasterRepositoryImpl implements BomMasterRepositoryCustom {
                         isDeleteYnFalse()
                 )
                 .fetchFirst();
+        return fetchOne != null;
+    }
+
+    // bomMaster 의 itemId 와 bomItemDetail 의 itemId 로 bomItemDetail 조회
+    @Override
+    public Optional<Float> findBomItemDetailByBomMasterItemAndDetailItem(Long bomMasterItemId, Long bomItemid) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(bomItemDetail.amount)
+                        .from(bomItemDetail)
+                        .where(
+                                bomMaster.item.id.eq(bomMasterItemId),
+                                bomMaster.deleteYn.isFalse(),
+                                bomItemDetail.item.id.eq(bomItemid),
+                                bomItemDetail.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // bomDetail 에 해당하는 item 인지
+    @Override
+    public boolean existsBomItemDetailByItemId(Long bomMasterItemId, Long bomDetailItemId) {
+        Integer fetchOne =
+                jpaQueryFactory
+                        .selectOne()
+                        .from(bomItemDetail)
+                        .where(
+                                bomItemDetail.bomMaster.item.id.eq(bomMasterItemId),
+                                bomItemDetail.bomMaster.deleteYn.isFalse(),
+                                bomItemDetail.item.id.eq(bomDetailItemId),
+                                bomItemDetail.deleteYn.isFalse()
+                        )
+                        .fetchFirst();
+
         return fetchOne != null;
     }
 

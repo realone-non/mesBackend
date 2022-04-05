@@ -29,11 +29,11 @@ public class OutSourcingProductionRequestRepositoryImpl implements OutsourcingRe
                 .select(
                         Projections.fields(
                                 OutsourcingProductionResponse.class,
-                                client.clientName.as("clientName"),
                                 request.id.as("id"),
+                                client.clientName.as("clientName"),
+                                item.id.as("itemId"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
-                                master.bomNo.as("bomNo"),
                                 request.productionDate.as("productionDate"),
                                 request.productionAmount.as("productionAmount"),
                                 request.materialRequestDate.as("materialRequestDate"),
@@ -43,15 +43,13 @@ public class OutSourcingProductionRequestRepositoryImpl implements OutsourcingRe
                         )
                 )
                 .from(request)
-                .leftJoin(master).on(master.id.eq(request.bomMaster.id))
-                .leftJoin(item).on(item.id.eq(master.item.id))
+                .leftJoin(item).on(item.id.eq(request.item.id))
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .where(
                         clientNull(clientId),
                         isItemNoContaining(itemNo),
                         isItemNameContaining(itemName),
                         dateNull(startDate, endDate),
-                        request.useYn.eq(true),
                         request.deleteYn.eq(false)
                 )
                 .fetch();
@@ -60,32 +58,30 @@ public class OutSourcingProductionRequestRepositoryImpl implements OutsourcingRe
     public Optional<OutsourcingProductionResponse> findRequestByIdAndDeleteYnAndUseYn(Long id){
         return Optional.ofNullable(
                 jpaQueryFactory
-                .select(
-                        Projections.fields(
-                            OutsourcingProductionResponse.class,
-                            client.clientName.as("clientName"),
-                            request.id.as("id"),
-                            item.itemNo.as("itemNo"),
-                            item.itemName.as("itemName"),
-                            master.bomNo.as("bomNo"),
-                            request.productionDate.as("productionDate"),
-                            request.productionAmount.as("productionAmount"),
-                            request.materialRequestDate.as("materialRequestDate"),
-                            request.periodDate.as("periodDate"),
-                            request.inputTestYn.as("inputTestYn"),
-                            request.note.as("note")
+                        .select(
+                                Projections.fields(
+                                        OutsourcingProductionResponse.class,
+                                        request.id.as("id"),
+                                        client.clientName.as("clientName"),
+                                        item.id.as("itemId"),
+                                        item.itemNo.as("itemNo"),
+                                        item.itemName.as("itemName"),
+                                        request.productionDate.as("productionDate"),
+                                        request.productionAmount.as("productionAmount"),
+                                        request.materialRequestDate.as("materialRequestDate"),
+                                        request.periodDate.as("periodDate"),
+                                        request.inputTestYn.as("inputTestYn"),
+                                        request.note.as("note")
+                                )
                         )
-                )
-                .from(request)
-                .leftJoin(master).on(master.id.eq(request.bomMaster.id))
-                .leftJoin(item).on(item.id.eq(master.item.id))
-                .leftJoin(client).on(client.id.eq(item.manufacturer.id))
-                .where(
-                        request.id.eq(id),
-                        request.useYn.eq(true),
-                        request.deleteYn.eq(false)
-                )
-                .fetchOne()
+                        .from(request)
+                        .leftJoin(item).on(item.id.eq(request.item.id))
+                        .leftJoin(client).on(client.id.eq(item.manufacturer.id))
+                        .where(
+                                request.id.eq(id),
+                                request.deleteYn.eq(false)
+                        )
+                        .fetchOne()
         );
     }
 

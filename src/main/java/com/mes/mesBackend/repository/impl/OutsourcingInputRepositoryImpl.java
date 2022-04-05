@@ -4,7 +4,6 @@ import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
 import com.mes.mesBackend.dto.response.OutsourcingInputResponse;
 import com.mes.mesBackend.dto.response.OutsourcingStatusResponse;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.repository.custom.OutsourcingInputRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -12,7 +11,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -44,20 +42,19 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
                                 request.inputTestYn.as("inputTestYn"),
-                                request.note.as("note")
+                                request.note.as("note"),
+                                request.productionAmount.as("productionAmount")
                         )
                 )
                 .from(request)
-                .leftJoin(master).on(master.id.eq(request.bomMaster.id))
-                .leftJoin(item).on(item.id.eq(master.item.id))
+                .leftJoin(item).on(item.id.eq(request.item.id))
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .where(
                         clientNull(clientId),
                         isItemNoContaining(itemNo),
                         isItemNameContaining(itemName),
                         dateNull(startDate, endDate),
-                        request.deleteYn.isFalse(),
-                        request.useYn.isTrue()
+                        request.deleteYn.isFalse()
                 )
                 .fetch();
     }
@@ -67,34 +64,27 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
     public Optional<OutsourcingInputResponse> findInputByIdAndDeleteYnAndUseYn(Long id){
         return Optional.ofNullable(
                 jpaQueryFactory
-                    .select(
-                            Projections.fields(
-                                OutsourcingInputResponse.class,
-                                input.id.as("id"),
-                                client.clientName.as("clientName"),
-                                request.id.as("requestNo"),
-                                item.itemNo.as("itemNo"),
-                                item.itemName.as("itemName"),
-                                input.inputDate.as("inputDate"),
-                                input.inputAmount.as("inputAmount"),
-                                wareHouse.wareHouseName.as("warehouseName"),
-                                input.testRequestType.as("testRequestType"),
-                                input.note.as("note")
+                        .select(
+                                Projections.fields(
+                                        OutsourcingInputResponse.class,
+                                        request.id.as("id"),
+                                        client.clientName.as("clientName"),
+                                        item.itemNo.as("itemNo"),
+                                        item.itemName.as("itemName"),
+                                        request.inputTestYn.as("inputTestYn"),
+                                        request.note.as("note"),
+                                        request.productionAmount.as("productionAmount")
+                                )
                         )
-                )
-                .from(input)
-                .leftJoin(wareHouse).on(wareHouse.id.eq(input.inputWareHouse.id))
-                .leftJoin(request).on(request.id.eq(input.productionRequest.id))
-                .leftJoin(master).on(master.id.eq(request.bomMaster.id))
-                .leftJoin(item).on(item.id.eq(master.item.id))
-                .leftJoin(client).on(client.id.eq(item.manufacturer.id))
-                .where(
-                        input.id.eq(id),
-                        input.useYn.eq(true),
-                        input.deleteYn.eq(false)
-                )
-                .fetchOne()
-            );
+                        .from(request)
+                        .leftJoin(item).on(item.id.eq(request.item.id))
+                        .leftJoin(client).on(client.id.eq(item.manufacturer.id))
+                        .where(
+                                input.id.eq(id),
+                                request.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
     }
 
     //외주생산의뢰 ID로 외주입고 조회
@@ -119,7 +109,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                 .from(request)
                 .where(
                         request.id.eq(requestId),
-                        request.useYn.isTrue(),
+//                        request.useYn.isTrue(),
                         request.deleteYn.isFalse()
                 )
                 .fetchOne();
@@ -164,7 +154,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                 .select(item.id)
                 .from(input)
                 .innerJoin(request).on(request.id.eq(input.productionRequest.id))
-                .innerJoin(master).on(master.id.eq(request.bomMaster.id))
+//                .innerJoin(master).on(master.id.eq(request.bomMaster.id))
                 .innerJoin(item).on(item.id.eq(master.item.id))
                 .where(
                     input.id.eq(inputId)
@@ -174,7 +164,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
 
     // 외주입고 lot 정보 리스트 조회
     @Override
-    public List<OutsourcingInputLOTResponse> findOutsourcingInputLotResponseByRequestId(Long requestId) {
+    public List<OutsourcingInputLOTResponse> findOutsourcingInputLotResponsesByRequestId(Long requestId) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -184,7 +174,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                                 lotType.lotType.as("lotType"),
                                 lotMaster.lotNo.as("lotNo"),
                                 lotMaster.createdAmount.as("inputAmount"),
-                                input.testRequestType.as("testRequestType"),
+                                lotMaster.item.testType.as("testRequestType"),
                                 input.inputTestYn.as("inputTestYn"),
                                 wareHouse.id.as("warehouseId"),
                                 wareHouse.wareHouseName.as("warehouseName")
@@ -201,6 +191,68 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                         lotMaster.deleteYn.isFalse(),
                         lotMaster.enrollmentType.eq(OUTSOURCING_INPUT)
                 )
+                .fetch();
+    }
+
+    // 외주입고 lot 정보 단일 조회
+    @Override
+    public Optional<OutsourcingInputLOTResponse> findOutsourcingInputLotResponseByRequestId(Long requestId, Long inputId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(
+                                Projections.fields(
+                                        OutsourcingInputLOTResponse.class,
+                                        input.id.as("id"),
+                                        lotMaster.id.as("lotId"),
+                                        lotType.lotType.as("lotType"),
+                                        lotMaster.lotNo.as("lotNo"),
+                                        lotMaster.createdAmount.as("inputAmount"),
+                                        lotMaster.item.testType.as("testRequestType"),
+                                        input.inputTestYn.as("inputTestYn"),
+                                        wareHouse.id.as("warehouseId"),
+                                        wareHouse.wareHouseName.as("warehouseName")
+                                )
+                        )
+                        .from(lotMaster)
+                        .leftJoin(input).on(input.id.eq(lotMaster.outSourcingInput.id))
+                        .leftJoin(request).on(request.id.eq(input.productionRequest.id))
+                        .leftJoin(wareHouse).on(wareHouse.id.eq(input.inputWareHouse.id))
+                        .leftJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
+                        .where(
+                                request.id.eq(requestId),
+                                input.id.eq(inputId),
+                                input.deleteYn.isFalse(),
+                                lotMaster.deleteYn.isFalse(),
+                                lotMaster.enrollmentType.eq(OUTSOURCING_INPUT)
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // 외주생산의뢰로 등록된 외주입고가 존재하는지여부
+    @Override
+    public boolean existsByOutsourcingProductionRequestId(Long requestId) {
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(input)
+                .where(
+                        input.productionRequest.id.eq(requestId),
+                        input.deleteYn.isFalse()
+                )
+                .fetchFirst();
+        return fetchOne != null;
+    }
+
+    // 외주생산의뢰 id 로 외주입고 list 조회
+    @Override
+    public List<OutSourcingInput> findOutsourcingInputByRequestId(Long requestId) {
+        return jpaQueryFactory
+                .selectFrom(input)
+                .where(
+                        input.productionRequest.id.eq(requestId),
+                        input.deleteYn.isFalse()
+                )
+                .orderBy(input.createdDate.desc())
                 .fetch();
     }
 

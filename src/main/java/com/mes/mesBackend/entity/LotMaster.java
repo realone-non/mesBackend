@@ -195,6 +195,11 @@ public class LotMaster extends BaseTimeEntity {
         setCreatedAmount(inputAmount);
     }
 
+    public void updateOutsourcingInput(int inputAmount, int stockAmount) {
+        setStockAmount(stockAmount);
+        setCreatedAmount(inputAmount);
+    }
+
     public void createWorkProcessLot(
             LotMasterRequest lotMasterRequest,
             WorkProcess workProcess,

@@ -80,7 +80,7 @@ public interface LotMasterRepositoryCustom {
     );
 
     //외주입고로 LOT 조회
-    LotMaster findByOutsourcingInput(Long outsourcingInputId);
+    Optional<LotMaster> findByOutsourcingInput(Long outsourcingInputId);
 
     // ========================== 7-2. Lot Tracking
     // == 정방향

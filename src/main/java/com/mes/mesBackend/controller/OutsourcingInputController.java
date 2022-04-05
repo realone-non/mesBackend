@@ -1,7 +1,6 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.OutsourcingInputLOTRequest;
-import com.mes.mesBackend.dto.request.OutsourcingInputRequest;
 import com.mes.mesBackend.dto.response.OutsourcingInputLOTResponse;
 import com.mes.mesBackend.dto.response.OutsourcingInputResponse;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -84,7 +83,7 @@ public class OutsourcingInputController {
             @PathVariable(value = "id") @Parameter(description = "입고정보 id") Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        OutsourcingInputResponse response = outsourcingService.getOutsourcingInput(id);
+        OutsourcingInputResponse response = outsourcingService.getOutsourcingInputResponseOrThrow(id);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + id + " from getOutsourcingInput.");
         return new ResponseEntity<>(response, OK);
@@ -148,7 +147,7 @@ public class OutsourcingInputController {
             @PathVariable(value = "id") @Parameter(description = "외주입고 id") Long inputId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        OutsourcingInputLOTResponse response = outsourcingService.getOutsourcingInputLOT(requestid, inputId);
+        OutsourcingInputLOTResponse response = outsourcingService.getOutsourcingInputLOTResponseOrThrow(requestid, inputId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + response.getId() + " from getOutsourcingInput.");
         return new ResponseEntity<>(response, OK);
@@ -165,15 +164,15 @@ public class OutsourcingInputController {
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity<Long> modifyOutsourcingInputLOT(
+    public ResponseEntity<OutsourcingInputLOTResponse> modifyOutsourcingInputLOT(
             @PathVariable(value = "request-id") @Parameter(description = "외주생산의뢰 id") Long requestid,
             @PathVariable(value = "id") @Parameter(description = "외주입고 id") Long inputId,
             @RequestBody @Valid OutsourcingInputLOTRequest request,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-        Long response = outsourcingService.modifyOutsourcingInputLOT(requestid, inputId, request);
+        OutsourcingInputLOTResponse response = outsourcingService.modifyOutsourcingInputLOT(requestid, inputId, request);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + requestid + " from modifyOutsourcingInputLOT.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + response.getId() + " from modifyOutsourcingInputLOT.");
         return new ResponseEntity<>(response, OK);
     }
 

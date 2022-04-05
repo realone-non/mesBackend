@@ -1,6 +1,5 @@
 package com.mes.mesBackend.dto.response;
 
-import com.mes.mesBackend.entity.LotType;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
