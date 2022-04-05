@@ -191,6 +191,7 @@ public class OutsourcingServiceImpl implements OutsourcingService {
             input.setInputAmount(allByRequestId.stream().mapToInt(OutSourcingInput::getInputAmount).sum() + request.getInputAmount());
             input.setInputWareHouse(wareHouse);
             input.setInputTestYn(request.isInputTestYn());
+            input.setTestRequestType(request.getRequestTestType());
         }
         //외주입고 정보가 존재 하지 않을 경우, 새롭게 생성
         else{

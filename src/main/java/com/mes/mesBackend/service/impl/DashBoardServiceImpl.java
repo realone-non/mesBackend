@@ -5,7 +5,6 @@ import com.mes.mesBackend.dto.response.OperationStatusResponse;
 import com.mes.mesBackend.dto.response.SalesRelatedStatusResponse;
 import com.mes.mesBackend.dto.response.WorkProcessStatusResponse;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
-import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.helper.LocalDateHelper;
 import com.mes.mesBackend.repository.ContractRepository;
 import com.mes.mesBackend.repository.LotMasterRepository;
@@ -20,6 +19,7 @@ import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.OrderState.ONGOING;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.*;
 
 // 대시보드
 @Service
@@ -56,20 +56,34 @@ public class DashBoardServiceImpl implements DashBoardService {
 
     // 작업 공정 별 정보
     @Override
-    public WorkProcessStatusResponse getWorkProcessStatus(WorkProcessDivision workProcessDivision) {
+    public WorkProcessStatusResponse getWorkProcessStatus() {
         WorkProcessStatusResponse response = new WorkProcessStatusResponse();
 
-        // 작업진행
-        Long ongoingAmount = workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(workProcessDivision, ONGOING).orElse(0L);
-        response.setOngoingAmount(ongoingAmount);
+        // 원료혼합
+        response.setMaterialMicingOngoingAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(MATERIAL_MIXING, ONGOING).orElse(0L));
+        response.setMaterialMicingCompletionAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(MATERIAL_MIXING, COMPLETION).orElse(0L));
+        response.setMaterialMicingProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(MATERIAL_MIXING));
 
-        // 작업완료
-        Long completionAmount = workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(workProcessDivision, COMPLETION).orElse(0L);
-        response.setCompletionAmount(completionAmount);
+        // 충진
+        response.setFillingOngoingAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(FILLING, ONGOING).orElse(0L));
+        response.setFillingCompletionAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(FILLING, COMPLETION).orElse(0L));
+        response.setFillingProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(FILLING));
 
-        // 수량
-        Integer productionAmount = workOrderDetailRepo.findProductionAmountByWorkProcessDivision(workProcessDivision);
-        response.setProductionAmount(productionAmount);
+        // 캡조립
+        response.setCapAssemblyOngoingAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(CAP_ASSEMBLY, ONGOING).orElse(0L));
+        response.setCapAssemblyCompletionAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(CAP_ASSEMBLY, COMPLETION).orElse(0L));
+        response.setCapAssemblyProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(CAP_ASSEMBLY));
+
+        // 라벨링
+        response.setLabelingOngoingAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(LABELING, ONGOING).orElse(0L));
+        response.setLabelingCompletionAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(LABELING, COMPLETION).orElse(0L));
+        response.setLabelingProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(LABELING));
+
+        // 포장
+        response.setPackagingOngoingAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(PACKAGING, ONGOING).orElse(0L));
+        response.setPackagingCompletionAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(PACKAGING, COMPLETION).orElse(0L));
+        response.setPackagingProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(PACKAGING));
+
         return response;
     }
 
