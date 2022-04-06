@@ -1,5 +1,7 @@
 package com.mes.mesBackend.service.impl;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.mes.mesBackend.dto.response.ItemInventoryStatusResponse;
 import com.mes.mesBackend.dto.response.OperationStatusResponse;
 import com.mes.mesBackend.dto.response.SalesRelatedStatusResponse;
@@ -96,105 +98,577 @@ public class DashBoardServiceImpl implements DashBoardService {
 
     // 매출관련현황 - 수주
     @Override
-    public List<SalesRelatedStatusResponse> getContractSaleRelatedStatus() {
+    public JsonArray getContractSaleRelatedStatus() {
         LocalDate fromDate = localDateHelper.getNowMonthStartDate();
         LocalDate toDate = localDateHelper.getNowMonthEndDate();
 
         List<SalesRelatedStatusResponse> responses = contractRepo.findSalesRelatedStatusResponseByContractItems(fromDate, toDate);
-        for (SalesRelatedStatusResponse r : responses) {
-            LocalDate firstWeekToDate = fromDate.plusWeeks(1);
-            LocalDate secondWeekFromDate = firstWeekToDate.plusDays(1);
-            LocalDate secondWeekToDate = secondWeekFromDate.plusWeeks(1);
-            LocalDate thirdWeekFromDate = secondWeekToDate.plusDays(1);
-            LocalDate thirdWeekToDate = thirdWeekFromDate.plusWeeks(1);
-            LocalDate fourthWeekFromDate = thirdWeekToDate.plusDays(1);
 
-            // 1 ~ 8
-            int firstWeekAmount = contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, r.getItemId()).orElse(0);
-            r.setFirstWeekAmount(firstWeekAmount);
+        LocalDate firstWeekToDate = fromDate.plusWeeks(1);
+        LocalDate secondWeekFromDate = firstWeekToDate.plusDays(1);
+        LocalDate secondWeekToDate = secondWeekFromDate.plusWeeks(1);
+        LocalDate thirdWeekFromDate = secondWeekToDate.plusDays(1);
+        LocalDate thirdWeekToDate = thirdWeekFromDate.plusWeeks(1);
+        LocalDate fourthWeekFromDate = thirdWeekToDate.plusDays(1);
 
-            // 9 ~ 16
-            int secondWeekAmount = contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, r.getItemId()).orElse(0);
-            r.setSecondWeekAmount(secondWeekAmount);
+        Long itemId1;
+        String itemName1;
+        Long itemId2;
+        String itemName2;
+        Long itemId3;
+        String itemName3;
+        Long itemId4;
+        String itemName4;
+        Long itemId5;
+        String itemName5;
 
-            // 17 ~ 24
-            int thirdWeekAmount = contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, r.getItemId()).orElse(0);
-            r.setThirdWeekAmount(thirdWeekAmount);
+        int size = responses.size();
 
-            // 25 ~ 말일
-            int fourthWeekAmount = contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, r.getItemId()).orElse(0);
-            r.setFourthWeekAmount(fourthWeekAmount);
+        JsonArray array = new JsonArray();
+        JsonObject firstWeekObject = new JsonObject();
+        JsonObject secondWeekObject = new JsonObject();
+        JsonObject thirdWeekObject = new JsonObject();
+        JsonObject fourthWeekObject = new JsonObject();
+
+        if (size == 5) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            itemId2 = responses.get(1).getItemId();
+            itemName2 = responses.get(1).getItemName();
+            itemId3 = responses.get(2).getItemId();
+            itemName3 = responses.get(2).getItemName();
+            itemId4 = responses.get(3).getItemId();
+            itemName4 = responses.get(3).getItemName();
+            itemId5 = responses.get(4).getItemId();
+            itemName5 = responses.get(4).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            firstWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId2).orElse(0));
+            firstWeekObject.addProperty(itemName3, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId3).orElse(0));
+            firstWeekObject.addProperty(itemName4, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId4).orElse(0));
+            firstWeekObject.addProperty(itemName5, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId5).orElse(0));
+            array.add(firstWeekObject);
+
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            secondWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId2).orElse(0));
+            secondWeekObject.addProperty(itemName3, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId3).orElse(0));
+            secondWeekObject.addProperty(itemName4, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId4).orElse(0));
+            secondWeekObject.addProperty(itemName5, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId5).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            thirdWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId2).orElse(0));
+            thirdWeekObject.addProperty(itemName3, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId3).orElse(0));
+            thirdWeekObject.addProperty(itemName4, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId4).orElse(0));
+            thirdWeekObject.addProperty(itemName5, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId5).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            fourthWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId2).orElse(0));
+            fourthWeekObject.addProperty(itemName3, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId3).orElse(0));
+            fourthWeekObject.addProperty(itemName4, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId4).orElse(0));
+            fourthWeekObject.addProperty(itemName5, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId5).orElse(0));
+            array.add(fourthWeekObject);
         }
-        return responses;
+        if (size == 4) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            itemId2 = responses.get(1).getItemId();
+            itemName2 = responses.get(1).getItemName();
+            itemId3 = responses.get(2).getItemId();
+            itemName3 = responses.get(2).getItemName();
+            itemId4 = responses.get(3).getItemId();
+            itemName4 = responses.get(3).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            firstWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId2).orElse(0));
+            firstWeekObject.addProperty(itemName3, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId3).orElse(0));
+            firstWeekObject.addProperty(itemName4, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId4).orElse(0));
+            array.add(firstWeekObject);
+
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            secondWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId2).orElse(0));
+            secondWeekObject.addProperty(itemName3, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId3).orElse(0));
+            secondWeekObject.addProperty(itemName4, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId4).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            thirdWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId2).orElse(0));
+            thirdWeekObject.addProperty(itemName3, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId3).orElse(0));
+            thirdWeekObject.addProperty(itemName4, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId4).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            fourthWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId2).orElse(0));
+            fourthWeekObject.addProperty(itemName3, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId3).orElse(0));
+            fourthWeekObject.addProperty(itemName4, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId4).orElse(0));
+            array.add(fourthWeekObject);
+        }
+        if (size == 3) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            itemId2 = responses.get(1).getItemId();
+            itemName2 = responses.get(1).getItemName();
+            itemId3 = responses.get(2).getItemId();
+            itemName3 = responses.get(2).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            firstWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId2).orElse(0));
+            firstWeekObject.addProperty(itemName3, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId3).orElse(0));
+            array.add(firstWeekObject);
+
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            secondWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId2).orElse(0));
+            secondWeekObject.addProperty(itemName3, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId3).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            thirdWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId2).orElse(0));
+            thirdWeekObject.addProperty(itemName3, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId3).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            fourthWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId2).orElse(0));
+            fourthWeekObject.addProperty(itemName3, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId3).orElse(0));
+            array.add(fourthWeekObject);
+        }
+        if (size == 2) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            itemId2 = responses.get(1).getItemId();
+            itemName2 = responses.get(1).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            firstWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId2).orElse(0));
+            array.add(firstWeekObject);
+
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            secondWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId2).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            thirdWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId2).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            fourthWeekObject.addProperty(itemName2, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId2).orElse(0));
+            array.add(fourthWeekObject);
+        }
+        if (size == 1) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            array.add(firstWeekObject);
+
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, contractRepo.findWeekAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            array.add(fourthWeekObject);
+        }
+        return array;
     }
 
     // 매출관련현황 - 제품 생산
     @Override
-    public List<SalesRelatedStatusResponse> getProductSaleRelatedStatus() {
+    public JsonArray getProductSaleRelatedStatus() {
         LocalDate fromDate = localDateHelper.getNowMonthStartDate();
         LocalDate toDate = localDateHelper.getNowMonthEndDate();
 
+        LocalDate firstWeekToDate = fromDate.plusWeeks(1);
+        LocalDate secondWeekFromDate = firstWeekToDate.plusDays(1);
+        LocalDate secondWeekToDate = secondWeekFromDate.plusWeeks(1);
+        LocalDate thirdWeekFromDate = secondWeekToDate.plusDays(1);
+        LocalDate thirdWeekToDate = thirdWeekFromDate.plusWeeks(1);
+        LocalDate fourthWeekFromDate = thirdWeekToDate.plusDays(1);
+
         List<SalesRelatedStatusResponse> responses = lotMasterRepo.findSalesRelatedStatusResponseByProductItems(fromDate, toDate);
-        for (SalesRelatedStatusResponse r : responses) {
 
-            LocalDate firstWeekToDate = fromDate.plusWeeks(1);
-            LocalDate secondWeekFromDate = firstWeekToDate.plusDays(1);
-            LocalDate secondWeekToDate = secondWeekFromDate.plusWeeks(1);
-            LocalDate thirdWeekFromDate = secondWeekToDate.plusDays(1);
-            LocalDate thirdWeekToDate = thirdWeekFromDate.plusWeeks(1);
-            LocalDate fourthWeekFromDate = thirdWeekToDate.plusDays(1);
+        Long itemId1;
+        String itemName1;
+        Long itemId2;
+        String itemName2;
+        Long itemId3;
+        String itemName3;
+        Long itemId4;
+        String itemName4;
+        Long itemId5;
+        String itemName5;
 
-            // 1 ~ 8
-            int firstWeekAmount = lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, r.getItemId()).orElse(0);
-            r.setFirstWeekAmount(firstWeekAmount);
+        int size = responses.size();
 
-            // 9 ~ 16
-            int secondWeekAmount = lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, r.getItemId()).orElse(0);
-            r.setSecondWeekAmount(secondWeekAmount);
+        JsonArray array = new JsonArray();
+        JsonObject firstWeekObject = new JsonObject();
+        JsonObject secondWeekObject = new JsonObject();
+        JsonObject thirdWeekObject = new JsonObject();
+        JsonObject fourthWeekObject = new JsonObject();
 
-            // 17 ~ 24
-            int thirdWeekAmount = lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, r.getItemId()).orElse(0);
-            r.setThirdWeekAmount(thirdWeekAmount);
+        if (size == 5) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            itemId2 = responses.get(1).getItemId();
+            itemName2 = responses.get(1).getItemName();
+            itemId3 = responses.get(2).getItemId();
+            itemName3 = responses.get(2).getItemName();
+            itemId4 = responses.get(3).getItemId();
+            itemName4 = responses.get(3).getItemName();
+            itemId5 = responses.get(4).getItemId();
+            itemName5 = responses.get(4).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            firstWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId2).orElse(0));
+            firstWeekObject.addProperty(itemName3, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId3).orElse(0));
+            firstWeekObject.addProperty(itemName4, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId4).orElse(0));
+            firstWeekObject.addProperty(itemName5, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId5).orElse(0));
+            array.add(firstWeekObject);
 
-            // 25 ~ 말일
-            int fourthWeekAmount = lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, r.getItemId()).orElse(0);
-            r.setFourthWeekAmount(fourthWeekAmount);
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            secondWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId2).orElse(0));
+            secondWeekObject.addProperty(itemName3, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId3).orElse(0));
+            secondWeekObject.addProperty(itemName4, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId4).orElse(0));
+            secondWeekObject.addProperty(itemName5, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId5).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            thirdWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId2).orElse(0));
+            thirdWeekObject.addProperty(itemName3, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId3).orElse(0));
+            thirdWeekObject.addProperty(itemName4, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId4).orElse(0));
+            thirdWeekObject.addProperty(itemName5, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId5).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            fourthWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId2).orElse(0));
+            fourthWeekObject.addProperty(itemName3, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId3).orElse(0));
+            fourthWeekObject.addProperty(itemName4, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId4).orElse(0));
+            fourthWeekObject.addProperty(itemName5, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId5).orElse(0));
+            array.add(fourthWeekObject);
         }
-        return responses;
+        if (size == 4) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            itemId2 = responses.get(1).getItemId();
+            itemName2 = responses.get(1).getItemName();
+            itemId3 = responses.get(2).getItemId();
+            itemName3 = responses.get(2).getItemName();
+            itemId4 = responses.get(3).getItemId();
+            itemName4 = responses.get(3).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            firstWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId2).orElse(0));
+            firstWeekObject.addProperty(itemName3, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId3).orElse(0));
+            firstWeekObject.addProperty(itemName4, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId4).orElse(0));
+            array.add(firstWeekObject);
+
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            secondWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId2).orElse(0));
+            secondWeekObject.addProperty(itemName3, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId3).orElse(0));
+            secondWeekObject.addProperty(itemName4, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId4).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            thirdWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId2).orElse(0));
+            thirdWeekObject.addProperty(itemName3, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId3).orElse(0));
+            thirdWeekObject.addProperty(itemName4, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId4).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            fourthWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId2).orElse(0));
+            fourthWeekObject.addProperty(itemName3, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId3).orElse(0));
+            fourthWeekObject.addProperty(itemName4, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId4).orElse(0));
+            array.add(fourthWeekObject);
+        }
+        if (size == 3) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            itemId2 = responses.get(1).getItemId();
+            itemName2 = responses.get(1).getItemName();
+            itemId3 = responses.get(2).getItemId();
+            itemName3 = responses.get(2).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            firstWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId2).orElse(0));
+            firstWeekObject.addProperty(itemName3, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId3).orElse(0));
+            array.add(firstWeekObject);
+
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            secondWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId2).orElse(0));
+            secondWeekObject.addProperty(itemName3, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId3).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            thirdWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId2).orElse(0));
+            thirdWeekObject.addProperty(itemName3, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId3).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            fourthWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId2).orElse(0));
+            fourthWeekObject.addProperty(itemName3, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId3).orElse(0));
+            array.add(fourthWeekObject);
+        }
+        if (size == 2) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            itemId2 = responses.get(1).getItemId();
+            itemName2 = responses.get(1).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            firstWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId2).orElse(0));
+            array.add(firstWeekObject);
+
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            secondWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId2).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            thirdWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId2).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            fourthWeekObject.addProperty(itemName2, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId2).orElse(0));
+            array.add(fourthWeekObject);
+        }
+        if (size == 1) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            array.add(firstWeekObject);
+
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, lotMasterRepo.findCreatedAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            array.add(fourthWeekObject);
+        }
+        return array;
     }
 
     // 매출관련현황 - 제품출고
     @Override
-    public List<SalesRelatedStatusResponse> getShipmentSaleRelatedStatus() {
+    public JsonArray getShipmentSaleRelatedStatus() {
         LocalDate fromDate = localDateHelper.getNowMonthStartDate();
         LocalDate toDate = localDateHelper.getNowMonthEndDate();
 
+        LocalDate firstWeekToDate = fromDate.plusWeeks(1);
+        LocalDate secondWeekFromDate = firstWeekToDate.plusDays(1);
+        LocalDate secondWeekToDate = secondWeekFromDate.plusWeeks(1);
+        LocalDate thirdWeekFromDate = secondWeekToDate.plusDays(1);
+        LocalDate thirdWeekToDate = thirdWeekFromDate.plusWeeks(1);
+        LocalDate fourthWeekFromDate = thirdWeekToDate.plusDays(1);
+
         List<SalesRelatedStatusResponse> responses = shipmentRepo.findSalesRelatedStatusResponseByShipmentItems(fromDate, toDate);
 
-        for (SalesRelatedStatusResponse r : responses) {
-            LocalDate firstWeekToDate = fromDate.plusWeeks(1);
-            LocalDate secondWeekFromDate = firstWeekToDate.plusDays(1);
-            LocalDate secondWeekToDate = secondWeekFromDate.plusWeeks(1);
-            LocalDate thirdWeekFromDate = secondWeekToDate.plusDays(1);
-            LocalDate thirdWeekToDate = thirdWeekFromDate.plusWeeks(1);
-            LocalDate fourthWeekFromDate = thirdWeekToDate.plusDays(1);
+        Long itemId1;
+        String itemName1;
+        Long itemId2;
+        String itemName2;
+        Long itemId3;
+        String itemName3;
+        Long itemId4;
+        String itemName4;
+        Long itemId5;
+        String itemName5;
 
-            // 1 ~ 8
-            int firstWeekAmount = shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, r.getItemId()).orElse(0);
-            r.setFirstWeekAmount(firstWeekAmount);
+        int size = responses.size();
 
-            // 9 ~ 16
-            int secondWeekAmount = shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, r.getItemId()).orElse(0);
-            r.setSecondWeekAmount(secondWeekAmount);
+        JsonArray array = new JsonArray();
+        JsonObject firstWeekObject = new JsonObject();
+        JsonObject secondWeekObject = new JsonObject();
+        JsonObject thirdWeekObject = new JsonObject();
+        JsonObject fourthWeekObject = new JsonObject();
 
-            // 17 ~ 24
-            int thirdWeekAmount = shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, r.getItemId()).orElse(0);
-            r.setThirdWeekAmount(thirdWeekAmount);
+        if (size == 5) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            itemId2 = responses.get(1).getItemId();
+            itemName2 = responses.get(1).getItemName();
+            itemId3 = responses.get(2).getItemId();
+            itemName3 = responses.get(2).getItemName();
+            itemId4 = responses.get(3).getItemId();
+            itemName4 = responses.get(3).getItemName();
+            itemId5 = responses.get(4).getItemId();
+            itemName5 = responses.get(4).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            firstWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId2).orElse(0));
+            firstWeekObject.addProperty(itemName3, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId3).orElse(0));
+            firstWeekObject.addProperty(itemName4, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId4).orElse(0));
+            firstWeekObject.addProperty(itemName5, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId5).orElse(0));
+            array.add(firstWeekObject);
 
-            // 25 ~ 말일
-            int fourthWeekAmount = shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, r.getItemId()).orElse(0);
-            r.setFourthWeekAmount(fourthWeekAmount);
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            secondWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId2).orElse(0));
+            secondWeekObject.addProperty(itemName3, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId3).orElse(0));
+            secondWeekObject.addProperty(itemName4, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId4).orElse(0));
+            secondWeekObject.addProperty(itemName5, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId5).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            thirdWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId2).orElse(0));
+            thirdWeekObject.addProperty(itemName3, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId3).orElse(0));
+            thirdWeekObject.addProperty(itemName4, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId4).orElse(0));
+            thirdWeekObject.addProperty(itemName5, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId5).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            fourthWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId2).orElse(0));
+            fourthWeekObject.addProperty(itemName3, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId3).orElse(0));
+            fourthWeekObject.addProperty(itemName4, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId4).orElse(0));
+            fourthWeekObject.addProperty(itemName5, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId5).orElse(0));
+            array.add(fourthWeekObject);
         }
-        return responses;
+        if (size == 4) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            itemId2 = responses.get(1).getItemId();
+            itemName2 = responses.get(1).getItemName();
+            itemId3 = responses.get(2).getItemId();
+            itemName3 = responses.get(2).getItemName();
+            itemId4 = responses.get(3).getItemId();
+            itemName4 = responses.get(3).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            firstWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId2).orElse(0));
+            firstWeekObject.addProperty(itemName3, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId3).orElse(0));
+            firstWeekObject.addProperty(itemName4, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId4).orElse(0));
+            array.add(firstWeekObject);
+
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            secondWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId2).orElse(0));
+            secondWeekObject.addProperty(itemName3, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId3).orElse(0));
+            secondWeekObject.addProperty(itemName4, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId4).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            thirdWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId2).orElse(0));
+            thirdWeekObject.addProperty(itemName3, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId3).orElse(0));
+            thirdWeekObject.addProperty(itemName4, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId4).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            fourthWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId2).orElse(0));
+            fourthWeekObject.addProperty(itemName3, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId3).orElse(0));
+            fourthWeekObject.addProperty(itemName4, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId4).orElse(0));
+            array.add(fourthWeekObject);
+        }
+        if (size == 3) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            itemId2 = responses.get(1).getItemId();
+            itemName2 = responses.get(1).getItemName();
+            itemId3 = responses.get(2).getItemId();
+            itemName3 = responses.get(2).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            firstWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId2).orElse(0));
+            firstWeekObject.addProperty(itemName3, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId3).orElse(0));
+            array.add(firstWeekObject);
+
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            secondWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId2).orElse(0));
+            secondWeekObject.addProperty(itemName3, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId3).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            thirdWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId2).orElse(0));
+            thirdWeekObject.addProperty(itemName3, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId3).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            fourthWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId2).orElse(0));
+            fourthWeekObject.addProperty(itemName3, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId3).orElse(0));
+            array.add(fourthWeekObject);
+        }
+        if (size == 2) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            itemId2 = responses.get(1).getItemId();
+            itemName2 = responses.get(1).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            firstWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId2).orElse(0));
+            array.add(firstWeekObject);
+
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            secondWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId2).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            thirdWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId2).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            fourthWeekObject.addProperty(itemName2, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId2).orElse(0));
+            array.add(fourthWeekObject);
+        }
+        if (size == 1) {
+            itemId1 = responses.get(0).getItemId();
+            itemName1 = responses.get(0).getItemName();
+            firstWeekObject.addProperty("name", "첫째주");
+            firstWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(fromDate, firstWeekToDate, itemId1).orElse(0));
+            array.add(firstWeekObject);
+
+            secondWeekObject.addProperty("name", "둘째주");
+            secondWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(secondWeekFromDate, secondWeekToDate, itemId1).orElse(0));
+            array.add(secondWeekObject);
+
+            thirdWeekObject.addProperty("name", "셋째주");
+            thirdWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(thirdWeekFromDate, thirdWeekToDate, itemId1).orElse(0));
+            array.add(thirdWeekObject);
+
+            fourthWeekObject.addProperty("name", "넷째주");
+            fourthWeekObject.addProperty(itemName1, shipmentRepo.findShipmentAmountByWeekDate(fourthWeekFromDate, toDate, itemId1).orElse(0));
+            array.add(fourthWeekObject);
+        }
+        return array;
     }
 }
