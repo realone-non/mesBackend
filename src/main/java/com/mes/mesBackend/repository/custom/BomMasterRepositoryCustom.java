@@ -15,4 +15,6 @@ public interface BomMasterRepositoryCustom {
     Optional<Float> findBomItemDetailByBomMasterItemAndDetailItem(Long bomMasterItemId, Long bomItemid);
     // bomDetail 에 해당하는 item 인지
     boolean existsBomItemDetailByItemId(Long bomMasterItemId, Long bomDetailItemId);
+    // item 으로 bom 조회
+    Optional<Long> findByItemIdAndDeleteYnFalse(Long bomMasterItemId);
 }

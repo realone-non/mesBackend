@@ -54,14 +54,23 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     }
 
     //외주생산의뢰 리스트조회
-    public List<OutsourcingProductionResponse> getOutsourcingProductions(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
-        return outsourcingProductionRepository.findAllByCondition(clientId, itemNo, itemName, startDate, endDate);
+    public List<OutsourcingProductionResponse> getOutsourcingProductions(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate) throws BadRequestException {
+        List<OutsourcingProductionResponse> responses = outsourcingProductionRepository.findAllByCondition(clientId, itemNo, itemName, startDate, endDate);
+        for (OutsourcingProductionResponse r : responses) {
+            Long bomMasterId = bomMasterRepository.findByItemIdAndDeleteYnFalse(r.getItemId()).orElseThrow(() -> new BadRequestException("품목에 해당하는 BOM 정보가 존재하지 않습니다."));
+            r.setBomMasterId(bomMasterId);
+        }
+        return responses;
     }
 
     //외주생산의뢰 response 단일 조회
-    public OutsourcingProductionResponse getOutsourcingProductionResponseOrThrow(Long id) throws NotFoundException {
-        return outsourcingProductionRepository.findRequestByIdAndDeleteYnAndUseYn(id)
+    public OutsourcingProductionResponse getOutsourcingProductionResponseOrThrow(Long id) throws NotFoundException, BadRequestException {
+        OutsourcingProductionResponse response = outsourcingProductionRepository.findRequestByIdAndDeleteYnAndUseYn(id)
                 .orElseThrow(() -> new NotFoundException("해당하는 외주생산의뢰 정보가 존재하지 않습니다."));
+
+        Long bomMasterId = bomMasterRepository.findByItemIdAndDeleteYnFalse(response.getItemId()).orElseThrow(() -> new BadRequestException("품목에 해당하는 BOM 정보가 존재하지 않습니다."));
+        response.setBomMasterId(bomMasterId);
+        return response;
 
         //        OutSourcingProductionRequest request = outsourcingProductionRepository.findById(id)
 //                .orElseThrow(() -> new IllegalArgumentException("not found data"));

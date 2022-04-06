@@ -13,10 +13,10 @@ public interface OutsourcingService {
     OutsourcingProductionResponse createOutsourcingProduction(OutsourcingProductionRequestRequest outsourcingProductionRequestRequest) throws NotFoundException, BadRequestException;
 
     //외주생산의뢰 리스트조회
-    List<OutsourcingProductionResponse> getOutsourcingProductions(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate);
+    List<OutsourcingProductionResponse> getOutsourcingProductions(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate) throws BadRequestException;
 
     //외주생산의뢰 조회
-    OutsourcingProductionResponse getOutsourcingProductionResponseOrThrow(Long id) throws NotFoundException;
+    OutsourcingProductionResponse getOutsourcingProductionResponseOrThrow(Long id) throws NotFoundException, BadRequestException;
 
     //외주생산의뢰 수정
     OutsourcingProductionResponse modifyOutsourcingProduction(Long id, OutsourcingProductionRequestRequest outsourcingProduction) throws NotFoundException, BadRequestException;

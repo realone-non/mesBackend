@@ -80,7 +80,7 @@ public class OutSourcingController {
             @RequestParam(required = false) @Parameter(description = "시작날짜") LocalDate startDate,
             @RequestParam(required = false) @Parameter(description = "종료날짜") LocalDate endDate,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         List<OutsourcingProductionResponse> productions = outsourcingService.getOutsourcingProductions(clientId, itemNo, itemName, startDate, endDate);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         return new ResponseEntity<>(productions, OK);
@@ -93,7 +93,7 @@ public class OutSourcingController {
     public ResponseEntity<OutsourcingProductionResponse> getOutsourcingProduction(
             @PathVariable Long id,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         OutsourcingProductionResponse production = outsourcingService.getOutsourcingProductionResponseOrThrow(id);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getItemForms.");

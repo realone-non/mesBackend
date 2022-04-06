@@ -108,6 +108,21 @@ public class BomMasterRepositoryImpl implements BomMasterRepositoryCustom {
         return fetchOne != null;
     }
 
+    // item 으로 bom 조회
+    @Override
+    public Optional<Long> findByItemIdAndDeleteYnFalse(Long bomMasterItemId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(bomMaster.id)
+                        .from(bomMaster)
+                        .where(
+                                bomMaster.item.id.eq(bomMasterItemId),
+                                bomMaster.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
+    }
+
     // 삭제여부 false만 검색
     private BooleanExpression isDeleteYnFalse() {
         return bomMaster.deleteYn.isFalse();

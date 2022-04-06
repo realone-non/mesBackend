@@ -55,4 +55,7 @@ public class OutsourcingProductionResponse {
 
     @Schema(description = "비고")
     String note;
+
+    @Schema(description = "BOM 고유아이디")
+    Long bomMasterId;
 }

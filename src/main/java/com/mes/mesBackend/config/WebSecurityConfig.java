@@ -46,7 +46,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                         "http://localhost:3000",
                                         "http://dev-mes-grid.s3-website.ap-northeast-2.amazonaws.com",
                                         "http://prod-mes-grid.s3-website.ap-northeast-2.amazonaws.com",
-                                        "http://prod-mes.s3-website.ap-northeast-2.amazonaws.com"
+                                        "http://prod-mes.s3-website.ap-northeast-2.amazonaws.com",
+                                        "http://dev-mes-dashboard.s3-website.ap-northeast-2.amazonaws.com",
+                                        "http://prod-mes-dashboard.s3-website.ap-northeast-2.amazonaws.com"
                                 )
                         );
                         // 요청이 허용되는 메소드를 지정한다. 와일드카드(*)를 통해 모든 메소더를 허용할 수 있다.
