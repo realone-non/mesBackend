@@ -67,7 +67,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 produceOrder.contract.client.clientName.as("contractClient"),
                                 produceOrder.contract.contractNo.as("contractNo"),
                                 produceOrder.contract.periodDate.as("periodDate"),
-                                produceOrder.contract.note.as("note")
+                                produceOrder.note.as("note")
                                 )
                 )
                 .from(produceOrder)
