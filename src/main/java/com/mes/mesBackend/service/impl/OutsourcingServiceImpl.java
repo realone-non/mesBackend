@@ -27,10 +27,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     private final OutsourcingInputRepository outsourcingInputRepository;
     private final OutsourcingReturnRepository outsourcingReturnRepository;
     private final BomMasterRepository bomMasterRepository;
-    private final BomItemDetailRepository bomItemDetailRepository;
     private final LotMasterRepository lotMasterRepository;
     private final WareHouseRepository wareHouseRepository;
-    private final LotTypeRepository lotTypeRepository;
     private final AmountHelper amountHelper;
     private final LotHelper lotHelper;
     private final ItemRepository itemRepository;
