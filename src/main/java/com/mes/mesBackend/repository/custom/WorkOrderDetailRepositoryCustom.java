@@ -135,5 +135,5 @@ public interface WorkOrderDetailRepositoryCustom {
     // 작업공정별 생산 정보
     Optional<Long> findOrderStateCountByWorkProcessDivisionAndOrderState(WorkProcessDivision workProcessDivision, OrderState orderState);
     // 작업공절별 생산수량
-    Integer findProductionAmountByWorkProcessDivision(WorkProcessDivision workProcessDivision);
+    Optional<Integer> findProductionAmountByWorkProcessDivision(WorkProcessDivision workProcessDivision);
 }
