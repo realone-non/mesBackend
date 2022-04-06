@@ -29,54 +29,66 @@ public class OutSourcingProductionRawMaterialOutputInfoRepositoryImpl implements
                         Projections.fields(
                                 OutsourcingMaterialReleaseResponse.class,
                                 material.id.as("id"),
-                                bomItem.id.as("itemId"),
+                                item.id.as("itemId"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
-                                bomItem.amount.as("amount"),
                                 material.outputRequestAmount.as("outputRequestAmount"),
                                 material.outputAmount.as("outputAmount"),
-                                request.id.as("requestId")
+                                request.id.as("requestId"),
+                                request.item.id.as("requestItemId")
                         )
                 )
                 .from(material)
+                .leftJoin(item).on(item.id.eq(material.item.id))
                 .leftJoin(request).on(request.id.eq(material.outSourcingProductionRequest.id))
-                .leftJoin(bomItem).on(bomItem.id.eq(material.bomItemDetail.id))
-                .leftJoin(item).on(item.id.eq(bomItem.item.id))
                 .where(
-                        material.outSourcingProductionRequest.id.eq(prodId),
-                        material.useYn.eq(true),
-                        material.deleteYn.eq(false)
+                        request.id.eq(prodId),
+                        material.deleteYn.isFalse()
                 )
                 .fetch();
     }
 
     //외주생산 원재료 출고 대상 정보 단일 조회
-    public Optional<OutsourcingMaterialReleaseResponse> findByMaterialId(Long id){
+    public Optional<OutsourcingMaterialReleaseResponse> findByMaterialId(Long prodId, Long id){
         return Optional.ofNullable(
                 jpaQueryFactory
                         .select(
                                 Projections.fields(
                                         OutsourcingMaterialReleaseResponse.class,
                                         material.id.as("id"),
-                                        bomItem.id.as("itemId"),
+                                        item.id.as("itemId"),
                                         item.itemNo.as("itemNo"),
                                         item.itemName.as("itemName"),
-                                        bomItem.amount.as("amount"),
                                         material.outputRequestAmount.as("outputRequestAmount"),
                                         material.outputAmount.as("outputAmount"),
-                                        request.id.as("requestId")
+                                        request.id.as("requestId"),
+                                        request.item.id.as("requestItemId")
                                 )
                         )
                         .from(material)
+                        .leftJoin(item).on(item.id.eq(material.item.id))
                         .leftJoin(request).on(request.id.eq(material.outSourcingProductionRequest.id))
-                        .leftJoin(bomItem).on(bomItem.id.eq(material.bomItemDetail.id))
-                        .leftJoin(item).on(item.id.eq(bomItem.item.id))
                         .where(
+                                request.id.eq(prodId),
                                 material.id.eq(id),
-                                material.useYn.eq(true),
-                                material.deleteYn.eq(false)
+                                material.deleteYn.isFalse()
                         )
                         .fetchOne()
         );
+    }
+
+    // 외주생산의뢰에 해당하는 원재료출고대상 정보가 존재하는지 여부
+    @Override
+    public boolean existsByRequestId(Long requestId) {
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(material)
+                .where(
+                        material.outSourcingProductionRequest.id.eq(requestId),
+                        material.deleteYn.isFalse()
+                )
+                .fetchFirst();
+
+        return fetchOne != null;
     }
 }

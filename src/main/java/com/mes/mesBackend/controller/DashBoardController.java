@@ -5,7 +5,6 @@ import com.mes.mesBackend.dto.response.OperationStatusResponse;
 import com.mes.mesBackend.dto.response.SalesRelatedStatusResponse;
 import com.mes.mesBackend.dto.response.WorkProcessStatusResponse;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
-import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
@@ -63,10 +62,9 @@ public class DashBoardController {
     @GetMapping("/work-process-status")
     @ResponseBody
     public ResponseEntity<WorkProcessStatusResponse> getWorkProcessStatus(
-            @RequestParam @Parameter(description = "") WorkProcessDivision workProcessDivision,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        WorkProcessStatusResponse response = dashBoardService.getWorkProcessStatus(workProcessDivision);
+        WorkProcessStatusResponse response = dashBoardService.getWorkProcessStatus();
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkProcessStatus.");
         return new ResponseEntity<>(response, OK);

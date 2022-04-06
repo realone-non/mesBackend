@@ -6,6 +6,7 @@ import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
+import com.mes.mesBackend.repository.custom.JpaCustomRepository;
 import com.mes.mesBackend.repository.custom.LotMasterRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -19,7 +20,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PRODUCTION;
+import static com.mes.mesBackend.entity.enumeration.EnrollmentType.*;
 import static com.mes.mesBackend.entity.enumeration.GoodsType.PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.FAMILY;
@@ -221,7 +222,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotType.lotType.as("lotType"),
                                 lotMaster.lotNo.as("lotNo"),
                                 lotMaster.createdAmount.as("inputAmount"),
-                                outSourcingInput.testRequestType.as("testRequestType")
+                                lotMaster.item.testType.as("testRequestType")
                         )
                 )
                 .from(lotMaster)
@@ -246,7 +247,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotType.lotType.as("lotType"),
                                 lotMaster.lotNo.as("lotNo"),
                                 lotMaster.stockAmount.as("inputAmount"),
-                                outSourcingInput.testRequestType.as("testRequestType")
+                                lotMaster.item.testType.as("testRequestType")
                         )
                 )
                 .from(lotMaster)
@@ -271,7 +272,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotType.lotType.as("lotType"),
                                 lotMaster.lotNo.as("lotNo"),
                                 lotMaster.stockAmount.as("inputAmount"),
-                                outSourcingInput.testRequestType.as("testRequestType")
+                                lotMaster.item.testType.as("testRequestType")
                         )
                 )
                 .from(lotMaster)
@@ -572,16 +573,18 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
 
     //외주입고로 LOT 조회
     @Transactional(readOnly = true)
-    public LotMaster findByOutsourcingInput(Long outsourcingInputId){
-        return jpaQueryFactory
-                .selectFrom(lotMaster)
-                .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.id))
-                .where(
-                        lotMaster.outSourcingInput.id.eq(outsourcingInputId),
-                        isDeleteYnFalse(),
-                        lotMaster.useYn.isTrue()
-                )
-                .fetchOne();
+    public Optional<LotMaster> findByOutsourcingInput(Long outsourcingInputId){
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(lotMaster)
+                        .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
+                        .where(
+                                outSourcingInput.id.eq(outsourcingInputId),
+                                isDeleteYnFalse(),
+                                lotMaster.enrollmentType.eq(OUTSOURCING_INPUT)
+                        )
+                        .fetchOne()
+        );
     }
 
     // LOT 마스터 조회, 검색조건: 품목그룹 id, LOT 번호, 품번|품명, 창고 id, 등록유형, 재고유무, LOT 유형, 검사중여부, 유효여부
@@ -810,6 +813,32 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
         );
     }
 
+    //재사용 LOT리스트 조회
+    @Override
+    public List<RecycleLotResponse> findRecycleLots(LocalDate fromDate, LocalDate toDate){
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                RecycleLotResponse.class,
+                                lotMaster.id.as("id"),
+                                lotMaster.lotNo.as("lotNo"),
+                                item.itemName.as("itemName"),
+                                item.itemNo.as("itemNo"),
+                                lotMaster.stockAmount.as("stockAmount"),
+                                lotMaster.workProcess.workProcessName.as("workProcess")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
+                .where(
+                        lotMaster.deleteYn.isFalse(),
+                        dateNull(fromDate, toDate),
+                        lotMaster.enrollmentType.eq(RECYCLE)
+                )
+                .fetch();
+    }
+
     private BooleanExpression isLotNoLengthEq(int length) {
         return lotMaster.lotNo.length().eq(length);
     }
@@ -824,5 +853,9 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
 
     private BooleanExpression isCodeContain(String code) {
         return lotMaster.lotNo.contains(code);
+    }
+
+    private  BooleanExpression dateNull(LocalDate startDate, LocalDate endDate){
+        return startDate != null ? lotMaster.createdDate.between(startDate.atStartOfDay(), LocalDateTime.of(endDate, LocalTime.MAX).withNano(0)) : null;
     }
 }

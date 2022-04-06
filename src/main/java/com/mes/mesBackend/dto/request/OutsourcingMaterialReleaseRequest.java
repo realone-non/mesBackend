@@ -13,13 +13,18 @@ import static com.mes.mesBackend.exception.Message.*;
 @Setter
 @Schema(description = "외주생산 원재료 출고대상 정보")
 public class OutsourcingMaterialReleaseRequest {
-
-    @Schema(description = "BomItem Detail id")
-    Long itemDetailId;
+    @Schema(description = "품목 고유아이디")
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
+    Long itemId;
 
     @Schema(description = "출고요청량")
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
     int outputRequestAmount;
 
-    @Schema(description = "출고요청량")
+    @Schema(description = "출고량")
+    @Min(value = ONE_VALUE, message = NOT_ZERO)
+    @NotNull(message = NOT_NULL)
     int outputAmount;
 }

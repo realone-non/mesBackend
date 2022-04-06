@@ -37,8 +37,8 @@ public class OutSourcingProductionRequest extends BaseTimeEntity {
 
     // 다대일 단방향
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "BOM_MASTER", nullable = false, columnDefinition = "bigint COMMENT 'BomMaster'")
-    private BomMaster bomMaster;        // BOM
+    @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목'", nullable = false)
+    private Item item;
 
     @Column(name = "PRODUCTION_DATE", columnDefinition = "date COMMENT '생산요청일자'")
     private LocalDate productionDate;       // 생산요청일자
@@ -58,14 +58,11 @@ public class OutSourcingProductionRequest extends BaseTimeEntity {
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
     private String note;                        // 비고
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
-    private boolean useYn = true;
-
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    public void update(BomMaster bomMaster, OutsourcingProductionRequestRequest request){
-        setBomMaster(bomMaster);
+    public void update(Item item, OutsourcingProductionRequestRequest request){
+        setItem(item);
         setProductionAmount(request.getProductionAmount());
         setMaterialRequestDate(request.getMaterialRequestDate());
         setPeriodDate(request.getPeriodDate());
@@ -75,5 +72,10 @@ public class OutSourcingProductionRequest extends BaseTimeEntity {
 
     public void delete() {
         setDeleteYn(true);
+    }
+
+    public void put(Item item) {
+        setItem(item);
+        setProductionDate(LocalDate.now());
     }
 }

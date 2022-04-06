@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,6 +14,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Getter
 @Setter
 @Schema(description = "외주입고정보")
+@JsonInclude(NON_NULL)
 public class OutsourcingInputResponse {
     @Schema(description = "고유번호")
     Long id;
@@ -42,13 +44,16 @@ public class OutsourcingInputResponse {
     String warehouseName;
 
     @Schema(description = "수입검사여부")
-    boolean inputTestYn;
+    Boolean inputTestYn;
 
     @Schema(description = "비고")
     String note;
 
     @Schema(description = "외주 검사의뢰 등록 품목")
     String outsourcingInputTestItemName;
+
+    @JsonIgnore
+    int productionAmount;
 
     public OutsourcingInputResponse setOutSourcingInputTestItemName() {
         setOutsourcingInputTestItemName(itemName + "(" + inputDate + ")");

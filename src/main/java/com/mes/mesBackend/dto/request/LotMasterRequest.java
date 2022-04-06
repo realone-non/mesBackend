@@ -80,8 +80,8 @@ public class LotMasterRequest {
             WareHouse wareHouse,
             OutSourcingInput outSourcingInput,
             int stockAmount,
-            int createdAmount,
-            LotType lotType
+            int createdAmount
+//            LotType lotType
     ) {
         setItem(item);
         setWareHouse(wareHouse);

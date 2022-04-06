@@ -134,9 +134,8 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
             PurchaseInputRequest.updateRequest purchaseInputUpdateRequest
     ) throws NotFoundException, BadRequestException {
         PurchaseInput findPurchaseInput = getPurchaseInputOrThrow(purchaseRequestId, purchaseInputId);
-
-        // 해당하는 lot 의 재고수량, 생성수량 변경
         LotMaster lotMaster = getLotMasterOrThrow(findPurchaseInput);
+
         // 해당 lot 사용된거면 수정 불가능
         throwIfLotMasterCreateAmountEqualStockAmount(lotMaster);
         // 해당 lot 가 부품수입검사에 등록이 되어있으면 inputTestYn 수정 불가능, 부품수입검사에 등록 되어있는지 체크
@@ -145,7 +144,8 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
         PurchaseInput newPurchaseInput = mapper.toEntity(purchaseInputUpdateRequest, PurchaseInput.class);
         findPurchaseInput.put(newPurchaseInput);
 
-        lotMaster.updatePurchaseInput(findPurchaseInput.getInputAmount(), purchaseInputUpdateRequest.isInputTestYn() ? 0 : findPurchaseInput.getInputAmount());
+        // 해당하는 lot 의 재고수량, 생성수량 변경
+        lotMaster.updatePurchaseInput(findPurchaseInput.getInputAmount(), purchaseInputUpdateRequest.isInputTestYn() ? lotMaster.getStockAmount() : lotMaster.getStockAmount() + findPurchaseInput.getInputAmount());
         lotMasterRepo.save(lotMaster);
 
         // 구매요청에 입고일시 생성
@@ -161,8 +161,15 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
     private void throwIfLotMasterCheckRequestAmount(int checkRequestAmount, boolean findInputTestYn, boolean newInputTestYn) throws BadRequestException {
         if (findInputTestYn != newInputTestYn) {
             if (checkRequestAmount != 0) {
-                throw new BadRequestException("해당 구매입고는 이미 부품검사의뢰에 등록 되어있으므로 수입검사여부 수정 불가능합니다.");
+                throw new BadRequestException("해당 구매입고는 이미 부품검사의뢰요청 등록 되어있으므로 수입검사여부 수정 불가능합니다.");
             }
+        }
+    }
+
+    // 해당 LOT 부품수입검사에 등록되어있는지 체크
+    private void throwIfLotMasterCheckRequestAmountNotDelete(int checkRequestAmount) throws BadRequestException {
+        if (checkRequestAmount != 0) {
+            throw new BadRequestException("해당 구매입고는 부품검사의뢰요청에 등록 되어있으므로 삭제가 불가능 합니다.");
         }
     }
 
@@ -174,11 +181,15 @@ public class PurchaseInputServiceImpl implements PurchaseInputService {
     // 구매입고 LOT 삭제
     @Override
     public void deletePurchaseInputDetail(Long purchaseRequestId, Long purchaseInputId) throws NotFoundException, BadRequestException {
-        // 구매입고 삭제
         PurchaseInput purchaseInput = getPurchaseInputOrThrow(purchaseRequestId, purchaseInputId);
         LotMaster lotMaster = getLotMasterOrThrow(purchaseInput);
+
         // 해당 LOT 사용되었으면 삭제 불가능
         throwIfLotMasterCreateAmountEqualStockAmount(lotMaster);
+        // 해당 LOT 부품수입검사에 등록되어있는지 체크
+        throwIfLotMasterCheckRequestAmountNotDelete(lotMaster.getCheckRequestAmount());
+
+        // 구매입고 삭제
         purchaseInput.delete();
         // 구매입고 등록 시 생성되었던 lotMaster 삭제
         lotMaster.delete();
