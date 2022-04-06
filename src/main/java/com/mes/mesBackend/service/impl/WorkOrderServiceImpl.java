@@ -163,10 +163,12 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         WorkOrderDetail newWorkOrderDetail = mapper.toEntity(newWorkOrderRequest, WorkOrderDetail.class);
 
+        OrderState orderState = findWorkOrderDetail.getOrderState();
         // 작업지시의 상태값 구하기
-        OrderState orderState = workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(newWorkOrderRequest.getOrderAmount(), findWorkOrderDetail.getProductionAmount(), findWorkOrderDetail.getWorkProcess().getWorkProcessDivision());
+        if (findWorkOrderDetail.getProductionAmount() != newWorkOrderDetail.getProductionAmount()) {
+            orderState = workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(newWorkOrderRequest.getOrderAmount(), findWorkOrderDetail.getProductionAmount(), findWorkOrderDetail.getWorkProcess().getWorkProcessDivision());
+        }
 
-        System.out.println("=======================================================" + orderState);
         findWorkOrderDetail.setOrderState(orderState);
         findWorkOrderDetail.update(newWorkOrderDetail, newWorkLine, newUser);
         workOrderDetailRepo.save(findWorkOrderDetail);
