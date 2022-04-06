@@ -5,7 +5,7 @@ import com.mes.mesBackend.dto.response.OperationStatusResponse;
 import com.mes.mesBackend.dto.response.SalesRelatedStatusResponse;
 import com.mes.mesBackend.dto.response.WorkProcessStatusResponse;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
-import com.mes.mesBackend.helper.LocalDateHelper;
+import com.mes.mesBackend.helper.CalendarHelper;
 import com.mes.mesBackend.repository.ContractRepository;
 import com.mes.mesBackend.repository.LotMasterRepository;
 import com.mes.mesBackend.repository.ShipmentRepository;
@@ -15,13 +15,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.OrderState.ONGOING;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.*;
-import static com.mes.mesBackend.helper.Constants.FORMAT_02;
 
 // 대시보드
 @Service
@@ -31,7 +29,7 @@ public class DashBoardServiceImpl implements DashBoardService {
     private final ContractRepository contractRepo;
     private final ShipmentRepository shipmentRepo;
     private final LotMasterRepository lotMasterRepo;
-    private final LocalDateHelper localDateHelper;
+    private final CalendarHelper localDateHelper;
 
     // 생산현황, 수주현황, 출하현황, 출하완료 갯수 조회
     @Override

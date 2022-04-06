@@ -222,7 +222,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotType.lotType.as("lotType"),
                                 lotMaster.lotNo.as("lotNo"),
                                 lotMaster.createdAmount.as("inputAmount"),
-                                outSourcingInput.testRequestType.as("testRequestType")
+                                lotMaster.item.testType.as("testRequestType")
                         )
                 )
                 .from(lotMaster)
@@ -247,7 +247,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotType.lotType.as("lotType"),
                                 lotMaster.lotNo.as("lotNo"),
                                 lotMaster.stockAmount.as("inputAmount"),
-                                outSourcingInput.testRequestType.as("testRequestType")
+                                lotMaster.item.testType.as("testRequestType")
                         )
                 )
                 .from(lotMaster)
@@ -272,7 +272,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotType.lotType.as("lotType"),
                                 lotMaster.lotNo.as("lotNo"),
                                 lotMaster.stockAmount.as("inputAmount"),
-                                outSourcingInput.testRequestType.as("testRequestType")
+                                lotMaster.item.testType.as("testRequestType")
                         )
                 )
                 .from(lotMaster)
