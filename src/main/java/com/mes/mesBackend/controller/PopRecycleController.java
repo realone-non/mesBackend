@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.request.PopRecycleRequest;
 import com.mes.mesBackend.dto.request.RecycleRequest;
 import com.mes.mesBackend.dto.response.PopRecycleCreateResponse;
 import com.mes.mesBackend.dto.response.PopRecycleResponse;
+import com.mes.mesBackend.dto.response.RecycleLotResponse;
 import com.mes.mesBackend.dto.response.RecycleResponse;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
@@ -21,15 +22,18 @@ import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -89,5 +93,22 @@ public class PopRecycleController {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the RecycleLot");
         return new ResponseEntity<>(response, OK);
+    }
+
+    // 재사용 생성 LOT리스트 조회
+    @GetMapping("/recycle-lot-list")
+    @ResponseBody
+    @Operation(
+            summary = "재사용 생성 LOT리스트 조회"
+    )
+    public ResponseEntity<List<RecycleLotResponse>> getRecycleLots(
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "생성일자 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "생성일자 toDate") LocalDate toDate,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        List<RecycleLotResponse> responseList = popRecycleService.getRecycleLots(fromDate, toDate);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getRecycles.");
+        return new ResponseEntity<>(responseList, OK);
     }
 }

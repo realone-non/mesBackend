@@ -9,6 +9,7 @@ import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
+import jdk.vm.ci.meta.Local;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -104,4 +105,7 @@ public interface LotMasterRepositoryCustom {
     List<SalesRelatedStatusResponse> findSalesRelatedStatusResponseByProductItems(LocalDate fromDate, LocalDate toDate);
     // 주 별로 생산 된 품목 갯수
     Optional<Integer> findCreatedAmountByWeekDate(LocalDate fromDate, LocalDate toDate, Long itemId);
+
+    //재사용 LOT리스트 조회
+    List<RecycleLotResponse> findRecycleLots(LocalDate fromDate, LocalDate toDate);
 }

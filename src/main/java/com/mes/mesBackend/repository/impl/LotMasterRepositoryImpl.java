@@ -6,6 +6,7 @@ import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
+import com.mes.mesBackend.repository.custom.JpaCustomRepository;
 import com.mes.mesBackend.repository.custom.LotMasterRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -19,8 +20,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mes.mesBackend.entity.enumeration.EnrollmentType.OUTSOURCING_INPUT;
-import static com.mes.mesBackend.entity.enumeration.EnrollmentType.PRODUCTION;
+import static com.mes.mesBackend.entity.enumeration.EnrollmentType.*;
 import static com.mes.mesBackend.entity.enumeration.GoodsType.PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.FAMILY;
@@ -813,6 +813,32 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
         );
     }
 
+    //재사용 LOT리스트 조회
+    @Override
+    public List<RecycleLotResponse> findRecycleLots(LocalDate fromDate, LocalDate toDate){
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                RecycleLotResponse.class,
+                                lotMaster.id.as("id"),
+                                lotMaster.lotNo.as("lotNo"),
+                                item.itemName.as("itemName"),
+                                item.itemNo.as("itemNo"),
+                                lotMaster.stockAmount.as("stockAmount"),
+                                lotMaster.workProcess.workProcessName.as("workProcess")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
+                .where(
+                        lotMaster.deleteYn.isFalse(),
+                        dateNull(fromDate, toDate),
+                        lotMaster.enrollmentType.eq(RECYCLE)
+                )
+                .fetch();
+    }
+
     private BooleanExpression isLotNoLengthEq(int length) {
         return lotMaster.lotNo.length().eq(length);
     }
@@ -827,5 +853,9 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
 
     private BooleanExpression isCodeContain(String code) {
         return lotMaster.lotNo.contains(code);
+    }
+
+    private  BooleanExpression dateNull(LocalDate startDate, LocalDate endDate){
+        return startDate != null ? lotMaster.createdDate.between(startDate.atStartOfDay(), LocalDateTime.of(endDate, LocalTime.MAX).withNano(0)) : null;
     }
 }

@@ -4,6 +4,7 @@ import com.mes.mesBackend.dto.request.LotMasterRequest;
 import com.mes.mesBackend.dto.request.PopRecycleRequest;
 import com.mes.mesBackend.dto.response.PopRecycleCreateResponse;
 import com.mes.mesBackend.dto.response.PopRecycleResponse;
+import com.mes.mesBackend.dto.response.RecycleLotResponse;
 import com.mes.mesBackend.dto.response.RecycleResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
@@ -16,6 +17,7 @@ import com.mes.mesBackend.service.PopRecycleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.RECYCLE;
@@ -113,5 +115,10 @@ public class PopRecycleServiceImpl implements PopRecycleService {
         response.setRecycleAmount(badAmountByWorkProcess.getRecycleAmount());
 
         return response;
+    }
+
+    //재사용 LOT조회
+    public List<RecycleLotResponse> getRecycleLots(LocalDate fromDate, LocalDate toDate){
+        return lotMasterRepository.findRecycleLots(fromDate, toDate);
     }
 }
