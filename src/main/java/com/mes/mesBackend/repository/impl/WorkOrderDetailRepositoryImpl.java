@@ -544,6 +544,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         workOrderDetail.expectedWorkDate.eq(now),
                         workOrderDetail.deleteYn.isFalse()
                 )
+                .orderBy(workOrderDetail.createdDate.desc())
                 .fetch();
     }
 
