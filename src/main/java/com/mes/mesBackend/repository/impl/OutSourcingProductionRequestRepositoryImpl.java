@@ -52,6 +52,7 @@ public class OutSourcingProductionRequestRepositoryImpl implements OutsourcingRe
                         dateNull(startDate, endDate),
                         request.deleteYn.eq(false)
                 )
+                .orderBy(request.createdDate.desc())
                 .fetch();
     }
 

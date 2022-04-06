@@ -56,6 +56,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                         dateNull(startDate, endDate),
                         request.deleteYn.isFalse()
                 )
+                .orderBy(request.createdDate.desc())
                 .fetch();
     }
 
@@ -191,6 +192,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                         lotMaster.deleteYn.isFalse(),
                         lotMaster.enrollmentType.eq(OUTSOURCING_INPUT)
                 )
+                .orderBy(lotMaster.createdDate.desc())
                 .fetch();
     }
 
