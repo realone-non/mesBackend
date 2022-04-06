@@ -727,7 +727,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isDeleteYnFalse(),
                         workOrderDetail.orderState.ne(SCHEDULE),
                         workProcess.workProcessDivision.notIn(MATERIAL_INPUT),  // 공정 자제입고 제외
-                        workProcess.workProcessDivision.notIn(SHIPMENT)         // 공정 출하 제외
+                        workProcess.workProcessDivision.notIn(SHIPMENT),         // 공정 출하 제외
+                        workProcess.workProcessDivision.notIn(MATERIAL_MIXING)      // 원료혼합 공정 제외
                 )
                 .orderBy(workOrderDetail.startDate.desc(), workProcess.orders.asc())
                 .fetch();
@@ -795,7 +796,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isDeleteYnFalse(),
                         workOrderDetail.orderState.ne(SCHEDULE),    // 진행중, 완료만 조회
                         workProcess.workProcessDivision.notIn(MATERIAL_INPUT),  // 공정 자제입고 제외
-                        workProcess.workProcessDivision.notIn(SHIPMENT)         // 공정 출하 제외
+                        workProcess.workProcessDivision.notIn(SHIPMENT),         // 공정 출하 제외
+                        workProcess.workProcessDivision.notIn(MATERIAL_MIXING)  // 공정 원료혼합 제외
                 )
                 .orderBy(workOrderDetail.startDate.desc(), workProcess.orders.asc())
                 .fetch();
