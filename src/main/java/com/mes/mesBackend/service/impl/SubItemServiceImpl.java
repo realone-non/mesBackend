@@ -53,8 +53,7 @@ public class SubItemServiceImpl implements SubItemService {
     private void checkSubItemOrder(Item item, Item subItem, int subItemOrder) throws BadRequestException {
         boolean exists = subItemRepository.existsByItemAndSubItemAndDeleteYnFalseAndSubOrders(item, subItem, subItemOrder);
         if (exists) {
-            throw new BadRequestException("same item and subItem cannot have the same subOrders, input itemId: "
-                    + item.getId() + ", input subItemId: " + subItem.getId() + ", input subItemOrders: " + subItemOrder);
+            throw new BadRequestException("품목과 대체품목이 같을 수 없습니다. 확인 후 다시 시도해주세요.");
         }
     }
 

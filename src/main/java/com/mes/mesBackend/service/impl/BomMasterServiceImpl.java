@@ -102,13 +102,14 @@ public class BomMasterServiceImpl implements BomMasterService {
     public BomMasterResponse updateBomMaster(Long bomMasterId, BomMasterRequest bomMasterRequest) throws NotFoundException, BadRequestException {
         BomMaster findBomMaster = getBomMasterOrThrow(bomMasterId);
         Item newItem = itemService.getItemOrThrow(bomMasterRequest.getItem());
+        WorkProcess newWorkProcess = workProcessService.getWorkProcessOrThrow(bomMasterRequest.getWorkProcessId());
 
         // Bom 에 대한 상세 정보가 존재하면 품목정보는 수정 불가능
         if (!findBomMaster.getItem().getId().equals(newItem.getId())) throwIfBomMasterDetailExistIsNotItemUpdate(findBomMaster);
+        // Bom 에 대한 상세 정보가 존재하면 작업공정 수정 불가능
+        if (!findBomMaster.getWorkProcess().getId().equals(newWorkProcess.getId())) throwIfBomMasterDetailExistIsNotItemUpdateWorkProcess(findBomMaster);
 
         BomMaster newBomMaster = mapper.toEntity(bomMasterRequest, BomMaster.class);
-        WorkProcess newWorkProcess = workProcessService.getWorkProcessOrThrow(bomMasterRequest.getWorkProcessId());
-
         findBomMaster.update(newBomMaster, newItem, newWorkProcess);
 
         bomMasterRepository.save(findBomMaster);
@@ -212,5 +213,10 @@ public class BomMasterServiceImpl implements BomMasterService {
     private void throwIfBomMasterDetailExistIsNotItemUpdate(BomMaster bomMaster) throws BadRequestException {
         boolean exists = bomItemDetailRepository.existsByBomMasterAndDeleteYnFalse(bomMaster);
         if (exists) throw new BadRequestException("Bom 에 대한 상세정보가 등록되어 있으므로 품목정보 수정이 불가능합니다. 확인 후 다시 시도해주세요.");
+    }
+    // Bom 에 대한 상세 정보가 존재하면 작업공정 수정 불가능
+    private void throwIfBomMasterDetailExistIsNotItemUpdateWorkProcess(BomMaster bomMaster) throws BadRequestException {
+        boolean exists = bomItemDetailRepository.existsByBomMasterAndDeleteYnFalse(bomMaster);
+        if (exists) throw new BadRequestException("Bom 에 대한 상세정보가 등록되어 있으므로 작업공정 수정이 불가능합니다. 확인 후 다시 시도해주세요.");
     }
 }
