@@ -50,6 +50,8 @@ public class LabelPrintController {
     PopShipmentService popShipmentService;
     @Autowired
     PurchaseInputService purchaseInputService;
+    @Autowired
+    PopRecycleService popRecycleService;
 
     private Logger logger = LoggerFactory.getLogger(LabelPrintController.class);
     private CustomLogger cLogger;
@@ -121,6 +123,7 @@ public class LabelPrintController {
         return new ResponseEntity<>(responses, OK);
     }
 
+    //구매입고 목록 조회
     @GetMapping("/purchase-inputs")
     @ResponseBody
     @Operation(summary = "구매입고 목록", description = "검색조건: 입고일자 fromDate ~ toDate")
@@ -133,6 +136,22 @@ public class LabelPrintController {
         cLogger.info("purchaseInput viewed the list of from getPurchaseInputs!");
         return new ResponseEntity<>(responses, OK);
     }
+
+    //재사용 생성 목록 조회
+    @GetMapping("/recycles")
+    @ResponseBody
+    @Operation(summary = "재사용 목록", description = "검색조건: 재사용생성 fromDate ~ toDate")
+    public ResponseEntity<List<RecycleLotResponse>> getRecycles(
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "생성일자 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "생성일자 toDate") LocalDate toDate
+    ) {
+        List<RecycleLotResponse> responses = popRecycleService.getRecycleLots(fromDate, toDate);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info("purchaseInput viewed the list of from getPurchaseInputs!");
+        return new ResponseEntity<>(responses, OK);
+    }
+
+
 
 //    // 자재 입고 목록 조회
 //    @GetMapping("/material-inputs")
