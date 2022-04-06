@@ -865,15 +865,17 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
 
     // 작업공절별 생산수량
     @Override
-    public Integer findProductionAmountByWorkProcessDivision(WorkProcessDivision workProcessDivision) {
-        return jpaQueryFactory
-                .select(workOrderDetail.productionAmount.sum())
-                .from(workOrderDetail)
-                .where(
-                        workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision),
-                        workOrderDetail.deleteYn.isFalse()
-                )
-                .fetchOne();
+    public Optional<Integer> findProductionAmountByWorkProcessDivision(WorkProcessDivision workProcessDivision) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(workOrderDetail.productionAmount.sum())
+                        .from(workOrderDetail)
+                        .where(
+                                workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision),
+                                workOrderDetail.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
     }
 
     // 작업지시 startDate 조회

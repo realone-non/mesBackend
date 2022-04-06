@@ -65,27 +65,27 @@ public class DashBoardServiceImpl implements DashBoardService {
         // 원료혼합
         response.setMaterialMicingOngoingAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(MATERIAL_MIXING, ONGOING).orElse(0L));
         response.setMaterialMicingCompletionAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(MATERIAL_MIXING, COMPLETION).orElse(0L));
-        response.setMaterialMicingProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(MATERIAL_MIXING));
+        response.setMaterialMicingProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(MATERIAL_MIXING).orElse(0));
 
         // 충진
         response.setFillingOngoingAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(FILLING, ONGOING).orElse(0L));
         response.setFillingCompletionAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(FILLING, COMPLETION).orElse(0L));
-        response.setFillingProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(FILLING));
+        response.setFillingProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(FILLING).orElse(0));
 
         // 캡조립
         response.setCapAssemblyOngoingAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(CAP_ASSEMBLY, ONGOING).orElse(0L));
         response.setCapAssemblyCompletionAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(CAP_ASSEMBLY, COMPLETION).orElse(0L));
-        response.setCapAssemblyProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(CAP_ASSEMBLY));
+        response.setCapAssemblyProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(CAP_ASSEMBLY).orElse(0));
 
         // 라벨링
         response.setLabelingOngoingAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(LABELING, ONGOING).orElse(0L));
         response.setLabelingCompletionAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(LABELING, COMPLETION).orElse(0L));
-        response.setLabelingProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(LABELING));
+        response.setLabelingProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(LABELING).orElse(0));
 
         // 포장
         response.setPackagingOngoingAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(PACKAGING, ONGOING).orElse(0L));
         response.setPackagingCompletionAmount(workOrderDetailRepo.findOrderStateCountByWorkProcessDivisionAndOrderState(PACKAGING, COMPLETION).orElse(0L));
-        response.setPackagingProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(PACKAGING));
+        response.setPackagingProductionAmount(workOrderDetailRepo.findProductionAmountByWorkProcessDivision(PACKAGING).orElse(0));
 
         return response;
     }
