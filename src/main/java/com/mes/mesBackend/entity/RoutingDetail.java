@@ -113,6 +113,7 @@ public class RoutingDetail extends BaseTimeEntity {
         setMainProcessYn(newRoutingDetail.mainProcessYn);
         setLastProcessYn(newRoutingDetail.lastProcessYn);
         setUseYn(newRoutingDetail.useYn);
+        setWorkStartDate(newRoutingDetail.workStartDate);
     }
 
     public void delete() {
