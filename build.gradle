@@ -51,9 +51,6 @@ dependencies {
 //	implementation 'org.mongodb:mongo-java-driver:3.12.10'                                        // mongo db
 //	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb:2.6.1'		      // mongo db
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb:2.4.4'
-	implementation group: 'com.google.code.gson', name: 'gson', version: '2.7'					// gson
-
-
 }
 
 test {

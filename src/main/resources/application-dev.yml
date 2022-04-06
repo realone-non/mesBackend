@@ -63,7 +63,7 @@ spring:
     check-template-location: false
   mvc:
     converters:
-      preferred-json-mapper: gson
+      preferred-json-mapper: jackson
 
 # aws s3 bucket
 cloud:

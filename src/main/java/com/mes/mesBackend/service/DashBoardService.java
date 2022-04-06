@@ -1,6 +1,6 @@
 package com.mes.mesBackend.service;
 
-import com.google.gson.JsonArray;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mes.mesBackend.dto.response.ItemInventoryStatusResponse;
 import com.mes.mesBackend.dto.response.OperationStatusResponse;
 import com.mes.mesBackend.dto.response.WorkProcessStatusResponse;
@@ -17,9 +17,9 @@ public interface DashBoardService {
     // 품목계정 별 재고현황 정보
     List<ItemInventoryStatusResponse> getItemInventoryStatusResponse(GoodsType goodsType);
     // 매출관련현황 - 수주
-    JsonArray getContractSaleRelatedStatus();
+    List<ObjectNode> getContractSaleRelatedStatus();
     // 매출관련현황 - 제품 생산
-    JsonArray getProductSaleRelatedStatus();
+    List<ObjectNode> getProductSaleRelatedStatus();
     // 매출관련현황 - 제품출고
-    JsonArray getShipmentSaleRelatedStatus();
+    List<ObjectNode> getShipmentSaleRelatedStatus();
 }

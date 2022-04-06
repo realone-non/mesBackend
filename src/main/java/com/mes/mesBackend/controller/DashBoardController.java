@@ -1,6 +1,6 @@
 package com.mes.mesBackend.controller;
 
-import com.google.gson.JsonArray;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mes.mesBackend.dto.response.ItemInventoryStatusResponse;
 import com.mes.mesBackend.dto.response.OperationStatusResponse;
 import com.mes.mesBackend.dto.response.WorkProcessStatusResponse;
@@ -92,10 +92,10 @@ public class DashBoardController {
     )
     @GetMapping("/contract-sales-related-status")
     @ResponseBody
-    public ResponseEntity<JsonArray> getContractSaleRelatedStatus(
+    public ResponseEntity<List<ObjectNode>> getContractSaleRelatedStatus(
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        JsonArray responses = dashBoardService.getContractSaleRelatedStatus();
+        List<ObjectNode> responses = dashBoardService.getContractSaleRelatedStatus();
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getContractSaleRelatedStatus.");
         return new ResponseEntity<>(responses, OK);
@@ -107,10 +107,10 @@ public class DashBoardController {
     )
     @GetMapping("/product-sales-related-status")
     @ResponseBody
-    public ResponseEntity<JsonArray> getProductSaleRelatedStatus(
+    public ResponseEntity<List<ObjectNode>> getProductSaleRelatedStatus(
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        JsonArray responses = dashBoardService.getProductSaleRelatedStatus();
+        List<ObjectNode> responses = dashBoardService.getProductSaleRelatedStatus();
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProductSaleRelatedStatus.");
         return new ResponseEntity<>(responses, OK);
@@ -122,10 +122,10 @@ public class DashBoardController {
     )
     @GetMapping("/shipment-sales-related-status")
     @ResponseBody
-    public ResponseEntity<JsonArray> getShipmentSaleRelatedStatus(
+    public ResponseEntity<List<ObjectNode>> getShipmentSaleRelatedStatus(
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        JsonArray responses = dashBoardService.getShipmentSaleRelatedStatus();
+        List<ObjectNode> responses = dashBoardService.getShipmentSaleRelatedStatus();
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getShipmentSaleRelatedStatus.");
         return new ResponseEntity<>(responses, OK);
