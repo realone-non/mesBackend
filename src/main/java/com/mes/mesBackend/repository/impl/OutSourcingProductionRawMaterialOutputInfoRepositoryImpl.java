@@ -45,6 +45,7 @@ public class OutSourcingProductionRawMaterialOutputInfoRepositoryImpl implements
                         request.id.eq(prodId),
                         material.deleteYn.isFalse()
                 )
+                .orderBy(material.createdDate.desc())
                 .fetch();
     }
 

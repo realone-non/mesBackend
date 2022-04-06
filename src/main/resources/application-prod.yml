@@ -61,6 +61,9 @@ spring:
 
   freemarker:
     check-template-location: false
+  mvc:
+    converters:
+      preferred-json-mapper: jackson
 
 # aws s3 bucket
 # aws s3 bucket

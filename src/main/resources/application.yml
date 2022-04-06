@@ -59,6 +59,10 @@ spring:
 
   freemarker:
     check-template-location: false
+  mvc:
+    converters:
+      preferred-json-mapper:
+      # https://dblog94.tistory.com/entry/springframeworkhttpconverterHttpMessageNotWritableException-Could-not-write-JSON-JsonObject
 
 # aws s3 bucket
 cloud:
