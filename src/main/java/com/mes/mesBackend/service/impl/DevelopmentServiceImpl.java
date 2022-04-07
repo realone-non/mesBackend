@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
+// 개발품목 등록
 @Service
 @RequiredArgsConstructor
 public class DevelopmentServiceImpl implements DevelopmentService {

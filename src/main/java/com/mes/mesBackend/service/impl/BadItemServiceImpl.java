@@ -63,7 +63,7 @@ public class BadItemServiceImpl implements BadItemService {
         // 코드가 수정되었으면 기존 코드 존재하는 코드인지 체크
         if (!findBadItem.getBadItemCode().equals(badItemRequest.getBadItemCode())) checkExistBadItemCode(badItemRequest.getBadItemCode());
         // 작업공정이 변경 되었을때 불량정보 등록되어 있으면 공정수정 불가능
-        if (!findBadItem.getWorkProcess().getId().equals(newWorkProcess.getId())) throwIfExistsBadItemEnrollmentIsWorkProcessNotUpdate(newBadItem.getId());
+        if (!findBadItem.getWorkProcess().getId().equals(newWorkProcess.getId())) throwIfExistsBadItemEnrollmentIsWorkProcessNotUpdate(findBadItem.getId());
 
         findBadItem.update(newBadItem, newWorkProcess);
         badItemRepository.save(findBadItem);
@@ -109,6 +109,6 @@ public class BadItemServiceImpl implements BadItemService {
     // 불량정보 등록되어 있으면 공정수정 불가능
     private void throwIfExistsBadItemEnrollmentIsWorkProcessNotUpdate(Long badItemId) throws BadRequestException {
         boolean exists = workOrderBadItemRepository.existByBadItemAndDeleteYnFalse(badItemId);
-        if (exists) throw new BadRequestException("해당 불량유형은 불량정ㅂ로 등록되어 있으므로 공정정보 수정이 불가능합니다.");
+        if (exists) throw new BadRequestException("해당 불량유형은 불량정보로 등록되어 있으므로 공정정보 수정이 불가능합니다.");
     }
 }

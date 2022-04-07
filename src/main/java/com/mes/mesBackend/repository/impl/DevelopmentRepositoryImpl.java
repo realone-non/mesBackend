@@ -122,7 +122,8 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                                 developmentState.developmentChildrenStatus.as("childrenStatus"),
                                 developmentState.ver.as("ver"),
                                 developmentState.changeContents.as("changeContents"),
-                                developmentState.meetingType.as("meetingType")
+                                developmentState.meetingType.as("meetingType"),
+                                developmentState.orders.as("orders")
                         )
                 )
                 .from(developmentState)
@@ -154,7 +155,8 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                                 developmentState.developmentChildrenStatus.as("childrenStatus"),
                                 developmentState.ver.as("ver"),
                                 developmentState.changeContents.as("changeContents"),
-                                developmentState.meetingType.as("meetingType")
+                                developmentState.meetingType.as("meetingType"),
+                                developmentState.orders.as("orders")
                         )
                 )
                 .from(developmentState)

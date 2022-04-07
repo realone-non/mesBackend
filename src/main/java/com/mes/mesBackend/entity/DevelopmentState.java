@@ -60,6 +60,9 @@ public class DevelopmentState extends BaseTimeEntity{
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
+    @Column(name = "ORDERS", columnDefinition = "int COMMENT '순번'")
+    private int orders;
+
     public void update(DevelopmentStateRequest request){
         setDevelopmentStatus(request.getDevelopmentStatus());
         setDevelopmentChildrenStatus(request.getDevelopmentChildrenStatus());
@@ -67,6 +70,7 @@ public class DevelopmentState extends BaseTimeEntity{
         setVer(request.getVer());
         setChangeContents(request.getChangeContents());
         setMeetingType(request.getMeetingType());
+        setOrders(request.getOrders());
     }
 
     public void delete(){

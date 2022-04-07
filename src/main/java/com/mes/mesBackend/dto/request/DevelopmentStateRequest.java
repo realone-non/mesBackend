@@ -33,4 +33,7 @@ public class DevelopmentStateRequest {
 
     @Schema(description = "회의 구분")
     String meetingType;
+
+    @Schema(description = "순번")
+    int orders;
 }

@@ -43,7 +43,7 @@ public class WorkLine extends BaseTimeEntity {
     @JoinColumn(name = "WORK_PROCESS", columnDefinition = "bigint COMMENT '작업공정'")
     private WorkProcess workProcess;        // 작업공정
 
-    @Column(name = "POP_START_FORMID", nullable = false, columnDefinition = "varchar(255) COMMENT 'POP 시작 FORMID'")
+    @Column(name = "POP_START_FORMID", columnDefinition = "varchar(255) COMMENT 'POP 시작 FORMID'")
     private String popStartFormid;      // POP 시작 FORMID
 
 //    @ManyToOne(fetch = FetchType.LAZY)
