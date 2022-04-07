@@ -131,7 +131,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isExpectedWorkDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
-                .orderBy(workOrderDetail.createdDate.desc())
+                .orderBy(workOrderDetail.createdDate.desc(), workOrderDetail.workProcess.orders.asc())
                 .fetch();
     }
 
