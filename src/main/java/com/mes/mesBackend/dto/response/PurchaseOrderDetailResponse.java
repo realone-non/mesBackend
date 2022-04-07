@@ -75,6 +75,9 @@ public class PurchaseOrderDetailResponse {
 //    @Schema(description = "지시상태")
 //    OrderState orderState;
 
+    @Schema(description = "수입검사여부")
+    boolean inputTestYn;
+
     public PurchaseOrderDetailResponse putOrderPossibleAmountAndInputAmount(int allInputAmount) {
         setInputAmount(allInputAmount);
         setOrderPossibleAmount(this.orderAmount - this.inputAmount);

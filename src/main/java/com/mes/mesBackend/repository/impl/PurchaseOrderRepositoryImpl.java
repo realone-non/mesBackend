@@ -200,7 +200,8 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 purchaseRequest.note.as("note"),
                                 client.clientName.as("manufacturerName"),
                                 purchaseRequest.ordersState.as("orderState"),
-                                item.testType.as("testType")
+                                item.testType.as("testType"),
+                                purchaseRequest.inputTestYn.as("inputTestYn")
                         )
                 )
                 .from(purchaseRequest)
@@ -241,7 +242,8 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 purchaseRequest.note.as("note"),
                                 client.clientName.as("manufacturerName"),
                                 purchaseRequest.ordersState.as("orderState"),
-                                item.testType.as("testType")
+                                item.testType.as("testType"),
+                                purchaseRequest.inputTestYn.as("inputTestYn")
                         )
                 )
                 .from(purchaseRequest)
