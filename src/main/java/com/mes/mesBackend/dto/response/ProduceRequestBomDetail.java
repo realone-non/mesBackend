@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.Item;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.TestType;
@@ -7,9 +8,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 @Getter
 @Setter
 @Schema
+@JsonInclude(NON_NULL)
 public class ProduceRequestBomDetail {
     @Schema(description = "품목 id")
     Long itemId;
@@ -46,7 +50,9 @@ public class ProduceRequestBomDetail {
         setManufacturerPartNo(item.getManufacturerPartNo());
         setUnit(item.getUnit().getUnitCodeName());
         setTestType(item.getTestType());
-        setManufacturer(item.getManufacturer().getClientName());
+        if (item.getManufacturer() != null) {
+            setManufacturer(item.getManufacturer().getClientName());
+        }
         setGoodsType(item.getItemAccount().getGoodsType());
         return this;
     }
