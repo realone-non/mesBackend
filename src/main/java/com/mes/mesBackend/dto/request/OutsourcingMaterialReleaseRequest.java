@@ -24,7 +24,5 @@ public class OutsourcingMaterialReleaseRequest {
     int outputRequestAmount;
 
     @Schema(description = "출고량")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
-    @NotNull(message = NOT_NULL)
     int outputAmount;
 }

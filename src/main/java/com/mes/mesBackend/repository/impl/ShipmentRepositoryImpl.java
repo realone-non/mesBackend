@@ -1,7 +1,7 @@
 package com.mes.mesBackend.repository.impl;
 
+import com.mes.mesBackend.dto.response.ItemResponse;
 import com.mes.mesBackend.dto.response.PopShipmentResponse;
-import com.mes.mesBackend.dto.response.SalesRelatedStatusResponse;
 import com.mes.mesBackend.dto.response.ShipmentResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
@@ -209,12 +209,12 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
     // 매출관련현황 - 제품 출고
     // 현재 달에 가장 많이 출고 된 품목 5개
     @Override
-    public List<SalesRelatedStatusResponse> findSalesRelatedStatusResponseByShipmentItems(LocalDate fromDate, LocalDate toDate) {
+    public List<ItemResponse.noAndName> findSalesRelatedStatusResponseByShipmentItems(LocalDate fromDate, LocalDate toDate) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
-                                SalesRelatedStatusResponse.class,
-                                item.id.as("itemId"),
+                                ItemResponse.noAndName.class,
+                                item.id.as("id"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName")
                         )
