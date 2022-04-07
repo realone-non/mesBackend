@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.ClientResponse;
+import com.mes.mesBackend.dto.response.ItemResponse;
 import com.mes.mesBackend.dto.response.SalesRelatedStatusResponse;
 import com.mes.mesBackend.entity.Contract;
 import com.mes.mesBackend.entity.QContract;
@@ -86,12 +87,12 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
 
     // 매출관련현황 - 수주
     @Override
-    public List<SalesRelatedStatusResponse> findSalesRelatedStatusResponseByContractItems(LocalDate fromDate, LocalDate toDate) {
+    public List<ItemResponse.noAndName> findSalesRelatedStatusResponseByContractItems(LocalDate fromDate, LocalDate toDate) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
-                                SalesRelatedStatusResponse.class,
-                                item.id.as("itemId"),
+                                ItemResponse.noAndName.class,
+                                item.id.as("id"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName")
                         )

@@ -1,7 +1,7 @@
 package com.mes.mesBackend.repository.custom;
 
+import com.mes.mesBackend.dto.response.ItemResponse;
 import com.mes.mesBackend.dto.response.PopShipmentResponse;
-import com.mes.mesBackend.dto.response.SalesRelatedStatusResponse;
 import com.mes.mesBackend.dto.response.ShipmentResponse;
 import com.mes.mesBackend.entity.ShipmentItem;
 import com.mes.mesBackend.entity.enumeration.OrderState;
@@ -30,7 +30,7 @@ public interface ShipmentRepositoryCustom {
     Optional<Long> findShipmentCountByToday(OrderState orderState);
     // 매출관련현황 - 제품 출고
     // 현재 달에 가장 많이 출고 된 품목 5개
-    List<SalesRelatedStatusResponse> findSalesRelatedStatusResponseByShipmentItems(LocalDate fromDate, LocalDate toDate);
+    List<ItemResponse.noAndName> findSalesRelatedStatusResponseByShipmentItems(LocalDate fromDate, LocalDate toDate);
     // 주 별로 출하 된 품목 갯수
     Optional<Integer> findShipmentAmountByWeekDate(LocalDate fromDate, LocalDate toDate, Long itemId);
 }

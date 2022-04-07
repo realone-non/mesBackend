@@ -766,12 +766,12 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
 
     // 매출관련현황 - 제품 생산
     @Override
-    public List<SalesRelatedStatusResponse> findSalesRelatedStatusResponseByProductItems(LocalDate fromDate, LocalDate toDate) {
+    public List<ItemResponse.noAndName>findSalesRelatedStatusResponseByProductItems(LocalDate fromDate, LocalDate toDate) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
-                                SalesRelatedStatusResponse.class,
-                                item.id.as("itemId"),
+                                ItemResponse.noAndName.class,
+                                item.id.as("id"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName")
                         )

@@ -101,7 +101,7 @@ public interface LotMasterRepositoryCustom {
 
     // 매출관련현황 - 제품 생산
     // 현재 달에 가장 많이 생산 된 완제품 품목 5개
-    List<SalesRelatedStatusResponse> findSalesRelatedStatusResponseByProductItems(LocalDate fromDate, LocalDate toDate);
+    List<ItemResponse.noAndName> findSalesRelatedStatusResponseByProductItems(LocalDate fromDate, LocalDate toDate);
     // 주 별로 생산 된 품목 갯수
     Optional<Integer> findCreatedAmountByWeekDate(LocalDate fromDate, LocalDate toDate, Long itemId);
 
