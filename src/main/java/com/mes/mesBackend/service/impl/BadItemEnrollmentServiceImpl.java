@@ -360,6 +360,6 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
     private void throwIfRealLotInputAmountCheck(Long dummyLotId) throws BadRequestException {
         List<LotMaster> checkRealLots = lotEquipmentConnectRepository.findChildLotByChildLotOfParentLotCreatedDateDesc(dummyLotId);
         boolean noneMatch = checkRealLots.stream().allMatch(n -> n.getInputAmount() == 0);
-        if (!noneMatch) throw new BadRequestException("공정이 진행중인 LOT 이므로 삭제 할 수 없습니다.");
+        if (!noneMatch) throw new BadRequestException("공정이 진행중인 LOT 이므로 생성, 수정, 삭제를 할 수 없습니다.");
     }
 }
