@@ -26,7 +26,6 @@ import com.mes.mesBackend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -34,10 +33,11 @@ import org.springframework.stereotype.Service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.UserType.NEW;
+import static com.mes.mesBackend.entity.enumeration.UserType.NORMAL;
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 
 @Service
@@ -70,16 +70,6 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordHashing(userRequest.getUserCode().getBytes(), salt));
         user.addJoin(department);
         user.setUserType(NEW);
-
-        // 권한 추가
-        // RoleUser 테이블에
-//        for (Long roleId : userRequest.getRoles()) {
-//            Role role = roleRepository.findById(roleId).orElseThrow(() -> new NotFoundException("role does not exist. input role id: " + roleId));
-//            UserRole userRole = new UserRole();
-//            userRole.save(user, role);
-//            userRoleRepository.save(userRole);
-//            user.getUserRoles().add(userRole);
-//        }
 
         userRepository.save(user);
         return mapper.toResponse(user, UserResponse.class);
@@ -141,8 +131,11 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("비밀번호가 잘못 입력 되었습니다. 비밀번호를 정확히 입력해 주세요.");
         }
 
+        List<UserType> userRoles = new ArrayList<>();
+        userRoles.add(user.getUserType());
+
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(user.getUserCode(), user.getPassword(), Collections.emptyList());
+                new UsernamePasswordAuthenticationToken(user.getUserCode(), user.getPassword(), userRoles);
 
         // AccessToken, RefreshToken 생성
         String accessToken = jwtTokenProvider.createAccessToken(authenticationToken);

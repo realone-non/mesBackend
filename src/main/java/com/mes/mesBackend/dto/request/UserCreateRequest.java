@@ -9,8 +9,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import java.util.List;
-
 import static com.mes.mesBackend.exception.Message.*;
 
 @Getter
