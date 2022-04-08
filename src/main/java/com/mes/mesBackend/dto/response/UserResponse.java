@@ -55,7 +55,7 @@ public class UserResponse {
     @Schema(description = "메모")
     String description;
 
-    @Schema(description = "유저유형")
+    @Schema(description = "유저유형(권한)")
     UserType userType;
 
     @Getter

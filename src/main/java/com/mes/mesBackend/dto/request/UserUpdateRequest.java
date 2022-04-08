@@ -9,8 +9,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import java.util.List;
-
 import static com.mes.mesBackend.exception.Message.*;
 
 @Getter
@@ -57,6 +55,6 @@ public class UserUpdateRequest {
     @Schema(description = "메모")
     String description;
 
-    @Schema(description = "유저유형")
+    @Schema(description = "유저유형(권한)")
     UserType userType;
 }

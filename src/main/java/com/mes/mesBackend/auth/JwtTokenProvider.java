@@ -1,5 +1,6 @@
 package com.mes.mesBackend.auth;
 
+import com.mes.mesBackend.entity.enumeration.UserType;
 import com.mes.mesBackend.exception.CustomJwtException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -8,15 +9,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,6 +28,7 @@ public class JwtTokenProvider {
 
     private static final Long ACCESS_TOKEN_EXPIRE_TIME = 24 * 60 * 60 *  1000L;          // 24시간
     private static final Long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;      // 7일
+    private static final String ROLES = "roles";
 
 //    private static final Long ACCESS_TOKEN_EXPIRE_TIME = 60 * 1000L;          // 1분
 //    private static final Long REFRESH_TOKEN_EXPIRE_TIME = 120 * 1000L;      // 2분
@@ -44,18 +45,20 @@ public class JwtTokenProvider {
 
         JwtBuilder builder = Jwts.builder();
 
+        // 권한 가져오기
+        String authority = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).findFirst().orElse(UserType.NEW.getAuthority());
+
         // Header
-        builder.setHeaderParam("typ", "JWT");       // header "typ": JWT
-        builder.signWith(SignatureAlgorithm.HS256, secretKey);  // header "alg": HS256
+        builder.setHeaderParam("typ", "JWT");                         // "typ": JWT
+        builder.signWith(SignatureAlgorithm.HS256, secretKey);                     // "alg": HS256
 
         // payLoad
-//        builder.claim(ROLES, authentication.getAuthorities().toString().split(","));      // "roles": "ROLE_USER"
-        builder.setSubject(authentication.getName());       // "sub": userCode
-        builder.setExpiration(new Date(now + ACCESS_TOKEN_EXPIRE_TIME));    // "exp": 1516239022
-        builder.setIssuedAt(new Date());            // "iss": 15162120  토큰 발행시간 정보
+        builder.claim(ROLES, authority);                                  // "roles": "ROLE_USER"
+        builder.setSubject(authentication.getName());                             // "sub": userCode
+        builder.setExpiration(new Date(now + ACCESS_TOKEN_EXPIRE_TIME));          // "exp": 1516239022
+        builder.setIssuedAt(new Date());                                          // "iss": 15162120  토큰 발행시간 정보
 
-        String accessToken = builder.compact();
-        return accessToken;
+        return builder.compact();
     }
 
 //
@@ -82,12 +85,11 @@ public class JwtTokenProvider {
         Claims claims = parseClaims(accessToken);
 
         // claims 에서 권한 정보 가져오기
-        Collection<? extends GrantedAuthority> authorities =
-                Collections.emptyList();
-//                Arrays.stream(claims.get(ROLES).toString().split(","))
-//                        .map(SimpleGrantedAuthority::new)
-//                        .collect(Collectors.toList());
+        Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get(ROLES).toString().split(","))
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
 
+        System.out.println(authorities.stream().map(GrantedAuthority::getAuthority).findFirst());
         // UserDetails 객체를 만들어서 Authentication 리턴
         UserDetails principal = new User(claims.getSubject(), "", authorities);
 
