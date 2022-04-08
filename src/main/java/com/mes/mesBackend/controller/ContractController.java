@@ -102,9 +102,10 @@ public class ContractController {
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "수주기간 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "수주기간 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "화폐 id") Long currencyId,
+            @RequestParam(required = false) @Parameter(description = "마감일자 등록 여부(등록: true, 미등록: false)") Boolean deadlineDateYn,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<ContractResponse> contracts = contractService.getContracts(clientName, userName, fromDate, toDate, currencyId);
+        List<ContractResponse> contracts = contractService.getContracts(clientName, userName, fromDate, toDate, currencyId, deadlineDateYn);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of currencyId: " + currencyId + " from getContracts.");
         return new ResponseEntity<>(contracts, OK);

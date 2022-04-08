@@ -116,6 +116,9 @@ public class Contract extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;  // 삭제여부
 
+    @Column(name = "DEAD_LINE_DATE", columnDefinition = "date COMMENT '마감일자'")
+    private LocalDate deadlineDate;
+
     public void addJoin(Client client, User user, Currency currency, WareHouse outPutWareHouse, PayType payType) {
         setClient(client);
         setUser(user);
@@ -150,6 +153,7 @@ public class Contract extends BaseTimeEntity {
         setShipmentService(newContract.shipmentService);
         setShipmentWk(newContract.shipmentWk);
         setNote(newContract.note);
+        setDeadlineDate(newContract.deadlineDate);
     }
 
     public void delete() {

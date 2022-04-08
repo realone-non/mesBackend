@@ -81,6 +81,23 @@ public class ContractResponse {
     @Schema(description = "비고")
     String note;
 
+    @Schema(description = "마감일자")
+    @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
+    LocalDate deadlineDate;
+
+    @Schema(description = "마감 여부")
+    Boolean isPeriod;
+
+    public ContractResponse setIsPeriod() {
+        if (deadlineDate != null) {
+            LocalDate now = LocalDate.now();
+            setIsPeriod(deadlineDate.isEqual(now) || deadlineDate.isBefore(now));
+        } else {
+            setIsPeriod(null);
+        }
+        return this;
+    }
+
     @Getter
     @Setter
     @Schema(description = "수주")

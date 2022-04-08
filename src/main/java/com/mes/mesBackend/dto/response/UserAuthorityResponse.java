@@ -1,6 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.enumeration.UserType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,4 +25,7 @@ public class UserAuthorityResponse {
 
     @Schema(description = "부서명")
     String deptName;
+
+    @Schema(description = "권한")
+    UserType userType;
 }
