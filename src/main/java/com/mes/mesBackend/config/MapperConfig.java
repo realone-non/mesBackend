@@ -34,7 +34,6 @@ public class MapperConfig {
         modelMapper.addConverter(toContractItemResponse);
         modelMapper.addConverter(contractToProduceOrderConverter);
         modelMapper.addConverter(contractItemToProduceOrderConverter);
-//        modelMapper.addConverter(toOutsourcingInputConverter);
 
         return modelMapper;
     }

@@ -3,12 +3,13 @@ package com.mes.mesBackend.entity;
 import com.mes.mesBackend.entity.enumeration.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
@@ -16,13 +17,11 @@ import static javax.persistence.GenerationType.AUTO;
 
 // 직원(작업자)
 @AllArgsConstructor
-@NoArgsConstructor
+//@NoArgsConstructor
 @Entity(name = "USERS")
 @Data
 public class User extends BaseTimeEntity implements UserDetails {
-
-    @Id
-    @GeneratedValue(strategy = AUTO)
+    @Id @GeneratedValue(strategy = AUTO)
     @Column(name = "ID", columnDefinition = "bigint COMMENT '직원 고유아이디'")
     private Long id;
 
@@ -38,7 +37,6 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(name = "KOR_NAME", nullable = false, columnDefinition = "varchar(255) COMMENT '이름'")
     private String korName;    // 이름
 
-    // 다대일 단방향
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "DEPARTMENTS_ID", columnDefinition = "bigint COMMENT '부서'")
     private Department department;  // 부서
@@ -76,12 +74,9 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(name = "IMAGE_URL", columnDefinition = "varchar(255) COMMENT '프로필사진 url'")
     private String imageUrl;
 
-    @Column(name = "USER_TYPE", columnDefinition = "varchar(255) COMMENT '유저유형'")
+    @Column(name = "USER_TYPE", columnDefinition = "varchar(255) COMMENT '권한'", nullable = false)
     @Enumerated(STRING)
     private UserType userType;
-//
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-//    private List<UserRole> userRoles = new ArrayList<>();
 
     public void put(User newUser, Department newDepartment) {
         setKorName(newUser.korName);
@@ -108,15 +103,10 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        List<UserType> roles = new ArrayList<>();
+        roles.add(this.userType);
+        return roles;
     }
-
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return this.userRoles.stream()
-//                .map(userRole -> new SimpleGrantedAuthority(userRole.getRole().getRole()))
-//                .collect(Collectors.toList());
-//    }
 
     @Override
     public String getUsername() {
@@ -141,5 +131,8 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public User() {
     }
 }
