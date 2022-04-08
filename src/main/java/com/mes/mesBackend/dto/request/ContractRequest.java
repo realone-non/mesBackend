@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mes.mesBackend.entity.enumeration.ProductionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 import static com.mes.mesBackend.exception.Message.*;
+import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
 import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 @Getter
@@ -88,4 +90,9 @@ public class ContractRequest {
 
     @Schema(description = "비고")
     String note;
+
+    @Schema(description = "마감일자")
+    @DateTimeFormat(pattern = YYYY_MM_DD)
+    LocalDate deadlineDate;
+
 }

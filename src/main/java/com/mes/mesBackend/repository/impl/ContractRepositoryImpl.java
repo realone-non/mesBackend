@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.ClientResponse;
+import com.mes.mesBackend.dto.response.DeadlineResponse;
 import com.mes.mesBackend.dto.response.ItemResponse;
 import com.mes.mesBackend.dto.response.SalesRelatedStatusResponse;
 import com.mes.mesBackend.entity.Contract;
@@ -129,6 +130,49 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
                         .groupBy(item.id)
                         .fetchOne()
         );
+    }
+
+    // 마감일자 단일 조회
+    @Override
+    public Optional<DeadlineResponse> findDeadlineResponseByContractId(Long id) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(
+                                Projections.fields(
+                                        DeadlineResponse.class,
+                                        contract.id.as("contractId"),
+                                        contract.contractNo.as("contractNo"),
+                                        contract.deadlineDate.as("deadlineDate")
+                                )
+                        )
+                        .from(contract)
+                        .where(
+                                contract.id.eq(id),
+                                contract.deadlineDate.isNotNull(),
+                                contract.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // 마감일자 없는 수주 조회
+    @Override
+    public List<DeadlineResponse> findDeadlineResponsesByNotDeadlineDate() {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                DeadlineResponse.class,
+                                contract.id.as("contractId"),
+                                contract.contractNo.as("contractNo"),
+                                contract.deadlineDate.as("deadlineDate")
+                        )
+                )
+                .from(contract)
+                .where(
+                        contract.deadlineDate.isNotNull(),
+                        contract.deleteYn.isFalse()
+                )
+                .fetch();
     }
 
     // 거래처명 조회

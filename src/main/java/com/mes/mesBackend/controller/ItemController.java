@@ -41,7 +41,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 @RequiredArgsConstructor
 @SecurityRequirement(name = AUTHORIZATION)
 //@PreAuthorize("hasRole('ROLE_CEO') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_NORMAL') or hasRole('ROLE_NEW')")
-@PreAuthorize("hasRole('ROLE_NEW')")
+//@PreAuthorize("hasRole('ROLE_NEW')")
 public class ItemController {
     private final ItemService itemService;
     private final LogService logService;

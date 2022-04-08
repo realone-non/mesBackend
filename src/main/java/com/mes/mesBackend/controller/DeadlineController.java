@@ -1,6 +1,7 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.DeadlineResponse;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -41,9 +42,9 @@ public class DeadlineController {
     private CustomLogger cLogger;
 
     // 마감일자 생성
-    @PostMapping
+    @PostMapping("{contract-id}")
     @ResponseBody
-    @Operation(summary = "마감일자 생성")
+    @Operation(summary = "수주 마감일자 생성")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "success"),
@@ -52,39 +53,20 @@ public class DeadlineController {
             }
     )
     public ResponseEntity<DeadlineResponse> createDeadline(
-            @RequestParam @Parameter(description = "마감일자 yyyy-MM-dd") @DateTimeFormat(iso = DATE) LocalDate deadlineDate,
-            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        DeadlineResponse deadline = deadlineService.createDeadline(deadlineDate);
-        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + deadline.getId() + " from createDeadline.");
-        return new ResponseEntity<>(deadline, OK);
-    }
-
-    // 마감일자 단일 조회
-    @GetMapping("/{id}")
-    @ResponseBody
-    @Operation(summary = "마감일자 단일 조회")
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "200", description = "success"),
-                    @ApiResponse(responseCode = "404", description = "not found resource"),
-            }
-    )
-    public ResponseEntity<DeadlineResponse> getDeadline(
-            @PathVariable Long id,
+            @PathVariable(value = "contract-id") @Parameter(description = "수주 id") Long contractId,
+            @RequestParam @Parameter(description = "수주 마감일자 yyyy-MM-dd") @DateTimeFormat(iso = DATE) LocalDate deadlineDate,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        DeadlineResponse deadline = deadlineService.getDeadline(id);
+        DeadlineResponse deadline = deadlineService.createDeadline(contractId, deadlineDate);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the " + deadline.getId() + " from getDeadline.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + contractId + " from createDeadline.");
         return new ResponseEntity<>(deadline, OK);
     }
 
     // 마감일자 리스트 조회
     @GetMapping
     @ResponseBody
-    @Operation(summary = "마감일자 리스트 조회")
+    @Operation(summary = "수주 마감일자 리스트 조회", description = "마감일자 등록 된 수주만 조회")
     public ResponseEntity<List<DeadlineResponse>> getDeadlines(
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
@@ -94,32 +76,10 @@ public class DeadlineController {
         return new ResponseEntity<>(deadlines, OK);
     }
 
-    // 마감일자 수정
-    @PatchMapping("/{id}")
-    @ResponseBody
-    @Operation(summary = "마감일자 수정")
-    @ApiResponses(
-            value = {
-                    @ApiResponse(responseCode = "200", description = "success"),
-                    @ApiResponse(responseCode = "404", description = "not found resource"),
-                    @ApiResponse(responseCode = "400", description = "bad request")
-            }
-    )
-    public ResponseEntity<DeadlineResponse> updateDeadline(
-            @PathVariable Long id,
-            @RequestParam @Parameter(description = "마감일자 yyyy-MM-dd") @DateTimeFormat(iso = DATE) LocalDate deadlineDate,
-            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
-        DeadlineResponse deadline = deadlineService.updateDeadline(id, deadlineDate);
-        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + deadline.getId() + " from updateDeadline.");
-        return new ResponseEntity<>(deadline,OK);
-    }
-
     // 마감일자 삭제
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{contract-id}")
     @ResponseBody
-    @Operation(summary = "마감일자 삭제")
+    @Operation(summary = "수주 마감일자 삭제", description = "수주에 마감일자만 없어짐")
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "204", description = "no content"),
@@ -127,12 +87,12 @@ public class DeadlineController {
             }
     )
     public ResponseEntity deleteDeadline(
-            @PathVariable Long id,
+            @PathVariable(value = "contract-id") @Parameter(description = "수주 id") Long contractId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
-        deadlineService.deleteDeadline(id);
+    ) throws NotFoundException, BadRequestException {
+        deadlineService.deleteDeadline(contractId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + id + " from deleteDeadline.");
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + contractId + " from deleteDeadline.");
         return new ResponseEntity(NO_CONTENT);
     }
 }
