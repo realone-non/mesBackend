@@ -54,8 +54,8 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     // 설비 전체 조회
     @Override
-    public List<EquipmentResponse> getEquipments(String equipmentName) {
-        List<Equipment> equipments = equipmentRepository.findByCondition(equipmentName);
+    public List<EquipmentResponse> getEquipments(String equipmentName, Integer checkCycle) {
+        List<Equipment> equipments = equipmentRepository.findByCondition(equipmentName, checkCycle);
         List<EquipmentResponse> responses = new ArrayList<>();
         for (Equipment equipment : equipments) {
             EquipmentResponse response = new EquipmentResponse();

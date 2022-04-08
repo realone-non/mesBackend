@@ -13,5 +13,5 @@ public interface EquipmentRepositoryCustom {
     // 작업공정으로 단일 설비 조회
     Equipment findByWorkProcess(Long workProcessId);
 
-    List<Equipment> findByCondition(String equipmentName);
+    List<Equipment> findByCondition(String equipmentName, Integer checkCycle);
 }
