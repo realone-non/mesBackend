@@ -130,6 +130,8 @@ public interface WorkOrderDetailRepositoryCustom {
     Optional<Long> findProduceOrderStateOngoingProductionAmountSum();
     // 제조오더에 해당하는 공정 별 endDate 조회
     LocalDateTime findWorkOrderEndDateByProduceOrderIdAndWorkProcessDivision(Long produceOrderId, WorkProcessDivision workProcessDivision);
+    // 제조오더에 해당하는 공정 별 startDate 조회
+    LocalDateTime findWorkOrderStartDateByProduceOrderIdAndWorkProcessDivision(Long produceOrderId, WorkProcessDivision workProcessDivision);
     // 포장공정의 생산량
     Optional<Integer> findPackagingProductAmountByProduceOrderId(Long produceOrderId);
     // 작업공정별 생산 정보

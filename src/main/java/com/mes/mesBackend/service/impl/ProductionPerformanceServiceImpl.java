@@ -8,7 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.*;
 
@@ -30,6 +33,7 @@ public class ProductionPerformanceServiceImpl implements ProductionPerformanceSe
         List<ProductionPerformanceResponse> responses = produceOrderRepository.findProductionPerformanceResponseByCondition(fromDate, toDate, itemGroupId, itemNoOrItemName);
 
         for (ProductionPerformanceResponse r : responses) {
+            r.setStartMaterialMixing(workOrderDetailRepository.findWorkOrderStartDateByProduceOrderIdAndWorkProcessDivision(r.getId(), MATERIAL_MIXING));
             r.setMaterialMixing(workOrderDetailRepository.findWorkOrderEndDateByProduceOrderIdAndWorkProcessDivision(r.getId(), MATERIAL_MIXING));
             r.setFilling(workOrderDetailRepository.findWorkOrderEndDateByProduceOrderIdAndWorkProcessDivision(r.getId(), FILLING));
             r.setCapAssembly(workOrderDetailRepository.findWorkOrderEndDateByProduceOrderIdAndWorkProcessDivision(r.getId(), CAP_ASSEMBLY));
@@ -38,7 +42,23 @@ public class ProductionPerformanceServiceImpl implements ProductionPerformanceSe
             Integer packagingProductAmount = workOrderDetailRepository.findPackagingProductAmountByProduceOrderId(r.getId()).orElse(0);
             r.setProductionAmount(packagingProductAmount);
         }
-        return responses;
+
+        // 조회기간 기준: 원료혼합 공정 완료날짜와 충진공정 완료날짜의 사이에 있는거
+        if (fromDate != null && toDate == null) {
+            LocalDateTime fromDateTime = fromDate.atStartOfDay();
+            return responses.stream().filter(f -> f.getStartMaterialMixing() != null && f.getStartMaterialMixing().isAfter(fromDateTime)).collect(Collectors.toList());
+        } else if (fromDate != null && toDate != null) {
+            LocalDateTime fromDateTime = fromDate.atStartOfDay();
+            LocalDateTime toDateTime = LocalDateTime.of(toDate, LocalTime.MAX).withNano(0);
+            return responses.stream().filter(
+                    f -> (f.getStartMaterialMixing() != null && f.getStartMaterialMixing().isAfter(fromDateTime)) && (f.getPackaging() != null && f.getPackaging().isBefore(toDateTime))
+            ).collect(Collectors.toList());
+        } else if (fromDate == null && toDate != null) {
+            LocalDateTime toDateTime = LocalDateTime.of(toDate, LocalTime.MAX).withNano(0);
+            return responses.stream().filter(f -> f.getPackaging() != null && f.getPackaging().isBefore(toDateTime)).collect(Collectors.toList());
+        } else {
+            return responses;
+        }
 //        return productionPerformanceRepository.findProductionPerformanceResponsesByCondition(fromDate, toDate, itemGroupId, itemNoOrItemName);
     }
 
