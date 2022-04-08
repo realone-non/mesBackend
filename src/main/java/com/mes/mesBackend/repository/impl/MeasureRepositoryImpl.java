@@ -20,12 +20,12 @@ public class MeasureRepositoryImpl implements MeasureRepositoryCustom {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Measure> findAllByCondition(Long gaugeTypeId, Long month) {
+    public List<Measure> findAllByCondition(Long gaugeTypeId, Integer calibrationCycle) {
         return jpaQueryFactory
                 .selectFrom(measure)
                 .where(
                         isGaugeTypeEq(gaugeTypeId),
-                        isCalibrationDateEq(month),
+                        isCalibrationCycleEq(calibrationCycle),
                         isDeleteYnFalse()
                 )
                 .fetch();
@@ -36,9 +36,9 @@ public class MeasureRepositoryImpl implements MeasureRepositoryCustom {
         return gaugeTypeId != null ? measure.gaugeType.id.eq(gaugeTypeId) : null;
     }
 
-    // 월로 검색
-    private BooleanExpression isCalibrationDateEq(Long month) {
-        return month != null ? measure.calibrationNextDate.month().eq(Math.toIntExact(month)) : null;
+    // 검교정주기 검색
+    private BooleanExpression isCalibrationCycleEq(Integer calibrationCycle) {
+        return calibrationCycle != null ? measure.calibrationCycle.eq(calibrationCycle) : null;
     }
 
     private BooleanExpression isDeleteYnFalse() {
