@@ -63,8 +63,16 @@ public class DevelopmentServiceImpl implements DevelopmentService {
             String itemNoOrItemName,
             DevelopmentStatusType status,
             DevelopmentChildrenStatusType childrenStatus){
-        return developmentRepository.findDevelopByCondition(
+        List<DevelopmentResponse> developmentResponses = developmentRepository.findDevelopByCondition(
                 userId, fromDate, toDate, itemNoOrItemName, status, childrenStatus);
+
+        if(developmentResponses != null){
+            for (DevelopmentResponse developmentResponse : developmentResponses) {
+                developmentResponse.setFileCount(developmentRepository.findByFileYn(developmentResponse.getId()).intValue());
+            }
+        }
+
+        return developmentResponses;
     }
 
     //개발품목 단건 조회
