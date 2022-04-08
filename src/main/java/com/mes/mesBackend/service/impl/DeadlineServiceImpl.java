@@ -46,11 +46,12 @@ public class DeadlineServiceImpl implements DeadlineService {
         Contract contract = getContractOrThrow(contractId);
         throwIfContractDeadlineNull(contract);
         contract.setDeadlineDate(null);
+        contractRepo.save(contract);
     }
 
     // 수주 마감일자 등록 안되어 있는지 여부
     private void throwIfContractDeadlineNull(Contract contract) throws BadRequestException {
-        if (contract.getDeadlineDate() != null) {
+        if (contract.getDeadlineDate() == null) {
             throw new BadRequestException("해당 수주는 마감일자가 등록되어 있지 않으므로 삭제가 불가능합니다.");
         }
     }

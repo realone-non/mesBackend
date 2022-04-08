@@ -36,7 +36,8 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
             String userName,
             LocalDate fromDate,
             LocalDate toDate,
-            Long currencyId
+            Long currencyId,
+            Boolean deadlineDateNullYn
     ) {
         return jpaQueryFactory
                 .selectFrom(contract)
@@ -45,10 +46,23 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
                         isUserNameContaining(userName),
                         isCurrencyEq(currencyId),
                         isContractDateBetween(fromDate, toDate),
-                        isDeleteYnFalse()
+                        isDeleteYnFalse(),
+                        isDeadlineNullYn(deadlineDateNullYn)
                 )
                 .orderBy(contract.createdDate.desc())
                 .fetch();
+    }
+
+    private BooleanExpression isDeadlineNullYn(Boolean deadlineDateNullYn) {
+        if (deadlineDateNullYn != null) {
+            if (deadlineDateNullYn) {
+                return contract.deadlineDate.isNotNull();
+            } else {
+                return contract.deadlineDate.isNull();
+            }
+        } else {
+            return null;
+        }
     }
 
     // 수주 등록된 제조사 list 조회 api

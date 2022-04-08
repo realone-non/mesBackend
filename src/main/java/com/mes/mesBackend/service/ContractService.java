@@ -22,7 +22,7 @@ public interface ContractService {
     // 수주 단일 조회
     ContractResponse getContract(Long contractId) throws NotFoundException;
     // 수주 리스트 조회
-    List<ContractResponse> getContracts(String clientName, String userName, LocalDate fromDate, LocalDate toDate, Long currencyId);
+    List<ContractResponse> getContracts(String clientName, String userName, LocalDate fromDate, LocalDate toDate, Long currencyId, Boolean deadlineDateNullYn);
     // 수주 수정
     ContractResponse updateContract(Long contractId, ContractRequest contractRequest) throws NotFoundException;
     // 수주 삭제

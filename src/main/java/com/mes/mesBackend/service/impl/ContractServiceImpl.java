@@ -64,8 +64,8 @@ public class ContractServiceImpl implements ContractService {
 
     // 수주 리스트 조회
     @Override
-    public List<ContractResponse> getContracts(String clientName, String userName, LocalDate fromDate, LocalDate toDate, Long currencyId) {
-        List<Contract> contracts = contractRepo.findAllByCondition(clientName, userName, fromDate, toDate, currencyId);
+    public List<ContractResponse> getContracts(String clientName, String userName, LocalDate fromDate, LocalDate toDate, Long currencyId, Boolean deadlineDateNullYn) {
+        List<Contract> contracts = contractRepo.findAllByCondition(clientName, userName, fromDate, toDate, currencyId, deadlineDateNullYn);
         List<ContractResponse> responses = mapper.toListResponses(contracts, ContractResponse.class);
         return responses.stream().map(ContractResponse::setIsPeriod).collect(Collectors.toList());
     }
