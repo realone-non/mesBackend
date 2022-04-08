@@ -42,14 +42,11 @@ public class DevelopmentState extends BaseTimeEntity{
     @JoinColumn(name = "USER", nullable = false, columnDefinition = "bigint COMMENT '등록자'")
     private User user;
 
+    @Column(name = "FILE_NAME", columnDefinition = "nvarchar(500) COMMENT '파일 이름'")
+    private String fileName;
+
     @Column(name = "FILE_URL", columnDefinition = "nvarchar(500) COMMENT '파일URL'")
     private String fileUrl;
-
-    @Column(name = "APPROVE_DATE", columnDefinition = "date COMMENT '승인날짜'")
-    private LocalDate approveDate;
-
-    @Column(name = "VER", columnDefinition = "int COMMENT '파일 버전'")
-    private int ver;
 
     @Column(name = "CHANGE_CONTENTS", columnDefinition = "text COMMENT '변경 내용'")
     private String changeContents;
@@ -66,8 +63,6 @@ public class DevelopmentState extends BaseTimeEntity{
     public void update(DevelopmentStateRequest request){
         setDevelopmentStatus(request.getDevelopmentStatus());
         setDevelopmentChildrenStatus(request.getDevelopmentChildrenStatus());
-        setApproveDate(request.getApproveDate());
-        setVer(request.getVer());
         setChangeContents(request.getChangeContents());
         setMeetingType(request.getMeetingType());
         setOrders(request.getOrders());

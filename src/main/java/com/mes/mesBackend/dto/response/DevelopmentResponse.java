@@ -42,7 +42,6 @@ public class DevelopmentResponse {
     @Schema(description = "담당자 이름")
     String userName;
 
-    @Schema(description = "수주 파일")
-    String fileUrl;
-
+    @Schema(description = "파일 갯수")
+    int fileCount;
 }

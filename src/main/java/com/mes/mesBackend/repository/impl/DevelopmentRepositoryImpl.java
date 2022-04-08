@@ -47,10 +47,8 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                                 development.startDate.as("startDate"),
                                 development.endDate.as("endDate"),
                                 development.deliverAmount.as("deliverAmount"),
-                                development.processState.coalesce("").as("processState"),
                                 development.user.id.as("userId"),
-                                development.user.korName.as("userName"),
-                                development.fileUrl.as("fileUrl")
+                                development.user.korName.as("userName")
                                 )
                             )
                 .from(development)
@@ -84,10 +82,8 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                                 development.startDate.as("startDate"),
                                 development.endDate.as("endDate"),
                                 development.deliverAmount.as("deliverAmount"),
-                                development.processState.coalesce("").as("processState"),
                                 development.user.id.as("userId"),
-                                development.user.korName.as("userName"),
-                                development.fileUrl.as("fileUrl")
+                                development.user.korName.as("userName")
                         )
                 )
                 .from(development)
@@ -117,10 +113,8 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                                 developmentState.createdDate.as("addDate"),
                                 developmentState.user.id.as("userId"),
                                 developmentState.user.korName.as("userName"),
-                                developmentState.approveDate.as("approveDate"),
                                 developmentState.developmentStatus.as("status"),
                                 developmentState.developmentChildrenStatus.as("childrenStatus"),
-                                developmentState.ver.as("ver"),
                                 developmentState.changeContents.as("changeContents"),
                                 developmentState.meetingType.as("meetingType"),
                                 developmentState.orders.as("orders")
@@ -150,10 +144,8 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                                 developmentState.createdDate.as("addDate"),
                                 developmentState.user.id.as("userId"),
                                 developmentState.user.korName.as("userName"),
-                                developmentState.approveDate.as("approveDate"),
                                 developmentState.developmentStatus.as("status"),
                                 developmentState.developmentChildrenStatus.as("childrenStatus"),
-                                developmentState.ver.as("ver"),
                                 developmentState.changeContents.as("changeContents"),
                                 developmentState.meetingType.as("meetingType"),
                                 developmentState.orders.as("orders")
