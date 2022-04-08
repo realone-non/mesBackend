@@ -80,16 +80,16 @@ public class MeasureController {
         return new ResponseEntity<>(measure, OK);
     }
 
-    // 계측기 전체 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
-    @Operation(summary = "계측기 전체 조회", description = "검색조건: GAUGE유형, 검교정대상(월)")
+    // 계측기 전체 조회 검색조건: 검색조건: GAUGE유형, 검교정 주기
+    @Operation(summary = "계측기 전체 조회", description = "검색조건: GAUGE유형, 검교정 주기")
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<MeasureResponse>> getMeasures(
             @RequestParam(required = false) @Parameter(description = "GAUGE유형 id") Long gaugeId,
-            @RequestParam(required = false) @Parameter(description = "월") Long month,
+            @RequestParam(required = false) @Parameter(description = "검교정 주기") Integer calibrationCycle,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<MeasureResponse> measures = measureService.getMeasures(gaugeId, month);
+        List<MeasureResponse> measures = measureService.getMeasures(gaugeId, calibrationCycle);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of gaugeId: " + gaugeId + " from getMeasures.");
         return new ResponseEntity<>(measures, OK);

@@ -178,7 +178,8 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                                 lotMaster.item.testType.as("testRequestType"),
                                 input.inputTestYn.as("inputTestYn"),
                                 wareHouse.id.as("warehouseId"),
-                                wareHouse.wareHouseName.as("warehouseName")
+                                wareHouse.wareHouseName.as("warehouseName"),
+                                input.note.as("note")
                         )
                 )
                 .from(lotMaster)
@@ -212,7 +213,8 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                                         lotMaster.item.testType.as("testRequestType"),
                                         input.inputTestYn.as("inputTestYn"),
                                         wareHouse.id.as("warehouseId"),
-                                        wareHouse.wareHouseName.as("warehouseName")
+                                        wareHouse.wareHouseName.as("warehouseName"),
+                                        input.note.as("note")
                                 )
                         )
                         .from(lotMaster)

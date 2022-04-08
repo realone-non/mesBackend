@@ -35,4 +35,7 @@ public class OutsourcingInputLOTResponse {
 
     @Schema(description = "입고창고")
     String warehouseName;
+
+    @Schema(description = "비고")
+    String note;
 }
