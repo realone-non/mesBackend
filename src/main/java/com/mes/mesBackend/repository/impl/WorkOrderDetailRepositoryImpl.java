@@ -827,10 +827,27 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .where(
                         workOrderDetail.produceOrder.id.eq(produceOrderId),
                         workOrderDetail.deleteYn.isFalse(),
-                        workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision)
+                        workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision),
+                        workOrderDetail.orderState.eq(COMPLETION)
                 )
                 .fetchOne();
     }
+
+    // 제조오더에 해당하는 공정 별 startDate 조회
+    @Override
+    public LocalDateTime findWorkOrderStartDateByProduceOrderIdAndWorkProcessDivision(Long produceOrderId, WorkProcessDivision workProcessDivision) {
+        return jpaQueryFactory
+                .select(workOrderDetail.startDate)
+                .from(workOrderDetail)
+                .where(
+                        workOrderDetail.produceOrder.id.eq(produceOrderId),
+                        workOrderDetail.deleteYn.isFalse(),
+                        workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision),
+                        workOrderDetail.orderState.eq(COMPLETION)
+                )
+                .fetchOne();
+    }
+
     // 포장공정의 생산량
     @Override
     public Optional<Integer> findPackagingProductAmountByProduceOrderId(Long produceOrderId) {
