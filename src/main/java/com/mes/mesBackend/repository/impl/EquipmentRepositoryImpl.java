@@ -71,11 +71,12 @@ public class EquipmentRepositoryImpl implements EquipmentRepositoryCustom {
     }
 
     @Override
-    public List<Equipment> findByCondition(String equipmentName) {
+    public List<Equipment> findByCondition(String equipmentName, Integer checkCycle) {
         return  jpaQueryFactory
                 .selectFrom(equipment)
                 .where(
                         isEquipmentNameContain(equipmentName),
+                        isCheckCycleEq(checkCycle),
                         equipment.deleteYn.isFalse()
                 )
                 .orderBy(equipment.workProcess.orders.asc(), equipment.createdDate.desc())
@@ -83,5 +84,9 @@ public class EquipmentRepositoryImpl implements EquipmentRepositoryCustom {
     }
     private BooleanExpression isEquipmentNameContain(String equipmentName) {
         return equipmentName != null ? equipment.equipmentName.contains(equipmentName) : null;
+    }
+
+    private BooleanExpression isCheckCycleEq(Integer checkCycle) {
+        return checkCycle != null ? equipment.checkCycle.eq(checkCycle) : null;
     }
 }

@@ -15,7 +15,7 @@ public interface EquipmentService {
     // 설비 단일 조회
     EquipmentResponse getEquipment(Long id) throws NotFoundException;
     // 설비 전체 조회
-    List<EquipmentResponse> getEquipments(String equipmentName);
+    List<EquipmentResponse> getEquipments(String equipmentName, Integer checkCycle);
 //    Page<EquipmentResponse> getEquipments(Pageable pageable);
     // 설비 수정
     EquipmentResponse updateEquipment(Long id, EquipmentRequest equipmentRequest) throws NotFoundException;
