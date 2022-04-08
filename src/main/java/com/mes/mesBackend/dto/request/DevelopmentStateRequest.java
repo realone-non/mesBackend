@@ -22,18 +22,6 @@ public class DevelopmentStateRequest {
     @Schema(description = "승인날짜")
     LocalDate approveDate;
 
-    @Schema(description = "파일 버전")
-    int ver;
-
     @Schema(description = "사용자 ID")
     Long userId;
-
-    @Schema(description = "변경 내용")
-    String changeContents;
-
-    @Schema(description = "회의 구분")
-    String meetingType;
-
-    @Schema(description = "순번")
-    int orders;
 }

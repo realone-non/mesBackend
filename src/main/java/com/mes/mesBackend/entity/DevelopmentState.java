@@ -42,35 +42,18 @@ public class DevelopmentState extends BaseTimeEntity{
     @JoinColumn(name = "USER", nullable = false, columnDefinition = "bigint COMMENT '등록자'")
     private User user;
 
+    @Column(name = "FILE_NAME", columnDefinition = "nvarchar(500) COMMENT '파일 이름'")
+    private String fileName;
+
     @Column(name = "FILE_URL", columnDefinition = "nvarchar(500) COMMENT '파일URL'")
     private String fileUrl;
-
-    @Column(name = "APPROVE_DATE", columnDefinition = "date COMMENT '승인날짜'")
-    private LocalDate approveDate;
-
-    @Column(name = "VER", columnDefinition = "int COMMENT '파일 버전'")
-    private int ver;
-
-    @Column(name = "CHANGE_CONTENTS", columnDefinition = "text COMMENT '변경 내용'")
-    private String changeContents;
-
-    @Column(name = "MEETING_TYPE", columnDefinition = "nvarchar(255) COMMENT '회의 구분'")
-    private String meetingType;
 
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @Column(name = "ORDERS", columnDefinition = "int COMMENT '순번'")
-    private int orders;
-
     public void update(DevelopmentStateRequest request){
         setDevelopmentStatus(request.getDevelopmentStatus());
         setDevelopmentChildrenStatus(request.getDevelopmentChildrenStatus());
-        setApproveDate(request.getApproveDate());
-        setVer(request.getVer());
-        setChangeContents(request.getChangeContents());
-        setMeetingType(request.getMeetingType());
-        setOrders(request.getOrders());
     }
 
     public void delete(){

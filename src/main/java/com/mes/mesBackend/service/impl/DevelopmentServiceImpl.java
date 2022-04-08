@@ -63,8 +63,16 @@ public class DevelopmentServiceImpl implements DevelopmentService {
             String itemNoOrItemName,
             DevelopmentStatusType status,
             DevelopmentChildrenStatusType childrenStatus){
-        return developmentRepository.findDevelopByCondition(
+        List<DevelopmentResponse> developmentResponses = developmentRepository.findDevelopByCondition(
                 userId, fromDate, toDate, itemNoOrItemName, status, childrenStatus);
+
+        if(developmentResponses != null){
+            for (DevelopmentResponse developmentResponse : developmentResponses) {
+                developmentResponse.setFileCount(developmentRepository.findByFileYn(developmentResponse.getId()).intValue());
+            }
+        }
+
+        return developmentResponses;
     }
 
     //개발품목 단건 조회
@@ -99,7 +107,6 @@ public class DevelopmentServiceImpl implements DevelopmentService {
         User user = userRepository.findByIdAndDeleteYnFalse(request.getUserId())
                 .orElseThrow(() -> new NotFoundException("user does not exist. input id: " + request.getUserId()));
         DevelopmentState state = mapper.toEntity(request, DevelopmentState.class);
-        development.setProcessState(state.getDevelopmentStatus() + "-" + state.getDevelopmentChildrenStatus());
         state.setDevelopment(development);
         state.setUser(user);
         developmentStateRepository.save(state);
@@ -115,7 +122,7 @@ public class DevelopmentServiceImpl implements DevelopmentService {
     }
 
     //개발품목 진행상태 단건 조회
-    public DevelopmentStateReponse getDevelopmentState(Long developId, Long developStateId) throws NotFoundException {
+    public DevelopmentStateReponse getDevelopmentState(Long developId, Long developStateId)  {
         return developmentRepository.findByIdAndDeleteYn(developId, developStateId);
     }
 
@@ -130,7 +137,6 @@ public class DevelopmentServiceImpl implements DevelopmentService {
                 .orElseThrow(() -> new NotFoundException("developmentState does not exist. input id: " + developStateId));
         User user = userRepository.findByIdAndDeleteYnFalse(request.getUserId())
                 .orElseThrow(() -> new NotFoundException("user does not exist. input id: " + request.getUserId()));
-        development.setProcessState(request.getDevelopmentStatus() + "-" + request.getDevelopmentChildrenStatus());
         developmentRepository.save(development);
         state.setUser(user);
         state.update(request);
@@ -154,6 +160,7 @@ public class DevelopmentServiceImpl implements DevelopmentService {
                 .orElseThrow(() -> new NotFoundException("development does not exist. input id: " + developId));
         DevelopmentState state = developmentStateRepository.findByIdAndDeleteYnFalse(developStateId)
                 .orElseThrow(() -> new NotFoundException("developmentState does not exist. input id: " + developStateId));
+        state.setFileName(file.getOriginalFilename());
         state.setFileUrl(s3Uploader.upload(file, "develop"));
         developmentStateRepository.save(state);
         return developmentRepository.findByIdAndDeleteYn(developId, developStateId);
