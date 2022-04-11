@@ -827,10 +827,27 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .where(
                         workOrderDetail.produceOrder.id.eq(produceOrderId),
                         workOrderDetail.deleteYn.isFalse(),
-                        workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision)
+                        workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision),
+                        workOrderDetail.orderState.eq(COMPLETION)
                 )
                 .fetchOne();
     }
+
+    // 제조오더에 해당하는 공정 별 startDate 조회
+    @Override
+    public LocalDateTime findWorkOrderStartDateByProduceOrderIdAndWorkProcessDivision(Long produceOrderId, WorkProcessDivision workProcessDivision) {
+        return jpaQueryFactory
+                .select(workOrderDetail.startDate)
+                .from(workOrderDetail)
+                .where(
+                        workOrderDetail.produceOrder.id.eq(produceOrderId),
+                        workOrderDetail.deleteYn.isFalse(),
+                        workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision),
+                        workOrderDetail.orderState.eq(COMPLETION)
+                )
+                .fetchOne();
+    }
+
     // 포장공정의 생산량
     @Override
     public Optional<Integer> findPackagingProductAmountByProduceOrderId(Long produceOrderId) {
@@ -918,7 +935,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     // 작업기간
     private BooleanExpression isWorkDateBetween(LocalDate fromDate, LocalDate toDate) {
         // fromDate ~ toDate 사이에 진행중과 완료가 포함되어 있는거를 조회
-        return fromDate != null ?
+        return fromDate != null && toDate != null ?
                 (workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).and(workOrderDetail.endDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
                         .or(workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).or(workOrderDetail.endDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))))) : null;
     }

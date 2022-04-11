@@ -82,8 +82,8 @@ public class UserServiceImpl implements UserService {
     }
 
     // 직원(작업자) 전체 조회
-    public List<UserResponse> getUsers(Long departmentId, String userCode, String korName) {
-        List<User> users = userRepository.findAllCondition(departmentId, userCode, korName);
+    public List<UserResponse> getUsers(Long departmentId, String userCode, String korName, UserType userType) {
+        List<User> users = userRepository.findAllCondition(departmentId, userCode, korName, userType);
         return mapper.toListResponses(users, UserResponse.class);
     }
 

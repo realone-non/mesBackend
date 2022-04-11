@@ -9,6 +9,7 @@ import com.mes.mesBackend.dto.request.UserUpdateRequest;
 import com.mes.mesBackend.dto.response.UserRegistrationResponse;
 import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.entity.User;
+import com.mes.mesBackend.entity.enumeration.UserType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.CustomJwtException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -25,7 +26,7 @@ public interface UserService {
     UserResponse getUser(Long id) throws NotFoundException;
 
     // 직원(작업자) 전체 조회 검색조건: 부서, 사번, 이름
-    List<UserResponse> getUsers(Long departmentId, String userCode, String korName);
+    List<UserResponse> getUsers(Long departmentId, String userCode, String korName, UserType userType);
 
     // 직원(작업자) 페이징 조회
 //    Page<UserResponse> getUsers(Pageable pageable);

@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 * 대기(관리자 승인 x): NEW(ROLE_NEW)
 * 일반: NORMAL(ROLE_NORMAL)
 * 관리자: ADMIN(ROLE_ADMIN)
+* 주임: SUB_MANAGER(ROLE_SUB_MANAGER)
 * 부서장: MANAGER(ROLE_MANAGER)
 * 대표: CEO(ROLE_CEO)
 * */
@@ -16,9 +17,10 @@ import org.springframework.security.core.GrantedAuthority;
 public enum UserType implements GrantedAuthority {
     CEO("ROLE_CEO", 1),
     MANAGER("ROLE_MANAGER", 2),
-    ADMIN("ROLE_ADMIN", 3),
-    NORMAL("ROLE_NORMAL", 4),
-    NEW("ROLE_NEW", 5);
+    SUB_MANAGER("ROLE_SUB_MANAGER", 3),
+    ADMIN("ROLE_ADMIN", 4),
+    NORMAL("ROLE_NORMAL", 5),
+    NEW("ROLE_NEW", 6);
 
     @Getter
     private final String type;

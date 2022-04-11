@@ -2,6 +2,7 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.UserUpdateRequest;
 import com.mes.mesBackend.dto.response.UserResponse;
+import com.mes.mesBackend.entity.enumeration.UserType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
@@ -71,9 +72,10 @@ public class UserController {
             @RequestParam(required = false) @Parameter(description = "부서 id") Long departmentId,
             @RequestParam(required = false) @Parameter(description = "사번") String userCode,
             @RequestParam(required = false) @Parameter(description = "이름") String korName,
+            @RequestParam(required = false) @Parameter(description = "권한") UserType userType,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<UserResponse> users = userService.getUsers(departmentId, userCode, korName);
+        List<UserResponse> users = userService.getUsers(departmentId, userCode, korName, userType);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of departmentId: " + departmentId + " from getUsers.");
         return new ResponseEntity<>(users, OK);
