@@ -935,7 +935,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     // 작업기간
     private BooleanExpression isWorkDateBetween(LocalDate fromDate, LocalDate toDate) {
         // fromDate ~ toDate 사이에 진행중과 완료가 포함되어 있는거를 조회
-        return fromDate != null ?
+        return fromDate != null && toDate != null ?
                 (workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).and(workOrderDetail.endDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
                         .or(workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).or(workOrderDetail.endDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))))) : null;
     }
