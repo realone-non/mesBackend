@@ -33,9 +33,6 @@ public class DevelopmentStateReponse {
     @Schema(description = "등록자 이름")
     String userName;
 
-    @Schema(description = "승인일시")
-    LocalDate approveDate;
-
     @Schema(description = "개발 프로세스(상위) [COMPLETE_REPORT: 완료보고, ETC: 기타, (정의안된 나머지는 그대로]")
     DevelopmentStatusType status;
 
