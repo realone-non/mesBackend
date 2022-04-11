@@ -30,7 +30,7 @@ public class UserAuthorityServiceImpl implements UserAuthorityService {
     public UserAuthorityResponse createUserAuthority(Long userId, UserType userType) throws NotFoundException, BadRequestException {
         if (userType.equals(UserType.NEW)) throw new BadRequestException("대기 권한으로는 등록을 진행할 수 없습니다.");
         User user = getUserOrThrow(userId);
-        throwIfUserTypeNeNew(user.getUserType());
+//        throwIfUserTypeNeNew(user.getUserType());
         user.setUserType(userType);
         userRepo.save(user);
         return getUSerAuthorityResponseOrThrow(user.getId());
