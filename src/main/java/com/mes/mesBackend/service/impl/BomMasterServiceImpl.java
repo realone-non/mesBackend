@@ -128,10 +128,11 @@ public class BomMasterServiceImpl implements BomMasterService {
 
     // BOM 품목 생성
     @Override
-    public BomItemResponse createBomItem(Long bomMasterId, BomItemRequest bomItemRequest) throws NotFoundException {
+    public BomItemResponse createBomItem(Long bomMasterId, BomItemRequest bomItemRequest) throws NotFoundException, BadRequestException {
         BomMaster bomMaster = getBomMasterOrThrow(bomMasterId);
 
-//        Client toBuy = bomItemRequest.getToBuy() != null ? clientService.getClientOrThrow(bomItemRequest.getToBuy()) : null;
+        // 같은 품목 2개 등록 불가
+        throwIfBomItemDetailItemEq(bomMasterId, bomItemRequest.getItem());
         Item item = itemService.getItemOrThrow(bomItemRequest.getItem());
         WorkProcess workProcess = bomItemRequest.getWorkProcess() != null ?
                 workProcessService.getWorkProcessOrThrow(bomItemRequest.getWorkProcess()) : null;
@@ -141,6 +142,12 @@ public class BomMasterServiceImpl implements BomMasterService {
 
         bomItemDetailRepository.save(bomItemDetail);
         return mapper.toResponse(bomItemDetail, BomItemResponse.class);
+    }
+
+    // 같은 품목 2개 등록 불가
+    private void throwIfBomItemDetailItemEq(Long bomMasterId, Long itemId) throws BadRequestException {
+        boolean b = bomItemDetailRepository.existsByBomItemDetailItem(bomMasterId, itemId);
+        if (b) throw new BadRequestException("해당 품목은 이미 등록되어 있으므로 중복 등록이 불가능 합니다. 확인 후 다시 시도해주세요.");
     }
 
     // BOM 품목 리스트 조회

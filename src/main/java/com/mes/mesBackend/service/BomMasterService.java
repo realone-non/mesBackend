@@ -28,7 +28,7 @@ public interface BomMasterService {
 
 
     // BOM 품목 생성
-    BomItemResponse createBomItem(Long bomMasterId, BomItemRequest bomMasterDetailRequest) throws NotFoundException;
+    BomItemResponse createBomItem(Long bomMasterId, BomItemRequest bomMasterDetailRequest) throws NotFoundException, BadRequestException;
     // BOM 품목 리스트 조회
     List<BomItemDetailResponse> getBomItems(Long bomMasterId, String itemNoOrItemName) throws NotFoundException;
     // BOM 품목 수정

@@ -79,6 +79,22 @@ public class BomItemDetailRepositoryImpl implements BomItemDetailRepositoryCusto
                 .fetch();
     }
 
+    // 같은 품목정보가 등록 되어잇는지
+    @Override
+    public boolean existsByBomItemDetailItem(Long bomMasterId, Long itemId) {
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(bomItemDetail)
+                .where(
+                        bomItemDetail.bomMaster.id.eq(bomMasterId),
+                        bomItemDetail.item.id.eq(itemId),
+                        bomItemDetail.deleteYn.isFalse()
+                )
+                .fetchFirst();
+        return fetchOne != null;
+    }
+
+
 //    @Transactional(readOnly = true)
 //    @Override
 //    public List<BomItemDetailResponse> findAllByCondition(
