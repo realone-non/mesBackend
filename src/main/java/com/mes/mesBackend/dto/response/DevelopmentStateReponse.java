@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.DevelopmentChildrenStatusType;
 import com.mes.mesBackend.entity.enumeration.DevelopmentStatusType;
@@ -9,6 +10,8 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM;
 
 @Getter
 @Setter
@@ -24,6 +27,7 @@ public class DevelopmentStateReponse {
     @Schema(description = "진행상태 파일")
     String fileUrl;
 
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = "Asia/Seoul")
     @Schema(description = "등록일자")
     LocalDateTime addDate;
 

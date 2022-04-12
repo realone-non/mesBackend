@@ -553,7 +553,6 @@ public class OutsourcingServiceImpl implements OutsourcingService {
             else if(request.isReturnDivision() == false){
                 throw new BadRequestException("반품수량은 불량수량을 초과할 수 없습니다. 불량수량 :" + lotMaster.getBadItemAmount());
             }
-
         }
         returning.update(request, lotMaster);
         outsourcingReturnRepository.save(returning);
