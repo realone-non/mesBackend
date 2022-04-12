@@ -27,7 +27,7 @@ public class WorkCenter extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '작업장 등록 고유아이디'")
     private Long id;
 
-    @Column(name = "WORK_CENTER_NAME", columnDefinition = "varchar(255) COMMENT '작업장명'")
+    @Column(name = "WORK_CENTER_NAME", columnDefinition = "varchar(255) COMMENT '작업장명'", nullable = false)
     private String workCenterName;      // 작업장명
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -28,6 +28,7 @@ public class MeasureRepositoryImpl implements MeasureRepositoryCustom {
                         isCalibrationCycleEq(calibrationCycle),
                         isDeleteYnFalse()
                 )
+                .orderBy(measure.createdDate.desc())
                 .fetch();
     }
 

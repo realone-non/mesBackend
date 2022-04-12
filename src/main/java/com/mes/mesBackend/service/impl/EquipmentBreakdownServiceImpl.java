@@ -168,7 +168,7 @@ public class EquipmentBreakdownServiceImpl implements EquipmentBreakdownService 
     @Override
     public List<RepairItemResponse> getRepairItemResponses(Long equipmentBreakdownId) throws NotFoundException {
         EquipmentBreakdown equipmentBreakdown = getEquipmentBreakdownOrThrow(equipmentBreakdownId);
-        List<RepairItem> repairItems = repairItemRepo.findAllByEquipmentBreakdownAndDeleteYnFalse(equipmentBreakdown);
+        List<RepairItem> repairItems = repairItemRepo.findAllByEquipmentBreakdownAndDeleteYnFalseOrderByCreatedDate(equipmentBreakdown);
         return mapper.toListResponses(repairItems, RepairItemResponse.class);
     }
 
@@ -222,7 +222,7 @@ public class EquipmentBreakdownServiceImpl implements EquipmentBreakdownService 
     @Override
     public List<RepairPartResponse> getRepairPartResponses(Long equipmentBreakdownId, Long repairItemId) throws NotFoundException {
         RepairItem repairItem = getRepairItemOrThrow(equipmentBreakdownId, repairItemId);
-        List<RepairPart> repairParts = repairPartRepo.findAllByRepairItemAndDeleteYnFalse(repairItem);
+        List<RepairPart> repairParts = repairPartRepo.findAllByRepairItemAndDeleteYnFalseOrderByCreatedDate(repairItem);
         return mapper.toListResponses(repairParts, RepairPartResponse.class);
     }
 
@@ -278,7 +278,7 @@ public class EquipmentBreakdownServiceImpl implements EquipmentBreakdownService 
     @Override
     public List<RepairWorkerResponse> getRepairWorkerResponses(Long equipmentBreakdownId) throws NotFoundException {
         EquipmentBreakdown equipmentBreakdown = getEquipmentBreakdownOrThrow(equipmentBreakdownId);
-        List<RepairWorker> repairWorkers = repairWorkerRepo.findAllByEquipmentBreakdownAndDeleteYnFalse(equipmentBreakdown);
+        List<RepairWorker> repairWorkers = repairWorkerRepo.findAllByEquipmentBreakdownAndDeleteYnFalseOrderByCreatedDate(equipmentBreakdown);
         return mapper.toListResponses(repairWorkers, RepairWorkerResponse.class);
     }
 

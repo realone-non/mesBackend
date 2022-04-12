@@ -11,6 +11,6 @@ import java.util.Optional;
 // 17-2. 수리작업자 정보
 @Repository
 public interface RepairWorkerRepository extends JpaCustomRepository<RepairWorker, Long> {
-    List<RepairWorker> findAllByEquipmentBreakdownAndDeleteYnFalse(EquipmentBreakdown equipmentBreakdown);
+    List<RepairWorker> findAllByEquipmentBreakdownAndDeleteYnFalseOrderByCreatedDate(EquipmentBreakdown equipmentBreakdown);
     Optional<RepairWorker> findByIdAndEquipmentBreakdownAndDeleteYnFalse(Long id, EquipmentBreakdown equipmentBreakdown);
 }

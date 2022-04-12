@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import static com.mes.mesBackend.exception.Message.*;
@@ -14,6 +15,7 @@ import static com.mes.mesBackend.exception.Message.*;
 @Schema(description = "작업장")
 public class WorkCenterRequest {
     @Schema(description = "작업장명")
+    @NotBlank(message = NOT_NULL)
     String workCenterName;
 
     @Schema(description = "외주사 id")

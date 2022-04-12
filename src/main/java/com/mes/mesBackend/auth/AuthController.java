@@ -89,7 +89,7 @@ public class AuthController {
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
     )
-    public ResponseEntity<TokenResponse> updateRefreshToken(@RequestBody TokenRequest tokenRequestDto) throws CustomJwtException {
+    public ResponseEntity<TokenResponse> updateRefreshToken(@RequestBody TokenRequest tokenRequestDto) throws CustomJwtException, NotFoundException {
         TokenResponse reissue = userService.reissue(tokenRequestDto);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromToken(tokenRequestDto.accessToken) + " is token reissue. from updateRefreshToken.");
