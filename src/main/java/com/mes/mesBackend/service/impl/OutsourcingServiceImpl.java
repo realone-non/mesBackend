@@ -538,7 +538,7 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     public OutsourcingReturnResponse modifyOutsourcingReturn(Long returnId, OutsourcingReturnRequest request) throws NotFoundException, BadRequestException {
         OutsourcingReturn returning = outsourcingReturnRepository.findByIdAndDeleteYnFalse(returnId).orElseThrow(()-> new NotFoundException("returnInfo not in db:" + returnId));
         LotMaster lotMaster = lotMasterRepository.findByIdAndDeleteYnFalse(request.getLotMasterId()).orElseThrow(()-> new NotFoundException("lotInfo not in db:" + request.getLotMasterId()));
-        if(returning.isReturnDivision() == true && (lotMaster.getStockAmount() + lotMaster.getStockReturnAmount()) == (request.getStockAmount() + request.getStockReturnAmount())){
+        if(request.isReturnDivision() == true && (lotMaster.getStockAmount() + lotMaster.getStockReturnAmount()) == (request.getStockAmount() + request.getStockReturnAmount())){
             lotMaster.setStockAmount(request.getStockAmount());
             lotMaster.setStockReturnAmount(request.getStockReturnAmount());
         }
@@ -547,7 +547,12 @@ public class OutsourcingServiceImpl implements OutsourcingService {
             lotMaster.setBadItemReturnAmount(request.getBadItemReturnAmount());
         }
         else{
-            throw new BadRequestException("returnAmount can not bigger than stockAmount or badItemAmount");
+            if(request.isReturnDivision() == true){
+                throw new BadRequestException("반품수량은 재고수량을 초과할 수 없습니다. 재고수량 :" + lotMaster.getStockAmount());
+            }
+            else if(request.isReturnDivision() == false){
+                throw new BadRequestException("반품수량은 불량수량을 초과할 수 없습니다. 불량수량 :" + lotMaster.getBadItemAmount());
+            }
         }
         returning.update(request, lotMaster);
         outsourcingReturnRepository.save(returning);

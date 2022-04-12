@@ -19,12 +19,14 @@ public class TokenResponse {
     String refreshToken;
     String korName;
     UserType userType;
+    int level;
 
     public TokenResponse putToken(String accessToken, String refreshToken, String korName, UserType userType) {
         this.setAccessToken(accessToken);
         this.setRefreshToken(refreshToken);
         this.setKorName(korName);
         this.setUserType(userType);
+        this.setLevel(userType.getLevel());
         return this;
     }
 }

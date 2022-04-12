@@ -76,10 +76,10 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         purchaseRequest.setOrdersState(SCHEDULE);
         purchaseRequest.setInputTestYn(true);
 
-        PurchaseRequest save = purchaseRequestRepo.save(purchaseRequest);
+        purchaseRequestRepo.save(purchaseRequest);
 
         modifiedLogHelper.createInsertLog(userCode, PURCHASE_REQUEST, purchaseRequest);
-        return getPurchaseRequestResponseOrThrow(save.getId());
+        return getPurchaseRequestResponseOrThrow(purchaseRequest.getId());
     }
 
     // 구매요청 리스트 조회, 검색조건: 요청기간, 제조오더번호, 품목그룹, 품번|품명, 제조사 품번, 완료포함(check)

@@ -34,7 +34,7 @@ public class SubItemServiceImpl implements SubItemService {
         Item inputItem = itemService.getItemOrThrow(subItemRequest.getItem());
         Item inputSubItem = itemService.getItemOrThrow(subItemRequest.getSubItem());
         throwIfItemAndSubItemSame(inputItem, inputSubItem);
-        checkSubItemOrder(inputItem, inputSubItem, subItemRequest.getSubOrders());
+//        checkSubItemOrder(inputItem, inputSubItem, subItemRequest.getSubOrders());
         SubItem subItem = mapper.toEntity(subItemRequest, SubItem.class);
         subItem.addJoin(inputItem, inputSubItem);
         subItemRepository.save(subItem);
@@ -44,8 +44,7 @@ public class SubItemServiceImpl implements SubItemService {
     // item과 subItem이 같을경우 예외
     private void throwIfItemAndSubItemSame(Item item, Item subItem) throws BadRequestException {
         if (item.equals(subItem)) {
-            throw new BadRequestException("item and subItem cannot be the same. input itemId: " + item.getId() +
-                    ", input subItemId: " + subItem.getId());
+            throw new BadRequestException("품목과 대체품목이 같을 수 없습니다. 확인 후 다시 시도해주세요.");
         }
     }
 
@@ -90,7 +89,7 @@ public class SubItemServiceImpl implements SubItemService {
         Item newInputItem = itemService.getItemOrThrow(subItemRequest.getItem());
         Item newInputSubItem = itemService.getItemOrThrow(subItemRequest.getSubItem());
         throwIfItemAndSubItemSame(newInputItem, newInputSubItem);
-        checkSubItemOrder(newInputItem, newInputSubItem, subItemRequest.getSubOrders());
+//        checkSubItemOrder(newInputItem, newInputSubItem, subItemRequest.getSubOrders());
         SubItem findSubItem = getSubItemOrThrow(id);
         SubItem newSubItemEntity = mapper.toEntity(subItemRequest, SubItem.class);
 

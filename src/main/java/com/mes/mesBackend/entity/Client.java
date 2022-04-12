@@ -189,9 +189,10 @@ public class Client extends BaseTimeEntity {
         setPaymentMethod(newPayType);
         setPaymentDate(newClient.paymentDate);
         setTransitMethod(newClient.transitMethod);
-        setInspectionType(inspectionType);
+        setInspectionType(newClient.inspectionType);
         setSearchWord(newClient.searchWord);
         setUseYn(newClient.useYn);
+        setPhoneNumber(newClient.phoneNumber);
     }
 
     public void addJoin(

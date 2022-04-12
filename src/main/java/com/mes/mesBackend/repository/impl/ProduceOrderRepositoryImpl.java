@@ -4,12 +4,9 @@ import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
 import com.mes.mesBackend.dto.response.ProductionPerformanceResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
-import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.repository.custom.ProduceOrderRepositoryCustom;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +15,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-
-import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.*;
 
 @RequiredArgsConstructor
 public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom {
@@ -142,8 +137,8 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
                 .where(
                         produceOrder.deleteYn.isFalse(),
                         isItemGroupIdEq(itemGroupId),
-                        isItemNameAneItemNoCon(itemNoOrItemName),
-                        isProduceOrderCreatedDateBetween(fromDate, toDate)
+                        isItemNameAneItemNoCon(itemNoOrItemName)
+//                        isProduceOrderCreatedDateBetween(fromDate, toDate)
                 )
                 .groupBy(produceOrder.id)
                 .orderBy(produceOrder.createdDate.desc())

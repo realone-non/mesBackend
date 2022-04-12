@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
-// 권한 인증 없어서 현재 사용하지 않음
 @Component
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     @Override
@@ -25,7 +24,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType(APPLICATION_JSON.toString());
         JSONObject json = new JSONObject();
-        String message = "권한이 없습니다.";
+        String message = "해당 리소스에 접근할 수 있는 권한이 없습니다.";
 
         json.put("timeStamp", LocalDateTime.now().toString());
         json.put("httpStatusCode", HttpServletResponse.SC_FORBIDDEN);

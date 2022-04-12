@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,6 +40,8 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 @RestController
 @RequiredArgsConstructor
 @SecurityRequirement(name = AUTHORIZATION)
+//@PreAuthorize("hasRole('ROLE_CEO') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_NORMAL') or hasRole('ROLE_NEW')")
+//@PreAuthorize("hasRole('ROLE_NEW')")
 public class ItemController {
     private final ItemService itemService;
     private final LogService logService;

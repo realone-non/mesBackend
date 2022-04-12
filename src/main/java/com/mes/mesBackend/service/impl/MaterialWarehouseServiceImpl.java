@@ -70,6 +70,7 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
         WareHouse wareHouse = wareHouseRepository.findByIdAndDeleteYnFalse(request.getWarehouseId())
                 .orElseThrow(() -> new NotFoundException("warehouse does not exist. input id: " + request.getWarehouseId()));
         dbStockInspect.setWareHouse(wareHouse);
+        dbStockInspect.setInspectionType(request.getInspectionType());
         materialStockInspectRequestRepository.save(dbStockInspect);
         System.out.println(dbStockInspect.getId());
         return materialStockInspectRequestRepository.findByIdAndDeleteYn(dbStockInspect.getId())
@@ -92,7 +93,7 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
                 .orElseThrow(() -> new NotFoundException("warehouse does not exist. input id: " + request.getWarehouseId()));
         ItemAccount itemAccount = itemAccountRepository.findByIdAndDeleteYnFalse(request.getItemAccountId())
                 .orElseThrow(() -> new NotFoundException("itemAccount does not exist. input id: " + request.getItemAccountId()));
-        dbStockRequest.update(request.getNote(), wareHouse, itemAccount);
+        dbStockRequest.update(request.getNote(), wareHouse, itemAccount, request.getInspectionType());
         materialStockInspectRequestRepository.save(dbStockRequest);
         return materialStockInspectRequestRepository.findByIdAndDeleteYn(id)
                 .orElseThrow(() -> new NotFoundException("stockInspectRequest does not exist. input id: " + id));
