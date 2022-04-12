@@ -176,7 +176,8 @@ public class PopServiceImpl implements PopService {
             int productAmount,  // 생산수량
             int stockAmount,    // 양품수량
             int badItemAmount,  // 불량수량
-            Long equipmentId
+            Long equipmentId,
+            Long fillingEquipmentCode     // 원료혼합에서만 입력하는 충진공정 설비 id(생성되는 equipmentLot 에 넣어야함)
     ) throws NotFoundException, BadRequestException {
         WorkOrderDetail workOrder = getWorkOrderDetailOrThrow(workOrderId);
         WorkProcess workProcess = workOrder.getWorkProcess();
@@ -218,6 +219,9 @@ public class PopServiceImpl implements PopService {
         Item item = getItemOrThrow(itemId);
         WareHouse wareHouse = lotMasterService.getLotMasterWareHouseOrThrow();
 
+
+        Long fillEquipmentId = workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING) ? fillingEquipmentCode : null;
+
         // 작업지시의 공정이 충진일때 전 공정인 원료혼합에서 만든 반제품이 없으면 예외
         if (workProcess.getWorkProcessDivision().equals(FILLING)) {
             lotConnectRepo.findByTodayProduceOrderAndEquipmentIdEqAndLotStockAmountOneLoe(workOrder.getProduceOrder().getId(), equipment.getId(), LocalDate.now())
@@ -228,13 +232,13 @@ public class PopServiceImpl implements PopService {
         if (workOrder.getOrderState().equals(SCHEDULE)) {
             // dummyLot 생성: 품목, 창고, 생성수량, 등록유형, 설비유형, lot 생성 구분
             dummyLotRequest.putPopWorkOrder(    // 더미로트에 재고수량은 관리 안함
-                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, 0, badItemAmount, PRODUCTION, equipmentId, DUMMY_LOT
+                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, 0, badItemAmount, PRODUCTION, equipmentId, DUMMY_LOT, null
             );
             dummyLot = lotHelper.createLotMaster(dummyLotRequest);
 
             // equipmentLot 생성: 품목, 창고, 생성수량, 등록유형, 설비유형, lot 생성 구분
             equipmentLotRequest.putPopWorkOrder(
-                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT
+                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT, fillEquipmentId
             );
             equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
 
@@ -301,7 +305,7 @@ public class PopServiceImpl implements PopService {
 
                 if (materialMixingRealLot == null) {
                     // equipmentLot 생성
-                    equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
+                    equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT, fillEquipmentId);
                     equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
                     lotMasterRepo.save(equipmentLot);
 
@@ -324,7 +328,7 @@ public class PopServiceImpl implements PopService {
                 }
             } else {
                 // 작업수량 들어올때마다 equipmentLot 생성으로 로직변경 - 2022.03.02
-                equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
+                equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT, fillEquipmentId);
                 equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
                 lotMasterRepo.save(equipmentLot);
 
@@ -752,7 +756,8 @@ public class PopServiceImpl implements PopService {
                 0,
                 equipmentLot.getEnrollmentType(),
                 equipmentLot.getEquipment().getId(),
-                REAL_LOT
+                REAL_LOT,
+                null
         );
         realLot = lotHelper.createLotMaster(realLotRequest);
         // 분할 된 lot 와 부모로트 생성

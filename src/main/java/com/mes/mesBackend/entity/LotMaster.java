@@ -204,7 +204,8 @@ public class LotMaster extends BaseTimeEntity {
             LotMasterRequest lotMasterRequest,
             WorkProcess workProcess,
             Equipment equipment,
-            String lotNo
+            String lotNo,
+            Equipment fillingInputEquipment
     ) {
         setItem(lotMasterRequest.getItem());
         setWareHouse(lotMasterRequest.getWareHouse());
@@ -221,6 +222,7 @@ public class LotMaster extends BaseTimeEntity {
         setLotMasterDivision(lotMasterRequest.getLotMasterDivision());
         setEquipment(equipment);
         setLotNo(lotNo);
+        setInputEquipment(fillingInputEquipment);
     }
     public void delete() {
         setDeleteYn(true);

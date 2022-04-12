@@ -44,6 +44,7 @@ public class LotHelperImpl implements LotHelper {
     public LotMaster createLotMaster(LotMasterRequest lotMasterRequest) throws NotFoundException, BadRequestException {
         Long workProcessId = lotMasterRequest.getWorkProcessDivision() != null ? lotLogHelper.getWorkProcessByDivisionOrThrow(lotMasterRequest.getWorkProcessDivision()) : null;
         WorkProcess workProcess = workProcessId != null ? getWorkProcessIdOrThrow(workProcessId) : null;
+        Equipment fillingInputEquipment = lotMasterRequest.getFillingEquipmentId() != null ? getEquipmentOrThrow(lotMasterRequest.getFillingEquipmentId()) : null;
 
         // 설비 -> 설비값이 없을경우 공정에 해당하는 첫번째 설비로 등록
         Equipment equipment = lotMasterRequest.getEquipmentId() != null ? getEquipmentOrThrow(lotMasterRequest.getEquipmentId()) : equipmentRepository.findByWorkProcess(workProcess.getId());
@@ -59,7 +60,7 @@ public class LotHelperImpl implements LotHelper {
             lotMaster.createOutsourcingInputLot(lotMasterRequest, lotNo, workProcess);
         } else {
             String lotNo = createLotNo(lotMasterRequest.getItem(), equipment, lotMasterRequest.getLotMasterDivision());
-            lotMaster.createWorkProcessLot(lotMasterRequest, workProcess, equipment, lotNo);
+            lotMaster.createWorkProcessLot(lotMasterRequest, workProcess, equipment, lotNo, fillingInputEquipment);
         }
 
         lotMasterRepo.save(lotMaster);
