@@ -38,6 +38,7 @@ public class ShipmentItemRepositoryImpl implements ShipmentItemRepositoryCustom 
                                 shipmentItem.deleteYn.isFalse()
                         )
                         .orderBy(shipmentItem.createdDate.desc())
+                        .limit(1)
                         .fetchOne()
         );
     }
