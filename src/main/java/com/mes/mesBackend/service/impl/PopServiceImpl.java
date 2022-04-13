@@ -231,14 +231,12 @@ public class PopServiceImpl implements PopService {
         Item item = getItemOrThrow(itemId);
         WareHouse wareHouse = lotMasterService.getLotMasterWareHouseOrThrow();
 
-
         Long fillEquipmentId = workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING) ? fillingEquipmentCode : null;
 
         // 작업지시의 공정이 충진일때 전 공정인 원료혼합에서 만든 반제품이 없으면 예외
         if (workProcess.getWorkProcessDivision().equals(FILLING)) {
             lotConnectRepo.findByTodayProduceOrderAndEquipmentIdEqAndLotStockAmountOneLoe(workOrder.getProduceOrder().getId(), equipment.getId(), LocalDate.now())
-                    .orElseThrow(() -> new BadRequestException("입력한 설비로트와 같은 제조오더의 원료혼합 공정에서 생성 된 반제품이 존재하지 않습니다. " +
-                            "원료혼합 공정에서 반제품 생성 한 다음 충진공정 설비 지정 후에 다시 시도해주세요."));
+                    .orElseThrow(() -> new BadRequestException("원료혼합에서 반제품 생성이 되었지만 등록완료 버튼을 누르지 않았거나, 원료혼합 공정에서 해당 충진에 대한 반제품이 생성되지 않았습니다. 확인 후 다시 시도해주세요."));
         }
 
         if (workOrder.getOrderState().equals(SCHEDULE)) {
