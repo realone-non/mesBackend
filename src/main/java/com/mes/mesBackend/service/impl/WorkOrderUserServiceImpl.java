@@ -1,11 +1,13 @@
 package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.response.WorkOrderUserResponse;
+import com.mes.mesBackend.entity.Item;
 import com.mes.mesBackend.entity.User;
 import com.mes.mesBackend.entity.WorkOrderDetail;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.repository.ItemRepository;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
 import com.mes.mesBackend.service.UserService;
 import com.mes.mesBackend.service.WorkOrderUserService;
@@ -15,9 +17,11 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.OrderState.ONGOING;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 
 // 8-2. 작업자 투입 수정
 @Service
@@ -25,6 +29,8 @@ import static com.mes.mesBackend.entity.enumeration.OrderState.ONGOING;
 public class WorkOrderUserServiceImpl implements WorkOrderUserService {
     private final WorkOrderDetailRepository workOrderDetailRepository;
     private final UserService userService;
+    private final ItemRepository itemRepository;
+
     @Override
     public List<WorkOrderUserResponse> getWorkOrderUsers(
             Long workLineId,
@@ -37,8 +43,29 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
     ) {
         List<WorkOrderUserResponse> findWorkOrderUsers =
                 workOrderDetailRepository.findWorkOrderUserResponsesByCondition(workLineId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
+
+        // 해당 공정에 맞는 bomDetailItem
+        for (WorkOrderUserResponse response : findWorkOrderUsers) {
+            Item item = response.getWorkProcessDivision().equals(PACKAGING) ? getItemOrNull(response.getItemId())
+                    : workOrderDetailRepository.findBomDetailHalfProductByBomMasterItemIdAndWorkProcessId(response.getItemId(), response.getWorkProcessId(), null)
+                    .orElse(null);
+            if (item != null) response.setItems(item);
+        }
+
         findWorkOrderUsers.forEach(WorkOrderUserResponse::putCostTime);
-        return findWorkOrderUsers;
+
+        if (itemAccountId != null) {
+            return findWorkOrderUsers.stream().filter(
+                    f -> f.getItemAccountId() != null && f.getItemAccountId().equals(itemAccountId)
+            ).collect(Collectors.toList());
+        } else {
+            return findWorkOrderUsers;
+        }
+    }
+
+    // 품목 조회 및 없으면 null
+    private Item getItemOrNull(Long id) {
+        return itemRepository.findByIdAndDeleteYnFalse(id).orElse(null);
     }
 
     // 작업자 투입 단일 조회

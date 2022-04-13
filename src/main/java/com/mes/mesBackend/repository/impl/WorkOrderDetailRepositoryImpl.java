@@ -95,9 +95,6 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.id.as("id"),
                                 workOrderDetail.orderNo.as("orderNo"),
                                 workOrderDetail.orders.as("orders"),
-//                                item.itemNo.as("itemNo"),
-//                                item.itemName.as("itemName"),
-//                                itemAccount.account.as("itemAccount"),
                                 workLine.workLineName.as("workLine"),
                                 workOrderDetail.expectedWorkDate.as("expectedWorkDate"),
                                 workOrderDetail.expectedWorkTime.as("expectedWorkTime"),
@@ -107,7 +104,6 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 contract.contractNo.as("contractNo"),
                                 contractItem.contract.periodDate.as("periodDate"),
                                 client.clientName.as("cName"),
-//                                produceOrder.orderState.as("orderState"),
                                 workOrderDetail.productionAmount.as("productionAmount"),
                                 workOrderDetail.startDate.as("startDateTime"),
                                 workOrderDetail.endDate.as("endDateTime"),
@@ -131,7 +127,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isExpectedWorkDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
-                .orderBy(workOrderDetail.createdDate.desc(), workOrderDetail.workProcess.orders.asc())
+                .orderBy(workOrderDetail.createdDate.desc(), workOrderDetail.workProcess.orders.asc(), workOrderDetail.orders.asc())
                 .fetch();
     }
 
@@ -442,7 +438,10 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workLine.workLineName.as("workLine"),
                                 workOrderDetail.note.as("note"),
                                 contract.contractNo.as("contractNo"),
-                                produceOrder.produceOrderNo.as("produceOrderNo")
+                                produceOrder.produceOrderNo.as("produceOrderNo"),
+                                workOrderDetail.workProcess.workProcessDivision.as("workProcessDivision"),
+                                contractItem.item.id.as("itemId"),
+                                workOrderDetail.workProcess.id.as("workProcessId")
                         )
                 )
                 .from(workOrderDetail)
@@ -456,7 +455,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .where(
                         isWorkLineIdEq(workLineId),
                         isProduceOrderNoContain(produceOrderNo),
-                        isItemAccountIdEq(itemAccountId),
+//                        isItemAccountIdEq(itemAccountId),
                         isContractNoContain(contractNo),
                         isWorkDateBetween(fromDate, toDate),
                         isOrderStateEq(orderState),
