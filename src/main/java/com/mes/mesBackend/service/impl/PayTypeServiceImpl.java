@@ -36,7 +36,7 @@ public class PayTypeServiceImpl implements PayTypeService {
     // 결제조건 전체 조회
     @Override
     public List<PayTypeResponse> getPayTypes() {
-        List<PayType> payTypes = payTypeRepository.findAllByDeleteYnFalse();
+        List<PayType> payTypes = payTypeRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return mapper.toListResponses(payTypes, PayTypeResponse.class);
     }
 

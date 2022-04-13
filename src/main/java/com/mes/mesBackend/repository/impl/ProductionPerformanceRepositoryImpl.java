@@ -46,7 +46,7 @@ public class ProductionPerformanceRepositoryImpl implements ProductionPerformanc
                                 produceOrder.produceOrderNo.as("produceOrderNo"),
                                 client.clientName.as("clientName"),
                                 item.itemName.as("itemName"),
-                                contractItem.periodDate.as("periodDate"),
+                                contractItem.contract.periodDate.as("periodDate"),
                                 user.korName.as("korName"),
                                 contractItem.amount.as("contractItemAmount"),
 //                                productionPerformance.productionAmount.as("productionAmount"),
@@ -79,6 +79,7 @@ public class ProductionPerformanceRepositoryImpl implements ProductionPerformanc
                         isProductionPerformanceDeleteYnFalse(),
                         isWorkOrderDetailDeleteYnFalse()
                 )
+                .orderBy(productionPerformance.createdDate.desc())
                 .fetch();
     }
 

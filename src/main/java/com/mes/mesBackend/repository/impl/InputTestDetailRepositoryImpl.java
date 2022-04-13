@@ -77,6 +77,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                                 outSourcingProductionRequest.id.as("outsourcingProductionRequestNo"),   // 외주입고 발주번호
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
+                                item.standard.as("itemStandard"),
 //                                item.clientItemNo.as("itemClientPartNo"), // 고객사품번
                                 item.manufacturerPartNo.as("itemManufacturerPartNo"),    // 제조사품번
 //                                client.clientName.as("clientName"), // 고객사
@@ -85,7 +86,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                                 testCriteria.testCriteria.as("testCriteria"),
                                 wareHouse.wareHouseName.as("warehouse"),
                                 inputTestRequest.requestAmount.as("requestAmount"),
-                                purchaseInput.urgentYn.as("urgentYn"),
+                                purchaseInput.inputTestYn.as("inputTestYn"),
                                 purchaseInput.testReportYn.as("testReportYn"),
                                 purchaseInput.coc.as("coc"),
                                 lotMaster.enrollmentType.as("enrollmentType"),
@@ -119,6 +120,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                         isInputTestDivision(inputTestDivision),
                         isInspectionTypeEq(inspectionType)
                 )
+                .orderBy(inputTestRequest.createdDate.desc())
                 .fetch();
     }
 
@@ -196,7 +198,9 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                 .where(
                         inputTestRequest.id.eq(inputTestRequestId),
                         isInputTestDetailDeleteYnFalse()
-                ).fetch();
+                )
+                .orderBy(inputTestDetail.createdDate.desc())
+                .fetch();
     }
 
     // 검사요청정보에 해당하는 검사정보의 모든 검사수량
@@ -316,6 +320,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                         isInspectionTypeEq(inspectionType),
                         isWareHouseEq(wareHouseId)
                 )
+                .orderBy(inputTestDetail.createdDate.desc())
                 .fetch();
     }
 
@@ -385,6 +390,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                         isInputTestRequestDeleteYnFalse(),
                         inputTestRequest.inputTestState.eq(SCHEDULE)
                 )
+                .orderBy(inputTestRequest.createdDate.desc())
                 .fetch();
     }
 

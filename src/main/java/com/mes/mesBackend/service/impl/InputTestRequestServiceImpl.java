@@ -3,6 +3,7 @@ package com.mes.mesBackend.service.impl;
 import com.mes.mesBackend.dto.request.InputTestRequestCreateRequest;
 import com.mes.mesBackend.dto.request.InputTestRequestUpdateRequest;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
+import com.mes.mesBackend.dto.response.ItemResponse;
 import com.mes.mesBackend.entity.InputTestRequest;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
@@ -11,7 +12,9 @@ import com.mes.mesBackend.entity.enumeration.TestType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
-import com.mes.mesBackend.repository.*;
+import com.mes.mesBackend.repository.InputTestDetailRepository;
+import com.mes.mesBackend.repository.InputTestRequestRepository;
+import com.mes.mesBackend.repository.LotMasterRepository;
 import com.mes.mesBackend.service.InputTestRequestService;
 import com.mes.mesBackend.service.LotMasterService;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +24,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.mes.mesBackend.entity.enumeration.EnrollmentType.*;
 import static com.mes.mesBackend.entity.enumeration.InputTestDivision.*;
 import static com.mes.mesBackend.entity.enumeration.InspectionType.NONE;
-import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
-import static com.mes.mesBackend.helper.Constants.PRODUCT_ITEM_ACCOUNT;
 
 // 15-1. 외주수입검사의뢰 등록
 @Service
@@ -50,17 +52,15 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
         LotMaster lotMaster = lotMasterService.getLotMasterOrThrow(inputTestRequestRequest.getLotId());
 
         if (inputTestDivision.equals(PART)) {
-            if (lotMaster.getPurchaseInput() == null) throw new BadRequestException("구매입고만 등록할 수 있습니다.");
+            if (!lotMaster.getEnrollmentType().equals(PURCHASE_INPUT)) throw new BadRequestException("구매입고로 생성된 Lot 만 등록 할 수 있습니다.");
         } else if (inputTestDivision.equals(OUT_SOURCING)) {
-            if (lotMaster.getOutSourcingInput() == null) throw new BadRequestException("외주입고만 등록할 수 있습니다.");
+            if (!lotMaster.getEnrollmentType().equals(OUTSOURCING_INPUT)) throw new BadRequestException("외주입고로 생성된 Lot 만 등록 할 수 있습니다.");
         } else if (inputTestDivision.equals(PRODUCT)) {
-            if (!lotMaster.getItem().getItemAccount().getAccount().equals(PRODUCT_ITEM_ACCOUNT)) {
-                throw new BadRequestException("완제품만 등록할 수 있습니다.");
-            }
+            if (!lotMaster.getEnrollmentType().equals(PRODUCTION)) throw new BadRequestException("생산으로 등록된 Lot 만 등록 할 수 있습니다.");
         }
 
-        // 입력받은 요청수량이 lot 의 재고수량보다 많은지 체크
-        throwIfRequestAmountGreaterThanInputAmount(inputTestRequestRequest.getLotId(), lotMaster.getCheckRequestAmount() + requestAmount);
+        // 입력받은 요청수량이 lot 의 생성수량(구매입고, 외주입고) or 재고수량(생산) 보다 많은지 체크
+        throwIfRequestAmountGreaterThanInputAmount(inputTestRequestRequest.getLotId(), lotMaster.getCheckRequestAmount() + requestAmount, inputTestDivision);
         // 검사방법 (입력받으면 입력받은 검사방법으로 하고, 입력받지 않으면 품목의 검사방법으로 함)
         InspectionType inspectionType = inputTestRequestRequest.getInspectionType().equals(NONE) ? lotMaster.getItem().getInspectionType() : inputTestRequestRequest.getInspectionType();
 
@@ -103,7 +103,7 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
             LocalDate fromDate,
             LocalDate toDate,
             InputTestDivision inputTestDivision
-    ) throws NotFoundException {
+    ) {
             List<InputTestRequestResponse> responses = inputTestRequestRepo.findAllByCondition(
                     warehouseId,
                     lotTypeId,
@@ -119,16 +119,6 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
                 List<Integer> testAmountList = inputTestDetailRepo.findTestAmountByInputTestRequestId(response.getId());
                 int testAmountSum = testAmountList.stream().mapToInt(Integer::intValue).sum();
                 response.setTestAmount(testAmountSum);
-
-//                // 완제품에 대한 작업지시번호
-//                if (inputTestDivision.equals(PRODUCT)) {
-//                    Long realLotId = response.getLotId();
-//                    Long dummyLotId = lotConnectRepository.findDummyLotIdByChildLotId(realLotId).orElseThrow(() -> new NotFoundException("[데이터오류] 입력한 realLot 에 대한 dummyLot 가 존재하지 않음."));
-//                    // lotMaster id 로 PACKAGING 끝난 작업지시 가져옴
-//                    String workOrderNo = lotLogRepo.findWorkOrderIdByLotMasterIdAndWorkProcessDivision(dummyLotId, PACKAGING)
-//                            .orElseThrow(() -> new NotFoundException("lot 에 해당하는 작업지시가 없음. 조건: PACKAGING 공정이 완료된 작업지시"));
-//                    response.setWorkOrderNo(workOrderNo);
-//                }
             }
             return responses.stream().map(res -> res.division(inputTestDivision)).collect(Collectors.toList());
     }
@@ -145,8 +135,8 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
         int beforeRequestAmount = findInputTestRequest.getRequestAmount();
         int newRequestAmount = inputTestRequestUpdateRequest.getRequestAmount();
 
-        // 입력받은 요청수량이 lot 의 재고수량 보다 많은지 체크
-        throwIfRequestAmountGreaterThanInputAmount(findLotMaster.getId(), (findLotMaster.getCheckRequestAmount() - beforeRequestAmount) + newRequestAmount);
+        // 입력받은 요청수량이 lot 의 생성수량(구매입고, 외주입고) or 재고수량(생산) 보다 많은지 체크
+        throwIfRequestAmountGreaterThanInputAmount(findLotMaster.getId(), (findLotMaster.getCheckRequestAmount() - beforeRequestAmount) + newRequestAmount, inputTestDivision);
         // 검사방법 (입력받으면 입력받은 검사방법으로 하고, 입력받지 않으면 품목의 검사방법으로 함)
         InspectionType inspectionType = inputTestRequestUpdateRequest.getInspectionType().equals(NONE) ? findLotMaster.getItem().getInspectionType() : inputTestRequestUpdateRequest.getInspectionType();
         inputTestRequestUpdateRequest.setInspectionType(inspectionType);
@@ -186,11 +176,37 @@ public class InputTestRequestServiceImpl implements InputTestRequestService {
         lotMasterRepo.save(findLotMaster);
     }
 
-    // lotMaster 의 재고수량 갯수만큼만 요청수량을 등록 할 수 있음.
-    // 요청수량 재고수량 비교
-    private void throwIfRequestAmountGreaterThanInputAmount(Long lotId, int requestAmount) throws BadRequestException {
-        Integer stockAmountFromLotMaster = inputTestRequestRepo.findLotMasterStockAmountByLotMasterId(lotId);
-        if (requestAmount > stockAmountFromLotMaster)
-            throw new BadRequestException("입력한 요청수량은 LOT 의 재고수량보다 많으므로 생성할 수 없습니다. 요청수량을 LOT 재고수량보다 같거나 적게 입력해주세요.");
+    // lotMaster 의 생성수량 갯수만큼만 요청수량을 등록 할 수 있음.
+    // 입력받은 요청수량이 lot 의 생성수량(구매입고, 외주입고) or 재고수량(생산) 보다 많은지 체크
+    private void throwIfRequestAmountGreaterThanInputAmount(Long lotId, int requestAmount, InputTestDivision inputTestDivision) throws BadRequestException {
+        int amount = inputTestDivision.equals(PART) || inputTestDivision.equals(OUT_SOURCING)
+                ? inputTestRequestRepo.findLotMasterCreataeAmountByLotMasterId(lotId)
+                : inputTestRequestRepo.findLotMasterStockAmountByLotMasterId(lotId);
+        String message = inputTestDivision.equals(PART) || inputTestDivision.equals(OUT_SOURCING)
+                ? "입력한 요청수량은 LOT 의 생성수량 보다 많으므로 생성할 수 없습니다. 요청수량을 LOT 생성수량 보다 같거나 적게 입력해주세요."
+                : "입력한 요청수량은 LOT 의 재고수량 보다 많으므로 생성할 수 없습니다. 요청수량을 LOT 재고수량 보다 같거나 적게 입력해주세요.";
+        if (requestAmount > amount) throw new BadRequestException(message);
+    }
+
+    // 검사의뢰 가능한 품목조회
+    @Override
+    public List<ItemResponse.noAndName> getInputTestRequestItems(InputTestDivision inputTestDivision) {
+        if (inputTestDivision.equals(PART))                        // 부품수입검사
+            return inputTestRequestRepo.findPartInputTestRequestPossibleItems();
+        else if (inputTestDivision.equals(OUT_SOURCING))           // 외주수입검사
+            return inputTestRequestRepo.findOutsourcingInputTestRequestPossibleItems();
+        else                                                        // 제품검사
+            return inputTestRequestRepo.findProductInputTestRequestPossibleItems();
+    }
+
+    // 검사의뢰 가능한 lotMaster 조회
+    @Override
+    public List<InputTestRequestResponse> getInputTestRequestLotMasters(Long itemId, InputTestDivision inputTestDivision) {
+        if (inputTestDivision.equals(PART))                          // 부품수입검사
+            return inputTestRequestRepo.findPartInputTestRequestPossibleLotMasters(itemId);
+        else if (inputTestDivision.equals(OUT_SOURCING))             // 외주수입검사
+            return inputTestRequestRepo.findOutSourcingInputTestRequestPossibleLotMasters(itemId);
+        else                                                         // 제품검사
+            return inputTestRequestRepo.findProductInputTestRequestPossibleLotMasters(itemId);
     }
 }

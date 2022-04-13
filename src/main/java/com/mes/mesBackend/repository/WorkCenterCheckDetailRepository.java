@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface WorkCenterCheckDetailRepository extends JpaCustomRepository<WorkCenterCheckDetail, Long> {
-    List<WorkCenterCheckDetail> findAllByWorkCenterCheckAndDeleteYnFalse(WorkCenterCheck workCenterCheck);
+    List<WorkCenterCheckDetail> findAllByWorkCenterCheckAndDeleteYnFalseOrderByCreatedDateDesc(WorkCenterCheck workCenterCheck);
     WorkCenterCheckDetail findByIdAndWorkCenterCheckAndDeleteYnFalse(Long id, WorkCenterCheck workCenterCheck);
 }

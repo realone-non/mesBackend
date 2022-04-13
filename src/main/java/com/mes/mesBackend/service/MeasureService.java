@@ -14,8 +14,8 @@ public interface MeasureService {
     MeasureResponse createMeasure(MeasureRequest measureRequest) throws NotFoundException;
     // 계측기 단일 조회
     MeasureResponse getMeasure(Long id) throws NotFoundException;
-    // 계측기 전체 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
-    List<MeasureResponse> getMeasures(Long gaugeId, Long month);
+    // 계측기 전체 조회 검색조건: 검색조건: GAUGE유형, 검교정 주기
+    List<MeasureResponse> getMeasures(Long gaugeId, Integer calibrationCycle);
     // 계측기 페이징 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
 //    Page<MeasureResponse> getMeasures(Long gaugeId, Long month, Pageable pageable);
     // 계측기 수정

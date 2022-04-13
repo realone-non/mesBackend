@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // 4-2. 수주 등록
 @Service
@@ -58,14 +59,15 @@ public class ContractServiceImpl implements ContractService {
     @Override
     public ContractResponse getContract(Long contractId) throws NotFoundException {
         Contract contract = getContractOrThrow(contractId);
-        return mapper.toResponse(contract, ContractResponse.class);
+        return mapper.toResponse(contract, ContractResponse.class).setIsPeriod();
     }
 
     // 수주 리스트 조회
     @Override
-    public List<ContractResponse> getContracts(String clientName, String userName, LocalDate fromDate, LocalDate toDate, Long currencyId) {
-        List<Contract> contracts = contractRepo.findAllByCondition(clientName, userName, fromDate, toDate, currencyId);
-        return mapper.toListResponses(contracts, ContractResponse.class);
+    public List<ContractResponse> getContracts(String clientName, String userName, LocalDate fromDate, LocalDate toDate, Long currencyId, Boolean deadlineDateNullYn) {
+        List<Contract> contracts = contractRepo.findAllByCondition(clientName, userName, fromDate, toDate, currencyId, deadlineDateNullYn);
+        List<ContractResponse> responses = mapper.toListResponses(contracts, ContractResponse.class);
+        return responses.stream().map(ContractResponse::setIsPeriod).collect(Collectors.toList());
     }
 
     // 수주 수정
@@ -144,7 +146,7 @@ public class ContractServiceImpl implements ContractService {
     @Override
     public List<ContractItemResponse> getContractItems(Long contractId) throws NotFoundException {
         Contract contract = getContractOrThrow(contractId);
-        List<ContractItem> contractItems = contractItemRepo.findAllByContractAndDeleteYnFalse(contract);
+        List<ContractItem> contractItems = contractItemRepo.findAllByContractAndDeleteYnFalseOrderByCreatedDateDesc(contract);
         return mapper.toListResponses(contractItems, ContractItemResponse.class);
     }
 

@@ -1,6 +1,6 @@
 package com.mes.mesBackend.dto.response;
 
-import com.mes.mesBackend.entity.enumeration.TestCategory;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,4 +32,7 @@ public class OutsourcingMaterialReleaseResponse {
 
     @Schema(description = "외주생산의뢰 ID")
     Long requestId;
+
+    @JsonIgnore
+    Long requestItemId;
 }

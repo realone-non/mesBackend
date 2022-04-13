@@ -105,6 +105,7 @@ public class ShipmentLotRepositoryImpl implements ShipmentLotRepositoryCustom {
                         shipmentLot.shipmentItem.id.eq(shipmentItemId),
                         shipmentLot.deleteYn.isFalse()
                 )
+                .orderBy(shipmentLot.createdDate.desc())
                 .fetch();
     }
 
@@ -133,6 +134,7 @@ public class ShipmentLotRepositoryImpl implements ShipmentLotRepositoryCustom {
                         shipmentLot.shipmentItem.id.eq(shipmentItemId),
                         shipmentLot.deleteYn.isFalse()
                 )
+                .orderBy(shipmentLot.createdDate.desc())
                 .fetch();
     }
 
@@ -200,6 +202,7 @@ public class ShipmentLotRepositoryImpl implements ShipmentLotRepositoryCustom {
                         isShipmentItemDeleteYnFalse(),
                         isShipmentLotDeleteYnFalse()
                 )
+                .orderBy(shipmentLot.createdDate.desc())
                 .fetch();
     }
     // 출하현황 검색 리스트 조회, 검색조건: 거래처 id, 출하기간 fromDate~toDate, 화폐 id, 담당자 id, 품번|품명

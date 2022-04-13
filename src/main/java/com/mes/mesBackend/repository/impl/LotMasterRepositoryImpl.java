@@ -2,7 +2,11 @@ package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.*;
+import com.mes.mesBackend.entity.enumeration.EnrollmentType;
+import com.mes.mesBackend.entity.enumeration.GoodsType;
+import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
+import com.mes.mesBackend.repository.custom.JpaCustomRepository;
 import com.mes.mesBackend.repository.custom.LotMasterRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -13,14 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mes.mesBackend.entity.enumeration.EnrollmentType.*;
+import static com.mes.mesBackend.entity.enumeration.GoodsType.PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.FAMILY;
-import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.*;
-import static com.mes.mesBackend.entity.enumeration.OrderState.*;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.DUMMY_LOT;
+import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 
 @RequiredArgsConstructor
@@ -173,7 +178,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotMaster.checkRequestAmount.as("checkRequestAmount"),
                                 lotMaster.checkAmount.as("checkAmount"),
                                 lotMaster.qualityLevel.as("qualityLevel"),
-                                lotMaster.createdDate.as("createdDate")
+                                lotMaster.createdDate.as("createdDate"),
+                                item.itemAccountCode.detail.as("itemAccountCode")
                         )
                 )
                 .from(lotMaster)
@@ -195,6 +201,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         lotMaster.lotMasterDivision.eq(REAL_LOT),
                         isDeleteYnFalse()
                 )
+                .orderBy(lotMaster.createdDate.desc())
                 .fetch();
     }
 
@@ -214,8 +221,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotMaster.id.as("lotId"),
                                 lotType.lotType.as("lotType"),
                                 lotMaster.lotNo.as("lotNo"),
-                                lotMaster.stockAmount.as("inputAmount"),
-                                outSourcingInput.testRequestType.as("testRequestType")
+                                lotMaster.createdAmount.as("inputAmount"),
+                                lotMaster.item.testType.as("testRequestType")
                         )
                 )
                 .from(lotMaster)
@@ -240,7 +247,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotType.lotType.as("lotType"),
                                 lotMaster.lotNo.as("lotNo"),
                                 lotMaster.stockAmount.as("inputAmount"),
-                                outSourcingInput.testRequestType.as("testRequestType")
+                                lotMaster.item.testType.as("testRequestType")
                         )
                 )
                 .from(lotMaster)
@@ -265,7 +272,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotType.lotType.as("lotType"),
                                 lotMaster.lotNo.as("lotNo"),
                                 lotMaster.stockAmount.as("inputAmount"),
-                                outSourcingInput.testRequestType.as("testRequestType")
+                                lotMaster.item.testType.as("testRequestType")
                         )
                 )
                 .from(lotMaster)
@@ -526,7 +533,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                         BadItemWorkOrderResponse.subDto.class,
                                         lotMaster.badItemAmount.as("badAmount"),
                                         lotMaster.createdAmount.as("createAmount"),
-                                        item.itemName.as("itemNo"),
+                                        item.itemNo.as("itemNo"),
                                         item.itemName.as("itemName")
                                 )
                         )
@@ -559,6 +566,22 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 lotMaster.exhaustYn.isFalse(),
                                 lotMaster.stockAmount.goe(1),
                                 lotMaster.lotMasterDivision.eq(REAL_LOT)
+                        )
+                        .fetchOne()
+        );
+    }
+
+    //외주입고로 LOT 조회
+    @Transactional(readOnly = true)
+    public Optional<LotMaster> findByOutsourcingInput(Long outsourcingInputId){
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(lotMaster)
+                        .leftJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
+                        .where(
+                                outSourcingInput.id.eq(outsourcingInputId),
+                                isDeleteYnFalse(),
+                                lotMaster.enrollmentType.eq(OUTSOURCING_INPUT)
                         )
                         .fetchOne()
         );
@@ -712,6 +735,110 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
         );
     }
 
+    // 품목계정 별 재고현황 정보
+    // lotMaster 의 realLot 중 stockAmount 가 0 이상이고, 검색조건으로 품목계정이 들어왔을때 품목의 갯수는 5개
+    @Override
+    public List<ItemInventoryStatusResponse> findItemInventoryStatusResponseByGoodsType(GoodsType goodsType) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                ItemInventoryStatusResponse.class,
+                                item.id.as("itemId"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName"),
+                                lotMaster.stockAmount.sum().as("stockAmount")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                .where(
+                        itemAccount.goodsType.eq(goodsType),
+                        lotMaster.deleteYn.isFalse(),
+                        lotMaster.stockAmount.ne(0),
+                        lotMaster.lotMasterDivision.eq(REAL_LOT)
+                )
+                .orderBy(lotMaster.stockAmount.desc())
+                .groupBy(item.id)
+                .limit(5)
+                .fetch();
+    }
+
+    // 매출관련현황 - 제품 생산
+    @Override
+    public List<ItemResponse.noAndName>findSalesRelatedStatusResponseByProductItems(LocalDate fromDate, LocalDate toDate) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                ItemResponse.noAndName.class,
+                                item.id.as("id"),
+                                item.itemNo.as("itemNo"),
+                                item.itemName.as("itemName")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                .where(
+                        lotMaster.deleteYn.isFalse(),
+                        lotMaster.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)),
+                        lotMaster.lotMasterDivision.eq(REAL_LOT),
+                        itemAccount.goodsType.eq(PRODUCT),
+                        lotMaster.enrollmentType.eq(PRODUCTION)
+                )
+                .groupBy(item.id)
+                .orderBy(lotMaster.createdAmount.sum().desc())
+                .limit(5)
+                .fetch();
+    }
+
+    // 주 별로 생산 된 품목 갯수
+    @Override
+    public Optional<Integer> findCreatedAmountByWeekDate(LocalDate fromDate, LocalDate toDate, Long itemId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(lotMaster.createdAmount.sum())
+                        .from(lotMaster)
+                        .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                        .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                        .where(
+                                lotMaster.deleteYn.isFalse(),
+                                lotMaster.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)),
+                                lotMaster.lotMasterDivision.eq(REAL_LOT),
+                                itemAccount.goodsType.eq(PRODUCT),
+                                lotMaster.enrollmentType.eq(PRODUCTION),
+                                lotMaster.item.id.eq(itemId)
+                        )
+                        .fetchOne()
+        );
+    }
+
+    //재사용 LOT리스트 조회
+    @Override
+    public List<RecycleLotResponse> findRecycleLots(LocalDate fromDate, LocalDate toDate){
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                RecycleLotResponse.class,
+                                lotMaster.id.as("id"),
+                                lotMaster.lotNo.as("lotNo"),
+                                item.itemName.as("itemName"),
+                                item.itemNo.as("itemNo"),
+                                lotMaster.stockAmount.as("stockAmount"),
+                                lotMaster.workProcess.workProcessName.as("workProcess")
+                        )
+                )
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(lotMaster.workProcess.id))
+                .where(
+                        lotMaster.deleteYn.isFalse(),
+                        dateNull(fromDate, toDate),
+                        lotMaster.enrollmentType.eq(RECYCLE)
+                )
+                .fetch();
+    }
+
     private BooleanExpression isLotNoLengthEq(int length) {
         return lotMaster.lotNo.length().eq(length);
     }
@@ -726,5 +853,9 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
 
     private BooleanExpression isCodeContain(String code) {
         return lotMaster.lotNo.contains(code);
+    }
+
+    private  BooleanExpression dateNull(LocalDate startDate, LocalDate endDate){
+        return startDate != null ? lotMaster.createdDate.between(startDate.atStartOfDay(), LocalDateTime.of(endDate, LocalTime.MAX).withNano(0)) : null;
     }
 }

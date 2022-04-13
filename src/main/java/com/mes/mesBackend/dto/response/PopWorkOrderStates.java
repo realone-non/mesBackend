@@ -32,4 +32,7 @@ public class PopWorkOrderStates {
 
     @Schema(description = "작업 수량")
     int createdAmount;
+
+    @Schema(description = "원료혼합 공정에서 선택한 충진공정 설비")
+    Long fillingEquipmentCode;
 }

@@ -47,10 +47,8 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                                 development.startDate.as("startDate"),
                                 development.endDate.as("endDate"),
                                 development.deliverAmount.as("deliverAmount"),
-                                development.processState.coalesce("").as("processState"),
                                 development.user.id.as("userId"),
-                                development.user.korName.as("userName"),
-                                development.fileUrl.as("fileUrl")
+                                development.user.korName.as("userName")
                                 )
                             )
                 .from(development)
@@ -84,10 +82,8 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                                 development.startDate.as("startDate"),
                                 development.endDate.as("endDate"),
                                 development.deliverAmount.as("deliverAmount"),
-                                development.processState.coalesce("").as("processState"),
                                 development.user.id.as("userId"),
-                                development.user.korName.as("userName"),
-                                development.fileUrl.as("fileUrl")
+                                development.user.korName.as("userName")
                         )
                 )
                 .from(development)
@@ -113,16 +109,13 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                         Projections.fields(
                                 DevelopmentStateReponse.class,
                                 developmentState.id.as("id"),
+                                developmentState.fileName.as("fileName"),
                                 developmentState.fileUrl.as("fileUrl"),
                                 developmentState.createdDate.as("addDate"),
                                 developmentState.user.id.as("userId"),
                                 developmentState.user.korName.as("userName"),
-                                developmentState.approveDate.as("approveDate"),
                                 developmentState.developmentStatus.as("status"),
-                                developmentState.developmentChildrenStatus.as("childrenStatus"),
-                                developmentState.ver.as("ver"),
-                                developmentState.changeContents.as("changeContents"),
-                                developmentState.meetingType.as("meetingType")
+                                developmentState.developmentChildrenStatus.as("childrenStatus")
                         )
                 )
                 .from(developmentState)
@@ -145,16 +138,13 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                         Projections.fields(
                                 DevelopmentStateReponse.class,
                                 developmentState.id.as("id"),
+                                developmentState.fileName.as("fileName"),
                                 developmentState.fileUrl.as("fileUrl"),
                                 developmentState.createdDate.as("addDate"),
                                 developmentState.user.id.as("userId"),
                                 developmentState.user.korName.as("userName"),
-                                developmentState.approveDate.as("approveDate"),
                                 developmentState.developmentStatus.as("status"),
-                                developmentState.developmentChildrenStatus.as("childrenStatus"),
-                                developmentState.ver.as("ver"),
-                                developmentState.changeContents.as("changeContents"),
-                                developmentState.meetingType.as("meetingType")
+                                developmentState.developmentChildrenStatus.as("childrenStatus")
                         )
                 )
                 .from(developmentState)
@@ -164,6 +154,23 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                         developmentState.development.id.eq(developId),
                         developmentState.id.eq(stateId),
                         developmentState.deleteYn.eq(false)
+                )
+                .fetchOne();
+    }
+
+    //파일이 등록된 개발품목 상세 조회
+    @Transactional(readOnly = true)
+    public Long findByFileYn(Long developId){
+        return jpaQueryFactory
+                .select(
+                        developmentState.id.count()
+                )
+                .from(developmentState)
+                .innerJoin(development).on(development.id.eq(developmentState.development.id))
+                .where(
+                        developmentState.development.id.eq(developId),
+                        developmentState.deleteYn.eq(false),
+                        developmentState.fileUrl.isNotNull()
                 )
                 .fetchOne();
     }

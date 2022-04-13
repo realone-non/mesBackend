@@ -60,7 +60,8 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                         payType.id.as("payTypeId"),
                                         payType.payType.as("payType"),
                                         purchaseOrder.requestedShipping.as("requestedShipping"),
-                                        purchaseOrder.specialNote.as("specialNote")
+                                        purchaseOrder.specialNote.as("specialNote"),
+                                        purchaseRequest.inputTestYn.as("inputTestYn")
                                 )
                         )
                         .from(purchaseOrder)
@@ -113,7 +114,8 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 payType.id.as("payTypeId"),
                                 payType.payType.as("payType"),
                                 purchaseOrder.requestedShipping.as("requestedShipping"),
-                                purchaseOrder.specialNote.as("specialNote")
+                                purchaseOrder.specialNote.as("specialNote"),
+                                purchaseRequest.inputTestYn.as("inputTestYn")
                         )
                 )
                 .from(purchaseOrder)
@@ -131,6 +133,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                         isPeriodDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
+                .orderBy(purchaseOrder.createdDate.desc())
                 .fetch();
     }
 
@@ -197,7 +200,8 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 purchaseRequest.note.as("note"),
                                 client.clientName.as("manufacturerName"),
                                 purchaseRequest.ordersState.as("orderState"),
-                                item.testType.as("testType")
+                                item.testType.as("testType"),
+                                purchaseRequest.inputTestYn.as("inputTestYn")
                         )
                 )
                 .from(purchaseRequest)
@@ -238,7 +242,8 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 purchaseRequest.note.as("note"),
                                 client.clientName.as("manufacturerName"),
                                 purchaseRequest.ordersState.as("orderState"),
-                                item.testType.as("testType")
+                                item.testType.as("testType"),
+                                purchaseRequest.inputTestYn.as("inputTestYn")
                         )
                 )
                 .from(purchaseRequest)
@@ -309,6 +314,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                         isPeriodDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
+                .orderBy(purchaseRequest.createdDate.desc())
                 .fetch();
     }
 

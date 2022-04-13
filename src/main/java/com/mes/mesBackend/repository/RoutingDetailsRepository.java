@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface RoutingDetailsRepository extends JpaCustomRepository<RoutingDetail, Long> {
-    List<RoutingDetail> findAllByRoutingAndDeleteYnFalse(Routing routing);
+    List<RoutingDetail> findAllByRoutingAndDeleteYnFalseOrderByCreatedDateDesc(Routing routing);
     RoutingDetail findByIdAndRoutingAndDeleteYnFalse(Long id, Routing routing);
 }

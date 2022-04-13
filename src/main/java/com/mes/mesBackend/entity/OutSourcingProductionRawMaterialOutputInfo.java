@@ -31,8 +31,8 @@ public class OutSourcingProductionRawMaterialOutputInfo extends BaseTimeEntity {
 
     // 다대일 단방향
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "BOM_ITEM_DETAIL", columnDefinition = "bigint COMMENT 'BomItemDetail'")
-    private BomItemDetail bomItemDetail;        // BOM
+    @JoinColumn(name = "ITEM", columnDefinition = "bigint COMMENT '품목'")
+    private Item item;
 
     @Column(name = "OUTPUT_REQUEST_AMOUNT", columnDefinition = "int COMMENT '출고요청량'")
     private int outputRequestAmount;        // 출고요청량
@@ -44,19 +44,24 @@ public class OutSourcingProductionRawMaterialOutputInfo extends BaseTimeEntity {
     @JoinColumn(name = "OUT_SOURCING_PRODUCTION_REQUEST", columnDefinition = "bigint COMMENT '외주생산의뢰'")
     private OutSourcingProductionRequest outSourcingProductionRequest;
 
-    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
-    private boolean useYn = true;
+//    @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
+//    private boolean useYn = true;
 
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    public void update(OutsourcingMaterialReleaseRequest request, BomItemDetail itemDetail){
-        setOutputRequestAmount(request.getOutputRequestAmount());
-        setOutputAmount(request.getOutputAmount());
-        setBomItemDetail(itemDetail);
+    public void update(OutSourcingProductionRawMaterialOutputInfo info, Item item){
+        setOutputRequestAmount(info.outputRequestAmount);
+        setOutputAmount(info.outputAmount);
+        setItem(item);
     }
 
     public void delete() {
         setDeleteYn(true);
+    }
+
+    public void put(Item item, OutSourcingProductionRequest outSourcingProductionRequest) {
+        setItem(item);
+        setOutSourcingProductionRequest(outSourcingProductionRequest);
     }
 }

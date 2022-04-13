@@ -41,8 +41,8 @@ public class PurchaseInput extends BaseTimeEntity {
     private LocalDate validDate;
 
     // 긴급여부
-    @Column(name = "URGENT_YN", columnDefinition = "bit(1) COMMENT '긴급여부'")
-    private boolean urgentYn = false;
+    @Column(name = "INPUT_TEST_YN", columnDefinition = "bit(1) COMMENT '수입검사여부'")
+    private boolean inputTestYn = false;
 
     // 시험성적서
     @Column(name = "TEST_REPORT_YN", columnDefinition = "bit(1) COMMENT '시험성적서'")
@@ -63,7 +63,7 @@ public class PurchaseInput extends BaseTimeEntity {
         setInputAmount(newPurchaseInput.inputAmount);
         setValidDate(newPurchaseInput.validDate);
         setManufactureDate(newPurchaseInput.manufactureDate);
-        setUrgentYn(newPurchaseInput.urgentYn);
+        setInputTestYn(newPurchaseInput.inputTestYn);
         setTestReportYn(newPurchaseInput.testReportYn);
         setCoc(newPurchaseInput.coc);
         setClientLotNo(newPurchaseInput.clientLotNo);

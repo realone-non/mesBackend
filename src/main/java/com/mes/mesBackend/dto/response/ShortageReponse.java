@@ -20,14 +20,14 @@ public class ShortageReponse {
     String materialName;
 
     @Schema(description = "전일재고수량")
-    int beforeDayAmount;
+    float beforeDayAmount;
 
     @Schema(description = "입고예정수량")
-    int scheduleInputAmount;
+    float scheduleInputAmount;
 
     @Schema(description = "생산소요량")
-    int productionCapacity;
+    float productionCapacity;
 
     @Schema(description = "과부족량")
-    int overLackAmount;
+    float overLackAmount;
 }

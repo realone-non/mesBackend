@@ -82,6 +82,7 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                         isItemNoOrItemNameContain(itemNoOrItemName),
                         isPurchaseRequestDeleteYnFalse()
                 )
+                .orderBy(purchaseRequest.createdDate.desc())
                 .fetch();
     }
 
@@ -105,7 +106,7 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                                         purchaseInput.validDate.as("validDate"),
                                         testCriteria.testCriteria.as("testCriteria"),
                                         item.inspectionType.as("inspectionType"),   // 검사방법 ex) 샘플링
-                                        purchaseInput.urgentYn.as("urgentYn"),
+                                        purchaseInput.inputTestYn.as("inputTestYn"),
                                         purchaseInput.testReportYn.as("testReportYn"),
                                         purchaseInput.coc.as("coc"),
                                         item.lotType.lotType.as("lotType")
@@ -177,7 +178,7 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                                 purchaseInput.validDate.as("validDate"),
                                 testCriteria.testCriteria.as("testCriteria"),
                                 item.inspectionType.as("inspectionType"),   // 검사방법 ex) 샘플링
-                                purchaseInput.urgentYn.as("urgentYn"),
+                                purchaseInput.inputTestYn.as("inputTestYn"),
                                 purchaseInput.testReportYn.as("testReportYn"),
                                 purchaseInput.coc.as("coc"),
                                 purchaseInput.clientLotNo.as("clientLotNo"),
@@ -261,12 +262,13 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                         isItemNoOrItemNameContain(itemNoAndItemName),
                         isPurchaseInputDeleteYnFalse()
                 )
+                .orderBy(purchaseInput.createdDate.desc())
                 .fetch();
     }
 
     // 금일기준 입고된 자재목록
     @Override
-    public List<LabelPrintResponse> findByTodayAndPurchaseInput(LocalDate now) {
+    public List<LabelPrintResponse> findByTodayAndPurchaseInput(LocalDate fromDate, LocalDate toDate) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -281,9 +283,14 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                 .leftJoin(lotMaster).on(lotMaster.purchaseInput.id.eq(purchaseInput.id))
                 .where(
                         purchaseInput.deleteYn.isFalse(),
-                        purchaseInput.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0))
+                        isCreatedDateBetween(fromDate, toDate)
+//                        purchaseInput.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))
                 )
                 .fetch();
+    }
+
+    private BooleanExpression isCreatedDateBetween(LocalDate fromDate, LocalDate toDate) {
+        return fromDate != null ? purchaseInput.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)) : null;
     }
 
     // 입고기간

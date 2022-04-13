@@ -32,7 +32,7 @@ public interface InputTestDetailService {
             Long manufactureId,
             InputTestDivision inputTestDivision,
             InspectionType inspectionType
-    ) throws NotFoundException;
+    );
     // 검사정보 생성
     InputTestDetailResponse createInputTestDetail(Long inputTestRequestId, InputTestDetailRequest inputTestDetailRequest, InputTestDivision inputTestDivision) throws NotFoundException, BadRequestException;
     // 검사정보 단일조회

@@ -28,15 +28,12 @@ public class MapperConfig {
         modelMapper.addConverter(toItemFileResponseConvert);
         modelMapper.addConverter(toBomItemResponseConvert);
         modelMapper.addConverter(toItemBomResponseConvert);
-        modelMapper.addConverter(toBomMasterResponseConvert);
         modelMapper.addConverter(toSubItemResponseConvert);
         modelMapper.addConverter(toWorkLineResponse);
         modelMapper.addConverter(toEstimateItemResponse);
         modelMapper.addConverter(toContractItemResponse);
         modelMapper.addConverter(contractToProduceOrderConverter);
         modelMapper.addConverter(contractItemToProduceOrderConverter);
-        modelMapper.addConverter(equipmentToResponse);
-        modelMapper.addConverter(toOutsourcingInputConverter);
 
         return modelMapper;
     }
@@ -136,21 +133,6 @@ public class MapperConfig {
         }
     };
 
-    Converter<BomMaster, BomMasterResponse> toBomMasterResponseConvert = new Converter<BomMaster, BomMasterResponse>() {
-        @Override
-        public BomMasterResponse convert(MappingContext<BomMaster, BomMasterResponse> context) {
-            ModelMapper modelMapper = new ModelMapper();
-            BomMaster bomMaster = context.getSource();
-            BomMasterResponse bomMasterResponse = modelMapper.map(bomMaster, BomMasterResponse.class);
-
-            bomMasterResponse.getItem().setClientName(null);
-            bomMasterResponse.getItem().setUnitCodeName(null);
-            bomMasterResponse.getItem().setStorageLocation(null);
-
-            return bomMasterResponse;
-        }
-    };
-
     Converter<SubItem, SubItemResponse> toSubItemResponseConvert = new Converter<SubItem, SubItemResponse>() {
         @Override
         public SubItemResponse convert(MappingContext<SubItem, SubItemResponse> context) {
@@ -240,31 +222,16 @@ public class MapperConfig {
         }
     };
 
-
-    Converter<Equipment, EquipmentResponse> equipmentToResponse = new Converter<Equipment, EquipmentResponse>() {
-        @Override
-        public EquipmentResponse convert(MappingContext<Equipment, EquipmentResponse> context) {
-            ModelMapper modelMapper = new ModelMapper();
-            Equipment equipment = context.getSource();
-            EquipmentResponse response = modelMapper.map(equipment, EquipmentResponse.class);
-            if (equipment.getWorkLine() != null) {
-                response.setEquipmentType(equipment.getWorkLine().getWorkLineName());
-            }
-            return response;
-        }
-    };
-
-
     //LOT마스터 외주입고 LOT정보 변환
-    Converter<LotMaster, OutsourcingInputLOTResponse> toOutsourcingInputConverter = new Converter<LotMaster, OutsourcingInputLOTResponse>() {
-        @Override
-        public OutsourcingInputLOTResponse convert(MappingContext<LotMaster, OutsourcingInputLOTResponse> context) {
-            ModelMapper mapper = new ModelMapper();
-            LotMaster lotMaster = context.getSource();
-            OutsourcingInputLOTResponse response = mapper.map(lotMaster, OutsourcingInputLOTResponse.class);
-            response.setInputAmount(lotMaster.getStockAmount());
-            response.setTestRequestType(lotMaster.getOutSourcingInput().getTestRequestType());
-            return response;
-        }
-    };
+//    Converter<LotMaster, OutsourcingInputLOTResponse> toOutsourcingInputConverter = new Converter<LotMaster, OutsourcingInputLOTResponse>() {
+//        @Override
+//        public OutsourcingInputLOTResponse convert(MappingContext<LotMaster, OutsourcingInputLOTResponse> context) {
+//            ModelMapper mapper = new ModelMapper();
+//            LotMaster lotMaster = context.getSource();
+//            OutsourcingInputLOTResponse response = mapper.map(lotMaster, OutsourcingInputLOTResponse.class);
+//            response.setInputAmount(lotMaster.getStockAmount());
+//            response.setTestRequestType(lotMaster.getOutSourcingInput().getTestRequestType());
+//            return response;
+//        }
+//    };
 }

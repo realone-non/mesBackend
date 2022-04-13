@@ -46,6 +46,7 @@ public class MaterialStockInspectRequestRepositoryImpl implements MaterialStockI
                         dateNull(fromDate, toDate),
                         materialStockInspectRequest.deleteYn.eq(false)
                 )
+                .orderBy(materialStockInspectRequest.id.asc())
                 .fetch();
     }
 

@@ -7,6 +7,8 @@ import com.mes.mesBackend.repository.custom.JpaCustomRepository;
 import com.mes.mesBackend.repository.custom.ProduceOrderRepositoryCustom;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ProduceOrderRepository extends JpaCustomRepository<ProduceOrder, Long>, ProduceOrderRepositoryCustom {
     boolean existsByContractAndDeleteYnFalse(Contract contract);

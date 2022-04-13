@@ -67,6 +67,7 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                         isEquipmentBreakdownDeleteYnFalse(),
                         equipmentBreakdown.visibleYn.isFalse()
                 )
+                .orderBy(equipmentBreakdown.createdDate.desc())
                 .fetch();
     }
 
@@ -127,6 +128,7 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                         equipmentBreakdownFile.deleteYn.isFalse(),
                         isEquipmentBreakdownIdEq(equipmentBreakdownId)
                 )
+                .orderBy(equipmentBreakdownFile.createdDate.desc())
                 .fetch();
     }
 
@@ -148,6 +150,7 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                         equipmentBreakdownFile.deleteYn.isFalse(),
                         isEquipmentBreakdownIdEq(equipmentBreakdownId)
                 )
+                .orderBy(equipmentBreakdownFile.createdDate.desc())
                 .fetch();
     }
     // ============================================== 17-3. 설비 수리내역 조회 ==============================================
@@ -190,6 +193,7 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                         isEquipmentBreakdownDeleteYnFalse(),
                         isRepairItemDeleteYnFalse()
                 )
+                .orderBy(repairPart.createdDate.desc())
                 .fetch();
     }
 
@@ -236,6 +240,7 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                         isEquipmentBreakdownDeleteYnFalse(),
                         isRepairPartDeleteYn()
                 )
+                .orderBy(repairPart.createdDate.desc())
                 .fetch();
     }
     private BooleanExpression isRepairPartDeleteYn() {

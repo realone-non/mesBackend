@@ -29,9 +29,9 @@ public class ContractItemRequest {
     @NotNull(message = NOT_NULL)
     ContractType contractType;
 
-    @Schema(description = "납기일자")
-    @NotNull(message = NOT_NULL)
-    LocalDate periodDate;       // 납기일자
+//    @Schema(description = "납기일자")
+//    @NotNull(message = NOT_NULL)
+//    LocalDate periodDate;       // 납기일자
 
     @Schema(description = "규격화 품번")
     String standardItemNo;      // 규격화 품번

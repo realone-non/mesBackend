@@ -45,7 +45,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
 
     // 구매요청 생성
     @Override
-    public PurchaseRequestResponse createPurchaseRequest(PurchaseRequestRequest purchaseRequestRequest, String userCode) throws NotFoundException, BadRequestException {
+    public PurchaseRequestResponse createPurchaseRequest(PurchaseRequestRequest purchaseRequestRequest, String userCode) throws NotFoundException {
         ProduceOrder produceOrder = produceOrderService.getProduceOrderOrThrow(purchaseRequestRequest.getProduceOrder());
 
         // 총 구매요청수량이 수주수량을 초과하면 예외
@@ -74,11 +74,12 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         purchaseRequest.mapping(produceOrder, item);
         // 구매요청 등록의 첫 등록은 지시상태 schedule 로 등록됨.
         purchaseRequest.setOrdersState(SCHEDULE);
+        purchaseRequest.setInputTestYn(true);
 
-        PurchaseRequest save = purchaseRequestRepo.save(purchaseRequest);
+        purchaseRequestRepo.save(purchaseRequest);
 
         modifiedLogHelper.createInsertLog(userCode, PURCHASE_REQUEST, purchaseRequest);
-        return getPurchaseRequestResponseOrThrow(save.getId());
+        return getPurchaseRequestResponseOrThrow(purchaseRequest.getId());
     }
 
     // 구매요청 리스트 조회, 검색조건: 요청기간, 제조오더번호, 품목그룹, 품번|품명, 제조사 품번, 완료포함(check)
@@ -91,9 +92,10 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
             String itemNoAndName,
             String manufacturerPartNo,
             Boolean orderCompletion,
-            Boolean purchaseOrderYn
+            Boolean purchaseOrderYn,
+            Long purchaseOrderClientId
     ) {
-        List<PurchaseRequestResponse> responses = purchaseRequestRepo.findAllByCondition(fromDate, toDate, produceOrderNo, itemGroupId, itemNoAndName, manufacturerPartNo, orderCompletion, purchaseOrderYn);
+        List<PurchaseRequestResponse> responses = purchaseRequestRepo.findAllByCondition(fromDate, toDate, produceOrderNo, itemGroupId, itemNoAndName, manufacturerPartNo, orderCompletion, purchaseOrderYn, purchaseOrderClientId);
         for (PurchaseRequestResponse r : responses) {
             ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(PURCHASE_REQUEST, r.getId());
             ModifiedLog insertLog = modifiedLogHelper.getInsertLog(PURCHASE_REQUEST, r.getId());
@@ -216,7 +218,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
             ProduceRequestBomDetail detail = new ProduceRequestBomDetail();
             responses.add(detail.converter(item1));
         }
-        return responses.stream().filter(f -> !f.getGoodsType().equals(HALF_PRODUCT)).collect(Collectors.toList());
+        return responses.stream().filter(f -> !f.getGoodsType().equals(HALF_PRODUCT) && !f.getGoodsType().equals(PRODUCT)).collect(Collectors.toList());
     }
 
     // 제조 오더 단일 조회 및 예외

@@ -108,6 +108,7 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
         PurchaseInput purchaseInput = new PurchaseInput();
         purchaseInput.setPurchaseRequest(purchaseRequest);
         purchaseInput.setInputAmount(inputAmount);
+        purchaseInput.setInputTestYn(purchaseInput.getPurchaseRequest().isInputTestYn());   // 자재입고 된 항목에 대한 수입검사여부는 구매요청값을 따라간다.
         purchaseInputRepo.save(purchaseInput);
 
         // orderState 변경: 구매요청의 발주수량 만큼 모두 입고 완료 햇을때 구매요청의 지시상태값을 완료(COMPLETION) 으로 변경한다.
@@ -122,7 +123,7 @@ public class PopPurchaseInputServiceImpl implements PopPurchaseInputService {
         lotMasterRequest.setItem(purchaseRequest.getItem());        // 품목
         lotMasterRequest.setEnrollmentType(PURCHASE_INPUT); // 등록유형
         lotMasterRequest.setCreatedAmount(inputAmount);     // lotMaster 생성수량
-        lotMasterRequest.setStockAmount(inputAmount);       // lotMaster 재고수량
+        lotMasterRequest.setStockAmount(purchaseInput.isInputTestYn() ? 0 : inputAmount);       // lotMaster 재고수량 (수입검사여부 true 면 재고수량 0 , false 면 입고수량)
         lotMasterRequest.setWareHouse(purchaseInput.getPurchaseRequest().getPurchaseOrder().getWareHouse());        // 구매발주의 입고창고
         lotMasterRequest.setWorkProcessDivision(MATERIAL_INPUT);
         lotMasterRequest.setLotMasterDivision(REAL_LOT);

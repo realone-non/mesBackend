@@ -5,6 +5,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
+
+import static com.mes.mesBackend.exception.Message.NOT_NULL;
+
 @Getter
 @Setter
 @Schema(description = "재고실사의뢰 등록")
@@ -19,5 +23,6 @@ public class MaterialStockInspectRequestRequest {
     Long itemAccountId;
 
     @Schema(description = "재고실사기준 [전수: ALL, 품목계정: ITEM_ACCOUNT]")
+    @NotNull(message = NOT_NULL)
     StockInspectionType inspectionType;
 }

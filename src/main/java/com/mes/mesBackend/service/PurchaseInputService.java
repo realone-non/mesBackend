@@ -42,5 +42,5 @@ public interface PurchaseInputService {
     List<PurchaseStatusCheckResponse> getPurchaseStatusChecks(Long clientId, String itemNoAndItemName, LocalDate fromDate, LocalDate toDate) throws NotFoundException;
 
     // 금일기준 입고된 자재목록
-    List<LabelPrintResponse> getTodayPurchaseInputs();
+    List<LabelPrintResponse> getTodayPurchaseInputs(LocalDate fromDate, LocalDate toDate);
 }

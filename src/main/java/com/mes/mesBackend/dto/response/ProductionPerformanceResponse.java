@@ -1,6 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -78,13 +79,12 @@ public class ProductionPerformanceResponse {
     @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime packaging;
 
-//    @Schema(description = "출하")
-//    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
-//    LocalDateTime shipment;
-
     @Schema(description = "단가")
     int unitPrice;
 
     @Schema(description = "금액")
     int price;
+
+    @JsonIgnore
+    LocalDateTime startMaterialMixing;
 }

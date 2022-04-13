@@ -2,24 +2,23 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.LotMasterRequest;
 import com.mes.mesBackend.dto.request.PopRecycleRequest;
-import com.mes.mesBackend.dto.response.LotMasterResponse;
+import com.mes.mesBackend.dto.response.PopRecycleCreateResponse;
 import com.mes.mesBackend.dto.response.PopRecycleResponse;
+import com.mes.mesBackend.dto.response.RecycleLotResponse;
 import com.mes.mesBackend.dto.response.RecycleResponse;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.LotHelper;
 import com.mes.mesBackend.helper.LotLogHelper;
-import com.mes.mesBackend.helper.impl.LotHelperImpl;
 import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.PopRecycleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.RECYCLE;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.*;
@@ -53,7 +52,7 @@ public class PopRecycleServiceImpl implements PopRecycleService {
     }
 
     //재사용 등록
-    public PopRecycleResponse createUseRecycle(PopRecycleRequest request) throws NotFoundException, BadRequestException {
+    public PopRecycleCreateResponse createUseRecycle(PopRecycleRequest request) throws NotFoundException, BadRequestException {
         RecycleResponse recycle = recycleRepository.findByIdAndDeleteYn(request.getRecycleId())
                 .orElseThrow(() -> new NotFoundException("재사용 유형이 존재하지 않습니다. 입력 id: " + request.getRecycleId()));
         Item item = itemRepository.findByIdAndDeleteYnFalse(request.getItemId())
@@ -110,8 +109,16 @@ public class PopRecycleServiceImpl implements PopRecycleService {
                 break;
             }
         }
+        PopRecycleResponse badAmountByWorkProcess = lotMasterRepository.findBadAmountByWorkProcess(workProcess.getId(), item.getId());
+        PopRecycleCreateResponse response = new PopRecycleCreateResponse();
+        response.setLotNo(lotmaster.getLotNo());
+        response.setRecycleAmount(badAmountByWorkProcess.getRecycleAmount());
 
-        PopRecycleResponse response = lotMasterRepository.findBadAmountByWorkProcess(recycle.getWorkProcessId(), request.getItemId());
         return response;
+    }
+
+    //재사용 LOT조회
+    public List<RecycleLotResponse> getRecycleLots(LocalDate fromDate, LocalDate toDate){
+        return lotMasterRepository.findRecycleLots(fromDate, toDate);
     }
 }

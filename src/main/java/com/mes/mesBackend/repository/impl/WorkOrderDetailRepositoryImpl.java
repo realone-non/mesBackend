@@ -18,7 +18,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
+import static com.mes.mesBackend.entity.enumeration.OrderState.*;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.*;
 
 @RequiredArgsConstructor
@@ -67,7 +67,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 produceOrder.contract.client.clientName.as("contractClient"),
                                 produceOrder.contract.contractNo.as("contractNo"),
                                 produceOrder.contract.periodDate.as("periodDate"),
-                                produceOrder.contract.note.as("note")
+                                produceOrder.note.as("note")
                                 )
                 )
                 .from(produceOrder)
@@ -80,6 +80,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isInstructionStatusEq(orderState),
                         produceOrder.deleteYn.isFalse()
                 )
+                .orderBy(produceOrder.createdDate.desc())
                 .fetch();
     }
 
@@ -104,7 +105,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.uph.as("uph"),
                                 workOrderDetail.orderAmount.as("orderAmount"),
                                 contract.contractNo.as("contractNo"),
-                                contractItem.periodDate.as("periodDate"),
+                                contractItem.contract.periodDate.as("periodDate"),
                                 client.clientName.as("cName"),
 //                                produceOrder.orderState.as("orderState"),
                                 workOrderDetail.productionAmount.as("productionAmount"),
@@ -130,6 +131,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isExpectedWorkDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
+                .orderBy(workOrderDetail.createdDate.desc(), workOrderDetail.workProcess.orders.asc())
                 .fetch();
     }
 
@@ -153,7 +155,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.uph.as("uph"),
                                 workOrderDetail.orderAmount.as("orderAmount"),
                                 contract.contractNo.as("contractNo"),
-                                contractItem.periodDate.as("periodDate"),
+                                contractItem.contract.periodDate.as("periodDate"),
                                 client.clientName.as("cName"),
                                 produceOrder.orderState.as("orderState"),
                                 workOrderDetail.productionAmount.as("productionAmount"),
@@ -328,9 +330,6 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workProcess.workProcessName.as("workProcess"),
                                 workLine.workLineName.as("workLine"),
                                 workOrderDetail.orderState.as("orderState"),
-                                item.itemNo.as("itemNo"),
-                                item.itemName.as("itemName"),
-                                itemAccount.account.as("itemAccount"),
                                 contract.periodDate.as("periodDate"),
                                 workOrderDetail.orderAmount.as("orderAmount"),
                                 workOrderDetail.productionAmount.as("productionAmount"),
@@ -346,18 +345,18 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
                 .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
                 .leftJoin(item).on(item.id.eq(contractItem.item.id))
-                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
                 .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
                 .where(
                         isWorkProcessIdEq(workProcessId),
                         isWorkLineIdEq(workLineId),
                         isProduceOrderNoContain(produceOrderNo),
-                        isItemAccountIdEq(itemAccountId),
+//                        isItemAccountIdEq(itemAccountId),
                         isOrderStateEq(orderState),
                         isWorkDateBetween(fromDate, toDate),
                         isContractNoContain(contractNo),
                         isDeleteYnFalse()
                 )
+                .orderBy(workOrderDetail.createdDate.desc())
                 .fetch();
     }
 
@@ -463,6 +462,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isOrderStateEq(orderState),
                         isDeleteYnFalse()
                 )
+                .orderBy(workOrderDetail.createdDate.desc())
                 .fetch();
     }
 
@@ -544,6 +544,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         workOrderDetail.expectedWorkDate.eq(now),
                         workOrderDetail.deleteYn.isFalse()
                 )
+                .orderBy(workOrderDetail.createdDate.desc())
                 .fetch();
     }
 
@@ -722,14 +723,14 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         isItemGroupEq(itemGroupId),
                         isProduceOrderNoContain(produceOrderNo),
                         isWorkOrderNoContain(workOrderNo),
-                        isItemNoAndItemNameContain(itemNoAndItemName),
                         isWorkOrderStartDateBetween(fromDate, toDate),
                         isDeleteYnFalse(),
-                        workOrderDetail.orderState.eq(COMPLETION),
+                        workOrderDetail.orderState.ne(SCHEDULE),
                         workProcess.workProcessDivision.notIn(MATERIAL_INPUT),  // 공정 자제입고 제외
-                        workProcess.workProcessDivision.notIn(SHIPMENT)         // 공정 출하 제외
+                        workProcess.workProcessDivision.notIn(SHIPMENT),         // 공정 출하 제외
+                        workProcess.workProcessDivision.notIn(MATERIAL_MIXING)      // 원료혼합 공정 제외
                 )
-                .orderBy(workOrderDetail.startDate.desc())
+                .orderBy(workOrderDetail.startDate.desc(), workProcess.orders.asc())
                 .fetch();
     }
 
@@ -742,6 +743,156 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                         workOrderDetail.orderState.ne(COMPLETION)
                 )
                 .fetch();
+    }
+
+    // 제조오더로 원료혼합 공정인 작업지시 조회
+    @Override
+    public Optional<WorkOrderDetail> findWorkOrderIsFillingByProduceOrderId(Long produceOrderId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(workOrderDetail)
+                        .from(workOrderDetail)
+                        .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                        .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
+                        .where(
+                                produceOrder.id.eq(produceOrderId),                         // 제조오더 같은거
+                                workOrderDetail.deleteYn.isFalse(),                         // 삭제된거
+                                workProcess.workProcessDivision.eq(MATERIAL_MIXING) // 원료혼합 공정 조회
+                        )
+                        .fetchOne()
+        );
+    }
+
+    @Override
+    public List<WorkOrderBadItemStatusResponse> findWorkOrderBadItemStatusResponseByCondition(
+            Long workProcessId,
+            String workOrderNo,
+            String itemNoAndItemName,
+            Long userId,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                WorkOrderBadItemStatusResponse.class,
+                                workOrderDetail.id.as("workOrderId"),
+                                workOrderDetail.orderNo.as("workOrderNo"),
+                                workProcess.id.as("workProcessId"),
+                                workProcess.workProcessName.as("workProcessName"),
+                                user.id.as("userId"),
+                                user.korName.as("userKorName"),
+                                workOrderDetail.productionAmount.as("productionAmount")
+                        )
+                )
+                .from(workOrderDetail)
+                .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
+                .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
+                .where(
+                        isWorkProcessIdEq(workProcessId),
+                        isWorkOrderNoContain(workOrderNo),
+                        isUserId(userId),
+                        isWorkOrderStartDateBetween(fromDate, toDate),
+                        isDeleteYnFalse(),
+                        workOrderDetail.orderState.ne(SCHEDULE),    // 진행중, 완료만 조회
+                        workProcess.workProcessDivision.notIn(MATERIAL_INPUT),  // 공정 자제입고 제외
+                        workProcess.workProcessDivision.notIn(SHIPMENT),         // 공정 출하 제외
+                        workProcess.workProcessDivision.notIn(MATERIAL_MIXING)  // 공정 원료혼합 제외
+                )
+                .orderBy(workOrderDetail.startDate.desc(), workProcess.orders.asc())
+                .fetch();
+    }
+
+    // 현재 진행중인 제조오더 개수
+    @Override
+    public Optional<Long> findProduceOrderStateOngoingProductionAmountSum() {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(produceOrder.id.count())
+                        .from(produceOrder)
+                        .where(
+                                produceOrder.deleteYn.isFalse(),
+                                produceOrder.orderState.eq(ONGOING)
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // 제조오더에 해당하는 공정 별 endDate 조회
+    @Override
+    public LocalDateTime findWorkOrderEndDateByProduceOrderIdAndWorkProcessDivision(Long produceOrderId, WorkProcessDivision workProcessDivision) {
+        return jpaQueryFactory
+                .select(workOrderDetail.endDate)
+                .from(workOrderDetail)
+                .where(
+                        workOrderDetail.produceOrder.id.eq(produceOrderId),
+                        workOrderDetail.deleteYn.isFalse(),
+                        workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision),
+                        workOrderDetail.orderState.eq(COMPLETION)
+                )
+                .fetchOne();
+    }
+
+    // 제조오더에 해당하는 공정 별 startDate 조회
+    @Override
+    public LocalDateTime findWorkOrderStartDateByProduceOrderIdAndWorkProcessDivision(Long produceOrderId, WorkProcessDivision workProcessDivision) {
+        return jpaQueryFactory
+                .select(workOrderDetail.startDate)
+                .from(workOrderDetail)
+                .where(
+                        workOrderDetail.produceOrder.id.eq(produceOrderId),
+                        workOrderDetail.deleteYn.isFalse(),
+                        workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision),
+                        workOrderDetail.orderState.eq(COMPLETION)
+                )
+                .fetchOne();
+    }
+
+    // 포장공정의 생산량
+    @Override
+    public Optional<Integer> findPackagingProductAmountByProduceOrderId(Long produceOrderId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(workOrderDetail.productionAmount)
+                        .from(workOrderDetail)
+                        .where(
+                                workOrderDetail.produceOrder.id.eq(produceOrderId),
+                                workOrderDetail.deleteYn.isFalse(),
+                                workOrderDetail.workProcess.workProcessDivision.eq(PACKAGING)
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // 작업공정별 생산 정보
+    @Override
+    public Optional<Long> findOrderStateCountByWorkProcessDivisionAndOrderState(WorkProcessDivision workProcessDivision, OrderState orderState) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(workOrderDetail.id.count())
+                        .from(workOrderDetail)
+                        .where(
+                                workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision),
+                                workOrderDetail.orderState.eq(orderState),
+                                workOrderDetail.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // 작업공절별 생산수량
+    @Override
+    public Optional<Integer> findProductionAmountByWorkProcessDivision(WorkProcessDivision workProcessDivision) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(workOrderDetail.productionAmount.sum())
+                        .from(workOrderDetail)
+                        .where(
+                                workOrderDetail.workProcess.workProcessDivision.eq(workProcessDivision),
+                                workOrderDetail.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
     }
 
     // 작업지시 startDate 조회
@@ -761,7 +912,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
 
     // 작업자
     private BooleanExpression isUserId(Long userId) {
-        return workOrderDetail.user.id.eq(userId);
+        return userId != null ? user.id.eq(userId) : null;
     }
 
     // 작업예정일 기준
@@ -784,7 +935,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     // 작업기간
     private BooleanExpression isWorkDateBetween(LocalDate fromDate, LocalDate toDate) {
         // fromDate ~ toDate 사이에 진행중과 완료가 포함되어 있는거를 조회
-        return fromDate != null ?
+        return fromDate != null && toDate != null ?
                 (workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).and(workOrderDetail.endDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
                         .or(workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).or(workOrderDetail.endDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))))) : null;
     }

@@ -42,38 +42,106 @@ public class BomItemDetailRepositoryImpl implements BomItemDetailRepositoryCusto
                                 item.id.as("itemId"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
-                                itemAccount.account.as("itemAccount"),
+                                item.itemAccount.account.as("itemAccount"),
                                 item.manufacturerPartNo.as("itemManufacturerPartNo"),
-                                item.manufacturer.clientName.as("itemClientName"),
-                                unit.unitCodeName.as("itemUnitCodeName"),
+                                client.clientName.as("itemClientName"),
+                                item.unit.unitCodeName.as("itemUnitCodeName"),
                                 wareHouse.wareHouseName.as("itemStorageLocation"),
                                 item.inputUnitPrice.as("itemInputUnitPrice"),
                                 bomItemDetail.amount.as("amount"),
-                                client.id.as("toBuyId"),
-                                client.clientName.as("toBuyName"),
+//                                bomItemDetail.toBuy.id.as("toBuyId"),
+//                                bomItemDetail.toBuy.clientName.as("toBuyName"),
+                                item.clientItemNo.as("toBuyName"),
                                 workProcess.id.as("workProcessId"),
                                 workProcess.workProcessName.as("workProcessName"),
                                 bomItemDetail.useYn.as("useYn"),
                                 bomItemDetail.note.as("note"),
-                                qBomMaster.id.as("qbomId")
+                                bomItemDetail.bomMaster.id.as("qbomId")
                         )
                 )
                 .from(bomItemDetail)
                 .leftJoin(item).on(item.id.eq(bomItemDetail.item.id))
-                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
-                .leftJoin(unit).on(unit.id.eq(item.unit.id))
-                .leftJoin(client).on(client.id.eq(bomItemDetail.toBuy.id))
-                .leftJoin(workProcess).on(workProcess.id.eq(bomItemDetail.workProcess.id))
-                .leftJoin(qBomMaster).on(qBomMaster.id.eq(bomItemDetail.bomMaster.id))
                 .leftJoin(wareHouse).on(wareHouse.id.eq(item.storageLocation.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(bomItemDetail.workProcess.id))
+                .leftJoin(client).on(client.id.eq(item.manufacturer.id))
+//                .leftJoin(unit).on(unit.id.eq(item.unit.id))
+//                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+//                .leftJoin(unit).on(unit.id.eq(item.unit.id))
+//                .leftJoin(workProcess).on(workProcess.id.eq(bomItemDetail.workProcess.id))
+//                .leftJoin(qBomMaster).on(qBomMaster.id.eq(bomItemDetail.bomMaster.id))
+//                .leftJoin(wareHouse).on(wareHouse.id.eq(item.storageLocation.id))
                 .where(
-                        isBomMasterEq(bomMasterId),
-                        isItemNoOrItemNameToItemNoOrItemName(itemNoOrItemName),
-                        isDeleteYnFalse()
+                        bomItemDetail.bomMaster.id.eq(bomMasterId),
+                        bomItemDetail.deleteYn.isFalse(),
+                        isItemNoOrItemNameToItemNoOrItemName(itemNoOrItemName)
                 )
                 .orderBy(workProcess.orders.asc())
                 .fetch();
     }
+
+    // 같은 품목정보가 등록 되어잇는지
+    @Override
+    public boolean existsByBomItemDetailItem(Long bomMasterId, Long itemId) {
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(bomItemDetail)
+                .where(
+                        bomItemDetail.bomMaster.id.eq(bomMasterId),
+                        bomItemDetail.item.id.eq(itemId),
+                        bomItemDetail.deleteYn.isFalse()
+                )
+                .fetchFirst();
+        return fetchOne != null;
+    }
+
+
+//    @Transactional(readOnly = true)
+//    @Override
+//    public List<BomItemDetailResponse> findAllByCondition(
+//            Long bomMasterId,
+//            String itemNoOrItemName
+//    ) {
+//        return jpaQueryFactory
+//                .select(
+//                        Projections.fields(
+//                                BomItemDetailResponse.class,
+//                                bomItemDetail.id.as("id"),
+//                                bomItemDetail.level.as("level"),
+//                                item.id.as("itemId"),
+//                                item.itemNo.as("itemNo"),
+//                                item.itemName.as("itemName"),
+//                                itemAccount.account.as("itemAccount"),
+//                                item.manufacturerPartNo.as("itemManufacturerPartNo"),
+//                                item.manufacturer.clientName.as("itemClientName"),
+//                                unit.unitCodeName.as("itemUnitCodeName"),
+//                                wareHouse.wareHouseName.as("itemStorageLocation"),
+//                                item.inputUnitPrice.as("itemInputUnitPrice"),
+//                                bomItemDetail.amount.as("amount"),
+//                                client.id.as("toBuyId"),
+//                                client.clientName.as("toBuyName"),
+//                                workProcess.id.as("workProcessId"),
+//                                workProcess.workProcessName.as("workProcessName"),
+//                                bomItemDetail.useYn.as("useYn"),
+//                                bomItemDetail.note.as("note"),
+//                                qBomMaster.id.as("qbomId")
+//                        )
+//                )
+//                .from(bomItemDetail)
+//                .leftJoin(item).on(item.id.eq(bomItemDetail.item.id))
+//                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+//                .leftJoin(unit).on(unit.id.eq(item.unit.id))
+//                .leftJoin(client).on(client.id.eq(bomItemDetail.toBuy.id))
+//                .leftJoin(workProcess).on(workProcess.id.eq(bomItemDetail.workProcess.id))
+//                .leftJoin(qBomMaster).on(qBomMaster.id.eq(bomItemDetail.bomMaster.id))
+//                .leftJoin(wareHouse).on(wareHouse.id.eq(item.storageLocation.id))
+//                .where(
+//                        isBomMasterEq(bomMasterId),
+//                        isItemNoOrItemNameToItemNoOrItemName(itemNoOrItemName),
+//                        isDeleteYnFalse()
+//                )
+//                .orderBy(workProcess.orders.asc())
+//                .fetch();
+//    }
 
     // 품목|품명으로 검색
     private BooleanExpression isItemNoOrItemNameToItemNoOrItemName(String itemNoOrItemName) {
@@ -83,7 +151,7 @@ public class BomItemDetailRepositoryImpl implements BomItemDetailRepositoryCusto
 
     // BOM master Id 로 검색
     private BooleanExpression isBomMasterEq(Long bomMasterId) {
-        return qBomMaster.id.eq(bomMasterId);
+        return bomItemDetail.bomMaster.id.eq(bomMasterId);
     }
 
     // 삭제여부 false

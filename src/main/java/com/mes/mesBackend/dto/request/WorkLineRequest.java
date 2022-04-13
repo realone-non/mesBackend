@@ -31,7 +31,6 @@ public class WorkLineRequest {
     String popStartFormid;      // POP 시작 FORMID
 
     @Schema(description = "일 가동시간")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
     int time;                   // 일 가동시간
 
     @Schema(description = "사용여부")

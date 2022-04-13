@@ -44,7 +44,7 @@ public class OutsourcingReturn extends BaseTimeEntity {
     private boolean deleteYn = false;
 
     public void update(OutsourcingReturnRequest request, LotMaster lotMaster){
-
+        setReturnDivision(request.isReturnDivision());
         setReturnDate(request.getReturnDate());
         setNote(request.getNote());
         setLotMaster(lotMaster);

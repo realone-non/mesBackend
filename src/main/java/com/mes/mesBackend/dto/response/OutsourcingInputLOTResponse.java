@@ -26,4 +26,16 @@ public class OutsourcingInputLOTResponse {
 
     @Schema(description = "검사의뢰유형")
     TestType testRequestType;
+
+    @Schema(description = "수입검사여부")
+    Boolean inputTestYn;
+
+    @Schema(description = "입고창고ID")
+    Long warehouseId;
+
+    @Schema(description = "입고창고")
+    String warehouseName;
+
+    @Schema(description = "비고")
+    String note;
 }

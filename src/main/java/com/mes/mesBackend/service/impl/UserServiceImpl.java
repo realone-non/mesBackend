@@ -12,6 +12,7 @@ import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.entity.Department;
 import com.mes.mesBackend.entity.RefreshToken;
 import com.mes.mesBackend.entity.User;
+import com.mes.mesBackend.entity.enumeration.UserType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.CustomJwtException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -25,7 +26,6 @@ import com.mes.mesBackend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -33,9 +33,11 @@ import org.springframework.stereotype.Service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.UserType.NEW;
+import static com.mes.mesBackend.entity.enumeration.UserType.NORMAL;
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 
 @Service
@@ -50,22 +52,6 @@ public class UserServiceImpl implements UserService {
     private static final String REFRESH_TOKEN = "refreshToken";
     private final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
     private CustomLogger cLogger;
-
-    public User getUserOrThrow(Long id) throws NotFoundException {
-        return userRepository.findByIdAndDeleteYnFalse(id)
-                .orElseThrow(() -> new NotFoundException("user does not exists. input id: " + id));
-    }
-
-    // userCode 가 중복되지 않게 확인
-    private void checkUserCode(String userCode) throws BadRequestException {
-        boolean existsByUserCode = userRepository.existsByUserCodeAndDeleteYnFalse(userCode);
-        if (existsByUserCode) throw new BadRequestException("이미 존재하는 유저코드 입니다. 다른 유저코드를 입력 해주세요.");
-    }
-    // 중복되는 이메일이 있는지 체크
-    private void checkUserEmail(String email) throws BadRequestException {
-        boolean existsByMail = userRepository.existsByMailAndDeleteYnFalse(email);
-        if (existsByMail) throw new BadRequestException("이미 존재하는 이메일 입니다. 다른 이메일을 입력 해주세요.");
-    }
 
     // 직원(작업자) 생성
     public UserResponse createUser(UserCreateRequest userRequest) throws NotFoundException, BadRequestException {
@@ -83,16 +69,7 @@ public class UserServiceImpl implements UserService {
         user.setSalt(salt);
         user.setPassword(passwordHashing(userRequest.getUserCode().getBytes(), salt));
         user.addJoin(department);
-
-        // 권한 추가
-        // RoleUser 테이블에
-//        for (Long roleId : userRequest.getRoles()) {
-//            Role role = roleRepository.findById(roleId).orElseThrow(() -> new NotFoundException("role does not exist. input role id: " + roleId));
-//            UserRole userRole = new UserRole();
-//            userRole.save(user, role);
-//            userRoleRepository.save(userRole);
-//            user.getUserRoles().add(userRole);
-//        }
+        user.setUserType(NEW);
 
         userRepository.save(user);
         return mapper.toResponse(user, UserResponse.class);
@@ -105,8 +82,8 @@ public class UserServiceImpl implements UserService {
     }
 
     // 직원(작업자) 전체 조회
-    public List<UserResponse> getUsers(Long departmentId, String userCode, String korName) {
-        List<User> users = userRepository.findAllCondition(departmentId, userCode, korName);
+    public List<UserResponse> getUsers(Long departmentId, String userCode, String korName, UserType userType) {
+        List<User> users = userRepository.findAllCondition(departmentId, userCode, korName, userType);
         return mapper.toListResponses(users, UserResponse.class);
     }
 
@@ -154,8 +131,11 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("비밀번호가 잘못 입력 되었습니다. 비밀번호를 정확히 입력해 주세요.");
         }
 
+        List<UserType> userRoles = new ArrayList<>();
+        userRoles.add(user.getUserType());
+
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(user.getUserCode(), user.getPassword(), Collections.emptyList());
+                new UsernamePasswordAuthenticationToken(user.getUserCode(), user.getPassword(), userRoles);
 
         // AccessToken, RefreshToken 생성
         String accessToken = jwtTokenProvider.createAccessToken(authenticationToken);
@@ -163,7 +143,7 @@ public class UserServiceImpl implements UserService {
 
         TokenResponse tokenDto = new TokenResponse();
 
-        tokenDto.putToken(accessToken, refreshToken, user.getKorName());
+        tokenDto.putToken(accessToken, refreshToken, user.getKorName(), user.getUserType());
 
         // 기존 저장소에 있던 RefreshToken False 로 변경
         refreshTokenUseYnTrueToUseYnFalse(authenticationToken);
@@ -188,7 +168,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public TokenResponse reissue(TokenRequest tokenRequestDto) throws CustomJwtException {
+    public TokenResponse reissue(TokenRequest tokenRequestDto) throws CustomJwtException, NotFoundException {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         // 1. Refresh Token , AccessToken 검증
         jwtTokenProvider.validateToken(tokenRequestDto.getRefreshToken(), REFRESH_TOKEN);
@@ -212,13 +192,16 @@ public class UserServiceImpl implements UserService {
         // 6. RefreshToken 저장소 정보 업데이트
         refreshTokenUseYnTrueToUseYnFalse(authentication);
 
+        User user = userRepository.findByUserCode(authentication.getName())
+                .orElseThrow(() -> new NotFoundException("아이디가 잘못 입력 되었습니다. 아이디를 정확히 입력해 주세요."));
+
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.save(authentication.getName(), newRefreshToken);
         refreshTokenRepository.save(refreshToken);
 
         TokenResponse tokenResponse = new TokenResponse();
 
-        return tokenResponse.putToken(newAccessToken, newRefreshToken, null);
+        return tokenResponse.putToken(newAccessToken, newRefreshToken, user.getKorName(), user.getUserType());
     }
 
     // salt 값 생성
@@ -340,6 +323,23 @@ public class UserServiceImpl implements UserService {
         User user = getUserOrThrow(id);
         user.delete();
         userRepository.save(user);
+    }
+
+
+    public User getUserOrThrow(Long id) throws NotFoundException {
+        return userRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("user does not exists. input id: " + id));
+    }
+
+    // userCode 가 중복되지 않게 확인
+    private void checkUserCode(String userCode) throws BadRequestException {
+        boolean existsByUserCode = userRepository.existsByUserCodeAndDeleteYnFalse(userCode);
+        if (existsByUserCode) throw new BadRequestException("이미 존재하는 유저코드 입니다. 다른 유저코드를 입력 해주세요.");
+    }
+    // 중복되는 이메일이 있는지 체크
+    private void checkUserEmail(String email) throws BadRequestException {
+        boolean existsByMail = userRepository.existsByMailAndDeleteYnFalse(email);
+        if (existsByMail) throw new BadRequestException("이미 존재하는 이메일 입니다. 다른 이메일을 입력 해주세요.");
     }
 }
 

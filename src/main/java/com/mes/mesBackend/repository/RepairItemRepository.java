@@ -11,5 +11,5 @@ import java.util.Optional;
 @Repository
 public interface RepairItemRepository extends JpaCustomRepository<RepairItem, Long> {
     Optional<RepairItem> findByIdAndEquipmentBreakdownAndDeleteYnFalse(Long id, EquipmentBreakdown equipmentBreakdown);
-    List<RepairItem> findAllByEquipmentBreakdownAndDeleteYnFalse(EquipmentBreakdown equipmentBreakdown);
+    List<RepairItem> findAllByEquipmentBreakdownAndDeleteYnFalseOrderByCreatedDate(EquipmentBreakdown equipmentBreakdown);
 }

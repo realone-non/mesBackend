@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
+import com.mes.mesBackend.dto.response.ProductionPerformanceResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.repository.custom.ProduceOrderRepositoryCustom;
@@ -11,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -24,6 +27,10 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
     final QWorkProcess workProcess = QWorkProcess.workProcess;
     final QUnit unit = QUnit.unit;
     final QItemAccount itemAccount = QItemAccount.itemAccount;
+    final QContractItem contractItem = QContractItem.contractItem;
+    final QWorkOrderDetail workOrderDetail = QWorkOrderDetail.workOrderDetail;
+    final QContract contract = QContract.contract;
+    final QClient client = QClient.client;
 
     // 제조 오더 리스트 조회, 검색조건 : 품목그룹 id, 품명|품번, 지시상태, 제조오더번호, 수주번호, 착수예정일 fromDate~toDate, 자재납기일자(보류)
     @Override
@@ -48,6 +55,7 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
                         isExpectedCompletedDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
+                .orderBy(produceOrder.createdDate.desc())
                 .fetch();
     }
 
@@ -93,6 +101,61 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
                         produceOrder.deleteYn.eq(false)
                 )
                 .fetchOne();
+    }
+
+    final QWorkOrderDetail subWorkOrderDetail = QWorkOrderDetail.workOrderDetail;
+    // 생산실적 조회
+    @Override
+    public List<ProductionPerformanceResponse> findProductionPerformanceResponseByCondition(
+            LocalDate fromDate,
+            LocalDate toDate,
+            Long itemGroupId,
+            String itemNoOrItemName
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                ProductionPerformanceResponse.class,
+                                produceOrder.id.as("id"),
+                                contract.contractNo.as("contractNo"),
+                                produceOrder.produceOrderNo.as("produceOrderNo"),
+                                client.clientName.as("clientName"),
+                                item.itemName.as("itemName"),
+                                contract.periodDate.as("periodDate"),
+                                contractItem.amount.as("contractItemAmount"),
+                                contract.user.korName.as("korName"),
+                                item.inputUnitPrice.as("unitPrice"),
+                                item.inputUnitPrice.multiply(contractItem.amount).as("price")
+                        )
+                )
+                .from(produceOrder)
+                .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                .leftJoin(contract).on(contract.id.eq(contractItem.contract.id))
+                .leftJoin(client).on(client.id.eq(contract.client.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                .leftJoin(workOrderDetail).on(workOrderDetail.produceOrder.id.eq(produceOrder.id))
+                .where(
+                        produceOrder.deleteYn.isFalse(),
+                        isItemGroupIdEq(itemGroupId),
+                        isItemNameAneItemNoCon(itemNoOrItemName)
+//                        isProduceOrderCreatedDateBetween(fromDate, toDate)
+                )
+                .groupBy(produceOrder.id)
+                .orderBy(produceOrder.createdDate.desc())
+                .fetch();
+    }
+
+    private BooleanExpression isProduceOrderCreatedDateBetween(LocalDate fromDate, LocalDate toDate) {
+        return fromDate != null ? produceOrder.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)) : null;
+    }
+
+    private BooleanExpression isItemGroupIdEq(Long itemGroupId) {
+        return itemGroupId != null ? item.itemGroup.id.eq(itemGroupId) : null;
+    }
+
+    private BooleanExpression isItemNameAneItemNoCon(String itemNameOrItemName) {
+        return itemNameOrItemName != null ? item.itemNo.contains(itemNameOrItemName)
+                .or(item.itemName.contains(itemNameOrItemName)) : null;
     }
 
     /*

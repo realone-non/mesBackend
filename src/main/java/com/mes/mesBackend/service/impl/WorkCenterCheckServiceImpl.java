@@ -98,7 +98,7 @@ public class WorkCenterCheckServiceImpl implements WorkCenterCheckService {
     @Override
     public void deleteWorkCenterCheck(Long id) throws NotFoundException {
         WorkCenterCheck workCenterCheck = getWorkCenterCheckOrThrow(id);
-        List<WorkCenterCheckDetail> workCenterCheckDetails = workCenterCheckDetailRepository.findAllByWorkCenterCheckAndDeleteYnFalse(workCenterCheck);
+        List<WorkCenterCheckDetail> workCenterCheckDetails = workCenterCheckDetailRepository.findAllByWorkCenterCheckAndDeleteYnFalseOrderByCreatedDateDesc(workCenterCheck);
         // 해당하는 세부항목 deleteYn 전부 true
         for (WorkCenterCheckDetail workCenterCheckDetail : workCenterCheckDetails) {
             workCenterCheckDetail.delete();
@@ -161,7 +161,7 @@ public class WorkCenterCheckServiceImpl implements WorkCenterCheckService {
     @Override
     public List<WorkCenterCheckDetailResponse> getWorkCenterCheckDetails(Long workCenterCheckId) throws NotFoundException {
         WorkCenterCheck workCenterCheck = getWorkCenterCheckOrThrow(workCenterCheckId);
-        List<WorkCenterCheckDetail> workCenterCheckDetails = workCenterCheckDetailRepository.findAllByWorkCenterCheckAndDeleteYnFalse(workCenterCheck);
+        List<WorkCenterCheckDetail> workCenterCheckDetails = workCenterCheckDetailRepository.findAllByWorkCenterCheckAndDeleteYnFalseOrderByCreatedDateDesc(workCenterCheck);
         List<WorkCenterCheckDetailResponse> responses = mapper.toListResponses(workCenterCheckDetails, WorkCenterCheckDetailResponse.class);
         for (WorkCenterCheckDetailResponse r : responses) {
             ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(WORK_CENTER_CHECK_DETAIL, r.getId());

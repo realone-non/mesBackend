@@ -2,7 +2,9 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.PurchaseInputReturnCreateRequest;
 import com.mes.mesBackend.dto.request.PurchaseInputReturnUpdateRequest;
+import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.PurchaseInputReturnResponse;
+import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
@@ -142,5 +144,17 @@ public class PurchaseInputReturnController {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + purchaseInputReturnId + " from deletePurchaseInputReturn.");
         return new ResponseEntity(NO_CONTENT);
+    }
+
+    @Operation(summary = "구매입고반품 가능한 lotMaster 리스트 조회", description = "")
+    @GetMapping("/lot-masters")
+    @ResponseBody
+    public ResponseEntity<List<LotMasterResponse.stockAmountAndBadItemAmount>> getPurchaseInputReturnPossibleLotMasters(
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) {
+        List<LotMasterResponse.stockAmountAndBadItemAmount> responses = purchaseInputReturnService.getPurchaseInputReturnPossibleLotMasters();
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getPurchaseInputReturnPossibleLotMasters.");
+        return new ResponseEntity<>(responses, OK);
     }
 }

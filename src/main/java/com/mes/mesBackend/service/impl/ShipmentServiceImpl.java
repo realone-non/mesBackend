@@ -276,10 +276,11 @@ public class ShipmentServiceImpl implements ShipmentService {
         lotMaster.setStockAmount(0);                                    // 재고수량 0으로 변경
         lotMaster.setWorkProcess(workProcess);                      // 작업공정을 shipment 로 변경
 
+        // 2022.03.30(수) lotLog 로직 불필요한거같아서 삭제(출하는 작업지시가 존재하지 않으므로 lotlog 생성 안해도됨)
         // lotLog insert
-        Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(PACKAGING);
-        Long workOrderDetailId = lotLogHelper.getWorkOrderDetailByContractItemAndWorkProcess(shipmentItem.getContractItem().getContract().getId(), workProcessId);
-        lotLogHelper.createLotLog(lotMasterId, workOrderDetailId, workProcessId);
+//        Long workProcessId = lotLogHelper.getWorkProcessByDivisionOrThrow(PACKAGING);
+//        Long workOrderDetailId = lotLogHelper.getWorkOrderDetailByContractItemAndWorkProcess(shipmentItem.getContractItem().getContract().getId(), workProcessId);
+//        lotLogHelper.createLotLog(lotMasterId, workOrderDetailId, workProcessId);
 
         // amountHelper insert
         amountHelper.amountUpdate(shipmentItem.getContractItem().getItem().getId(), lotMaster.getWareHouse().getId(), null, SHIPMENT_AMOUNT, stockAmountLotMaster, false);

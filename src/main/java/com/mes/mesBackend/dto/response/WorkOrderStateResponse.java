@@ -67,9 +67,14 @@ public class WorkOrderStateResponse {
     @JsonIgnore
     Long workProcessId;
 
-    public void setItems(Item item) {
+//    @JsonIgnore
+    Long itemAccountId;
+
+    public WorkOrderStateResponse setItems(Item item) {
         setItemNo(item.getItemNo());
         setItemName(item.getItemName());
         setItemAccount(item.getItemAccount().getAccount());
+        setItemAccountId(item.getItemAccount().getId());
+        return this;
     }
 }

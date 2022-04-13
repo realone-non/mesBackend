@@ -2,6 +2,7 @@ package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.Equipment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -74,4 +75,42 @@ public class EquipmentResponse {
 
     @Schema(description = "로트 생성 용 코드")
     String lotCode;
+
+    public EquipmentResponse setResponse(Equipment equipment) {
+        setId(equipment.getId());
+        setEquipmentCode(equipment.getEquipmentCode());
+        setEquipmentName(equipment.getEquipmentName());
+        if (equipment.getWorkLine() != null) {
+            WorkLineResponse.workLineAndWorkCenterAndWorkProcess workLine = new WorkLineResponse.workLineAndWorkCenterAndWorkProcess();
+            setEquipmentType(equipment.getWorkLine().getWorkLineName());
+            workLine.setId(equipment.getWorkLine().getId());
+            workLine.setWorkLineName(equipment.getWorkLine().getWorkLineName());
+            workLine.setWorkCenterName(equipment.getWorkLine().getWorkCenter().getWorkCenterName());
+            setWorkLine(workLine);
+        }
+        setModel(equipment.getModel());
+        if (equipment.getClient() != null) {
+            ClientResponse.idAndName client = new ClientResponse.idAndName();
+            client.setId(equipment.getClient().getId());
+            client.setClientName(equipment.getClient().getClientName());
+            setClient(client);
+        }
+        setPurchaseDate(equipment.getPurchaseDate());
+        setPurchaseAmount(equipment.getPurchaseAmount());
+        setMaker(equipment.getMaker());
+        setSerialNo(equipment.getSerialNo());
+        setStartDate(equipment.getStartDate());
+        if (equipment.getWorkProcess() != null) {
+            WorkProcessResponse.idAndName workProcess = new WorkProcessResponse.idAndName();
+            workProcess.setId(equipment.getWorkProcess().getId());
+            workProcess.setWorkProcessName(equipment.getWorkProcess().getWorkProcessName());
+            setWorkProcess(workProcess);
+        }
+        setCheckCycle(equipment.getCheckCycle());
+        setUseYn(equipment.isUseYn());
+        setLife(equipment.getLife());
+        setLastTestDate(equipment.getLastTestDate());
+        setLotCode(equipment.getLotCode());
+        return this;
+    }
 }

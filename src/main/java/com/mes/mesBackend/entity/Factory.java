@@ -88,6 +88,7 @@ public class Factory extends BaseTimeEntity {
         setFaxNumber(newFactory.faxNumber);
         setLotCode(newFactory.lotCode);
         setWorkPlace(newWorkPlace);
+        setUseYn(newFactory.useYn);
     }
 
     public void addJoin(WorkPlace workPlace) {

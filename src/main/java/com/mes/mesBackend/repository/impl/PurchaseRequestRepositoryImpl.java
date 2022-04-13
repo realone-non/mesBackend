@@ -102,7 +102,8 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
             String itemNoAndName,
             String manufacturerPartNo,
             Boolean orderCompletion,
-            Boolean purchaseOrderYn
+            Boolean purchaseOrderYn,
+            Long purchaseOrderClientId
     ) {
         return jpaQueryFactory
                 .select(
@@ -143,9 +144,10 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                         isManufacturerPartNoContain(manufacturerPartNo),
                         isOrderCompletionEq(orderCompletion),
                         isDeleteYnFalse(),
-                        isPurchaseOrderYn(purchaseOrderYn)
+                        isPurchaseOrderYn(purchaseOrderYn),
+                        isPurchaseOrderClientId(purchaseOrderClientId)
                 )
-                .orderBy(purchaseRequest.id.asc())
+                .orderBy(purchaseRequest.createdDate.desc())
                 .fetch();
     }
 
@@ -158,6 +160,11 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
             }
         } else
             return null;
+    }
+
+    // 구매발주에서에서 상세 정보 등록할때 사용할 조건
+    private BooleanExpression isPurchaseOrderClientId(Long purchaseOrderClientId) {
+        return purchaseOrderClientId != null ? item.manufacturer.id.eq(purchaseOrderClientId) : null;
     }
 
     // 구매발주에 해당하는 구매요청이 있는지.

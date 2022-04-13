@@ -88,6 +88,9 @@ public class PurchaseOrderResponse {
     @Schema(description = "요청번호")
     Long purchaseRequestId;
 
+    @Schema(description = "수입검사여부")
+    boolean inputTestYn;
+
     public PurchaseOrderResponse orderStateCondition() {
         return this.orderState.equals(OrderState.COMPLETION) ? this : null;
     }

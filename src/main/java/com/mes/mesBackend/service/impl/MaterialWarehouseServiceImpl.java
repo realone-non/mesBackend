@@ -70,6 +70,7 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
         WareHouse wareHouse = wareHouseRepository.findByIdAndDeleteYnFalse(request.getWarehouseId())
                 .orElseThrow(() -> new NotFoundException("warehouse does not exist. input id: " + request.getWarehouseId()));
         dbStockInspect.setWareHouse(wareHouse);
+        dbStockInspect.setInspectionType(request.getInspectionType());
         materialStockInspectRequestRepository.save(dbStockInspect);
         System.out.println(dbStockInspect.getId());
         return materialStockInspectRequestRepository.findByIdAndDeleteYn(dbStockInspect.getId())
@@ -92,7 +93,7 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
                 .orElseThrow(() -> new NotFoundException("warehouse does not exist. input id: " + request.getWarehouseId()));
         ItemAccount itemAccount = itemAccountRepository.findByIdAndDeleteYnFalse(request.getItemAccountId())
                 .orElseThrow(() -> new NotFoundException("itemAccount does not exist. input id: " + request.getItemAccountId()));
-        dbStockRequest.update(request.getNote(), wareHouse, itemAccount);
+        dbStockRequest.update(request.getNote(), wareHouse, itemAccount, request.getInspectionType());
         materialStockInspectRequestRepository.save(dbStockRequest);
         return materialStockInspectRequestRepository.findByIdAndDeleteYn(id)
                 .orElseThrow(() -> new NotFoundException("stockInspectRequest does not exist. input id: " + id));
@@ -203,7 +204,7 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
 
     //헤더용 창고 목록 조회
     public JSONArray getHeaderWarehouse(){
-        List<WareHouse> wareHouseList = wareHouseRepository.findAllByDeleteYnFalse();
+        List<WareHouse> wareHouseList = wareHouseRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         JSONArray headerList = new JSONArray();
         int seq = 3;
         for (WareHouse wareHouse:wareHouseList) {
@@ -228,8 +229,8 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
         List<WorkOrderDetail> workOrderDetails = workOrderDetailRepository.findByWorkDate(stdDate);
         for (Item item:itemList) {
             ShortageReponse shortageResponse = new ShortageReponse();
-            int workAmount = 0;
-            int sumAmount = 0;
+            float workAmount = 0;
+            float sumAmount = 0;
             boolean isEmpty = false;
             for (WorkOrderDetail detail:workOrderDetails) {
 //                ProduceOrder order = produceOrderRepository.findByIdAndDeleteYnFalse(detail.getProduceOrder().getId())
@@ -246,7 +247,6 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
                         sumAmount = sumAmount + workAmount;
                     }
                     else if(detailResponse.getItemId().equals(item.getId())){
-
                         workAmount = (int) (detailResponse.getBomAmount() * detail.getOrderAmount());
                         sumAmount = sumAmount + workAmount;
                     }
@@ -279,15 +279,14 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
         return shortageResponseList;
     }
 
-    public int getDetailRecursive(ProduceOrderDetailResponse response, Long itemId, int workAmount){
+    public float getDetailRecursive(ProduceOrderDetailResponse response, Long itemId, float workAmount){
         List<ProduceOrderDetailResponse> detailList = produceOrderRepository.findAllProduceOrderDetail(response.getItemId());
         for (ProduceOrderDetailResponse detail:detailList) {
             if(detail.getItemAccount().equals("반제품")){
                 workAmount = getDetailRecursive(detail, itemId, workAmount);
             }
             else if(detail.getItemId().equals(itemId)){
-
-               workAmount = Integer.parseInt(workAmount + detail.getReservationAmount());
+               workAmount = Float.parseFloat(String.valueOf(workAmount + detail.getBomAmount()));
             }
         }
 

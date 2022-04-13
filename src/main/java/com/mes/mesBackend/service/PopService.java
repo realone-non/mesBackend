@@ -27,7 +27,8 @@ public interface PopService {
             int productAmount,
             int stockAmount,
             int badItemAmount,
-            Long equipmentId
+            Long equipmentId,
+            Long fillingEquipmentCode
     ) throws NotFoundException, BadRequestException;
     // 공정으로 공정에 해당하는 설비정보 가져오기 GET
     List<PopEquipmentResponse> getPopEquipments(WorkProcessDivision workProcessDivision, Boolean produceYn) throws NotFoundException;

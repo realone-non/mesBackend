@@ -8,8 +8,6 @@ import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.WareHouseTypeRepository;
 import com.mes.mesBackend.service.WareHouseTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,7 +40,7 @@ public class WareHouseTypeServiceImpl implements WareHouseTypeService {
     // 리스트조회
     @Override
     public List<WareHouseTypeResponse> getWareHouseTypes() {
-        List<WareHouseType> findWareHouseTypes = wareHouseTypeRepository.findAllByDeleteYnFalse();
+        List<WareHouseType> findWareHouseTypes = wareHouseTypeRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         return mapper.toListResponses(findWareHouseTypes, WareHouseTypeResponse.class);
     }
 

@@ -22,4 +22,8 @@ public class PurchaseOrderDetailRequest {
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     int orderAmount;
+
+    @Schema(description = "수입검사여부")
+    @NotNull(message = NOT_NULL)
+    boolean inputTestYn;
 }

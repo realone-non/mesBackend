@@ -6,7 +6,10 @@ import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.*;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.*;
+import com.mes.mesBackend.helper.AmountHelper;
+import com.mes.mesBackend.helper.LotHelper;
+import com.mes.mesBackend.helper.LotLogHelper;
+import com.mes.mesBackend.helper.WorkOrderStateHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.*;
 import com.mes.mesBackend.service.LotMasterService;
@@ -42,7 +45,7 @@ public class PopServiceImpl implements PopService {
     private final ItemRepository itemRepository;
     private final LotMasterService lotMasterService;
     private final WorkOrderStateHelper workOrderStateHelper;
-    private final ProductionPerformanceHelper productionPerformanceHelper;
+//    private final ProductionPerformanceHelper productionPerformanceHelper;
     private final LotLogHelper lotLogHelper;
     private final WorkOrderUserLogRepository workOrderUserLogRepo;
     private final EquipmentRepository equipmentRepository;
@@ -60,7 +63,7 @@ public class PopServiceImpl implements PopService {
     // 작업공정 전체 조회
     @Override
     public List<WorkProcessResponse> getPopWorkProcesses(Boolean recycleYn) {
-        List<WorkProcess> workProcesses = workProcessRepository.findAllByDeleteYnFalse()
+        List<WorkProcess> workProcesses = workProcessRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc()
                 .stream().sorted(Comparator.comparing(WorkProcess::getOrders)).collect(Collectors.toList());
         List<WorkProcessResponse> workProcessResponses = mapper.toListResponses(workProcesses, WorkProcessResponse.class);
         List<WorkProcessResponse> responses = new ArrayList<>();
@@ -173,7 +176,8 @@ public class PopServiceImpl implements PopService {
             int productAmount,  // 생산수량
             int stockAmount,    // 양품수량
             int badItemAmount,  // 불량수량
-            Long equipmentId
+            Long equipmentId,
+            Long fillingEquipmentCode     // 원료혼합에서만 입력하는 충진공정 설비 id(생성되는 equipmentLot 에 넣어야함)
     ) throws NotFoundException, BadRequestException {
         WorkOrderDetail workOrder = getWorkOrderDetailOrThrow(workOrderId);
         WorkProcess workProcess = workOrder.getWorkProcess();
@@ -188,9 +192,9 @@ public class PopServiceImpl implements PopService {
 
         // 작업지시의 상태가 COMPLETION 일 경우 더 이상 추가 할 수 없음. 추가하려면 workOrderDetail 의 productionAmount(지시수량) 을 늘려야함
         // 원료혼합 공정은 제외
-        if (!workOrder.getWorkProcess().getWorkProcessDivision().equals(MATERIAL_MIXING)) {
-            throwIfWorkOrderStateIsCompletion(workOrder.getOrderState());
-        }
+//        if (!workOrder.getWorkProcess().getWorkProcessDivision().equals(MATERIAL_MIXING)) {       <- 2022.04.01 로직 없앰
+        throwIfWorkOrderStateIsCompletion(workOrder.getOrderState());
+//        }
         // 작업수량이 0 이면 예외
         throwIfProductAmountIsNotZero(productAmount);
         // 생산수량 체크
@@ -215,6 +219,9 @@ public class PopServiceImpl implements PopService {
         Item item = getItemOrThrow(itemId);
         WareHouse wareHouse = lotMasterService.getLotMasterWareHouseOrThrow();
 
+
+        Long fillEquipmentId = workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING) ? fillingEquipmentCode : null;
+
         // 작업지시의 공정이 충진일때 전 공정인 원료혼합에서 만든 반제품이 없으면 예외
         if (workProcess.getWorkProcessDivision().equals(FILLING)) {
             lotConnectRepo.findByTodayProduceOrderAndEquipmentIdEqAndLotStockAmountOneLoe(workOrder.getProduceOrder().getId(), equipment.getId(), LocalDate.now())
@@ -225,13 +232,13 @@ public class PopServiceImpl implements PopService {
         if (workOrder.getOrderState().equals(SCHEDULE)) {
             // dummyLot 생성: 품목, 창고, 생성수량, 등록유형, 설비유형, lot 생성 구분
             dummyLotRequest.putPopWorkOrder(    // 더미로트에 재고수량은 관리 안함
-                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, 0, badItemAmount, PRODUCTION, equipmentId, DUMMY_LOT
+                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, 0, badItemAmount, PRODUCTION, equipmentId, DUMMY_LOT, null
             );
             dummyLot = lotHelper.createLotMaster(dummyLotRequest);
 
             // equipmentLot 생성: 품목, 창고, 생성수량, 등록유형, 설비유형, lot 생성 구분
             equipmentLotRequest.putPopWorkOrder(
-                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT
+                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT, fillEquipmentId
             );
             equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
 
@@ -249,7 +256,7 @@ public class PopServiceImpl implements PopService {
             // workOrderDetail: 상태값 변경 및 startDate 및 endDate 변경
             // productOrder: 상태값 변경
             OrderState orderState =
-                    workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(workOrder.getOrderAmount(), productAmount + beforeProductionAmount);
+                    workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(workOrder.getOrderAmount(), productAmount + beforeProductionAmount, workProcess.getWorkProcessDivision());
             workOrderStateHelper.updateOrderState(workOrderId, orderState);
 
             // lotLog 생성
@@ -258,10 +265,19 @@ public class PopServiceImpl implements PopService {
             }
 
             if (orderState.equals(COMPLETION)) {
-                productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
-                if (workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING)) {
-                    workOrder.setOrderState(ONGOING);
-                    workOrderDetailRepository.save(workOrder);
+//                productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
+//                if (workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING)) {
+//                    workOrder.setOrderState(ONGOING);
+//                    workOrder.changeOrderStateDate(workOrder.getOrderState());
+//                    workOrderDetailRepository.save(workOrder);
+//                }
+                // 충진공정 일 경우
+                if (workProcess.getWorkProcessDivision().equals(FILLING)) {
+                    WorkOrderDetail materialMixingWorkOrder = workOrderDetailRepository.findWorkOrderIsFillingByProduceOrderId(workOrder.getProduceOrder().getId())
+                            .orElseThrow(() -> new BadRequestException("해당하는 제조오더에 대한 원료혼합 공정 작업지시가 존재하지 않습니다."));
+                    materialMixingWorkOrder.setOrderState(workOrder.getOrderState());
+                    materialMixingWorkOrder.changeOrderStateDate(materialMixingWorkOrder.getOrderState());
+                    workOrderDetailRepository.save(materialMixingWorkOrder);
                 }
             }
         } else if (workOrder.getOrderState().equals(ONGOING)) {
@@ -289,7 +305,7 @@ public class PopServiceImpl implements PopService {
 
                 if (materialMixingRealLot == null) {
                     // equipmentLot 생성
-                    equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
+                    equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT, fillEquipmentId);
                     equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
                     lotMasterRepo.save(equipmentLot);
 
@@ -312,7 +328,7 @@ public class PopServiceImpl implements PopService {
                 }
             } else {
                 // 작업수량 들어올때마다 equipmentLot 생성으로 로직변경 - 2022.03.02
-                equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
+                equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT, fillEquipmentId);
                 equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
                 lotMasterRepo.save(equipmentLot);
 
@@ -334,7 +350,7 @@ public class PopServiceImpl implements PopService {
 
             // workOrderDetail
             OrderState orderState =
-                    workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(workOrder.getOrderAmount(), beforeProductionAmount + productAmount);
+                    workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(workOrder.getOrderAmount(), beforeProductionAmount + productAmount, workProcess.getWorkProcessDivision());
 
             // workOrderDetail: ONGOING -> COMPLETION ? orderState update 및 endDate update
             // produceOrder: ONGOING -> COMPLETION ? orderState update
@@ -343,11 +359,20 @@ public class PopServiceImpl implements PopService {
                 // workOrderDetail: ONGOING -> COMPLETION ? orderState update 및 endDate update
                 // produceOrder: ONGOING -> COMPLETION ? orderState update
                 workOrderStateHelper.updateOrderState(workOrderId, orderState);
-                productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
-                if (workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING)) {
-                    workOrder.setOrderState(ONGOING);
-                    workOrderDetailRepository.save(workOrder);
-                }
+//                productionPerformanceHelper.updateOrInsertProductionPerformance(workOrderId, dummyLot.getId());  // productionPerformance: create 및 update
+//                if (workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING)) {
+//                    workOrder.setOrderState(ONGOING);
+//                    workOrder.changeOrderStateDate(workOrder.getOrderState());
+//                    workOrderDetailRepository.save(workOrder);
+//                }
+//                if (workProcess.getWorkProcessDivision().equals(FILLING)) {     // 완료된 작업공정이 충진일 경우 원료혼합 지시상태도 완료로 바꾼다.
+//                    WorkOrderDetail materialMixingWorkOrder = workOrderDetailRepository.findWorkOrderIsFillingByProduceOrderId(workOrder.getProduceOrder().getId())
+//                            .orElseThrow(() -> new BadRequestException("해당 작업지시로 생성 된 원료혼합 공정의 작업지시가 존재하지 않습니다."));
+//                    materialMixingWorkOrder.setOrderState(COMPLETION);
+//                    materialMixingWorkOrder.changeOrderStateDate(materialMixingWorkOrder.getOrderState());
+//                    workOrderDetailRepository.save(workOrder);
+//                    workOrderStateHelper.updateOrderState(materialMixingWorkOrder.getId(), materialMixingWorkOrder.getOrderState());
+//                }
             }
         }
         workOrder.setProductionAmount(beforeProductionAmount + productAmount);  // productionAmount 변경
@@ -731,7 +756,8 @@ public class PopServiceImpl implements PopService {
                 0,
                 equipmentLot.getEnrollmentType(),
                 equipmentLot.getEquipment().getId(),
-                REAL_LOT
+                REAL_LOT,
+                null
         );
         realLot = lotHelper.createLotMaster(realLotRequest);
         // 분할 된 lot 와 부모로트 생성

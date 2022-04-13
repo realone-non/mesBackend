@@ -1,7 +1,6 @@
 package com.mes.mesBackend.service.impl;
 
-import com.mes.mesBackend.dto.response.BadItemEnrollmentResponse;
-import com.mes.mesBackend.dto.response.BadItemWorkOrderResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -14,13 +13,13 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.DUMMY_LOT;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.EQUIPMENT_LOT;
+import static com.mes.mesBackend.helper.Constants.DECIMAL_POINT_2;
+import static com.mes.mesBackend.helper.Constants.PERCENT;
 
 // 8-5. 불량 등록
 @Service
@@ -66,153 +65,242 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
             Long dummyLotId = lotLog.getLotMaster().getId();
             BadItemWorkOrderResponse.subDto subDto = lotMasterRepo.findLotMaterByDummyLotIdAndWorkProcessId(dummyLotId, workProcessId)
                     .orElseThrow(() -> new NotFoundException("[데이터오류] lotLog 에 등록된 lotMaster(id: " + dummyLotId + ") 가 lotEquipmentConnect parentLot 로 등록되지 않았습니다."));
-            response.setItemNo(subDto.getItemNo());
-            response.setItemName(subDto.getItemName());
-            response.setBadAmount(subDto.getBadAmount());
-            response.setProductionAmount(subDto.getCreateAmount());
+            response.set(subDto);
         }
-        return workOrderResponses;
+
+        if (itemNoAndItemName != null)
+            return workOrderResponses.stream().filter(f -> f.getItemNo().contains(itemNoAndItemName) || f.getItemName().contains(itemNoAndItemName)).collect(Collectors.toList());
+        else
+            return workOrderResponses;
     }
 
-    // 불량 정보 생성
+    // 작업지시 별 작업완료 상세 리스트
     @Override
-    public BadItemEnrollmentResponse createBadItemEnrollment(
-            Long workOrderId,
-            Long badItemId,
-            int badItemAmount
-    ) throws NotFoundException, BadRequestException {
+    public List<WorkOrderDetailResponse> getWorkOrderDetails(Long workOrderId) throws NotFoundException {
         WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderId);
-        BadItem badItem = badItemService.getBadItemOrThrow(badItemId);
         LotLog lotLog = lotLogHelper.getLotLogByWorkOrderDetailOrThrow(workOrderDetail.getId());
         LotMaster dummyLot = lotLog.getLotMaster();
+        List<WorkOrderDetailResponse> responses = lotEquipmentConnectRepository.findWorkOrderDetailResponseByDummyLotId(dummyLot.getId());
+        responses.forEach(f -> f.setWorkOrderId(workOrderDetail.getId()));
+        return responses;
+    }
 
-        // 입력받은 badItemAmount 가 해당 dummyLot 의 생성수량 - 불량수량 보다 크면 안됨
-        throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(dummyLot.getBadItemAmount() + badItemAmount, dummyLot.getCreatedAmount() - dummyLot.getBadItemAmount());
-        // lotLog 에서 해당하는 작업지시에 입력받은 dummylotMaster 가 있는지 여부
-        throwIfLotMasterId(workOrderId, dummyLot.getId());
+    // 작업완료 상세 리스트 별 불량정보 조회
+    @Override
+    public List<WorkOrderDetailBadItemResponse> getBadItemEnrollments(Long workOrderId, Long equipmentLotId) throws NotFoundException {
+        WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderId);
+        LotMaster equipmentLot = getLotMatserOrThrow(equipmentLotId);
+        return workOrderBadItemRepo.findWorkOrderDetailBadItemResponseByEquipmentLotId(equipmentLot.getId());
+    }
+
+    // 작업완료 상세 리스트 별 불량정보 생성
+    @Override
+    public WorkOrderDetailBadItemResponse createBadItemEnrollment(Long workOrderId, Long equipmentLotId, Long badItemId, int badItemAmount) throws NotFoundException, BadRequestException {
+        WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderId);
+        LotMaster equipmentLot = getLotMatserOrThrow(equipmentLotId);
+        LotEquipmentConnect lotEquipmentConnect = getLotEquipmentConnectByChildLotOrThrow(equipmentLot.getId());
+        LotMaster dummyLot = lotEquipmentConnect.getParentLot();
+        BadItem badItem = badItemService.getBadItemOrThrow(badItemId);
+
         // 입력받은 불량이 해당하는 작업공정의 불량유형이랑 일치하는지 여부
-        throwIfBadItemIdAnyMatchWorkProcess(lotLog.getWorkProcess().getId(), badItemId);
+        throwIfBadItemIdAnyMatchWorkProcess(workOrderDetail.getWorkProcess().getId(), badItemId);
+        // 총 불량수량과 이미 등록되어있는 불량수량 합계가 생성수량을 초과하는지 체크
+        throwBadAmountCheck(equipmentLot.getId(), badItemAmount, equipmentLot.getCreatedAmount());
+        // 하나의 lotMaster 에 중복 불량유형이 있는지 체크
+        throwIfBadItemIdInLotMaster(equipmentLot.getId(), badItem.getId());
+        // realLots 의 inputAmount 가 하나라도 0 이 아닌지 체크(다른공정에서 사용되었으면 에외)
+        throwIfRealLotInputAmountCheck(dummyLot.getId());
 
-        /*
-        * >>>>>> 해당 작업지시로 생산된 realLot 의 투입수량이 모두 0 일 경우에만 생성 가능
-        * > LotMaster
-        *   해당 작업지시로 생성된 dummyLot 의 불량수량 변경
-        *   해당 작업지시로 가장 마지막에 생성 된 equipmentLot 의 불량수량, 재고수량 변경
-        *
-        * > WorkOrderBadItem
-        *   불량수량 반영된 equipmentLot 로 workOrderBadItem 생성
-        * */
 
-        // 작업지시로 생산된 모든 realLot
-        List<LotMaster> realLots = lotEquipmentConnectRepository.findChildLotByChildLotOfParentLotCreatedDateDesc(dummyLot.getId());
-        // realLots 의 inputAmount 가 하나라도 0 이 아닌지 체크
-        boolean noneMatch = realLots.stream().allMatch(n -> n.getInputAmount() == 0);
-
-        WorkOrderBadItem workOrderBadItem = new WorkOrderBadItem();
-
-        if (noneMatch) {        // 모든 요소들이 0 인가
-            LotMaster realLot = realLots.stream().findFirst().orElseThrow(() -> new NotFoundException("[데이터오류] realLot 을 찾을 수 없음."));
-//            LotMaster dummyLot = lotEquipmentConnectRepository.findEquipmentLotByRealLotIdOrderByCreatedDateDesc(realLot.getId())
-//                    .orElseThrow(() -> new BadRequestException("[데이터오류] realLot 에 해당하는 equipmentLot(lotEquipmentConnect) 가 없음.")).getParentLot();
-
-            // dummyLot 불량수량 변경
-            dummyLot.setBadItemAmount(dummyLot.getBadItemAmount() + badItemAmount);
-//            lotMasterRepo.save(parentLot);
-
-//            List<LotEquipmentConnect> lotEquipmentConnects = lotEquipmentConnectRepository.findAllByRealLotIdOrderByCreateDateDesc(realLot.getId());
-
-            for (int i = 1; i <= badItemAmount; i++) {
-                // equipmentLot: dummyLot 로 분할이 제일 마지막에 생성된 재고수량이 불량수량이 같지 않은거
-                 LotMaster equipmentLot = lotEquipmentConnectRepository.findEquipmentLotByRealLotIdOrderByCreatedDateDesc(realLot.getId())
-                         .orElseThrow(() -> new BadRequestException("[데이터오류] realLot 에 해당하고 조건에 맞는 equipmentLot(lotEquipmentConnect) 가 없음.")).getChildLot();
-
-                // equipmentLot 불량수량, 재고수량 변경
-                equipmentLot.setBadItemAmount(equipmentLot.getBadItemAmount() + 1);
-
-                List<LotMaster> equipmentLotMaster = new ArrayList<>();
-
-                if (equipmentLot.getStockAmount() > 0) {
-                    equipmentLot.setStockAmount(equipmentLot.getStockAmount() - 1);
-                }
-
-                if (equipmentLot.getStockAmount() == 0) {   // 여기서 realLot 가져와야함
-                    List<LotMaster> notEqLotMaster = new ArrayList<>();
-
-                    for (int f = 1; f <= i; f++) {
-                        // 저 설비로트로 분할 된 재고수량이 0 이 아닌 최근에 생성된 분할로트
-                        LotMaster findRealLot = lotConnectRepository.findByStockAmountAndCreatedDateDesc(equipmentLot.getId())
-                                .orElseThrow(() -> new BadRequestException(""));
-
-                        findRealLot.setStockAmount(findRealLot.getStockAmount() - 1);
-//                        lotMasterRepo.save(findRealLot);
-                    }
-                }
-
+        for (int i = 1; i <= badItemAmount; i++) {
+            LotMaster notStockAmountEquipmentLot = lotEquipmentConnectRepository.findEquipmentLotByIdAndStockAmount(equipmentLotId, 0)
+                    .orElse(null);
+            if (notStockAmountEquipmentLot != null) {
+                notStockAmountEquipmentLot.setStockAmount(notStockAmountEquipmentLot.getStockAmount() - 1);
+                lotMasterRepo.save(notStockAmountEquipmentLot);
             }
 
-            // workOrderBadItem 생성
-//            workOrderBadItem.create(badItem, workOrderDetail, equipmentLot, badItemAmount, EQUIPMENT_LOT);
-//            workOrderBadItemRepo.save(workOrderBadItem);
-        } else {
-            throw new BadRequestException(workOrderDetail.getWorkProcess().getWorkProcessName() + " 공정에서 생산된 LOT 가 사용 되었으므로 불량 추가등록이 불가능합니다.");
+            if (notStockAmountEquipmentLot == null) {
+                LotMaster realLot = lotConnectRepository.findByStockAmountAndCreatedDateDesc(equipmentLot.getId(), 0, false)
+                        .orElseThrow(() -> new BadRequestException("불량 수량 반영할 분할 LOT 가 존재하지 않습니다."));
+                realLot.setStockAmount(realLot.getStockAmount() - 1);                   // 분할 LOT 재고수량 변경
+                lotMasterRepo.save(realLot);
+            }
         }
 
-        return getBadItemEnrollmentResponse(workOrderBadItem.getId());
+        // workOrderBadItem 생성
+        WorkOrderBadItem workOrderBadItem = new WorkOrderBadItem();
+        workOrderBadItem.popCreate(badItem, workOrderDetail, equipmentLot, badItemAmount, EQUIPMENT_LOT);
+        workOrderBadItemRepo.save(workOrderBadItem);
+
+        // equipmentLot 불량수량 변경
+        int equipmentLotBadItemSum = workOrderBadItemRepo.findBadItemAmountByEquipmentLotMaster(equipmentLot.getId()).stream().mapToInt(Integer::intValue).sum();
+        equipmentLot.setBadItemAmount(equipmentLotBadItemSum);
+        lotMasterRepo.save(equipmentLot);
+
+        // dummyLot 불량수량 변경
+        int dummyLotBadItemSum = workOrderBadItemRepo.findBadItemAmountByDummyLotMaster(dummyLot.getId()).stream().mapToInt(Integer::intValue).sum();
+        dummyLot.setBadItemAmount(dummyLotBadItemSum);
+        lotMasterRepo.save(dummyLot);
+
+        WorkOrderDetailBadItemResponse response = new WorkOrderDetailBadItemResponse();
+        return response.put(workOrderBadItem);
     }
 
-    // 불량유형 정보 전체 조회
+    // 작업완료 상세 리스트 별 불량정보 수정
     @Override
-    public List<BadItemEnrollmentResponse> getBadItemEnrollments(Long workOrderId) throws NotFoundException {
+    public WorkOrderDetailBadItemResponse updateBadItemEnrollment(Long workOrderId, Long equipmentLotId, Long badItemEnrollmentId, int badItemAmount) throws NotFoundException, BadRequestException {
         WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderId);
-        LotMaster dummyLotMaster = getLotLogByWorkOrderDetailOrThrow(workOrderDetail).getLotMaster(); // 작업지시와 연결 된 dummyLot
-        return workOrderBadItemRepo.findByDummyLotIdGroupByBadItemType(dummyLotMaster.getId());
+        LotMaster equipmentLot = getLotMatserOrThrow(equipmentLotId);
+        LotEquipmentConnect lotEquipmentConnect = getLotEquipmentConnectByChildLotOrThrow(equipmentLot.getId());
+        LotMaster dummyLot = lotEquipmentConnect.getParentLot();
+        WorkOrderBadItem workOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
+        int beforeBadItemAmount = workOrderBadItem.getBadItemAmount();
+
+        // realLots 의 inputAmount 가 하나라도 0 이 아닌지 체크(다른공정에서 사용되었으면 에외)
+        throwIfRealLotInputAmountCheck(dummyLot.getId());
+
+        int badItemDifference = beforeBadItemAmount - badItemAmount;        // 입력한 불량수량 - 수정 전 불량수량
+        if (badItemAmount > beforeBadItemAmount) {      // 수정할 수량이 더 크면
+            for (int i = 1; i <= badItemDifference * -1; i++) {
+                LotMaster notStockAmountEquipmentLot = lotEquipmentConnectRepository.findEquipmentLotByIdAndStockAmount(equipmentLotId, 0)
+                        .orElse(null);
+                if (notStockAmountEquipmentLot != null) {
+                    notStockAmountEquipmentLot.setStockAmount(notStockAmountEquipmentLot.getStockAmount() - 1);
+                    lotMasterRepo.save(notStockAmountEquipmentLot);
+                }
+
+                if (notStockAmountEquipmentLot == null) {
+                    LotMaster realLot = lotConnectRepository.findByStockAmountAndCreatedDateDesc(equipmentLot.getId(), 0, false)
+                            .orElseThrow(() -> new BadRequestException("불량 수량 반영할 분할 LOT 가 존재하지 않습니다."));
+                    realLot.setStockAmount(realLot.getStockAmount() - 1);                   // 분할 LOT 재고수량 변경
+                    lotMasterRepo.save(realLot);
+                }
+            }
+        } else { // 수정할 수량이 기존 불량수량보다 작다면
+            for (int i = 1; i <= badItemDifference; i++) {
+                LotMaster realLot = lotConnectRepository.findByStockAmountAndCreatedDateDesc(equipmentLot.getId(), null, true)
+                        .orElse(null);
+
+                if (realLot != null) {
+                    realLot.setStockAmount(realLot.getStockAmount() + 1);
+                    lotMasterRepo.save(realLot);
+                } else {
+                    equipmentLot.setStockAmount(equipmentLot.getStockAmount() + 1);
+                    lotMasterRepo.save(equipmentLot);
+                }
+            }
+        }
+
+        // 불량수량 변경
+        workOrderBadItem.setBadItemAmount(badItemAmount);
+        workOrderBadItemRepo.save(workOrderBadItem);
+
+        // equipmentLot 불량수량 변경
+        int equipmentLotBadItemSum = workOrderBadItemRepo.findBadItemAmountByEquipmentLotMaster(equipmentLot.getId()).stream().mapToInt(Integer::intValue).sum();
+        equipmentLot.setBadItemAmount(equipmentLotBadItemSum);
+        lotMasterRepo.save(equipmentLot);
+
+        // dummyLot 불량수량 변경
+        int dummyLotBadItemSum = workOrderBadItemRepo.findBadItemAmountByDummyLotMaster(dummyLot.getId()).stream().mapToInt(Integer::intValue).sum();
+        dummyLot.setBadItemAmount(dummyLotBadItemSum);
+        lotMasterRepo.save(dummyLot);
+
+        WorkOrderDetailBadItemResponse response = new WorkOrderDetailBadItemResponse();
+        return response.put(workOrderBadItem);
     }
 
-    // 불량유형 정보 수정 (불량수량)
+    // 작업완료 상세 리스트 별 불량정보 삭제
     @Override
-    public BadItemEnrollmentResponse updateBadItemEnrollment(
-            Long workOrderId,
-            Long badItemEnrollmentId,
-            int badItemAmount
-    ) throws NotFoundException, BadRequestException {
+    public void deleteBadItemEnrollment(Long workOrderId, Long equipmentLotId, Long badItemEnrollmentId) throws NotFoundException, BadRequestException {
         WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderId);
-        WorkOrderBadItem findWorkOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
-        LotLog lotLog = lotLogHelper.getLotLogByWorkOrderDetailOrThrow(workOrderDetail.getId());
-        LotMaster lotMaster = lotLog.getLotMaster();
+        LotMaster equipmentLot = getLotMatserOrThrow(equipmentLotId);
+        LotEquipmentConnect lotEquipmentConnect = getLotEquipmentConnectByChildLotOrThrow(equipmentLot.getId());
+        LotMaster dummyLot = lotEquipmentConnect.getParentLot();
+        WorkOrderBadItem workOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
+        int badItemAmount = workOrderBadItem.getBadItemAmount();
 
-        int beforeAmount = findWorkOrderBadItem.getBadItemAmount();
-        int beforeBadItemAmount = (lotMaster.getBadItemAmount() - findWorkOrderBadItem.getBadItemAmount());
+        // realLots 의 inputAmount 가 하나라도 0 이 아닌지 체크(다른공정에서 사용되었으면 에외)
+        throwIfRealLotInputAmountCheck(dummyLot.getId());
 
-        // 입력받은 불량 수량이 lotMaster 의 생성수량보다 큰지 체크
-        throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(beforeBadItemAmount + badItemAmount, lotMaster.getCreatedAmount() - lotMaster.getBadItemAmount());
+        // realLot 재고수량 반영
+        for (int i = 1; i <= badItemAmount; i++) {
+            LotMaster realLot = lotConnectRepository.findByStockAmountAndCreatedDateDesc(equipmentLot.getId(), null, true)
+                    .orElse(null);
 
-        findWorkOrderBadItem.setBadItemAmount(badItemAmount);
-        lotMaster.setBadItemAmount((lotMaster.getBadItemAmount() - beforeAmount) + badItemAmount);    // 불량수량 변경
+            if (realLot != null) {
+                realLot.setStockAmount(realLot.getStockAmount() + 1);
+                lotMasterRepo.save(realLot);
+            } else {
+                equipmentLot.setStockAmount(equipmentLot.getStockAmount() + 1);
+                lotMasterRepo.save(equipmentLot);
+            }
+        }
 
-        workOrderBadItemRepo.save(findWorkOrderBadItem);
-        lotMasterRepo.save(lotMaster);
+        // 불량 삭제
+        workOrderBadItem.delete();
+        workOrderBadItemRepo.save(workOrderBadItem);
 
-        return getBadItemEnrollmentResponse(findWorkOrderBadItem.getId());
+        // equipmentLot 불량수량 변경
+        int equipmentLotBadItemSum = workOrderBadItemRepo.findBadItemAmountByEquipmentLotMaster(equipmentLot.getId()).stream().mapToInt(Integer::intValue).sum();
+        equipmentLot.setBadItemAmount(equipmentLotBadItemSum);
+        lotMasterRepo.save(equipmentLot);
+
+        // dummyLot 불량수량 변경
+        int dummyLotBadItemSum = workOrderBadItemRepo.findBadItemAmountByDummyLotMaster(dummyLot.getId()).stream().mapToInt(Integer::intValue).sum();
+        dummyLot.setBadItemAmount(dummyLotBadItemSum);
+        lotMasterRepo.save(dummyLot);
     }
 
-    // 불량유형 정보 삭제
+
+    // ====================================== 작업지시 불량률 조회 =================================
+    // 작업지시 불량률 정보 리스트 조회(지시상태 완료, 진행중만 조회)
+    // 현재 완료, 진행중인 작업지시만 조회, 검색조건: 공정 id, 작업지시 번호, 품번|품명, 작업자 id, 작업기간 fromDate~toDate
     @Override
-    public void deleteBadItemEnrollment(Long workOrderId, Long badItemEnrollmentId) throws NotFoundException {
-        WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderId);
-        WorkOrderBadItem findWorkOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
-        findWorkOrderBadItem.delete();
-        int beforeBadItemAmount = findWorkOrderBadItem.getBadItemAmount();
+    public List<WorkOrderBadItemStatusResponse> getWorkOrderBadItems(
+            Long workProcessId,
+            String workOrderNo,
+            String itemNoAndItemName,
+            Long userId,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) throws NotFoundException {
+        List<WorkOrderBadItemStatusResponse> responses =
+                workOrderDetailRepo.findWorkOrderBadItemStatusResponseByCondition(workProcessId, workOrderNo, itemNoAndItemName, userId, fromDate, toDate);
+        for (WorkOrderBadItemStatusResponse response : responses) {
+            Long workOrder = response.getWorkOrderId();
+            Long workProcess = response.getWorkProcessId();
+            // dummyLot 를 찾기위한 Lotlog
+            LotLog lotLog = lotLogRepository.findLotLogByWorkOrderIdAndWorkProcessId(workOrder, workProcess)
+                    .orElseThrow(() -> new NotFoundException("[데이터오류] 공정 완료된 작업지시가 LotLog 에 등록되지 않았습니다."));
+            // dummyLot
+            Long dummyLotId = lotLog.getLotMaster().getId();
+            BadItemWorkOrderResponse.subDto subDto = lotMasterRepo.findLotMaterByDummyLotIdAndWorkProcessId(dummyLotId, workProcess)
+                    .orElseThrow(() -> new NotFoundException("[데이터오류] lotLog 에 등록된 lotMaster(id: " + dummyLotId + ") 가 lotEquipmentConnect parentLot 로 등록되지 않았습니다."));
+            // 품목정보 및 불량률 계산
+            response.setRateCalculationAndItem(subDto);
+        }
 
-        LotMaster lotMaster = findWorkOrderBadItem.getLotMaster();
-        lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() - beforeBadItemAmount); // 불량수량 변경
-        workOrderBadItemRepo.save(findWorkOrderBadItem);
-        lotMasterRepo.save(lotMaster);
+        // itemNoAndItemName 검색 필터링
+        if (itemNoAndItemName != null) {
+            return responses.stream().filter(f -> f.getItemNo().contains(itemNoAndItemName) || f.getItemName().contains(itemNoAndItemName)).collect(Collectors.toList());
+        } else
+            return responses;
     }
 
-    // 불량유형 단일 조회 및 예외
-    private BadItemEnrollmentResponse getBadItemEnrollmentResponse(Long id) throws NotFoundException {
-        return workOrderBadItemRepo.findWorkOrderEnrollmentResponseById(id)
-                .orElseThrow(() -> new NotFoundException("workOrderBadItem does not exist. input id: " + id));
+    // 작업지시 상세 불량률 조회
+    @Override
+    public List<WorkOrderBadItemStatusDetailResponse> getWorkOrderBadItemDetails(Long workOrderId) throws NotFoundException {
+        WorkOrderDetail workOrder = getWorkOrderDetailOrThrow(workOrderId);
+        // dummyLot 를 찾기위한 Lotlog
+        LotLog lotLog = lotLogRepository.findLotLogByWorkOrderIdAndWorkProcessId(workOrder.getId(), workOrder.getWorkProcess().getId())
+                .orElseThrow(() -> new NotFoundException("[데이터오류] 공정 완료된 작업지시가 LotLog 에 등록되지 않았습니다."));
+        LotMaster dummyLot = lotLog.getLotMaster();
+        List<WorkOrderBadItemStatusDetailResponse> responses = workOrderBadItemRepo.findByDummyLotIdGroupByBadItemType(dummyLot.getId());
+
+        return responses.stream().map(m ->
+                m.setRateCalculation(dummyLot.getCreatedAmount(), dummyLot.getBadItemAmount())
+        ).collect(Collectors.toList());
     }
 
     // 작업지시 불량정보 단일 조회 및 예외
@@ -230,28 +318,10 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
         }
     }
 
-    // lotLog 에서 해당하는 작업지시에 입력받은 lotMaster 가 있는지 여부
-    private void throwIfLotMasterId(Long workOrderId, Long lotMasterId) throws BadRequestException {
-        List<Long> lotMasterIds = lotLogRepository.findLotMasterIdByWorkOrderId(workOrderId);
-        boolean lotMasterIdCheck = lotMasterIds.stream().anyMatch(id -> id.equals(lotMasterId));
-        if (!lotMasterIdCheck){
-            throw new BadRequestException("해당하는 작업지시에 대한 lotMaster 가 존재하지 않음.");
-        }
-    }
-
     // 작업지시 단일 조회 및 예외
     private WorkOrderDetail getWorkOrderDetailOrThrow(Long id) throws NotFoundException {
         return workOrderDetailRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("workOrder does not exist. input id: " + id));
-    }
-
-    // 입력받은 badItemAmount 가 해당 lotMaster 의 생성수량 - 불량수량 보다 크면 안됨
-    private void throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(int badItemAmount, int createdAmount) throws BadRequestException {
-        if (badItemAmount > createdAmount) {
-            throw new BadRequestException("badItemAmount cannot be greater than createdAmount of lotMaster. " +
-                    "input badItemAmount: " + badItemAmount + ", " +
-                    "createdAmount of lotMaster: " + createdAmount);
-        }
     }
 
     // 입력받은 lotMaster 는 같은 불량유형이 존재하면 안됨.
@@ -259,87 +329,37 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
         List<Long> findBadItemIdByLotMasterId = workOrderBadItemRepo.findBadItemIdByLotMasterId(lotMasterId);
         boolean badItemIdAnyMatchByLotMaster = findBadItemIdByLotMasterId.stream().anyMatch(id -> id.equals(badItemId));
         if (badItemIdAnyMatchByLotMaster) {
-            throw new BadRequestException("하나의 로트는 같은 불량유형을 두개이상 등록 할 수 없음.");
+            throw new BadRequestException("하나의 로트는 같은 불량유형을 두개이상 등록 할 수 없습니다.");
         }
     }
 
-    // 작업지시로 lotLog 조회 및 예외
-    private LotLog getLotLogByWorkOrderDetailOrThrow(WorkOrderDetail workOrderDetail) throws NotFoundException {
-        return lotLogRepository.findByWorkOrderDetail(workOrderDetail)
-                .orElseThrow(() -> new NotFoundException("[데이터 오류] 해당 작업지시로 등록 된 lotLog 가 존재하지 않습니다."));
+    // lotEquipmentConnect 단일 조회 및 예외
+    private LotEquipmentConnect getLotEquipmentConnectByChildLotOrThrow(Long childLotId) throws NotFoundException {
+        return lotEquipmentConnectRepository.findByChildId(childLotId)
+                .orElseThrow(() -> new NotFoundException("해당하는 설비 lot 가 존재하지 않습니다."));
     }
 
-//    // 불량 정보 생성 -> 0323 (수) 수정하기 전 불량정보 생성
-//    @Override
-//    public BadItemEnrollmentResponse createBadItemEnrollment(
-//            Long workOrderId,
-//            Long badItemId,
-//            int badItemAmount
-//    ) throws NotFoundException, BadRequestException {
-//        WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderId);
-//        BadItem badItem = badItemService.getBadItemOrThrow(badItemId);
-//        LotLog lotLog = lotLogHelper.getLotLogByWorkOrderDetailOrThrow(workOrderDetail.getId());
-//        LotMaster lotMaster = lotLog.getLotMaster();
-//
-//        // 입력받은 badItemAmount 가 해당 lotMaster 의 생성수량 - 불량수량 보다 크면 안됨
-//        throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(lotMaster.getBadItemAmount() + badItemAmount, lotMaster.getCreatedAmount() - lotMaster.getBadItemAmount());
-//        // 입력받은 lotMaster 는 같은 불량유형이 존재하면 안됨.
-//        throwIfBadItemIdInLotMaster(lotMaster.getId(), badItemId);
-//        // lotLog 에서 해당하는 작업지시에 입력받은 lotMaster 가 있는지 여부
-//        throwIfLotMasterId(workOrderId, lotMaster.getId());
-//
-//        // 입력받은 불량이 해당하는 작업공정의 불량유형이랑 일치하는지 여부
-//        throwIfBadItemIdAnyMatchWorkProcess(lotLog.getWorkProcess().getId(), badItemId);
-//
-//        WorkOrderBadItem workOrderBadItem = new WorkOrderBadItem();
-//        workOrderBadItem.create(badItem, workOrderDetail, lotMaster, badItemAmount, DUMMY_LOT);
-//
-//        lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() + badItemAmount);   // 불량수량 변경
-//        workOrderBadItemRepo.save(workOrderBadItem);
-//        lotMasterRepo.save(lotMaster);
-//
-//        return getBadItemEnrollmentResponse(workOrderBadItem.getId());
-//    }
+    // lotMaster 단일 조회 및 예외
+    private LotMaster getLotMatserOrThrow(Long id) throws NotFoundException {
+        return lotMasterRepo.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("lotMaster does not exist."));
+    }
 
+    private void throwBadAmountCheck(Long equipmentLotId, int badItemAmount, int equipmentCreateAmount) throws BadRequestException {
+        int equipmentLotBadItemSum = workOrderBadItemRepo.findBadItemAmountByEquipmentLotMaster(equipmentLotId).stream().mapToInt(Integer::intValue).sum();
+        if (equipmentLotBadItemSum + badItemAmount > equipmentCreateAmount) {
+            throw new BadRequestException("총 불량수량과 입력한 불량수량의 합계가 equipmentLot 의 생성수량을 초과할수 없습니다. " +
+                    "생성수량: " + equipmentCreateAmount + ", " +
+                    "현재 등록된 불량수량: " + equipmentLotBadItemSum + ", " +
+                    "입력한 불량수량: " + badItemAmount + ", " +
+                    "입력 가능불량수량: " + (equipmentCreateAmount - equipmentLotBadItemSum)
+            );
+        }
+    }
 
-//    // 불량유형 정보 수정 (불량수량) 0323 (수) 수정하기 전 불량 정보 수정
-//    @Override
-//    public BadItemEnrollmentResponse updateBadItemEnrollment(
-//            Long workOrderId,
-//            Long badItemEnrollmentId,
-//            int badItemAmount
-//    ) throws NotFoundException, BadRequestException {
-//        WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderId);
-//        WorkOrderBadItem findWorkOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
-//        LotLog lotLog = lotLogHelper.getLotLogByWorkOrderDetailOrThrow(workOrderDetail.getId());
-//        LotMaster lotMaster = lotLog.getLotMaster();
-//
-//        int beforeAmount = findWorkOrderBadItem.getBadItemAmount();
-//        int beforeBadItemAmount = (lotMaster.getBadItemAmount() - findWorkOrderBadItem.getBadItemAmount());
-//
-//        // 입력받은 불량 수량이 lotMaster 의 생성수량보다 큰지 체크
-//        throwIfBadItemAmountGreaterThanCreatedAmountLotMaster(beforeBadItemAmount + badItemAmount, lotMaster.getCreatedAmount() - lotMaster.getBadItemAmount());
-//
-//        findWorkOrderBadItem.setBadItemAmount(badItemAmount);
-//        lotMaster.setBadItemAmount((lotMaster.getBadItemAmount() - beforeAmount) + badItemAmount);    // 불량수량 변경
-//
-//        workOrderBadItemRepo.save(findWorkOrderBadItem);
-//        lotMasterRepo.save(lotMaster);
-//
-//        return getBadItemEnrollmentResponse(findWorkOrderBadItem.getId());
-//    }
-
-//    // 불량유형 정보 삭제 > 0323(수) 수정되기 전 불량삭제
-//    @Override
-//    public void deleteBadItemEnrollment(Long workOrderId, Long badItemEnrollmentId) throws NotFoundException {
-//        WorkOrderDetail workOrderDetail = getWorkOrderDetailOrThrow(workOrderId);
-//        WorkOrderBadItem findWorkOrderBadItem = getWorkOrderBadItemOrThrow(badItemEnrollmentId);
-//        findWorkOrderBadItem.delete();
-//        int beforeBadItemAmount = findWorkOrderBadItem.getBadItemAmount();
-//
-//        LotMaster lotMaster = findWorkOrderBadItem.getLotMaster();
-//        lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() - beforeBadItemAmount); // 불량수량 변경
-//        workOrderBadItemRepo.save(findWorkOrderBadItem);
-//        lotMasterRepo.save(lotMaster);
-//    }
+    private void throwIfRealLotInputAmountCheck(Long dummyLotId) throws BadRequestException {
+        List<LotMaster> checkRealLots = lotEquipmentConnectRepository.findChildLotByChildLotOfParentLotCreatedDateDesc(dummyLotId);
+        boolean noneMatch = checkRealLots.stream().allMatch(n -> n.getInputAmount() == 0);
+        if (!noneMatch) throw new BadRequestException("공정이 진행중인 LOT 이므로 생성, 수정, 삭제를 할 수 없습니다.");
+    }
 }

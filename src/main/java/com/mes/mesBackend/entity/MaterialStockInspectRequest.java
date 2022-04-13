@@ -49,10 +49,11 @@ public class MaterialStockInspectRequest extends BaseTimeEntity {
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'")
     private boolean deleteYn = false;
 
-    public void update(String note, WareHouse wareHouse, ItemAccount itemAccount){
+    public void update(String note, WareHouse wareHouse, ItemAccount itemAccount, StockInspectionType inspectionType){
         setNote(note);
         setWareHouse(wareHouse);
         setItemAccount(itemAccount);
+        setInspectionType(inspectionType);
     }
 
     public void delete(Long id){

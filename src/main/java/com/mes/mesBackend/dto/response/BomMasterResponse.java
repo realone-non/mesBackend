@@ -2,12 +2,13 @@ package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.BomMaster;
 import com.mes.mesBackend.entity.enumeration.DevelopStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
@@ -30,11 +31,11 @@ public class BomMasterResponse {
 
     @Schema(description = "유효시작일")
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
-    LocalDateTime startDate;
+    LocalDate startDate;
 
     @Schema(description = "유효종료일")
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
-    LocalDateTime endDate;
+    LocalDate endDate;
 
     @Schema(description = "개발상태")
     DevelopStatus developStatus;
@@ -44,8 +45,39 @@ public class BomMasterResponse {
 
     @Schema(description = "승인일시")
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
-    LocalDateTime approvalDate;
+    LocalDate approvalDate;
 
     @Schema(description = "사용")
     Boolean useYn;
+
+    @Schema(description = "작업공정")
+    WorkProcessResponse.idAndName workProcess;
+
+    public BomMasterResponse setResponse(BomMaster bomMaster) {
+        setId(bomMaster.getId());
+        if (bomMaster.getItem() != null) {
+            ItemResponse.itemToBomResponse item = new ItemResponse.itemToBomResponse();
+            item.setId(bomMaster.getItem().getId());
+            item.setItemNo(bomMaster.getItem().getItemNo());
+            item.setItemName(bomMaster.getItem().getItemName());
+            item.setItemAccount(bomMaster.getItem().getItemAccount().getAccount());
+            item.setManufacturerPartNo(bomMaster.getItem().getManufacturerPartNo());
+            item.setInputUnitPrice(bomMaster.getItem().getInputUnitPrice());
+            setItem(item);
+        }
+        setBomNo(bomMaster.getBomNo());
+        setStartDate(bomMaster.getStartDate());
+        setEndDate(bomMaster.getEndDate());
+        setDevelopStatus(bomMaster.getDevelopStatus());
+        setNote(bomMaster.getNote());
+        setApprovalDate(bomMaster.getApprovalDate());
+        setUseYn(bomMaster.isUseYn());
+        if (bomMaster.getWorkProcess() != null) {
+            WorkProcessResponse.idAndName workProcess = new WorkProcessResponse.idAndName();
+            workProcess.setId(bomMaster.getWorkProcess().getId());
+            workProcess.setWorkProcessName(bomMaster.getWorkProcess().getWorkProcessName());
+            setWorkProcess(workProcess);
+        }
+        return this;
+    }
 }

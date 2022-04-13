@@ -93,6 +93,9 @@ public class LotMasterResponse {
     @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime createdDate;
 
+    @Schema(description = "품목계정코드")
+    String itemAccountCode;
+
     @JsonIgnore
     int badItemReturnAmount;       // 반품수량
     @JsonIgnore
@@ -129,5 +132,22 @@ public class LotMasterResponse {
 
         @Schema(description = "재고수량")
         int stockAmount;
+    }
+
+    @Getter
+    @Setter
+    @Schema(description = "LOT 불량수량, 재고수량 정보")
+    public static class stockAmountAndBadItemAmount {
+        @Schema(description = "고유아이디")
+        Long id;
+
+        @Schema(description = "LOT 번호")
+        String lotNo;
+
+        @Schema(description = "재고수량")
+        int stockAmount;
+
+        @Schema(description = "불량수량")
+        int badItemAmount;
     }
 }

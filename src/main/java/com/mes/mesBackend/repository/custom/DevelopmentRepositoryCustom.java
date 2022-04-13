@@ -30,4 +30,7 @@ public interface DevelopmentRepositoryCustom {
 
     //개발품목 진행 상태 단건 조회
     DevelopmentStateReponse findByIdAndDeleteYn(Long developId, Long stateId);
+
+    //개발품목 진행 상태 갯수 조회
+    Long findByFileYn(Long developId);
 }

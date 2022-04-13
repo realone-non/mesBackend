@@ -51,6 +51,7 @@ public class LotMasterRequest {
     Long equipmentId;       // 설비 id
 
     LotMasterDivision lotMasterDivision;
+    Long fillingEquipmentId;
 
     // 자재입고 lot
     public void putPurchaseInputLotRequest(
@@ -80,13 +81,14 @@ public class LotMasterRequest {
             WareHouse wareHouse,
             OutSourcingInput outSourcingInput,
             int stockAmount,
-            LotType lotType
+            int createdAmount
+//            LotType lotType
     ) {
         setItem(item);
         setWareHouse(wareHouse);
         setOutSourcingInput(outSourcingInput);
         setStockAmount(stockAmount);
-        setCreatedAmount(stockAmount);
+        setCreatedAmount(createdAmount);
 //        setLotType(lotType);
         setLotMasterDivision(REAL_LOT);
         setWorkProcessDivision(MATERIAL_INPUT);
@@ -102,7 +104,8 @@ public class LotMasterRequest {
             int badItemAmount,
             EnrollmentType enrollmentType,
             Long equipmentId,
-            LotMasterDivision division
+            LotMasterDivision division,
+            Long fillingEquipmentId
     ) {
         setItem(item);                                    // 품목
         setWorkProcessDivision(workProcessDivision);    // 공정
@@ -122,6 +125,7 @@ public class LotMasterRequest {
         if (division.equals(EQUIPMENT_LOT)) {
             setStockAmount(stockAmount);
             setBadItemAmount(this.badItemAmount + badItemAmount);
+            setFillingEquipmentId(fillingEquipmentId);
         }
 
         // 분할 로트

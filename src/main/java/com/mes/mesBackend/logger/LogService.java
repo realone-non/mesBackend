@@ -1,6 +1,7 @@
 package com.mes.mesBackend.logger;
 
 import com.mes.mesBackend.auth.JwtTokenProvider;
+import com.mes.mesBackend.exception.CustomJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;

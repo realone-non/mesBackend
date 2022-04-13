@@ -54,15 +54,9 @@ public class Development extends BaseTimeEntity {
     @Column(name = "DELIVER_AMOUNT", columnDefinition = "int COMMENT '납품수량'")
     private int deliverAmount;          // 납품수량
 
-    @Column(name = "진행상태", columnDefinition = "nvarchar(255) COMMENT '진행상황'")
-    private String processState;
-
     @ManyToOne
     @JoinColumn(name = "USER", columnDefinition = "bigint COMMENT '담당자'")
     private User user;
-
-    @Column(name = "FILE_URL", columnDefinition = "varchar(255) COMMENT '수주파일'")
-    private String fileUrl;         // 수주파일
 
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private Boolean useYn = true;      //  사용여부

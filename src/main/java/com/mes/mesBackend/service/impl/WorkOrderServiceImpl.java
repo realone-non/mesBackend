@@ -10,19 +10,22 @@ import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.NumberAutomatic;
+import com.mes.mesBackend.helper.ProductionPerformanceHelper;
 import com.mes.mesBackend.helper.WorkOrderStateHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.ItemRepository;
+import com.mes.mesBackend.repository.LotLogRepository;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
 import com.mes.mesBackend.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
-import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.*;
 
 // 6-2. 작업지시 등록
 @Service
@@ -149,24 +152,48 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             Long produceOrderId,
             Long workOrderId,
             WorkOrderUpdateRequest newWorkOrderRequest
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         WorkOrderDetail findWorkOrderDetail = getWorkOrderDetailOrThrow(workOrderId, produceOrderId);
+
+        // 생산수량이 0 일경우 지시수량을 0으로 변경 할 수 없음.
+        throwIfProductAmount(newWorkOrderRequest.getOrderAmount(), findWorkOrderDetail.getProductionAmount());
 
         WorkLine newWorkLine = workLineService.getWorkLineOrThrow(newWorkOrderRequest.getWorkLine());
         User newUser = newWorkOrderRequest.getUser() != null ? userService.getUserOrThrow(newWorkOrderRequest.getUser()) : null;
 
         WorkOrderDetail newWorkOrderDetail = mapper.toEntity(newWorkOrderRequest, WorkOrderDetail.class);
 
+        OrderState orderState = findWorkOrderDetail.getOrderState();
         // 작업지시의 상태값 구하기
-        OrderState orderState = workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(newWorkOrderRequest.getOrderAmount(), findWorkOrderDetail.getProductionAmount());
+        if (findWorkOrderDetail.getProductionAmount() != newWorkOrderDetail.getProductionAmount()) {
+            orderState = workOrderStateHelper.findOrderStateByOrderAmountAndProductAmount(newWorkOrderRequest.getOrderAmount(), findWorkOrderDetail.getProductionAmount(), findWorkOrderDetail.getWorkProcess().getWorkProcessDivision());
+        }
+
         findWorkOrderDetail.setOrderState(orderState);
         findWorkOrderDetail.update(newWorkOrderDetail, newWorkLine, newUser);
         workOrderDetailRepo.save(findWorkOrderDetail);
+
+        // 충진공정 일 경우
+        if (findWorkOrderDetail.getWorkProcess().getWorkProcessDivision().equals(FILLING)) {
+            WorkOrderDetail materialMixingWorkOrder = workOrderDetailRepo.findWorkOrderIsFillingByProduceOrderId(findWorkOrderDetail.getProduceOrder().getId())
+                    .orElseThrow(() -> new BadRequestException("해당하는 제조오더에 대한 원료혼합 공정 작업지시가 존재하지 않습니다."));
+            materialMixingWorkOrder.setOrderState(findWorkOrderDetail.getOrderState());
+            workOrderStateHelper.updateOrderState(materialMixingWorkOrder.getId(), materialMixingWorkOrder.getOrderState());
+//            materialMixingWorkOrder.changeOrderStateDate(materialMixingWorkOrder.getOrderState(), materialMixingWorkOrder.getOrderState());
+//            workOrderDetailRepo.save(materialMixingWorkOrder);
+        }
 
         // 작업지시 상태값, 제조오더 상태값 변경
         workOrderStateHelper.updateOrderState(findWorkOrderDetail.getId(), findWorkOrderDetail.getOrderState());
 
         return getWorkOrderResponseOrThrow(produceOrderId, workOrderId);
+    }
+
+    // 생산수량이 0 일경우 지시수량을 0으로 변경 할 수 없음.
+    private void throwIfProductAmount(int newOrderAmount, int productAmount) throws BadRequestException {
+        if (productAmount == 0) {
+            if (newOrderAmount == 0) throw new BadRequestException("생산수량이 0 일 경우 지시수량을 0으로 변경 할 수 없습니다.");
+        }
     }
 
     // 작업지시 삭제

@@ -24,6 +24,9 @@ public class MaterialStockInspectResponse {
     @Schema(description = "품명")
     String itemName;
 
+    @Schema(description = "단위")
+    String unit;
+
     @Schema(description = "LOT유형")
     String lotType;
 

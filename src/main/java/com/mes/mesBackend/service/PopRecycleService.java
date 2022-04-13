@@ -1,11 +1,14 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.request.PopRecycleRequest;
+import com.mes.mesBackend.dto.response.PopRecycleCreateResponse;
 import com.mes.mesBackend.dto.response.PopRecycleResponse;
+import com.mes.mesBackend.dto.response.RecycleLotResponse;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface PopRecycleService {
@@ -14,5 +17,8 @@ public interface PopRecycleService {
     List<PopRecycleResponse> getRecycles(WorkProcessDivision workProcessDivision) throws NotFoundException;
 
     //재사용 등록
-    PopRecycleResponse createUseRecycle(PopRecycleRequest request) throws NotFoundException, BadRequestException;
+    PopRecycleCreateResponse createUseRecycle(PopRecycleRequest request) throws NotFoundException, BadRequestException;
+
+    //재사용 LOT조회
+    List<RecycleLotResponse> getRecycleLots(LocalDate fromDate, LocalDate toDate);
 }

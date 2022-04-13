@@ -30,6 +30,7 @@ public class WorkCenterCheckRepositoryImpl implements WorkCenterCheckRepositoryC
                         isWorkCenterEq(workCenterId),
                         isDeleteYnFalse()
                 )
+                .orderBy(workCenterCheck.createdDate.desc())
                 .fetch();
     }
 

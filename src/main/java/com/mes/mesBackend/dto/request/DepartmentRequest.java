@@ -29,7 +29,6 @@ public class DepartmentRequest {
     String shortName;
 
     @Schema(description = "순번")
-    @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     int orders;
 

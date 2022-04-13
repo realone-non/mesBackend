@@ -4,16 +4,12 @@ import com.mes.mesBackend.dto.request.EquipmentMaintenanceRequest;
 import com.mes.mesBackend.dto.response.EquipmentMaintenanceResponse;
 import com.mes.mesBackend.entity.EquipmentMaintenance;
 import com.mes.mesBackend.entity.ModifiedLog;
-import com.mes.mesBackend.entity.enumeration.ModifiedDivision;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.helper.ModifiedLogHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.EquipmentMaintenanceRepository;
 import com.mes.mesBackend.service.EquipmentMaintenanceService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,7 +40,7 @@ public class EquipmentMaintenanceServiceImpl implements EquipmentMaintenanceServ
     // 설비 보전항목 전체 조회
     @Override
     public List<EquipmentMaintenanceResponse> getEquipmentMaintenances() {
-        List<EquipmentMaintenance> equipmentMaintenances = equipmentMaintenanceRepository.findAllByDeleteYnFalse();
+        List<EquipmentMaintenance> equipmentMaintenances = equipmentMaintenanceRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         List<EquipmentMaintenanceResponse> responses = mapper.toListResponses(equipmentMaintenances, EquipmentMaintenanceResponse.class);
         for (EquipmentMaintenanceResponse r : responses) {
             ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(EQUIPMENT_MAINTENANCE, r.getId());

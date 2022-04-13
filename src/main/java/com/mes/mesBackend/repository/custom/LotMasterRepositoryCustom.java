@@ -79,6 +79,9 @@ public interface LotMasterRepositoryCustom {
             Long inputEquipmentId
     );
 
+    //외주입고로 LOT 조회
+    Optional<LotMaster> findByOutsourcingInput(Long outsourcingInputId);
+
     // ========================== 7-2. Lot Tracking
     // == 정방향
     // 입력된 LOT NO 로 등록된 LotConnect 모두
@@ -92,4 +95,16 @@ public interface LotMasterRepositoryCustom {
     // lotTracking 검색조건: 추적유형(필수값), 품명|품번 -> 역방향
     List<LotTrackingResponse> findLotTrackingResponseByTrackingTypeFalse(Long equipmentLotId, String itemNoAndItemName);
 
+    // 품목계정 별 재고현황 정보
+    // lotMaster 의 realLot 중 stockAmount 가 0 이상이고, 검색조건으로 품목계정이 들어왔을때 품목의 갯수는 5개
+    List<ItemInventoryStatusResponse> findItemInventoryStatusResponseByGoodsType(GoodsType goodsType);
+
+    // 매출관련현황 - 제품 생산
+    // 현재 달에 가장 많이 생산 된 완제품 품목 5개
+    List<ItemResponse.noAndName> findSalesRelatedStatusResponseByProductItems(LocalDate fromDate, LocalDate toDate);
+    // 주 별로 생산 된 품목 갯수
+    Optional<Integer> findCreatedAmountByWeekDate(LocalDate fromDate, LocalDate toDate, Long itemId);
+
+    //재사용 LOT리스트 조회
+    List<RecycleLotResponse> findRecycleLots(LocalDate fromDate, LocalDate toDate);
 }

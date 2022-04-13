@@ -10,5 +10,8 @@ public interface OutsourcingProductionRawMaterialOutputInfoRepositoryCustom {
     List<OutsourcingMaterialReleaseResponse> findAllUseYn(Long prodId);
 
     //외주생산 원재료 출고 대상 정보 단일 조회
-    Optional<OutsourcingMaterialReleaseResponse> findByMaterialId(Long id);
+    Optional<OutsourcingMaterialReleaseResponse> findByMaterialId(Long prodId, Long id);
+
+    // 외주생산의뢰에 해당하는 원재료출고대상 정보가 존재하는지 여부
+    boolean existsByRequestId(Long requestId);
 }

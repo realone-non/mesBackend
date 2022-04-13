@@ -6,6 +6,7 @@ import com.mes.mesBackend.dto.response.BomItemDetailResponse;
 import com.mes.mesBackend.dto.response.BomItemResponse;
 import com.mes.mesBackend.dto.response.BomMasterResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
@@ -18,8 +19,11 @@ import com.mes.mesBackend.service.WorkProcessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static com.mes.mesBackend.entity.enumeration.GoodsType.RAW_MATERIAL;
+import static com.mes.mesBackend.entity.enumeration.GoodsType.SUB_MATERIAL;
 import static com.mes.mesBackend.helper.Constants.DECIMAL_POINT_2;
 
 @Service
@@ -39,19 +43,24 @@ public class BomMasterServiceImpl implements BomMasterService {
 
         // 입력받은 item 이 bomMaster 에 이미 등록되어 있는지 채크
         throwIfNotDuplicateItemInBomMasters(item);
-        BomMaster bomMaster = mapper.toEntity(bomMasterRequest, BomMaster.class);
+        // 입력받은 item 의 품목계정이 원부자재면 등록 불가능
+        throwIfGoodsTypeNe(item.getItemAccount().getGoodsType());
 
-        bomMaster.addJoin(item);
+        BomMaster bomMaster = mapper.toEntity(bomMasterRequest, BomMaster.class);
+        WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(bomMasterRequest.getWorkProcessId());
+
+        bomMaster.addJoin(item, workProcess);
 
         BomMaster save = bomMasterRepository.save(bomMaster);
-        return mapper.toResponse(save, BomMasterResponse.class);
+        return getBomMaster(save.getId());
     }
 
     // BOM 마스처 단일 조회
     @Override
     public BomMasterResponse getBomMaster(Long bomMasterId) throws NotFoundException {
         BomMaster bomMaster = getBomMasterOrThrow(bomMasterId);
-        return mapper.toResponse(bomMaster, BomMasterResponse.class);
+        BomMasterResponse response = new BomMasterResponse();
+        return response.setResponse(bomMaster);
     }
 
     // BOM 마스처 단일 조회 및 에외
@@ -60,7 +69,7 @@ public class BomMasterServiceImpl implements BomMasterService {
                 .orElseThrow(() -> new NotFoundException("bom master does exist. input id: " + bomMasterId));
     }
 
-    // BOM 마스터 페이징 조회 검색조건: 품목계정, 품목그룹, 품번|품명
+    // BOM 마스터 조회 검색조건: 품목계정, 품목그룹, 품번|품명
     @Override
     public List<BomMasterResponse> getBomMasters(
             Long itemAccountId,
@@ -68,7 +77,13 @@ public class BomMasterServiceImpl implements BomMasterService {
             String itemNoAndItemName
     ) {
         List<BomMaster> bomMasters = bomMasterRepository.findAllByCondition(itemAccountId, itemGroupId, itemNoAndItemName);
-        return mapper.toListResponses(bomMasters, BomMasterResponse.class);
+        List<BomMasterResponse> responses = new ArrayList<>();
+        for (BomMaster bomMaster : bomMasters) {
+            BomMasterResponse response = new BomMasterResponse();
+            response.setResponse(bomMaster);
+            responses.add(response);
+        }
+        return responses;
     }
     // BOM 마스터 페이징 조회 검색조건: 품목계정, 품목그룹, 품번|품명
 //    @Override
@@ -84,16 +99,21 @@ public class BomMasterServiceImpl implements BomMasterService {
 
     // BOM 마스터 수정
     @Override
-    public BomMasterResponse updateBomMaster(Long bomMasterId, BomMasterRequest bomMasterRequest) throws NotFoundException {
-        Item newItem = itemService.getItemOrThrow(bomMasterRequest.getItem());
-
+    public BomMasterResponse updateBomMaster(Long bomMasterId, BomMasterRequest bomMasterRequest) throws NotFoundException, BadRequestException {
         BomMaster findBomMaster = getBomMasterOrThrow(bomMasterId);
-        BomMaster newBomMaster = mapper.toEntity(bomMasterRequest, BomMaster.class);
+        Item newItem = itemService.getItemOrThrow(bomMasterRequest.getItem());
+        WorkProcess newWorkProcess = workProcessService.getWorkProcessOrThrow(bomMasterRequest.getWorkProcessId());
 
-        findBomMaster.update(newBomMaster, newItem);
+        // Bom 에 대한 상세 정보가 존재하면 품목정보는 수정 불가능
+        if (!findBomMaster.getItem().getId().equals(newItem.getId())) throwIfBomMasterDetailExistIsNotItemUpdate(findBomMaster);
+        // Bom 에 대한 상세 정보가 존재하면 작업공정 수정 불가능
+        if (!findBomMaster.getWorkProcess().getId().equals(newWorkProcess.getId())) throwIfBomMasterDetailExistIsNotItemUpdateWorkProcess(findBomMaster);
+
+        BomMaster newBomMaster = mapper.toEntity(bomMasterRequest, BomMaster.class);
+        findBomMaster.update(newBomMaster, newItem, newWorkProcess);
 
         bomMasterRepository.save(findBomMaster);
-        return mapper.toResponse(findBomMaster, BomMasterResponse.class);
+        return getBomMaster(findBomMaster.getId());
     }
 
     // BOM 마스터 삭제
@@ -106,27 +126,28 @@ public class BomMasterServiceImpl implements BomMasterService {
         bomMasterRepository.save(bomMaster);
     }
 
-    // bomMaster 에 해당되는 BomItemDetail 이 있는지 체크(존재하면 삭제 불가능)
-    private void throwIfBomMasterExistInBomItemDetail(BomMaster bomMaster) throws BadRequestException {
-        boolean exists = bomItemDetailRepository.existsByBomMasterAndDeleteYnFalse(bomMaster);
-        if (exists) throw new BadRequestException("해당 BOM 에 등록되어있는 상세 정보가 존재하므로 삭제가 불가능 합니다. 상세 정보 삭제 후 다시 시도해주세요.");
-    }
-
     // BOM 품목 생성
     @Override
-    public BomItemResponse createBomItem(Long bomMasterId, BomItemRequest bomItemRequest) throws NotFoundException {
+    public BomItemResponse createBomItem(Long bomMasterId, BomItemRequest bomItemRequest) throws NotFoundException, BadRequestException {
         BomMaster bomMaster = getBomMasterOrThrow(bomMasterId);
 
-        Client toBuy = bomItemRequest.getToBuy() != null ? clientService.getClientOrThrow(bomItemRequest.getToBuy()) : null;
+        // 같은 품목 2개 등록 불가
+        throwIfBomItemDetailItemEq(bomMasterId, bomItemRequest.getItem());
         Item item = itemService.getItemOrThrow(bomItemRequest.getItem());
         WorkProcess workProcess = bomItemRequest.getWorkProcess() != null ?
                 workProcessService.getWorkProcessOrThrow(bomItemRequest.getWorkProcess()) : null;
         BomItemDetail bomItemDetail = mapper.toEntity(bomItemRequest, BomItemDetail.class);
 
-        bomItemDetail.addJoin(bomMaster, item, toBuy, workProcess);
+        bomItemDetail.addJoin(bomMaster, item, workProcess);
 
         bomItemDetailRepository.save(bomItemDetail);
         return mapper.toResponse(bomItemDetail, BomItemResponse.class);
+    }
+
+    // 같은 품목 2개 등록 불가
+    private void throwIfBomItemDetailItemEq(Long bomMasterId, Long itemId) throws BadRequestException {
+        boolean b = bomItemDetailRepository.existsByBomItemDetailItem(bomMasterId, itemId);
+        if (b) throw new BadRequestException("해당 품목은 이미 등록되어 있으므로 중복 등록이 불가능 합니다. 확인 후 다시 시도해주세요.");
     }
 
     // BOM 품목 리스트 조회
@@ -143,13 +164,13 @@ public class BomMasterServiceImpl implements BomMasterService {
     public BomItemResponse updateBomItem(Long bomMasterId, Long bomItemId, BomItemRequest bomItemRequest) throws NotFoundException {
         BomItemDetail findBomItemDetail = getBomItemDetailOrThrow(bomMasterId, bomItemId);
 
-        Client newToBuy = bomItemRequest.getToBuy() != null ? clientService.getClientOrThrow(bomItemRequest.getToBuy()) : null;
+//        Client newToBuy = bomItemRequest.getToBuy() != null ? clientService.getClientOrThrow(bomItemRequest.getToBuy()) : null;
         Item newItem = itemService.getItemOrThrow(bomItemRequest.getItem());
         WorkProcess newWorkProcess = bomItemRequest.getWorkProcess() != null ? workProcessService.getWorkProcessOrThrow(bomItemRequest.getWorkProcess()) : null;
 
         BomItemDetail newBomItemDetail = mapper.toEntity(bomItemRequest, BomItemDetail.class);
 
-        findBomItemDetail.update(newItem, newToBuy, newWorkProcess, newBomItemDetail);
+        findBomItemDetail.update(newItem, newWorkProcess, newBomItemDetail);
         bomItemDetailRepository.save(findBomItemDetail);
         return mapper.toResponse(findBomItemDetail, BomItemResponse.class);
     }
@@ -180,5 +201,29 @@ public class BomMasterServiceImpl implements BomMasterService {
     private void throwIfNotDuplicateItemInBomMasters(Item item) throws BadRequestException {
         boolean b = bomMasterRepository.existsByItemInBomMasters(item.getId());
         if (b) throw new BadRequestException("입략한 품목이 이미 Bom 에 등록되어 있으므로 중복 등록이 불가능 합니다.");
+    }
+
+    // 입력받은 item 의 품목계정이 원부자재면 등록 불가능
+    private void throwIfGoodsTypeNe(GoodsType goodsType) throws BadRequestException {
+        if (goodsType.equals(RAW_MATERIAL) || goodsType.equals(SUB_MATERIAL)) {
+            throw new BadRequestException("원부자재 품목은 등록할수 없습니다. 반제품, 완제품만 Bom 등록이 가능합니다. 확인 후 다시 시도해주세요.");
+        }
+    }
+
+    // bomMaster 에 해당되는 BomItemDetail 이 있는지 체크(존재하면 삭제 불가능)
+    private void throwIfBomMasterExistInBomItemDetail(BomMaster bomMaster) throws BadRequestException {
+        boolean exists = bomItemDetailRepository.existsByBomMasterAndDeleteYnFalse(bomMaster);
+        if (exists) throw new BadRequestException("해당 BOM 에 등록되어있는 상세 정보가 존재하므로 삭제가 불가능 합니다. 상세 정보 삭제 후 다시 시도해주세요.");
+    }
+
+    // Bom 에 대한 상세 정보가 존재하면 품목정보는 수정 불가능
+    private void throwIfBomMasterDetailExistIsNotItemUpdate(BomMaster bomMaster) throws BadRequestException {
+        boolean exists = bomItemDetailRepository.existsByBomMasterAndDeleteYnFalse(bomMaster);
+        if (exists) throw new BadRequestException("Bom 에 대한 상세정보가 등록되어 있으므로 품목정보 수정이 불가능합니다. 확인 후 다시 시도해주세요.");
+    }
+    // Bom 에 대한 상세 정보가 존재하면 작업공정 수정 불가능
+    private void throwIfBomMasterDetailExistIsNotItemUpdateWorkProcess(BomMaster bomMaster) throws BadRequestException {
+        boolean exists = bomItemDetailRepository.existsByBomMasterAndDeleteYnFalse(bomMaster);
+        if (exists) throw new BadRequestException("Bom 에 대한 상세정보가 등록되어 있으므로 작업공정 수정이 불가능합니다. 확인 후 다시 시도해주세요.");
     }
 }

@@ -81,6 +81,7 @@ public class ProduceOrderServiceImpl implements ProduceOrderService {
     @Override
     public ProduceOrderResponse updateProduceOrder(Long produceOrderId, ProduceOrderRequest newProduceOrderRequest) throws NotFoundException, BadRequestException {
         ProduceOrder findProduceOrder = getProduceOrderOrThrow(produceOrderId);
+
         // 제조오더에 해당하는 작업지시가 한개라도 진행중이면 수주품목 필드 수정 불가
         throwIfWorkOrderStateNotItemInfoUpdate(findProduceOrder.getId(), findProduceOrder.getContractItem().getId(), newProduceOrderRequest.getContractItem());
         // 제조오더에 해당하는 구매요청이 한개라도 진행중이거나 완료일 경우엔 수주품목 필드 수정 불가
@@ -97,17 +98,23 @@ public class ProduceOrderServiceImpl implements ProduceOrderService {
 
     // 제조오더에 해당하는 구매요청이 한개라도 진행중이거나 완료일 경우엔 수주품목 필드 수정 불가
     private void throwIfPurchsaeRequestOrderStateNotItemInfoUpdate(Long purchaseOrderId, Long findContractItemId, Long newContractItemId) throws BadRequestException {
-        boolean b = purchaseRequestRepository.findOrderStateByPurchaseOrder(purchaseOrderId).stream().noneMatch(m -> m.equals(SCHEDULE));
-        if (b && !findContractItemId.equals(newContractItemId)) {
-            throw new BadRequestException("제조오더에 해당하는 구매입고가 진행중일 경우엔 품목정보를 수정할수없습니다.");
+        List<OrderState> orderStates = purchaseRequestRepository.findOrderStateByPurchaseOrder(purchaseOrderId);
+        if (!orderStates.isEmpty()) {
+            boolean b = orderStates.stream().noneMatch(m -> m.equals(SCHEDULE));
+            if (b && !findContractItemId.equals(newContractItemId)) {
+                throw new BadRequestException("제조오더에 해당하는 구매입고가 진행중일 경우엔 품목정보를 수정할수없습니다.");
+            }
         }
     }
 
     // 제조오더에 해당하는 작업지시가 한개라도 진행중이면 수주품목 필드 수정 불가
     private void throwIfWorkOrderStateNotItemInfoUpdate(Long produceOrderId, Long findContractItemId, Long newContractItemId) throws BadRequestException {
-        boolean b = workOrderDetailRepository.findOrderStatesByProduceOrderId(produceOrderId).stream().noneMatch(m -> m.equals(SCHEDULE));
-        if (b && !findContractItemId.equals(newContractItemId)) {
-            throw new BadRequestException("제조오더에 해당하는 작업지시 중 하나라도 진행중이나 완료일 경우에는 품목정보를 수정할수없습니다.");
+        List<OrderState> orderStates = workOrderDetailRepository.findOrderStatesByProduceOrderId(produceOrderId);
+        if (!orderStates.isEmpty()) {
+            boolean b = orderStates.stream().noneMatch(m -> m.equals(SCHEDULE));
+            if (b && !findContractItemId.equals(newContractItemId)) {
+                throw new BadRequestException("제조오더에 해당하는 작업지시 중 하나라도 진행중이나 완료일 경우에는 품목정보를 수정할수없습니다.");
+            }
         }
     }
 

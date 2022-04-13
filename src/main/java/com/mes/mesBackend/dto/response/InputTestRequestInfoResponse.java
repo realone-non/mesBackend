@@ -59,6 +59,9 @@ public class InputTestRequestInfoResponse {
     @Schema(description = "품명")
     String itemName;
 
+    @Schema(description = "품목 규격")
+    String itemStandard;
+
 //    @Schema(description = "고객사 품번")
 //    String itemClientPartNo;
 
@@ -89,8 +92,8 @@ public class InputTestRequestInfoResponse {
     @Schema(description = "요청수량")
     int requestAmount;
 
-    @Schema(description = "긴급여부")
-    Boolean urgentYn;
+    @Schema(description = "수입검사여부")
+    Boolean inputTestYn;
 
     @Schema(description = "시험성적서")
     Boolean testReportYn;
@@ -123,7 +126,7 @@ public class InputTestRequestInfoResponse {
             setPurchaseOrderNo(null);
             setTestCompletionRequestDate(null);
             setWorkOrderNo(null);
-            setUrgentYn(null);
+            setInputTestYn(null);
             setTestReportYn(null);
             setCoc(null);
         } else if (inputTestDivision.equals(PRODUCT)) {
@@ -133,7 +136,7 @@ public class InputTestRequestInfoResponse {
             setPurchaseOrderNo(null);
             setItemManufacturerPartNo(null);
             setLotMasterId(null);
-            setUrgentYn(null);
+            setInputTestYn(null);
             setTestReportYn(null);
             setCoc(null);
             setTestType(null);

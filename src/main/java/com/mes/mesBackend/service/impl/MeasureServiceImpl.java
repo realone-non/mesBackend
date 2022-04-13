@@ -49,10 +49,10 @@ public class MeasureServiceImpl implements MeasureService {
         return mapper.toResponse(measure, MeasureResponse.class);
     }
 
-    // 계측기 전체 조회 검색조건: 검색조건: GAUGE유형, 검교정대상(월)
+    // 계측기 전체 조회 검색조건: 검색조건: GAUGE유형, 검교정 주기
     @Override
-    public List<MeasureResponse> getMeasures(Long gaugeId, Long month) {
-        List<Measure> measures = measureRepository.findAllByCondition(gaugeId, month);
+    public List<MeasureResponse> getMeasures(Long gaugeId, Integer calibrationCycle) {
+        List<Measure> measures = measureRepository.findAllByCondition(gaugeId, calibrationCycle);
         return mapper.toListResponses(measures, MeasureResponse.class);
     }
 

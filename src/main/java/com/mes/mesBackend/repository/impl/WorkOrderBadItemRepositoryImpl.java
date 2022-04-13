@@ -1,8 +1,6 @@
 package com.mes.mesBackend.repository.impl;
 
-import com.mes.mesBackend.dto.response.BadItemEnrollmentResponse;
-import com.mes.mesBackend.dto.response.PopBadItemTypeResponse;
-import com.mes.mesBackend.dto.response.PopTestBadItemResponse;
+import com.mes.mesBackend.dto.response.*;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.repository.custom.WorkOrderBadItemRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -26,59 +24,6 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
     final QWorkProcess workProcess = QWorkProcess.workProcess;
     final QLotEquipmentConnect lotEquipmentConnect = QLotEquipmentConnect.lotEquipmentConnect;
 
-    @Override
-    public Optional<BadItemEnrollmentResponse> findWorkOrderEnrollmentResponseById(Long id) {
-        return Optional.ofNullable(
-                jpaQueryFactory
-                        .select(
-                            Projections.fields(
-                                    BadItemEnrollmentResponse.class,
-                                    workOrderBadItem.id.as("badItemId"),
-                                    workProcess.id.as("workProcessId"),
-                                    workProcess.workProcessName.as("workProcessName"),
-                                    badItem.badItemName.as("badItemName"),
-                                    workOrderBadItem.badItemAmount.as("badItemAmount"),
-                                    lotMaster.lotNo.as("lotNo")
-                            )
-                        )
-                        .from(workOrderBadItem)
-                        .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(workOrderBadItem.workOrderDetail.id))
-                        .leftJoin(lotMaster).on(lotMaster.id.eq(workOrderBadItem.lotMaster.id))
-                        .leftJoin(badItem).on(badItem.id.eq(workOrderBadItem.badItem.id))
-                        .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.id))
-                        .where(
-                                workOrderBadItem.id.eq(id),
-                                workOrderBadItem.deleteYn.isFalse()
-                        )
-                        .fetchOne()
-        );
-    }
-
-    @Override
-    public List<BadItemEnrollmentResponse> findWorkOrderEnrollmentResponsesByWorkOrderId(Long workOrderId) {
-        return jpaQueryFactory
-                .select(
-                        Projections.fields(
-                                BadItemEnrollmentResponse.class,
-                                workOrderBadItem.id.as("badItemId"),
-                                workProcess.id.as("workProcessId"),
-                                workProcess.workProcessName.as("workProcessName"),
-                                badItem.badItemName.as("badItemName"),
-                                workOrderBadItem.badItemAmount.as("badItemAmount"),
-                                lotMaster.lotNo.as("lotNo")
-                        )
-                )
-                .from(workOrderBadItem)
-                .leftJoin(lotMaster).on(lotMaster.id.eq(workOrderBadItem.lotMaster.id))
-                .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(workOrderBadItem.workOrderDetail.id))
-                .leftJoin(badItem).on(badItem.id.eq(workOrderBadItem.badItem.id))
-                .leftJoin(workProcess).on(workProcess.id.eq(badItem.workProcess.id))
-                .where(
-                        workOrderDetail.id.eq(workOrderId),
-                        workOrderBadItem.deleteYn.isFalse()
-                )
-                .fetch();
-    }
     // 해당하는 lot 의 badItem 모두
     @Override
     public List<Long> findBadItemIdByLotMasterId(Long lotMasterId) {
@@ -158,6 +103,7 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                         isWorkProcessIdEq(workProcessId),
                         isBadItemDeleteYnFalse()
                 )
+                .orderBy(workProcess.orders.asc(), badItem.orders.asc())      // 공정 순번 별 정렬 , 불량 순번 별 정렬
                 .fetch();
     }
 
@@ -205,24 +151,19 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
 
     // dummyLot 에 해당하는 불량유형 별 불량수량
     @Override
-    public List<BadItemEnrollmentResponse> findByDummyLotIdGroupByBadItemType(Long dummyLotId) {
+    public List<WorkOrderBadItemStatusDetailResponse> findByDummyLotIdGroupByBadItemType(Long dummyLotId) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
-                                BadItemEnrollmentResponse.class,
-                                workOrderBadItem.workOrderDetail.id.as("workOrderId"),
+                                WorkOrderBadItemStatusDetailResponse.class,
                                 badItem.id.as("badItemId"),
                                 badItem.badItemName.as("badItemName"),
-                                workOrderBadItem.badItemAmount.sum().as("badItemAmount"),
-                                badItem.workProcess.id.as("workProcessId"),
-                                workProcess.workProcessName.as("workProcessName")
+                                workOrderBadItem.badItemAmount.sum().as("badItemAmount")
                         )
                 )
                 .from(workOrderBadItem)
                 .leftJoin(lotEquipmentConnect).on(lotEquipmentConnect.childLot.id.eq(workOrderBadItem.lotMaster.id))
                 .leftJoin(badItem).on(badItem.id.eq(workOrderBadItem.badItem.id))
-                .leftJoin(workProcess).on(workProcess.id.eq(badItem.workProcess.id))
-                .leftJoin(workOrderDetail).on(workOrderDetail.id.eq(workOrderBadItem.workOrderDetail.id))
                 .groupBy(lotEquipmentConnect.parentLot.id)
                 .groupBy(workOrderBadItem.badItem.id)
                 .where(
@@ -230,6 +171,54 @@ public class WorkOrderBadItemRepositoryImpl implements WorkOrderBadItemRepositor
                         workOrderBadItem.deleteYn.isFalse()
                 )
                 .fetch();
+    }
+
+    @Override
+    public List<WorkOrderBadItem> findByWorkOrderDetailIdAndBadItemId(Long workOrderDetailId, Long badItemId) {
+        return jpaQueryFactory
+                .selectFrom(workOrderBadItem)
+                .where(
+                        workOrderBadItem.workOrderDetail.id.eq(workOrderDetailId),
+                        workOrderBadItem.badItem.id.eq(badItemId),
+                        workOrderBadItem.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+
+    // 설비 lot 에 해당하는 등록된 불량 전체 조회
+    @Override
+    public List<WorkOrderDetailBadItemResponse> findWorkOrderDetailBadItemResponseByEquipmentLotId(Long equipmentId) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                WorkOrderDetailBadItemResponse.class,
+                                workOrderBadItem.id.as("enrollmentBadItemId"),
+                                workOrderBadItem.badItem.id.as("badItemTypeId"),
+                                workOrderBadItem.badItem.badItemName.as("badItemTypeName"),
+                                workOrderBadItem.badItemAmount.as("badItemAmount")
+                        )
+                )
+                .from(workOrderBadItem)
+                .where(
+                        workOrderBadItem.lotMaster.id.eq(equipmentId),
+                        workOrderBadItem.deleteYn.isFalse(),
+                        workOrderBadItem.division.eq(EQUIPMENT_LOT)
+                )
+                .fetch();
+    }
+
+    // 불량유형이 불량등록 정보에 존재하는지
+    @Override
+    public boolean existByBadItemAndDeleteYnFalse(Long badItemId) {
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(workOrderBadItem)
+                .where(
+                        workOrderBadItem.badItem.id.eq(badItemId),
+                        workOrderBadItem.deleteYn.isFalse()
+                )
+                .fetchFirst();
+        return fetchOne != null;
     }
 
     private BooleanExpression isWorkProcessIdEq(Long workProcessId) {

@@ -139,10 +139,11 @@ public class PopController {
             @RequestParam @Parameter(description = "양품 수량") int stockAmount,
             @RequestParam @Parameter(description = "불량 수량") int badItemAmount,
             @RequestParam @Parameter(description = "설비 id") Long equipmentId,
+            @RequestParam(required = false) @Parameter(description = "충진공정 설비 id") Long fillingEquipmentCode,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
-        Long lotId = popService.createWorkOrder(workOrderId, itemId, userCode, productAmount, stockAmount, badItemAmount, equipmentId);
+        Long lotId = popService.createWorkOrder(workOrderId, itemId, userCode, productAmount, stockAmount, badItemAmount, equipmentId, fillingEquipmentCode);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is viewed the list of from getPopWorkOrders.");
         return new ResponseEntity<>(lotId, OK);
