@@ -184,10 +184,22 @@ public class PopServiceImpl implements PopService {
         int beforeProductionAmount = workOrder.getProductionAmount();
         Equipment equipment = getEquipmentOrThrow(equipmentId);
         BadItem badItem = new BadItem();
+
         // 공정에 해당하는 첫번째 불량유형
         if (badItemAmount != 0) {
             badItem = workOrderBadItemRepo.findByWorkOrderIdLimitOne(workProcess.getId())
                     .orElseThrow(() -> new NotFoundException("해당 공정에 등록된 불량유형이 존재하지 않습니다."));
+        }
+
+        // 원료혼합 공정에서 선택한 충진공정 설비 produceYn false 로 변경
+        if (fillingEquipmentCode != null) {
+            Equipment fillingEquipment = getEquipmentOrThrow(fillingEquipmentCode);
+
+            // 입력한 설비가 produceYn 이 true 인지 체크(true: 생산 가능, false: 생산 불가능)
+            if (!fillingEquipment.isProduceYn()) throw new BadRequestException("입력한 설비는 현재 사용 다른 제품 생산중이므로 사용이 불가능 합니다.");
+
+            fillingEquipment.setProduceYn(false);
+            equipmentRepository.save(fillingEquipment);
         }
 
         // 작업지시의 상태가 COMPLETION 일 경우 더 이상 추가 할 수 없음. 추가하려면 workOrderDetail 의 productionAmount(지시수량) 을 늘려야함
@@ -375,6 +387,8 @@ public class PopServiceImpl implements PopService {
 //                }
             }
         }
+
+
         workOrder.setProductionAmount(beforeProductionAmount + productAmount);  // productionAmount 변경
         workOrderDetailRepository.save(workOrder);
 
@@ -833,16 +847,16 @@ public class PopServiceImpl implements PopService {
             throw new BadRequestException("입력한 설비가 충진공정의 설비에 해당되지 않습니다.");
 
         // 입력한 설비가 produceYn 이 true 인지 체크(true: 생산 가능, false: 생산 불가능)
-        if (!fillingEquipment.isProduceYn())
-            throw new BadRequestException("입력한 설비는 현재 사용 다른 제품 생산중이므로 사용이 불가능 합니다.");
+//        if (!fillingEquipment.isProduceYn())
+//            throw new BadRequestException("입력한 설비는 현재 사용 다른 제품 생산중이므로 사용이 불가능 합니다.");
 
         // realLot 에 inputEquipment 저장
         realLot.setInputEquipment(fillingEquipment);
         lotMasterRepo.save(realLot);
 
         // 설비 생산불가능 상태로 변경
-        fillingEquipment.setProduceYn(false);
-        equipmentRepository.save(fillingEquipment);
+//        fillingEquipment.setProduceYn(false);
+//        equipmentRepository.save(fillingEquipment);
     }
 
     // 충진공정 설비 고장등록 api
