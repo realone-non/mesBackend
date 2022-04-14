@@ -158,14 +158,14 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
     @Transactional(readOnly = true)
     public LocalDate findPeriodDateByPurchaseOrderId(Long purchaseOrderId) {
         return jpaQueryFactory
-                .select(purchaseRequest.periodDate)
+                .select(purchaseRequest.purchasePeriodDate)
                 .from(purchaseRequest)
                 .leftJoin(purchaseOrder).on(purchaseOrder.id.eq(purchaseRequest.id))
                 .where(
                         purchaseRequest.deleteYn.isFalse(),
                         purchaseRequest.purchaseOrder.id.eq(purchaseOrderId)
                 )
-                .orderBy(purchaseRequest.periodDate.desc())
+                .orderBy(purchaseRequest.purchasePeriodDate.desc())
                 .limit(1)
                 .fetchOne();
     }
@@ -196,7 +196,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
 //                                purchaseRequest.orderPossibleAmount.as("orderPossibleAmount"),
 //                                purchaseRequest.inputAmount.as("inputAmount"),
                                 purchaseRequest.cancelAmount.as("cancelAmount"),    // 미구현
-                                purchaseRequest.periodDate.as("orderPeriodDate"),
+                                purchaseRequest.purchasePeriodDate.as("orderPeriodDate"),
                                 purchaseRequest.note.as("note"),
                                 client.clientName.as("manufacturerName"),
                                 purchaseRequest.ordersState.as("orderState"),
@@ -238,7 +238,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
 //                                purchaseRequest.orderPossibleAmount.as("orderPossibleAmount"),
 //                                purchaseRequest.inputAmount.as("inputAmount"),
                                 purchaseRequest.cancelAmount.as("cancelAmount"),
-                                purchaseRequest.periodDate.as("orderPeriodDate"),
+                                purchaseRequest.purchasePeriodDate.as("orderPeriodDate"),
                                 purchaseRequest.note.as("note"),
                                 client.clientName.as("manufacturerName"),
                                 purchaseRequest.ordersState.as("orderState"),
@@ -287,7 +287,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                 item.inputUnitPrice.as("unitPrice"),
                                 item.inputUnitPrice.multiply(purchaseRequest.orderAmount).as("orderPrice"),
                                 (purchaseRequest.orderAmount.multiply(item.inputUnitPrice).doubleValue()).multiply(0.1).as("vat"),
-                                purchaseRequest.periodDate.as("orderPeriodDate"),
+                                purchaseRequest.purchasePeriodDate.as("orderPeriodDate"),
                                 user.id.as("userId"),
                                 user.korName.as("userName"),
                                 purchaseOrder.note.as("note"),
@@ -341,7 +341,7 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
                                         item.inputUnitPrice.as("unitPrice"),
                                         item.inputUnitPrice.multiply(purchaseRequest.orderAmount).as("orderPrice"),
                                         (purchaseRequest.orderAmount.multiply(item.inputUnitPrice).doubleValue()).multiply(0.1).as("vat"),
-                                        purchaseRequest.periodDate.as("orderPeriodDate"),
+                                        purchaseRequest.purchasePeriodDate.as("orderPeriodDate"),
                                         user.korName.as("userName"),
                                         purchaseOrder.note.as("note"),
                                         wareHouse.wareHouseName.as("wareHouseName"),

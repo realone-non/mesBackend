@@ -69,7 +69,7 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                                 purchaseRequest.requestDate.as("requestDate"),
                                 purchaseRequest.requestAmount.as("requestAmount"),
                                 purchaseRequest.orderAmount.as("orderAmount"),
-                                purchaseRequest.periodDate.as("purchasePeriodDate"),
+                                purchaseRequest.purchasePeriodDate.as("purchasePeriodDate"),
                                 item.testType.as("testType"),
                                 item.manufacturer.clientName.as("itemManufacturerName"),
                                 purchaseRequest.note.as("note"),
@@ -122,7 +122,7 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                                 purchaseRequest.requestDate.as("requestDate"),
                                 purchaseRequest.requestAmount.as("requestAmount"),
                                 purchaseRequest.orderAmount.as("orderAmount"),
-                                purchaseRequest.periodDate.as("purchasePeriodDate"),
+                                purchaseRequest.purchasePeriodDate.as("purchasePeriodDate"),
                                 item.testType.as("testType"),
                                 item.manufacturer.clientName.as("itemManufacturerName"),
                                 purchaseRequest.note.as("note"),
@@ -243,7 +243,7 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                 .from(purchaseRequest)
                 .innerJoin(item).on(item.id.eq(purchaseRequest.item.id))
                 .where(
-                        purchaseRequest.periodDate.eq(fromDate),
+                        purchaseRequest.purchasePeriodDate.eq(fromDate),
                         purchaseRequest.item.id.eq(itemId),
                         purchaseRequest.deleteYn.eq(false)
                 )

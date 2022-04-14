@@ -360,7 +360,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                                 lotMaster.lotNo.as("lotNo"),
                                 inputTestRequest.createdDate.as("requestDate"),
                                 inputTestRequest.requestAmount.as("requestAmount"),
-                                purchaseRequest.periodDate.as("purchaseInputPeriodDate"),   // purchaseInput
+                                purchaseRequest.purchasePeriodDate.as("purchaseInputPeriodDate"),   // purchaseInput
                                 outSourcingProductionRequest.periodDate.as("outsourcingPeriodDate"),  // outsourcing
                                 wareHouse.wareHouseName.as("wareHouseName"),
                                 client.clientName.as("clientName"),
