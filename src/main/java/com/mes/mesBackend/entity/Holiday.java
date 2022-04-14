@@ -21,7 +21,7 @@ public class Holiday extends BaseTimeEntity {
     @Column(name = "ID", columnDefinition = "bigint COMMENT '휴일 고유아이디'")
     private Long id;
 
-    @Column(name = "DATE", columnDefinition = "date COMMENT '휴일일자'")
+    @Column(name = "DATE", nullable = false, columnDefinition = "date COMMENT '휴일일자'")
     private LocalDate date; // 휴일일자
 
     @Column(name = "DAY", columnDefinition = "varchar(255) COMMENT '요일'")
