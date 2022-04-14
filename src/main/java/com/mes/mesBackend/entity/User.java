@@ -41,10 +41,10 @@ public class User extends BaseTimeEntity implements UserDetails {
     @JoinColumn(name = "DEPARTMENTS_ID", columnDefinition = "bigint COMMENT '부서'")
     private Department department;  // 부서
 
-    @Column(name = "POSITION", nullable = false, columnDefinition = "varchar(255) COMMENT '직위'")
+    @Column(name = "POSITION",  columnDefinition = "varchar(255) COMMENT '직위'")
     private String position;    // 직위
 
-    @Column(name = "JOb", nullable = false, columnDefinition = "varchar(255) COMMENT '직무'")
+    @Column(name = "JOb",  columnDefinition = "varchar(255) COMMENT '직무'")
     private String job;         // 직무
 
     @Column(name = "TEL_NUMBER", columnDefinition = "varchar(255) COMMENT '연락처'")
