@@ -284,18 +284,33 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                 .where(
                         purchaseInput.deleteYn.isFalse(),
                         isCreatedDateBetween(fromDate, toDate)
-//                        purchaseInput.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))
                 )
                 .fetch();
     }
 
     private BooleanExpression isCreatedDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? purchaseInput.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)) : null;
+        if (fromDate != null && toDate != null) {
+            return purchaseInput.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0));
+        } else if (fromDate != null) {
+            return purchaseInput.createdDate.after(fromDate.atStartOfDay());
+        } else if (toDate != null) {
+            return purchaseInput.createdDate.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0));
+        } else {
+            return null;
+        }
     }
 
     // 입고기간
     private BooleanExpression isInputDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? purchaseRequest.inputDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return purchaseRequest.inputDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return purchaseRequest.inputDate.after(fromDate).or(purchaseRequest.inputDate.eq(fromDate));
+        } else if (toDate != null) {
+            return purchaseRequest.inputDate.before(toDate).or(purchaseRequest.inputDate.eq(toDate));
+        } else {
+            return null;
+        }
     }
     // 입고창고
     private BooleanExpression isWareHouseEq(Long wareHouseId) {

@@ -856,6 +856,14 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     }
 
     private  BooleanExpression dateNull(LocalDate startDate, LocalDate endDate){
-        return startDate != null ? lotMaster.createdDate.between(startDate.atStartOfDay(), LocalDateTime.of(endDate, LocalTime.MAX).withNano(0)) : null;
+        if (startDate != null && endDate != null) {
+            return lotMaster.createdDate.between(startDate.atStartOfDay(), LocalDateTime.of(endDate, LocalTime.MAX).withNano(0));
+        } else if (startDate != null) {
+            return lotMaster.createdDate.after(startDate.atStartOfDay());
+        } else if (endDate != null) {
+            return lotMaster.createdDate.before(LocalDateTime.of(endDate, LocalTime.MAX).withNano(0));
+        } else {
+            return null;
+        }
     }
 }

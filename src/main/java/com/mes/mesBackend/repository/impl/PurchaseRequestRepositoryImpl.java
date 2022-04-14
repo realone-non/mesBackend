@@ -69,12 +69,15 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                                 purchaseRequest.requestDate.as("requestDate"),
                                 purchaseRequest.requestAmount.as("requestAmount"),
                                 purchaseRequest.orderAmount.as("orderAmount"),
-                                purchaseRequest.periodDate.as("purchasePeriodDate"),
+                                purchaseRequest.purchasePeriodDate.as("purchasePeriodDate"),
                                 item.testType.as("testType"),
                                 item.manufacturer.clientName.as("itemManufacturerName"),
                                 purchaseRequest.note.as("note"),
                                 contractItem.item.itemNo.as("modelItemNo"),
-                                contract.periodDate.as("periodDate")
+                                contract.periodDate.as("periodDate"),
+                                purchaseRequest.inputTestYn.as("inputTestYn"),
+                                purchaseRequest.stockUnitRequestAmount.as("stockUnitRequestAmount"),
+                                purchaseRequest.stockUnitOrderAmount.as("stockUnitOrderAmount")
                         )
                 )
                 .from(purchaseRequest)
@@ -121,12 +124,15 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                                 purchaseRequest.requestDate.as("requestDate"),
                                 purchaseRequest.requestAmount.as("requestAmount"),
                                 purchaseRequest.orderAmount.as("orderAmount"),
-                                purchaseRequest.periodDate.as("purchasePeriodDate"),
+                                purchaseRequest.purchasePeriodDate.as("purchasePeriodDate"),
                                 item.testType.as("testType"),
                                 item.manufacturer.clientName.as("itemManufacturerName"),
                                 purchaseRequest.note.as("note"),
                                 contractItem.item.itemNo.as("modelItemNo"),
-                                contract.periodDate.as("periodDate")
+                                contract.periodDate.as("periodDate"),
+                                purchaseRequest.inputTestYn.as("inputTestYn"),
+                                purchaseRequest.stockUnitRequestAmount.as("stockUnitRequestAmount"),
+                                purchaseRequest.stockUnitOrderAmount.as("stockUnitOrderAmount")
                         )
                 )
                 .from(purchaseRequest)
@@ -241,7 +247,7 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                 .from(purchaseRequest)
                 .innerJoin(item).on(item.id.eq(purchaseRequest.item.id))
                 .where(
-                        purchaseRequest.periodDate.eq(fromDate),
+                        purchaseRequest.purchasePeriodDate.eq(fromDate),
                         purchaseRequest.item.id.eq(itemId),
                         purchaseRequest.deleteYn.eq(false)
                 )
@@ -280,7 +286,15 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
 
     // 요청기간
     private BooleanExpression isRequestDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? purchaseRequest.requestDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return purchaseRequest.requestDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return purchaseRequest.requestDate.after(fromDate).or(purchaseRequest.requestDate.eq(fromDate));
+        } else if (toDate != null) {
+            return purchaseRequest.requestDate.before(toDate).or(purchaseRequest.requestDate.eq(toDate));
+        } else {
+            return null;
+        }
     }
     // 제조오더번호
     private BooleanExpression isProduceOrderNoContain(String produceOrderNo) {

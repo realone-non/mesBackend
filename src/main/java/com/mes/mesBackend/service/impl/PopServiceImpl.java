@@ -176,17 +176,30 @@ public class PopServiceImpl implements PopService {
             int productAmount,  // 생산수량
             int stockAmount,    // 양품수량
             int badItemAmount,  // 불량수량
-            Long equipmentId
+            Long equipmentId,
+            Long fillingEquipmentCode     // 원료혼합에서만 입력하는 충진공정 설비 id(생성되는 equipmentLot 에 넣어야함)
     ) throws NotFoundException, BadRequestException {
         WorkOrderDetail workOrder = getWorkOrderDetailOrThrow(workOrderId);
         WorkProcess workProcess = workOrder.getWorkProcess();
         int beforeProductionAmount = workOrder.getProductionAmount();
         Equipment equipment = getEquipmentOrThrow(equipmentId);
         BadItem badItem = new BadItem();
+
         // 공정에 해당하는 첫번째 불량유형
         if (badItemAmount != 0) {
             badItem = workOrderBadItemRepo.findByWorkOrderIdLimitOne(workProcess.getId())
                     .orElseThrow(() -> new NotFoundException("해당 공정에 등록된 불량유형이 존재하지 않습니다."));
+        }
+
+        // 원료혼합 공정에서 선택한 충진공정 설비 produceYn false 로 변경
+        if (fillingEquipmentCode != null) {
+            Equipment fillingEquipment = getEquipmentOrThrow(fillingEquipmentCode);
+
+            // 입력한 설비가 produceYn 이 true 인지 체크(true: 생산 가능, false: 생산 불가능)
+            if (!fillingEquipment.isProduceYn()) throw new BadRequestException("입력한 설비는 현재 사용 다른 제품 생산중이므로 사용이 불가능 합니다.");
+
+            fillingEquipment.setProduceYn(false);
+            equipmentRepository.save(fillingEquipment);
         }
 
         // 작업지시의 상태가 COMPLETION 일 경우 더 이상 추가 할 수 없음. 추가하려면 workOrderDetail 의 productionAmount(지시수량) 을 늘려야함
@@ -218,23 +231,24 @@ public class PopServiceImpl implements PopService {
         Item item = getItemOrThrow(itemId);
         WareHouse wareHouse = lotMasterService.getLotMasterWareHouseOrThrow();
 
+        Long fillEquipmentId = workProcess.getWorkProcessDivision().equals(MATERIAL_MIXING) ? fillingEquipmentCode : null;
+
         // 작업지시의 공정이 충진일때 전 공정인 원료혼합에서 만든 반제품이 없으면 예외
         if (workProcess.getWorkProcessDivision().equals(FILLING)) {
             lotConnectRepo.findByTodayProduceOrderAndEquipmentIdEqAndLotStockAmountOneLoe(workOrder.getProduceOrder().getId(), equipment.getId(), LocalDate.now())
-                    .orElseThrow(() -> new BadRequestException("입력한 설비로트와 같은 제조오더의 원료혼합 공정에서 생성 된 반제품이 존재하지 않습니다. " +
-                            "원료혼합 공정에서 반제품 생성 한 다음 충진공정 설비 지정 후에 다시 시도해주세요."));
+                    .orElseThrow(() -> new BadRequestException("원료혼합에서 반제품 생성이 되었지만 등록완료 버튼을 누르지 않았거나, 원료혼합 공정에서 해당 충진에 대한 반제품이 생성되지 않았습니다. 확인 후 다시 시도해주세요."));
         }
 
         if (workOrder.getOrderState().equals(SCHEDULE)) {
             // dummyLot 생성: 품목, 창고, 생성수량, 등록유형, 설비유형, lot 생성 구분
             dummyLotRequest.putPopWorkOrder(    // 더미로트에 재고수량은 관리 안함
-                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, 0, badItemAmount, PRODUCTION, equipmentId, DUMMY_LOT
+                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, 0, badItemAmount, PRODUCTION, equipmentId, DUMMY_LOT, null
             );
             dummyLot = lotHelper.createLotMaster(dummyLotRequest);
 
             // equipmentLot 생성: 품목, 창고, 생성수량, 등록유형, 설비유형, lot 생성 구분
             equipmentLotRequest.putPopWorkOrder(
-                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT
+                    item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT, fillEquipmentId
             );
             equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
 
@@ -301,7 +315,7 @@ public class PopServiceImpl implements PopService {
 
                 if (materialMixingRealLot == null) {
                     // equipmentLot 생성
-                    equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
+                    equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT, fillEquipmentId);
                     equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
                     lotMasterRepo.save(equipmentLot);
 
@@ -324,7 +338,7 @@ public class PopServiceImpl implements PopService {
                 }
             } else {
                 // 작업수량 들어올때마다 equipmentLot 생성으로 로직변경 - 2022.03.02
-                equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT);
+                equipmentLotRequest.putPopWorkOrder(item, workProcess.getWorkProcessDivision(), wareHouse, productAmount, stockAmount, badItemAmount, PRODUCTION, equipmentId, EQUIPMENT_LOT, fillEquipmentId);
                 equipmentLot = lotHelper.createLotMaster(equipmentLotRequest);
                 lotMasterRepo.save(equipmentLot);
 
@@ -371,6 +385,8 @@ public class PopServiceImpl implements PopService {
 //                }
             }
         }
+
+
         workOrder.setProductionAmount(beforeProductionAmount + productAmount);  // productionAmount 변경
         workOrderDetailRepository.save(workOrder);
 
@@ -752,7 +768,8 @@ public class PopServiceImpl implements PopService {
                 0,
                 equipmentLot.getEnrollmentType(),
                 equipmentLot.getEquipment().getId(),
-                REAL_LOT
+                REAL_LOT,
+                null
         );
         realLot = lotHelper.createLotMaster(realLotRequest);
         // 분할 된 lot 와 부모로트 생성
@@ -828,16 +845,16 @@ public class PopServiceImpl implements PopService {
             throw new BadRequestException("입력한 설비가 충진공정의 설비에 해당되지 않습니다.");
 
         // 입력한 설비가 produceYn 이 true 인지 체크(true: 생산 가능, false: 생산 불가능)
-        if (!fillingEquipment.isProduceYn())
-            throw new BadRequestException("입력한 설비는 현재 사용 다른 제품 생산중이므로 사용이 불가능 합니다.");
+//        if (!fillingEquipment.isProduceYn())
+//            throw new BadRequestException("입력한 설비는 현재 사용 다른 제품 생산중이므로 사용이 불가능 합니다.");
 
         // realLot 에 inputEquipment 저장
         realLot.setInputEquipment(fillingEquipment);
         lotMasterRepo.save(realLot);
 
         // 설비 생산불가능 상태로 변경
-        fillingEquipment.setProduceYn(false);
-        equipmentRepository.save(fillingEquipment);
+//        fillingEquipment.setProduceYn(false);
+//        equipmentRepository.save(fillingEquipment);
     }
 
     // 충진공정 설비 고장등록 api

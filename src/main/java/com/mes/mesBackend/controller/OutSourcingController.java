@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -77,8 +79,8 @@ public class OutSourcingController {
             @RequestParam(required = false) @Parameter(description = "외주사 ID") Long clientId,
             @RequestParam(required = false) @Parameter(description = "아이템 품번") String itemNo,
             @RequestParam(required = false) @Parameter(description = "아이템 품명") String itemName,
-            @RequestParam(required = false) @Parameter(description = "시작날짜") LocalDate startDate,
-            @RequestParam(required = false) @Parameter(description = "종료날짜") LocalDate endDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "시작날짜") LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "종료날짜") LocalDate endDate,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         List<OutsourcingProductionResponse> productions = outsourcingService.getOutsourcingProductions(clientId, itemNo, itemName, startDate, endDate);

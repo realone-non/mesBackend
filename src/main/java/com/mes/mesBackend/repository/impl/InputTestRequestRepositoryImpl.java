@@ -459,7 +459,15 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     }
     // 의뢰기간
     private BooleanExpression isRequestDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? inputTestRequest.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)) : null;
+        if (fromDate != null && toDate != null) {
+            return inputTestRequest.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0));
+        } else if (fromDate != null) {
+            return inputTestRequest.createdDate.after(fromDate.atStartOfDay());
+        } else if (toDate != null) {
+            return inputTestRequest.createdDate.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0));
+        } else {
+            return null;
+        }
     }
     // 삭제여부
     private BooleanExpression isInputTestRequestDeleteYnFalse() {

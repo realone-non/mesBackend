@@ -42,7 +42,7 @@ public interface UserService {
 
     User getUserOrThrow(Long id) throws NotFoundException;
 
-    TokenResponse reissue(TokenRequest tokenRequestDto) throws CustomJwtException;
+    TokenResponse reissue(TokenRequest tokenRequestDto) throws CustomJwtException, NotFoundException;
 
     // =============================== 18-3. 사용자 등록 ===============================
     // 사용자 생성

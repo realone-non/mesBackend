@@ -49,7 +49,8 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
                                 equipment.equipmentName.as("equipmentName"),
                                 lotEquipmentConnect.processStatus.as("processStatus"),
                                 lotEquipmentConnect.modifiedDate.as("updateDateTime"),
-                                lotEquipmentConnect.childLot.createdAmount.as("createdAmount")
+                                lotEquipmentConnect.childLot.createdAmount.as("createdAmount"),
+                                lotEquipmentConnect.childLot.inputEquipment.id.as("fillingEquipmentCode")
                         )
                 )
                 .from(lotEquipmentConnect)

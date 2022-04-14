@@ -53,7 +53,7 @@ public class EquipmentBreakdown extends BaseTimeEntity {
     @JoinColumn(name = "EQUIPMENT", columnDefinition = "bigint COMMENT '설비정보'", nullable = false)
     private Equipment equipment;            // 설비정보
 
-    @Column(name = "REPORT_DATE", columnDefinition = "datetime COMMENT '신고일시'", nullable = false)
+    @Column(name = "REPORT_DATE", columnDefinition = "datetime COMMENT '신고일시'")
     private LocalDateTime reportDate;       // 신고일시
 
     @Column(name = "REQUEST_BREAK_TYPE", columnDefinition = "varchar(255) COMMENT '요청시 고장유형'")

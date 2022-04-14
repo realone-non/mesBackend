@@ -54,8 +54,8 @@ public class Equipment extends BaseTimeEntity {
     @JoinColumn(name = "CLIENT", columnDefinition = "bigint COMMENT '구매처'")
     private Client client;
 
-    @Column(name = "PURCHASE_DATE", columnDefinition = "datetime(6) COMMENT '구매일자'")
-    private LocalDateTime purchaseDate;        // 구매일자
+    @Column(name = "PURCHASE_DATE", columnDefinition = "date COMMENT '구매일자'")
+    private LocalDate purchaseDate;        // 구매일자
 
     @Column(name = "PURCHASE_AMOUNT", columnDefinition = "int COMMENT '구입금액'")
     private int purchaseAmount;      // 구입금액
@@ -66,8 +66,8 @@ public class Equipment extends BaseTimeEntity {
     @Column(name = "SERIAL_NO", columnDefinition = "varchar(255) COMMENT '시리얼번호'")
     private String serialNo;            // 시리얼번호
 
-    @Column(name = "START_DATE", columnDefinition = "datetime(6) COMMENT '생산개시일자'")
-    private LocalDateTime startDate;        // 생산개시일자
+    @Column(name = "START_DATE", columnDefinition = "date COMMENT '생산개시일자'")
+    private LocalDate startDate;        // 생산개시일자
 
     // 다대일 단방향
     @ManyToOne(fetch = LAZY)

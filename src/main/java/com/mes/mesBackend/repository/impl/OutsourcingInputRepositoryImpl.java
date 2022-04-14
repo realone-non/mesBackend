@@ -253,9 +253,10 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
         return jpaQueryFactory
                 .selectFrom(input)
                 .where(
-                        input.productionRequest.id.eq(requestId),
+                        request.id.eq(requestId),
                         input.deleteYn.isFalse()
                 )
+                .leftJoin(request).on(request.id.eq(input.productionRequest.id))
                 .orderBy(input.createdDate.desc())
                 .fetch();
     }
@@ -270,7 +271,15 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
     }
 
     private  BooleanExpression dateNull(LocalDate startDate, LocalDate endDate){
-        return startDate != null ? request.productionDate.between(startDate, endDate) : null;
+        if (startDate != null && endDate != null) {
+            return request.productionDate.between(startDate, endDate);
+        } else if (startDate != null) {
+            return request.productionDate.after(startDate).or(request.productionDate.eq(startDate));
+        } else if (endDate != null) {
+            return request.productionDate.before(endDate).or(request.productionDate.eq(endDate));
+        } else {
+            return null;
+        }
     }
 
     // 품번 검색

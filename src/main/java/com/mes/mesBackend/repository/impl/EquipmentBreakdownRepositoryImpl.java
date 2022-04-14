@@ -67,6 +67,7 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                         isEquipmentBreakdownDeleteYnFalse(),
                         equipmentBreakdown.visibleYn.isFalse()
                 )
+                .orderBy(equipmentBreakdown.createdDate.desc())
                 .fetch();
     }
 
@@ -127,6 +128,7 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                         equipmentBreakdownFile.deleteYn.isFalse(),
                         isEquipmentBreakdownIdEq(equipmentBreakdownId)
                 )
+                .orderBy(equipmentBreakdownFile.createdDate.desc())
                 .fetch();
     }
 
@@ -148,6 +150,7 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                         equipmentBreakdownFile.deleteYn.isFalse(),
                         isEquipmentBreakdownIdEq(equipmentBreakdownId)
                 )
+                .orderBy(equipmentBreakdownFile.createdDate.desc())
                 .fetch();
     }
     // ============================================== 17-3. 설비 수리내역 조회 ==============================================
@@ -190,6 +193,7 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                         isEquipmentBreakdownDeleteYnFalse(),
                         isRepairItemDeleteYnFalse()
                 )
+                .orderBy(repairItem.createdDate.desc())
                 .fetch();
     }
 
@@ -236,6 +240,7 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
                         isEquipmentBreakdownDeleteYnFalse(),
                         isRepairPartDeleteYn()
                 )
+                .orderBy(repairPart.createdDate.desc())
                 .fetch();
     }
     private BooleanExpression isRepairPartDeleteYn() {
@@ -256,10 +261,19 @@ public class EquipmentBreakdownRepositoryImpl implements EquipmentBreakdownRepos
     private BooleanExpression isEquipmentTypeContain(Long equipmentType) {
         return equipmentType != null ? workLine.id.eq(equipmentType) : null;
     }
+
     // 작업기간 fromDate~toDate
     private BooleanExpression isWorkDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? equipmentBreakdown.repairStartDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))
-                .or(equipmentBreakdown.repairEndDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))) : null;
+        if (fromDate != null && toDate != null) {
+            return equipmentBreakdown.repairStartDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))
+                    .or(equipmentBreakdown.repairEndDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)));
+        } else if (fromDate != null) {
+            return equipmentBreakdown.repairStartDate.after(fromDate.atStartOfDay()).or(equipmentBreakdown.repairEndDate.after(fromDate.atStartOfDay()));
+        } else if (toDate != null) {
+            return equipmentBreakdown.repairStartDate.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).or(equipmentBreakdown.repairEndDate.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)));
+        } else {
+            return null;
+        }
     }
     // 설비고장 삭제여부
     private BooleanExpression isEquipmentBreakdownDeleteYnFalse() {

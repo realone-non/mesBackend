@@ -55,7 +55,7 @@ public class MeasureCalibration extends BaseTimeEntity {
     @Column(name = "REQUEST_DATE", columnDefinition = "date COMMENT '요청일자'", nullable = false)
     private LocalDate requestDate;                  // 요청일자
 
-    @Column(name = "CALIBRATION_DATE", columnDefinition = "varchar(255) COMMENT '검교정일자'", nullable = false)
+    @Column(name = "CALIBRATION_DATE", columnDefinition = "DATE COMMENT '검교정일자'")
     private LocalDate calibrationDate;              // 검교정일자
 
     @Enumerated(STRING)

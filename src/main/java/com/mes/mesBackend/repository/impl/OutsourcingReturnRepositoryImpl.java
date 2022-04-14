@@ -126,6 +126,14 @@ public class OutsourcingReturnRepositoryImpl implements OutsourcingReturnReposit
     }
 
     private  BooleanExpression dateNull(LocalDate startDate, LocalDate endDate) {
-        return startDate != null ? outsourcingReturn.returnDate.between(startDate, endDate) : null;
+        if (startDate != null && endDate != null) {
+            return outsourcingReturn.returnDate.between(startDate, endDate);
+        } else if (startDate != null) {
+            return outsourcingReturn.returnDate.after(startDate).or(outsourcingReturn.returnDate.eq(startDate));
+        } else if (endDate != null) {
+            return outsourcingReturn.returnDate.before(endDate).or(outsourcingReturn.returnDate.eq(endDate));
+        } else {
+            return null;
+        }
     }
 }

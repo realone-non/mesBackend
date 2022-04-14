@@ -1,7 +1,11 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.Item;
+import com.mes.mesBackend.entity.WorkProcess;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,11 +57,28 @@ public class WorkOrderUserResponse {
     @Schema(description = "제조오더번호")
     String produceOrderNo;
 
+    @JsonIgnore
+    WorkProcessDivision workProcessDivision;
+
+    @JsonIgnore
+    Long itemId;
+
+    @JsonIgnore
+    Long itemAccountId;
+
+    @JsonIgnore
+    Long workProcessId;
+
     // costTime(소요시간)
     public void putCostTime() {
         if (this.startDateTime != null && this.endDateTime != null) {
             long costTime = ChronoUnit.MINUTES.between(this.startDateTime, this.endDateTime);
             setCostTime(costTime);
         }
+    }
+
+    public WorkOrderUserResponse setItems(Item item) {
+        setItemAccountId(item.getItemAccount().getId());
+        return this;
     }
 }

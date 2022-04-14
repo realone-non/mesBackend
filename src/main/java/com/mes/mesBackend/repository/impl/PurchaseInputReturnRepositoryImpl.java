@@ -189,7 +189,15 @@ public class PurchaseInputReturnRepositoryImpl implements PurchaseInputReturnRep
     }
 
     private BooleanExpression isReturnDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? purchaseInputReturn.returnDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return purchaseInputReturn.returnDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return purchaseInputReturn.returnDate.after(fromDate).or(purchaseInputReturn.returnDate.eq(fromDate));
+        } else if (toDate != null) {
+            return purchaseInputReturn.returnDate.before(toDate).or(purchaseInputReturn.returnDate.eq(toDate));
+        } else {
+            return null;
+        }
     }
 
     private BooleanExpression isDeleteYnFalse() {

@@ -360,7 +360,7 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
                                 lotMaster.lotNo.as("lotNo"),
                                 inputTestRequest.createdDate.as("requestDate"),
                                 inputTestRequest.requestAmount.as("requestAmount"),
-                                purchaseRequest.periodDate.as("purchaseInputPeriodDate"),   // purchaseInput
+                                purchaseRequest.purchasePeriodDate.as("purchaseInputPeriodDate"),   // purchaseInput
                                 outSourcingProductionRequest.periodDate.as("outsourcingPeriodDate"),  // outsourcing
                                 wareHouse.wareHouseName.as("wareHouseName"),
                                 client.clientName.as("clientName"),
@@ -412,7 +412,10 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     }
     // 완료여부
     private BooleanExpression isCompletionYn(Boolean completionYn) {
-        return completionYn != null ? completionYn ? inputTestRequest.inputTestState.eq(COMPLETION) : inputTestRequest.inputTestState.eq(SCHEDULE).or(inputTestRequest.inputTestState.eq(ONGOING)) : null;
+        return completionYn != null ? completionYn
+                ? inputTestRequest.inputTestState.eq(COMPLETION)
+                : inputTestRequest.inputTestState.eq(SCHEDULE).or(inputTestRequest.inputTestState.eq(ONGOING))
+                : null;
     }
 
     // 입고번호
@@ -434,7 +437,15 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     }
     // 요청기간 from~toDate
     private BooleanExpression isRequestDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? inputTestRequest.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)) : null;
+        if (fromDate != null && toDate != null) {
+            return inputTestRequest.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0));
+        } else if (fromDate != null) {
+            return inputTestRequest.createdDate.after(fromDate.atStartOfDay());
+        } else if (toDate != null) {
+            return inputTestRequest.createdDate.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0));
+        } else {
+            return null;
+        }
     }
 
     private BooleanExpression isInputTestRequestDeleteYnFalse() {
@@ -443,9 +454,18 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
     private BooleanExpression isInputTestDetailDeleteYnFalse() {
         return inputTestDetail.deleteYn.isFalse();
     }
+
     // 검사기간
     private BooleanExpression isTestDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? inputTestDetail.testDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return inputTestDetail.testDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return inputTestDetail.testDate.after(fromDate).or(inputTestDetail.testDate.eq(fromDate));
+        } else if (toDate != null) {
+            return inputTestDetail.testDate.before(toDate).or(inputTestDetail.testDate.eq(toDate));
+        } else {
+            return null;
+        }
     }
     private BooleanExpression isInputTestDivision(InputTestDivision testDivision) {
         return inputTestRequest.inputTestDivision.eq(testDivision);

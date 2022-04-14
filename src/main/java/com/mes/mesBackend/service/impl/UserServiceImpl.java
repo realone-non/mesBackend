@@ -168,7 +168,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public TokenResponse reissue(TokenRequest tokenRequestDto) throws CustomJwtException {
+    public TokenResponse reissue(TokenRequest tokenRequestDto) throws CustomJwtException, NotFoundException {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         // 1. Refresh Token , AccessToken 검증
         jwtTokenProvider.validateToken(tokenRequestDto.getRefreshToken(), REFRESH_TOKEN);
@@ -192,13 +192,16 @@ public class UserServiceImpl implements UserService {
         // 6. RefreshToken 저장소 정보 업데이트
         refreshTokenUseYnTrueToUseYnFalse(authentication);
 
+        User user = userRepository.findByUserCode(authentication.getName())
+                .orElseThrow(() -> new NotFoundException("아이디가 잘못 입력 되었습니다. 아이디를 정확히 입력해 주세요."));
+
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.save(authentication.getName(), newRefreshToken);
         refreshTokenRepository.save(refreshToken);
 
         TokenResponse tokenResponse = new TokenResponse();
 
-        return tokenResponse.putToken(newAccessToken, newRefreshToken, null, null);
+        return tokenResponse.putToken(newAccessToken, newRefreshToken, user.getKorName(), user.getUserType());
     }
 
     // salt 값 생성

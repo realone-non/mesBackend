@@ -14,4 +14,7 @@ public interface OutsourcingRepositoryCustom {
     //외주생산의뢰 단일 조회
     Optional<OutsourcingProductionResponse> findRequestByIdAndDeleteYnAndUseYn(Long id);
 
+    // 해당 품목이 외주생산의뢰에 등록되어 있는지
+    boolean existsItemByOutsourcingRequest(Long itemId);
+
 }

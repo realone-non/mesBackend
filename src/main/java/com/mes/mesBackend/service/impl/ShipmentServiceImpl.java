@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.SHIPMENT_AMOUNT;
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.STOCK_AMOUNT;
@@ -82,33 +83,22 @@ public class ShipmentServiceImpl implements ShipmentService {
             Long userId
     ) {
         List<ShipmentResponse> shipmentResponses = shipmentRepo.findShipmentResponsesByCondition(clientId, fromDate, toDate, currencyId, userId);
-        List<ShipmentResponse> response = new ArrayList<>();
+//        List<ShipmentResponse> response = new ArrayList<>();
         for (ShipmentResponse res : shipmentResponses) {
             // shipmentItem 에 제일 첨에 등록된 contractItem 의  contract 조회
             Contract contract = shipmentItemRepo.findContractsByShipmentId(res.getId()).orElse(null);
             res.addContractInfo(contract);
-
-            // 화폐 id, 담당자 id 검색
-            if (res.getCurrencyId() != null && res.getUserId() != null) {
-                if (currencyId != null && userId != null) {
-                    if (!res.getCurrencyId().equals(currencyId) && !res.getUserId().equals(userId)) res = null;
-                    else if (res.getCurrencyId().equals(currencyId) && !res.getUserId().equals(userId)) res = null;
-                } else if (!res.getCurrencyId().equals(currencyId) && res.getUserId().equals(userId)) {
-                    res = null;
-                } else if (currencyId != null) {
-                    if (!res.getCurrencyId().equals(currencyId)) res = null;
-                } else if (userId != null) {
-                    if (!res.getUserId().equals(userId)) res = null;
-                }
-            } else {
-                if (currencyId != null && userId != null) res = null;
-                else if (currencyId != null) res = null;
-                else if (userId != null) res = null;
-            }
-            response.add(res);
         }
-        response.remove(null);
-        return response;
+
+         if (userId != null && currencyId != null) {
+             return shipmentResponses.stream().filter(f -> f.getUserId() != null && f.getUserId().equals(userId) && f.getCurrencyId() != null && f.getCurrencyId().equals(currencyId)).collect(Collectors.toList());
+         } else if (userId != null) {
+            return shipmentResponses.stream().filter(f -> f.getUserId() != null && f.getUserId().equals(userId)).collect(Collectors.toList());
+        } else if (currencyId != null) {
+            return shipmentResponses.stream().filter(f -> f.getCurrencyId() != null && f.getCurrencyId().equals(currencyId)).collect(Collectors.toList());
+        } else {
+            return shipmentResponses;
+        }
     }
 
     // 출하 수정
