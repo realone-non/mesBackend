@@ -146,7 +146,15 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
     }
 
     private BooleanExpression isProduceOrderCreatedDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? produceOrder.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)) : null;
+        if (fromDate != null && toDate != null) {
+            return produceOrder.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0));
+        } else if (fromDate != null) {
+            return produceOrder.createdDate.after(fromDate.atStartOfDay());
+        } else if (toDate != null) {
+            return produceOrder.createdDate.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0));
+        } else {
+            return null;
+        }
     }
 
     private BooleanExpression isItemGroupIdEq(Long itemGroupId) {
@@ -186,7 +194,15 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
     }
     // 착수예정일 fromDate~toDate
     private BooleanExpression isExpectedCompletedDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? produceOrder.expectedStartedDate.between(fromDate, toDate) :  null;
+        if (fromDate != null && toDate != null) {
+            return produceOrder.expectedStartedDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return produceOrder.expectedStartedDate.after(fromDate);
+        } else if (toDate != null) {
+            return produceOrder.expectedStartedDate.before(toDate);
+        } else {
+            return null;
+        }
     }
     // 삭제여부
     private BooleanExpression isDeleteYnFalse() {

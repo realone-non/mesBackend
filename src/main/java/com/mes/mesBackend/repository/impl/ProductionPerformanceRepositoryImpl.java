@@ -85,15 +85,33 @@ public class ProductionPerformanceRepositoryImpl implements ProductionPerformanc
 
     // 검색조건: 조회기간 fromDate~toDate
     private BooleanExpression isSelectDate(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ?
-                productionPerformance.materialInput.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))
-                        .or(productionPerformance.materialMixing.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
-                        .or(productionPerformance.filling.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
-                        .or(productionPerformance.capAssembly.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
-                        .or(productionPerformance.labeling.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
-                        .or(productionPerformance.packaging.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
-                        .or(productionPerformance.shipment.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
-                : null;
+        if (fromDate != null && toDate != null) {
+            return productionPerformance.materialInput.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))
+                    .or(productionPerformance.materialMixing.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
+                    .or(productionPerformance.filling.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
+                    .or(productionPerformance.capAssembly.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
+                    .or(productionPerformance.labeling.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
+                    .or(productionPerformance.packaging.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
+                    .or(productionPerformance.shipment.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)));
+        } else if (fromDate != null) {
+            return productionPerformance.materialInput.after(fromDate.atStartOfDay())
+                    .or(productionPerformance.materialMixing.after(fromDate.atStartOfDay()))
+                    .or(productionPerformance.filling.after(fromDate.atStartOfDay()))
+                    .or(productionPerformance.capAssembly.after(fromDate.atStartOfDay()))
+                    .or(productionPerformance.labeling.after(fromDate.atStartOfDay()))
+                    .or(productionPerformance.packaging.after(fromDate.atStartOfDay()))
+                    .or(productionPerformance.shipment.after(fromDate.atStartOfDay()));
+        } else if (toDate != null) {
+            return productionPerformance.materialInput.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))
+                    .or(productionPerformance.materialMixing.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
+                    .or(productionPerformance.filling.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
+                    .or(productionPerformance.capAssembly.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
+                    .or(productionPerformance.labeling.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
+                    .or(productionPerformance.packaging.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
+                    .or(productionPerformance.shipment.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)));
+        } else {
+            return null;
+        }
     }
 
     @Override

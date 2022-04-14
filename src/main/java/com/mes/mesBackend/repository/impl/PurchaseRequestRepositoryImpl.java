@@ -286,7 +286,15 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
 
     // 요청기간
     private BooleanExpression isRequestDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? purchaseRequest.requestDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return purchaseRequest.requestDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return purchaseRequest.requestDate.after(fromDate);
+        } else if (toDate != null) {
+            return purchaseRequest.requestDate.before(toDate);
+        } else {
+            return null;
+        }
     }
     // 제조오더번호
     private BooleanExpression isProduceOrderNoContain(String produceOrderNo) {

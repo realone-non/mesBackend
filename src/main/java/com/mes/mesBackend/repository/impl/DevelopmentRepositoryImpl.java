@@ -182,7 +182,15 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
 
     //날짜 검색
     private  BooleanExpression dateNull(LocalDate fromDate, LocalDate toDate){
-        return fromDate != null ? development.startDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return development.startDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return development.startDate.after(fromDate);
+        } else if (toDate != null) {
+            return development.startDate.before(toDate);
+        } else {
+            return null;
+        }
     }
 
     //품번 검색

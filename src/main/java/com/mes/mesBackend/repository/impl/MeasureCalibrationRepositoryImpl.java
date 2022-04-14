@@ -110,7 +110,15 @@ public class MeasureCalibrationRepositoryImpl implements MeasureCalibrationRepos
 
     // 검정기간(검교정일자) fromDate~toDate
     private BooleanExpression isCalibrationDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? measureCalibration.calibrationDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return measureCalibration.calibrationDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return measureCalibration.calibrationDate.after(fromDate);
+        } else if (toDate != null) {
+            return measureCalibration.calibrationDate.before(toDate);
+        } else {
+            return null;
+        }
     }
 
 

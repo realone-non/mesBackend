@@ -433,9 +433,18 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
     private BooleanExpression isWareHouseEq(Long wareHouseId) {
         return wareHouseId != null ? wareHouse.id.eq(wareHouseId) : null;
     }
+
     // 발주기간
     private BooleanExpression isPeriodDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? purchaseOrder.purchaseOrderDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return purchaseOrder.purchaseOrderDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return purchaseOrder.purchaseOrderDate.after(fromDate);
+        } else if (toDate != null) {
+            return purchaseOrder.purchaseOrderDate.before(toDate);
+        } else {
+            return null;
+        }
     }
     // 삭제여부
     private BooleanExpression isDeleteYnFalse() {

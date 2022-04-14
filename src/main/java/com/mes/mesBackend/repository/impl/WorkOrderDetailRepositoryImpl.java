@@ -896,7 +896,15 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
 
     // 작업지시 startDate 조회
     private BooleanExpression isWorkOrderStartDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)) : null;
+        if (fromDate != null && toDate != null) {
+            return workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0));
+        } else if (fromDate != null) {
+            return workOrderDetail.startDate.after(fromDate.atStartOfDay());
+        } else if (toDate != null) {
+            return workOrderDetail.startDate.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0));
+        } else {
+            return null;
+        }
     }
 
     // JOB NO
@@ -916,7 +924,15 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
 
     // 작업예정일 기준
     private BooleanExpression isWorkOrderDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? workOrderDetail.expectedWorkDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return  workOrderDetail.expectedWorkDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return  workOrderDetail.expectedWorkDate.after(fromDate);
+        } else if (toDate != null) {
+            return  workOrderDetail.expectedWorkDate.before(toDate);
+        } else {
+            return null;
+        }
     }
 
     // 작업장
@@ -933,10 +949,22 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     }
     // 작업기간
     private BooleanExpression isWorkDateBetween(LocalDate fromDate, LocalDate toDate) {
+        if (fromDate != null && toDate != null) {
+            return (workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).and(workOrderDetail.endDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
+                    .or(workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).or(workOrderDetail.endDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))));
+        } else if (fromDate != null) {
+            return (workOrderDetail.startDate.after(fromDate.atStartOfDay()).and(workOrderDetail.endDate.after(fromDate.atStartOfDay()))
+                    .or(workOrderDetail.startDate.after(fromDate.atStartOfDay()).or(workOrderDetail.endDate.after(fromDate.atStartOfDay()))));
+        } else if (toDate != null) {
+            return (workOrderDetail.startDate.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).and(workOrderDetail.endDate.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
+                    .or(workOrderDetail.startDate.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).or(workOrderDetail.endDate.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))));
+        } else {
+            return null;
+        }
         // fromDate ~ toDate 사이에 진행중과 완료가 포함되어 있는거를 조회
-        return fromDate != null && toDate != null ?
-                (workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).and(workOrderDetail.endDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
-                        .or(workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).or(workOrderDetail.endDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))))) : null;
+//        return fromDate != null && toDate != null ?
+//                (workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).and(workOrderDetail.endDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)))
+//                        .or(workOrderDetail.startDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)).or(workOrderDetail.endDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0))))) : null;
     }
     // 품목그룹
     private BooleanExpression isItemGroupEq(Long itemGroupId) {
@@ -961,7 +989,15 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
 
     // 착수예정일 fromDate~toDate
     private BooleanExpression isExpectedCompletedDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? produceOrder.expectedStartedDate.between(fromDate, toDate) :  null;
+        if (fromDate != null && toDate != null) {
+            return produceOrder.expectedStartedDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return produceOrder.expectedStartedDate.after(fromDate);
+        } else if (toDate != null) {
+            return produceOrder.expectedStartedDate.before(toDate);
+        } else {
+            return null;
+        }
     }
     // 지시상태
     private BooleanExpression isInstructionStatusEq(OrderState orderState) {
@@ -975,7 +1011,15 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
 
     // 작업예정일
     private BooleanExpression isExpectedWorkDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? workOrderDetail.expectedWorkDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return workOrderDetail.expectedWorkDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return workOrderDetail.expectedWorkDate.after(fromDate);
+        } else if (toDate != null) {
+            return workOrderDetail.expectedWorkDate.before(toDate);
+        } else {
+            return null;
+        }
     }
     // 삭제여부
     private BooleanExpression isDeleteYnFalse() {

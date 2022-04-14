@@ -39,7 +39,7 @@ public class EquipmentResponse {
 
     @Schema(description = "구매일자")
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
-    LocalDateTime purchaseDate;
+    LocalDate purchaseDate;
 
     @Schema(description = "구입금액")
     int purchaseAmount;
@@ -52,7 +52,7 @@ public class EquipmentResponse {
 
     @Schema(description = "생산개시일자")
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
-    LocalDateTime startDate;
+    LocalDate startDate;
 
     @Schema(description = "작업라인, 작업장")
     WorkLineResponse.workLineAndWorkCenterAndWorkProcess workLine;

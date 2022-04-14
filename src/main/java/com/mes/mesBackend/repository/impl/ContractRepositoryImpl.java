@@ -118,7 +118,7 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
                 .where(
                         contractItem.deleteYn.isFalse(),
                         contract.deleteYn.isFalse(),
-                        contract.contractDate.between(fromDate, toDate)
+                        isContractDateBetween(fromDate, toDate)
                 )
                 .groupBy(item.id)
                 .orderBy(contractItem.amount.sum().desc())
@@ -137,7 +137,7 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
                         .leftJoin(item).on(item.id.eq(contractItem.item.id))
                         .where(
                                 item.id.eq(itemId),
-                                contract.contractDate.between(fromDate, toDate),
+                                isContractDateBetween(fromDate, toDate),
                                 contract.deleteYn.isFalse(),
                                 contractItem.deleteYn.isFalse()
                         )
@@ -201,7 +201,15 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom {
 
     // 수주기간 조회
     private BooleanExpression isContractDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? contract.contractDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return contract.contractDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return contract.contractDate.after(fromDate);
+        } else if (toDate != null) {
+            return contract.contractDate.before(toDate);
+        } else {
+            return null;
+        }
     }
 
     // 화폐 조회

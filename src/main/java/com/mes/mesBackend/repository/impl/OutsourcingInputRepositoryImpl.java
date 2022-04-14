@@ -270,7 +270,15 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
     }
 
     private  BooleanExpression dateNull(LocalDate startDate, LocalDate endDate){
-        return startDate != null ? request.productionDate.between(startDate, endDate) : null;
+        if (startDate != null && endDate != null) {
+            return request.productionDate.between(startDate, endDate);
+        } else if (startDate != null) {
+            return request.productionDate.after(startDate);
+        } else if (endDate != null) {
+            return request.productionDate.before(endDate);
+        } else {
+            return null;
+        }
     }
 
     // 품번 검색

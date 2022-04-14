@@ -158,7 +158,15 @@ public class EquipmentCheckDetailRepositoryImpl implements EquipmentCheckDetailR
     }
     // 작업기간(디테일 정보 생성날짜 기준) fromDate~toDate
     private BooleanExpression isWorkDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? equipmentCheckDetail.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0)) : null;
+        if (fromDate != null && toDate != null) {
+            return equipmentCheckDetail.createdDate.between(fromDate.atStartOfDay(), LocalDateTime.of(toDate, LocalTime.MAX).withNano(0));
+        } else if (fromDate != null) {
+            return equipmentCheckDetail.createdDate.after(fromDate.atStartOfDay());
+        } else if (toDate != null) {
+            return equipmentCheckDetail.createdDate.before(LocalDateTime.of(toDate, LocalTime.MAX).withNano(0));
+        } else {
+            return null;
+        }
     }
     // equipmentId
     private BooleanExpression isEquipmentIdEq(Long equipmentId) {

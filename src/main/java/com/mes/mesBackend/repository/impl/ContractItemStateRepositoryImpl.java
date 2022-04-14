@@ -108,15 +108,33 @@ public class ContractItemStateRepositoryImpl implements ContractItemStateReposit
     private BooleanExpression isPeriodDateBetween(PeriodType periodType, LocalDate fromDate, LocalDate toDate) {
         if (periodType == null || periodType.equals(PeriodType.CONTRACT_DATE)) {
             return null;
+        } else {
+            if (fromDate != null && toDate != null) {
+                return contract.periodDate.between(fromDate, toDate);
+            } else if (fromDate != null) {
+                return contract.periodDate.after(fromDate);
+            } else if (toDate != null) {
+                return contract.periodDate.before(toDate);
+            } else {
+                return null;
+            }
         }
-        return contract.periodDate.between(fromDate, toDate);
     }
 
     private BooleanExpression isContractDateBetween(PeriodType periodType, LocalDate fromDate, LocalDate toDate) {
         if (periodType == null || periodType == PeriodType.PERIOD_DATE) {
             return null;
+        } else {
+            if (fromDate != null && toDate != null) {
+                return contract.contractDate.between(fromDate, toDate);
+            } else if (fromDate != null) {
+                return contract.contractDate.after(fromDate);
+            } else if (toDate != null) {
+                return contract.contractDate.before(toDate);
+            } else {
+                return null;
+            }
         }
-        return contract.contractDate.between(fromDate, toDate);
     }
 
     // 수주유형
