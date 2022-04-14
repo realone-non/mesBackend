@@ -253,9 +253,10 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
         return jpaQueryFactory
                 .selectFrom(input)
                 .where(
-                        input.productionRequest.id.eq(requestId),
+                        request.id.eq(requestId),
                         input.deleteYn.isFalse()
                 )
+                .leftJoin(request).on(request.id.eq(input.productionRequest.id))
                 .orderBy(input.createdDate.desc())
                 .fetch();
     }
