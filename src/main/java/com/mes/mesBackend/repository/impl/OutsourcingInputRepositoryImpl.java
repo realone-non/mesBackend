@@ -273,9 +273,9 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
         if (startDate != null && endDate != null) {
             return request.productionDate.between(startDate, endDate);
         } else if (startDate != null) {
-            return request.productionDate.after(startDate);
+            return request.productionDate.after(startDate).or(request.productionDate.eq(startDate));
         } else if (endDate != null) {
-            return request.productionDate.before(endDate);
+            return request.productionDate.before(endDate).or(request.productionDate.eq(endDate));
         } else {
             return null;
         }

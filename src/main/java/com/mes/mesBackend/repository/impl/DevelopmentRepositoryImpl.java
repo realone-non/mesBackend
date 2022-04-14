@@ -185,9 +185,9 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
         if (fromDate != null && toDate != null) {
             return development.startDate.between(fromDate, toDate);
         } else if (fromDate != null) {
-            return development.startDate.after(fromDate);
+            return development.startDate.after(fromDate).or(development.startDate.eq(fromDate));
         } else if (toDate != null) {
-            return development.startDate.before(toDate);
+            return development.startDate.before(toDate).or(development.startDate.eq(toDate));
         } else {
             return null;
         }

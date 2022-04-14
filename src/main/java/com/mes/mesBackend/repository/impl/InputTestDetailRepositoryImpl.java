@@ -460,9 +460,9 @@ public class InputTestDetailRepositoryImpl implements InputTestDetailRepositoryC
         if (fromDate != null && toDate != null) {
             return inputTestDetail.testDate.between(fromDate, toDate);
         } else if (fromDate != null) {
-            return inputTestDetail.testDate.after(fromDate);
+            return inputTestDetail.testDate.after(fromDate).or(inputTestDetail.testDate.eq(fromDate));
         } else if (toDate != null) {
-            return inputTestDetail.testDate.before(toDate);
+            return inputTestDetail.testDate.before(toDate).or(inputTestDetail.testDate.eq(toDate));
         } else {
             return null;
         }

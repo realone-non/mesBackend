@@ -64,7 +64,6 @@ public class PurchaseInputRequest {
         LocalDate manufactureDate;
 
         @Schema(description = "유효일자")
-        @NotNull(message = NOT_NULL)
         LocalDate validDate;
 
         @Schema(description = "긴급여부")

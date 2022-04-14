@@ -192,9 +192,9 @@ public class PurchaseInputReturnRepositoryImpl implements PurchaseInputReturnRep
         if (fromDate != null && toDate != null) {
             return purchaseInputReturn.returnDate.between(fromDate, toDate);
         } else if (fromDate != null) {
-            return purchaseInputReturn.returnDate.after(fromDate);
+            return purchaseInputReturn.returnDate.after(fromDate).or(purchaseInputReturn.returnDate.eq(fromDate));
         } else if (toDate != null) {
-            return purchaseInputReturn.returnDate.before(toDate);
+            return purchaseInputReturn.returnDate.before(toDate).or(purchaseInputReturn.returnDate.eq(toDate));
         } else {
             return null;
         }

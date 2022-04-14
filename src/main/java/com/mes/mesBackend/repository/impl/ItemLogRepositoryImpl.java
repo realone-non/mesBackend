@@ -119,9 +119,9 @@ public class ItemLogRepositoryImpl implements ItemLogRepositoryCustom {
         if (fromDate != null && toDate != null) {
             return itemLog.logDate.between(fromDate, toDate);
         } else if (fromDate != null) {
-            return itemLog.logDate.after(fromDate);
+            return itemLog.logDate.after(fromDate).or(itemLog.logDate.eq(fromDate));
         } else if (toDate != null) {
-            return itemLog.logDate.before(toDate);
+            return itemLog.logDate.before(toDate).or(itemLog.logDate.eq(toDate));
         } else {
             return null;
         }

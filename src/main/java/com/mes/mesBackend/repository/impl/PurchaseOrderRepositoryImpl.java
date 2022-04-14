@@ -439,9 +439,9 @@ public class PurchaseOrderRepositoryImpl implements PurchaseOrderRepositoryCusto
         if (fromDate != null && toDate != null) {
             return purchaseOrder.purchaseOrderDate.between(fromDate, toDate);
         } else if (fromDate != null) {
-            return purchaseOrder.purchaseOrderDate.after(fromDate);
+            return purchaseOrder.purchaseOrderDate.after(fromDate).or(purchaseOrder.purchaseOrderDate.eq(fromDate));
         } else if (toDate != null) {
-            return purchaseOrder.purchaseOrderDate.before(toDate);
+            return purchaseOrder.purchaseOrderDate.before(toDate).or(purchaseOrder.purchaseOrderDate.eq(toDate));
         } else {
             return null;
         }

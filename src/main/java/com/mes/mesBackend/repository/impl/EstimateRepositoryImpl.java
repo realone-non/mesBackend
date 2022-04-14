@@ -51,9 +51,9 @@ public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
         if (fromDate != null && toDate != null) {
             return estimate.estimateDate.between(fromDate, toDate);
         } else if (fromDate != null) {
-            return estimate.estimateDate.after(fromDate);
+            return estimate.estimateDate.after(fromDate).or(estimate.estimateDate.eq(fromDate));
         } else if (toDate != null) {
-            return estimate.estimateDate.before(toDate);
+            return estimate.estimateDate.before(toDate).or(estimate.estimateDate.eq(toDate));
         } else {
             return null;
         }

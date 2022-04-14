@@ -129,9 +129,9 @@ public class OutsourcingReturnRepositoryImpl implements OutsourcingReturnReposit
         if (startDate != null && endDate != null) {
             return outsourcingReturn.returnDate.between(startDate, endDate);
         } else if (startDate != null) {
-            return outsourcingReturn.returnDate.after(startDate);
+            return outsourcingReturn.returnDate.after(startDate).or(outsourcingReturn.returnDate.eq(startDate));
         } else if (endDate != null) {
-            return outsourcingReturn.returnDate.before(endDate);
+            return outsourcingReturn.returnDate.before(endDate).or(outsourcingReturn.returnDate.eq(endDate));
         } else {
             return null;
         }

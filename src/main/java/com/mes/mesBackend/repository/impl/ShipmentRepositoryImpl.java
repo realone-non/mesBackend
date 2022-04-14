@@ -292,9 +292,9 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
         if (fromDate != null && toDate != null) {
             return shipment.shipmentDate.between(fromDate, toDate);
         } else if (fromDate != null) {
-            return shipment.shipmentDate.after(fromDate);
+            return shipment.shipmentDate.after(fromDate).or(shipment.shipmentDate.eq(fromDate));
         } else if (toDate != null) {
-            return shipment.shipmentDate.before(toDate);
+            return shipment.shipmentDate.before(toDate).or(shipment.shipmentDate.eq(toDate));
         } else {
             return null;
         }

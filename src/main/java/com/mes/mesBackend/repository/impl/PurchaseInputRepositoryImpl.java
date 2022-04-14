@@ -305,9 +305,9 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
         if (fromDate != null && toDate != null) {
             return purchaseRequest.inputDate.between(fromDate, toDate);
         } else if (fromDate != null) {
-            return purchaseRequest.inputDate.after(fromDate);
+            return purchaseRequest.inputDate.after(fromDate).or(purchaseRequest.inputDate.eq(fromDate));
         } else if (toDate != null) {
-            return purchaseRequest.inputDate.before(toDate);
+            return purchaseRequest.inputDate.before(toDate).or(purchaseRequest.inputDate.eq(toDate));
         } else {
             return null;
         }

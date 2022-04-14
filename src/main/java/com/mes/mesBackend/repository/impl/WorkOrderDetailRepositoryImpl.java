@@ -927,9 +927,9 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
         if (fromDate != null && toDate != null) {
             return  workOrderDetail.expectedWorkDate.between(fromDate, toDate);
         } else if (fromDate != null) {
-            return  workOrderDetail.expectedWorkDate.after(fromDate);
+            return  workOrderDetail.expectedWorkDate.after(fromDate).or(workOrderDetail.expectedWorkDate.eq(fromDate));
         } else if (toDate != null) {
-            return  workOrderDetail.expectedWorkDate.before(toDate);
+            return  workOrderDetail.expectedWorkDate.before(toDate).or(workOrderDetail.expectedWorkDate.eq(toDate));
         } else {
             return null;
         }
@@ -992,9 +992,9 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
         if (fromDate != null && toDate != null) {
             return produceOrder.expectedStartedDate.between(fromDate, toDate);
         } else if (fromDate != null) {
-            return produceOrder.expectedStartedDate.after(fromDate);
+            return produceOrder.expectedStartedDate.after(fromDate).or(produceOrder.expectedStartedDate.eq(fromDate));
         } else if (toDate != null) {
-            return produceOrder.expectedStartedDate.before(toDate);
+            return produceOrder.expectedStartedDate.before(toDate).or(produceOrder.expectedStartedDate.eq(toDate));
         } else {
             return null;
         }
@@ -1014,9 +1014,9 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
         if (fromDate != null && toDate != null) {
             return workOrderDetail.expectedWorkDate.between(fromDate, toDate);
         } else if (fromDate != null) {
-            return workOrderDetail.expectedWorkDate.after(fromDate);
+            return workOrderDetail.expectedWorkDate.after(fromDate).or(workOrderDetail.expectedWorkDate.eq(fromDate));
         } else if (toDate != null) {
-            return workOrderDetail.expectedWorkDate.before(toDate);
+            return workOrderDetail.expectedWorkDate.before(toDate).or(workOrderDetail.expectedWorkDate.eq(toDate));
         } else {
             return null;
         }

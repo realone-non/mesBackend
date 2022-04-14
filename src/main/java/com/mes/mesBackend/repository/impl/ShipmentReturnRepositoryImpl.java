@@ -226,9 +226,9 @@ public class ShipmentReturnRepositoryImpl implements ShipmentReturnRepositoryCus
         if (fromDate != null && toDate != null) {
             return shipmentReturn.returnDate.between(fromDate, toDate);
         } else if (fromDate != null) {
-            return shipmentReturn.returnDate.after(fromDate);
+            return shipmentReturn.returnDate.after(fromDate).or(shipmentReturn.returnDate.eq(fromDate));
         } else if (toDate != null) {
-            return shipmentReturn.returnDate.before(toDate);
+            return shipmentReturn.returnDate.before(toDate).or(shipmentReturn.returnDate.before(toDate));
         } else {
             return null;
         }
@@ -238,9 +238,9 @@ public class ShipmentReturnRepositoryImpl implements ShipmentReturnRepositoryCus
         if (fromDate != null && toDate != null) {
             return shipment.shipmentDate.between(fromDate, toDate);
         } else if (fromDate != null) {
-            return shipment.shipmentDate.after(fromDate);
+            return shipment.shipmentDate.after(fromDate).or(shipment.shipmentDate.eq(fromDate));
         } else if (toDate != null) {
-            return shipment.shipmentDate.before(toDate);
+            return shipment.shipmentDate.before(toDate).or(shipment.shipmentDate.eq(toDate));
         } else {
             return null;
         }

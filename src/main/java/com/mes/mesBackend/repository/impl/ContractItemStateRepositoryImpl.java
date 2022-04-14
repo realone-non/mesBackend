@@ -112,9 +112,9 @@ public class ContractItemStateRepositoryImpl implements ContractItemStateReposit
             if (fromDate != null && toDate != null) {
                 return contract.periodDate.between(fromDate, toDate);
             } else if (fromDate != null) {
-                return contract.periodDate.after(fromDate);
+                return contract.periodDate.after(fromDate).or(contract.periodDate.eq(fromDate));
             } else if (toDate != null) {
-                return contract.periodDate.before(toDate);
+                return contract.periodDate.before(toDate).or(contract.periodDate.eq(toDate));
             } else {
                 return null;
             }
@@ -128,9 +128,9 @@ public class ContractItemStateRepositoryImpl implements ContractItemStateReposit
             if (fromDate != null && toDate != null) {
                 return contract.contractDate.between(fromDate, toDate);
             } else if (fromDate != null) {
-                return contract.contractDate.after(fromDate);
+                return contract.contractDate.after(fromDate).or(contract.contractDate.eq(fromDate));
             } else if (toDate != null) {
-                return contract.contractDate.before(toDate);
+                return contract.contractDate.before(toDate).or(contract.contractDate.eq(toDate));
             } else {
                 return null;
             }

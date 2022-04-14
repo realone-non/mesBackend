@@ -83,9 +83,9 @@ public class MaterialStockInspectRequestRepositoryImpl implements MaterialStockI
         if (startDate != null && endDate != null) {
             return materialStockInspectRequest.inspectDate.between(startDate, endDate);
         } else if (startDate != null) {
-            return materialStockInspectRequest.inspectDate.after(startDate);
+            return materialStockInspectRequest.inspectDate.after(startDate).or(materialStockInspectRequest.inspectDate.eq(startDate));
         } else if (endDate != null) {
-            return materialStockInspectRequest.inspectDate.before(endDate);
+            return materialStockInspectRequest.inspectDate.before(endDate).or(materialStockInspectRequest.inspectDate.eq(endDate));
         } else {
             return null;
         }

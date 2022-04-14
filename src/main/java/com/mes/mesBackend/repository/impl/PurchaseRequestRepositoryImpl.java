@@ -289,9 +289,9 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
         if (fromDate != null && toDate != null) {
             return purchaseRequest.requestDate.between(fromDate, toDate);
         } else if (fromDate != null) {
-            return purchaseRequest.requestDate.after(fromDate);
+            return purchaseRequest.requestDate.after(fromDate).or(purchaseRequest.requestDate.eq(fromDate));
         } else if (toDate != null) {
-            return purchaseRequest.requestDate.before(toDate);
+            return purchaseRequest.requestDate.before(toDate).or(purchaseRequest.requestDate.eq(toDate));
         } else {
             return null;
         }
