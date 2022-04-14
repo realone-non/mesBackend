@@ -271,10 +271,11 @@ public class UserServiceImpl implements UserService {
     // 사용자 생성
     @Override
     public UserRegistrationResponse createUserRegistration(UserRegistrationRequest userRegistrationRequest) throws BadRequestException, NotFoundException {
-        // userCode 가 중복되지 않게 확인
+        // 중복되는 유저코드가 있는지 체크
         checkUserCode(userRegistrationRequest.getUserCode());
+        // 중복되는 이메일이 있는지 체크
+        checkUserEmail(userRegistrationRequest.getMail());
 
-        Department department = departmentService.getDepartmentOrThrow(userRegistrationRequest.getDepartment());
         User user = mapper.toEntity(userRegistrationRequest, User.class);
 
         // salt 생성
@@ -282,7 +283,7 @@ public class UserServiceImpl implements UserService {
         // 솔트값, 해싱된 Password
         user.setSalt(salt);
         user.setPassword(passwordHashing(userRegistrationRequest.getUserCode().getBytes(), salt));
-        user.addJoin(department);
+        user.setUserType(NEW);
 
         userRepository.save(user);
         return getUserRegistration(user.getId());
@@ -304,15 +305,15 @@ public class UserServiceImpl implements UserService {
 
     // 사용자 수정
     @Override
-    public UserRegistrationResponse updateUserRegistration(Long id, UserRegistrationRequest userRegistrationRequest) throws NotFoundException {
+    public UserRegistrationResponse updateUserRegistration(Long id, UserRegistrationRequest.Update userRegistrationRequest) throws NotFoundException, BadRequestException {
         User findUser = getUserOrThrow(id);
-        User newUser = mapper.toEntity(userRegistrationRequest, User.class);
-        Department newDepartment = departmentService.getDepartmentOrThrow(userRegistrationRequest.getDepartment());
-        findUser.setUserCode(newUser.getUserCode());
-        findUser.setKorName(newUser.getKorName());
-        findUser.setDepartment(newDepartment);
-        findUser.setUseYn(newUser.isUseYn());
 
+        // 이메일 변경 시 중복 이메일인지 체크
+        if (!findUser.getMail().equals(userRegistrationRequest.getMail())) checkUserEmail(userRegistrationRequest.getMail());
+        User newUser = mapper.toEntity(userRegistrationRequest, User.class);
+        findUser.setMail(userRegistrationRequest.getMail());
+        findUser.setKorName(newUser.getKorName());
+        findUser.setUseYn(newUser.isUseYn());
         userRepository.save(findUser);
         return getUserRegistration(findUser.getId());
     }

@@ -53,7 +53,7 @@ public interface UserService {
     // 검색조건: 사용자 ID(사번), 이름, 공장(X)
     List<UserRegistrationResponse> getUserRegistrations(String userCode, String korName);
     // 사용자 수정
-    UserRegistrationResponse updateUserRegistration(Long id, UserRegistrationRequest userRegistrationRequest) throws NotFoundException;
+    UserRegistrationResponse updateUserRegistration(Long id, UserRegistrationRequest.Update userRegistrationRequest) throws NotFoundException, BadRequestException;
     // 사용자 삭제
     void deleteUserRegistration(Long id) throws NotFoundException;
     // 비밀번호 초기화
