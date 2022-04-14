@@ -2,6 +2,7 @@ package com.mes.mesBackend.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.HolidayType;
+import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +19,7 @@ public class HolidayRequest {
     @Schema(description = "고유아이디")
     Long id;
 
-    @NotBlank(message = NOT_NULL)
+    @NotNull
     @Schema(description = "휴일일자")
     LocalDate date;
 
