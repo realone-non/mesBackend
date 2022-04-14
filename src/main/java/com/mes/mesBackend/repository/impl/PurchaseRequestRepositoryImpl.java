@@ -75,7 +75,9 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                                 purchaseRequest.note.as("note"),
                                 contractItem.item.itemNo.as("modelItemNo"),
                                 contract.periodDate.as("periodDate"),
-                                purchaseRequest.inputTestYn.as("inputTestYn")
+                                purchaseRequest.inputTestYn.as("inputTestYn"),
+                                purchaseRequest.stockUnitRequestAmount.as("stockUnitRequestAmount"),
+                                purchaseRequest.stockUnitOrderAmount.as("stockUnitOrderAmount")
                         )
                 )
                 .from(purchaseRequest)
@@ -128,7 +130,9 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                                 purchaseRequest.note.as("note"),
                                 contractItem.item.itemNo.as("modelItemNo"),
                                 contract.periodDate.as("periodDate"),
-                                purchaseRequest.inputTestYn.as("inputTestYn")
+                                purchaseRequest.inputTestYn.as("inputTestYn"),
+                                purchaseRequest.stockUnitRequestAmount.as("stockUnitRequestAmount"),
+                                purchaseRequest.stockUnitOrderAmount.as("stockUnitOrderAmount")
                         )
                 )
                 .from(purchaseRequest)
