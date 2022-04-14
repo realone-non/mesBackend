@@ -16,7 +16,7 @@ import java.util.List;
 
 public interface DevelopmentService {
     //개발품목 등록
-    DevelopmentResponse createDevelopment(DevelopmentRequest request) throws NotFoundException;
+    DevelopmentResponse createDevelopment(DevelopmentRequest request) throws NotFoundException, BadRequestException;
 
     //개발품목 리스트 조회
     List<DevelopmentResponse> getDevelopments(
@@ -31,7 +31,7 @@ public interface DevelopmentService {
     DevelopmentResponse getDevelopment(Long id) throws NotFoundException;
 
     //개발품목 수정
-    DevelopmentResponse modifyDevelopment(Long id, DevelopmentRequest request) throws NotFoundException;
+    DevelopmentResponse modifyDevelopment(Long id, DevelopmentRequest request) throws NotFoundException, BadRequestException;
 
     //개발품목 삭제
     void deleteDevelopment(Long id) throws NotFoundException;
