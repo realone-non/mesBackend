@@ -88,14 +88,13 @@ public class LotHelperImpl implements LotHelper {
                     break;
                 case HALF_PRODUCT:
                     // equipment 가 null 일 경우는 외주생산입고일 경우임
-                        lotNo = equipment != null
-                                ? createHalfProductLotNo(beforeRealLotNo, itemAccountCode, equipment.getLotCode())
-                                : createHalfProductLotNo(beforeRealLotNo, itemAccountCode, "");
+                    createHalfProductLotNo(beforeRealLotNo, itemAccountCode, equipment != null ? equipment.getLotCode() : "");
                     break;
                 case PRODUCT:
                     // 완제품 중 해당하는 달에 등록된 lot, 조건: 품목계정, 설비, 해당하는 달
+                    // equipment 가 null 일 경우는 외주생산입고일 경우임
                     String beforeProductRealLotNo = lotMasterRepo.findLotNoByAccountCodeAndMonth(goodsType, now).orElse(null);
-                    lotNo = createProductLotNo(beforeProductRealLotNo, itemAccountCode, equipment.getLotCode());
+                    lotNo = createProductLotNo(beforeProductRealLotNo, itemAccountCode, equipment != null ? equipment.getLotCode() : "");
                     break;
                 case NONE: throw new BadRequestException("해당 품목에 대한 품목계정이 존재하지 않습니다.");
             }

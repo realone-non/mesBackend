@@ -86,6 +86,20 @@ public class OutSourcingProductionRequestRepositoryImpl implements OutsourcingRe
         );
     }
 
+    // 해당 품목이 외주생산의뢰에 등록되어 있는지
+    @Override
+    public boolean existsItemByOutsourcingRequest(Long itemId) {
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(request)
+                .where(
+                        request.deleteYn.isFalse(),
+                        request.item.id.eq(itemId)
+                )
+                .fetchFirst();
+        return fetchOne != null;
+    }
+
     private BooleanExpression clientNull(Long clientId){
 //        return clientId != null ? request.bomMaster.item.manufacturer.id.eq(clientId) : null;
         return clientId != null ? client.id.eq(clientId) : null;
