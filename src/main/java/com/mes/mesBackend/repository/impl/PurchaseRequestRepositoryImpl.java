@@ -74,7 +74,8 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                                 item.manufacturer.clientName.as("itemManufacturerName"),
                                 purchaseRequest.note.as("note"),
                                 contractItem.item.itemNo.as("modelItemNo"),
-                                contract.periodDate.as("periodDate")
+                                contract.periodDate.as("periodDate"),
+                                purchaseRequest.inputTestYn.as("inputTestYn")
                         )
                 )
                 .from(purchaseRequest)
@@ -126,7 +127,8 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                                 item.manufacturer.clientName.as("itemManufacturerName"),
                                 purchaseRequest.note.as("note"),
                                 contractItem.item.itemNo.as("modelItemNo"),
-                                contract.periodDate.as("periodDate")
+                                contract.periodDate.as("periodDate"),
+                                purchaseRequest.inputTestYn.as("inputTestYn")
                         )
                 )
                 .from(purchaseRequest)

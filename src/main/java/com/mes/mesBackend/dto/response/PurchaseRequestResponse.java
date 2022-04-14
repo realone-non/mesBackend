@@ -60,7 +60,7 @@ public class PurchaseRequestResponse {
     int orderAmount;
 
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
-    @Schema(description = "구매납기일자")
+    @Schema(description = "구매납기일자(구매요청 납기일자)")
     LocalDate purchasePeriodDate;
 
     @Schema(description = "검사유형")
@@ -76,7 +76,7 @@ public class PurchaseRequestResponse {
     String modelItemNo;
 
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
-    @Schema(description = "납기일자")
+    @Schema(description = "납기일자(수주의 납기일자)")
     LocalDate periodDate;
 
     // ============ 수정 기록

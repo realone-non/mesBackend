@@ -40,7 +40,7 @@ public class badItemStatusController {
 
     // 작업지시조회
     @Operation(
-            summary = "작업지시 불량률 정보 리스트 조회(지시상태 완료, 진행중만 조회)",
+            summary = "작업지시 불량률 정보 리스트 조회(지시상태 완료, 진행중만 조회, 원료혼합 공정 제외)",
             description = "현재 완료, 진행중인 작업지시만 조회, 검색조건: 공정 id, 작업지시 번호, 품번|품명, 작업자 id, 작업기간 fromDate~toDate"
     )
     @GetMapping

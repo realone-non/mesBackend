@@ -74,7 +74,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         purchaseRequest.mapping(produceOrder, item);
         // 구매요청 등록의 첫 등록은 지시상태 schedule 로 등록됨.
         purchaseRequest.setOrdersState(SCHEDULE);
-        purchaseRequest.setInputTestYn(true);
+//        purchaseRequest.setInputTestYn(true);
 
         purchaseRequestRepo.save(purchaseRequest);
 

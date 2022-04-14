@@ -34,7 +34,7 @@ public class PurchaseRequestRequest {
 
     @Schema(description = "구매납기일자")
     @NotNull(message = NOT_NULL)
-    LocalDate periodDate;
+    LocalDate purchasePeriodDate;
 
     @Schema(description = "비고")
     String note;

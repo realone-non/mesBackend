@@ -51,8 +51,8 @@ public class PurchaseRequest extends BaseTimeEntity {
     private int orderAmount;
 
     // 구매납기일자
-    @Column(name = "PERIOD_DATE", columnDefinition = "datetime COMMENT '구매납기일자'", nullable = false)
-    private LocalDate periodDate;
+    @Column(name = "PURCHASE_PERIOD_DATE", columnDefinition = "datetime COMMENT '구매납기일자'", nullable = false)
+    private LocalDate purchasePeriodDate;
 
     // 비고
     @Column(name = "NOTE", columnDefinition = "varchar(255) COMMENT '비고'")
@@ -61,14 +61,6 @@ public class PurchaseRequest extends BaseTimeEntity {
     // 삭제여부
     @Column(name = "DELETE_YN", columnDefinition = "bit(1) COMMENT '삭제여부'", nullable = false)
     private boolean deleteYn = false;
-
-    // 발주가능수량
-//    @Column(name = "ORDER_POSSIBLE_AMOUNT", columnDefinition = "int COMMENT '발주가능수량'")
-//    private int orderPossibleAmount;
-
-//    // 입고수량
-//    @Column(name = "INPUT_AMOUNT", columnDefinition = "int COMMENT '입고수량'")
-//    private int inputAmount;
 
     // 취소수량
     @Column(name = "CANCEL_AMOUNT", columnDefinition = "int COMMENT '취소수량'")
@@ -105,7 +97,7 @@ public class PurchaseRequest extends BaseTimeEntity {
         setItem(newItem);
         setRequestDate(newPurchaseRequest.requestDate);
         setRequestAmount(newPurchaseRequest.requestAmount);
-        setPeriodDate(newPurchaseRequest.periodDate);
+        setPurchasePeriodDate(newPurchaseRequest.purchasePeriodDate);
         setNote(newPurchaseRequest.note);
         setStockUnitRequestAmount(newPurchaseRequest.stockUnitRequestAmount);
         setStockUnitOrderAmount(newPurchaseRequest.stockUnitOrderAmount);
