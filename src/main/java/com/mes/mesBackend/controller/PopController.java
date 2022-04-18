@@ -20,9 +20,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static com.mes.mesBackend.helper.Constants.YYMMDD;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -391,7 +395,7 @@ public class PopController {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
         PopLotMasterResponse popLotMasterResponse = popService.createPopLotMasters(lotMasterId, amount);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(userCode + " is viewed the list of from createPopLotMasters.");
+        cLogger.info(userCode + " is create the realLot from createPopLotMasters. create lotNo: " + popLotMasterResponse.getLotNo() + ", LocalDateTime: " + LocalDate.now().format(DateTimeFormatter.ofPattern(YYMMDD)));
         return new ResponseEntity<>(popLotMasterResponse, OK);
     }
 
@@ -408,7 +412,7 @@ public class PopController {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
         PopLotMasterResponse popLotMasterResponse = popService.putPopLotMasters(lotMasterId, amount);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(userCode + " is viewed the list of from putPopLotMasters.");
+        cLogger.info(userCode + " is modified the realLot from putPopLotMasters.");
         return new ResponseEntity<>(popLotMasterResponse, OK);
     }
 

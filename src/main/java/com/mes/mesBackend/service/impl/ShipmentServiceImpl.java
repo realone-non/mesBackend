@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +27,7 @@ import static com.mes.mesBackend.entity.enumeration.ItemLogType.STOCK_AMOUNT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.SHIPMENT;
-import static com.mes.mesBackend.helper.Constants.NOW_YYMMDD;
+import static com.mes.mesBackend.helper.Constants.YYMMDD;
 
 // 4-5. 출하등록
 @Service
@@ -139,7 +139,11 @@ public class ShipmentServiceImpl implements ShipmentService {
         // 오늘 날짜로 생성 된 shipment 중 barcodeNumber 만 가져옴(내림차순 limit 1)
         String beforeNo = shipmentRepo.findBarcodeNumberByToday(LocalDate.now()).orElse(null);
         Integer seq = beforeNo != null ? Integer.parseInt(beforeNo.substring(beforeNo.length() - 3)) + 1 : 1;
-        return BAR + NOW_YYMMDD + String.format(FORMAT_3, seq);
+        return BAR + getDateFormatYymmdd() + String.format(FORMAT_3, seq);
+    }
+
+    private String getDateFormatYymmdd() {
+        return LocalDate.now().format(DateTimeFormatter.ofPattern(YYMMDD));
     }
 
     // =================================================== 출하 품목 ====================================================
