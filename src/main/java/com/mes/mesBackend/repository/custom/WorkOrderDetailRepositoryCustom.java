@@ -102,10 +102,10 @@ public interface WorkOrderDetailRepositoryCustom {
     // 품목에 해당하는 bomDetail 의 라벨링 공정의 bomDetailItem, 포장공정의 원자재 부자재 가져옴
     List<Item> findBomDetailItemByBomMasterItemWorkProcessPackaging(Long bomMasterItemId);
     // =============================================== 8-5. 불량등록 ===============================================
-    // 작업지시 정보 리스트 조회, 검색조건: 작업장 id, 작업라인 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목
+    // 작업지시 정보 리스트 조회, 검색조건: 작업장 id, 작업공정 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목
     List<BadItemWorkOrderResponse> findBadItemWorkOrderResponseByCondition(
             Long workCenterId,
-            Long workLineId,
+            Long inputWorkProcessId,
             Long itemGroupId,
             String produceOrderNo,
             String workOrderNo,
