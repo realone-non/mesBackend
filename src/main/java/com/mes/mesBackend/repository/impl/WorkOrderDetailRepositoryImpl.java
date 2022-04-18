@@ -900,6 +900,45 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
         );
     }
 
+    // 생산실적 리스트 조회, 검색조건: 조회기간 fromDate~toDate, 작업공정 id
+    @Override
+    public List<ProductionPerformanceResponse> findProductionPerformanceResponseByCondition(
+            LocalDate fromDate,
+            LocalDate toDate,
+            Long workProcessId
+    ) {
+        return jpaQueryFactory
+                .select(
+                        Projections.fields(
+                                ProductionPerformanceResponse.class,
+                                produceOrder.produceOrderNo.as("produceOrderNo"),
+                                workProcess.workProcessName.as("workProcessName"),
+                                workOrderDetail.productionAmount.as("productionAmount"),
+                                user.korName.as("userKorName"),
+                                client.clientName.as("clientName"),
+                                workOrderDetail.startDate.as("workOrderStartDate"),
+                                workOrderDetail.endDate.as("workOrderEndDate"),
+                                workOrderDetail.id.as("workOrderId"),
+                                workProcess.id.as("workProcessId"),
+                                workOrderDetail.orderAmount.as("orderAmount")
+                        )
+                )
+                .from(workOrderDetail)
+                .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
+                .leftJoin(workProcess).on(workProcess.id.eq(workOrderDetail.workProcess.id))
+                .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
+                .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
+                .leftJoin(client).on(client.id.eq(contract.client.id))
+                .where(
+                        isWorkOrderStartDateBetween(fromDate, toDate),
+                        isWorkProcessIdEq(workProcessId),
+                        workOrderDetail.orderState.ne(SCHEDULE),
+                        workOrderDetail.deleteYn.isFalse()
+                )
+                .orderBy(produceOrder.id.desc())
+                .fetch();
+    }
+
     // 작업지시 startDate 조회
     private BooleanExpression isWorkOrderStartDateBetween(LocalDate fromDate, LocalDate toDate) {
         if (fromDate != null && toDate != null) {

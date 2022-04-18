@@ -138,4 +138,8 @@ public interface WorkOrderDetailRepositoryCustom {
     Optional<Long> findOrderStateCountByWorkProcessDivisionAndOrderState(WorkProcessDivision workProcessDivision, OrderState orderState);
     // 작업공절별 생산수량
     Optional<Integer> findProductionAmountByWorkProcessDivision(WorkProcessDivision workProcessDivision);
+
+    // ================================ 생산실적 관리
+    // 생산실적 리스트 조회, 검색조건: 조회기간 fromDate~toDate, 작업공정 id
+    List<ProductionPerformanceResponse> findProductionPerformanceResponseByCondition(LocalDate fromDate, LocalDate toDate, Long workProcessId);
 }
