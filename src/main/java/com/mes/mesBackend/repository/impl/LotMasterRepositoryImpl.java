@@ -443,7 +443,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .where(
                         lotMaster.item.id.eq(itemId),
                         lotMaster.workProcess.id.eq(workProcessId),
-                        lotMaster.badItemAmount.gt(0),
+                        (lotMaster.badItemAmount.subtract(lotMaster.recycleAmount).gt(0)),
                         lotMaster.deleteYn.eq(false),
                         lotMaster.useYn.eq(true),
                         lotMaster.lotMasterDivision.eq(division)

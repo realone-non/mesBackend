@@ -1,6 +1,9 @@
 package com.mes.mesBackend.repository.custom;
 
+import com.mes.mesBackend.entity.BomItemDetail;
 import com.mes.mesBackend.entity.BomMaster;
+import com.mes.mesBackend.entity.Item;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +20,6 @@ public interface BomMasterRepositoryCustom {
     boolean existsBomItemDetailByItemId(Long bomMasterItemId, Long bomDetailItemId);
     // item 으로 bom 조회
     Optional<Long> findByItemIdAndDeleteYnFalse(Long bomMasterItemId);
+    List<BomItemDetail> findByItemIdAndWorkProcessDivision(Long itemId, WorkProcessDivision workProcessDivision);
+
 }

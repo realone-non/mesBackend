@@ -21,7 +21,7 @@ import javax.persistence.*;
 * 공장도 빼고 작업.
 * */
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "WARE_HOUSES")
 @Data
 public class WareHouse extends BaseTimeEntity {

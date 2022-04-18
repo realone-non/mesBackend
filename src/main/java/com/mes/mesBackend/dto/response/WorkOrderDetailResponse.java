@@ -38,6 +38,9 @@ public class WorkOrderDetailResponse {
     @Schema(description = "불량수량")
     int badItemAmount;
 
+    @Schema(description = "재사용수량")
+    int recycleAmount;
+
     @Schema(description = "공정 고유아이디")
     Long workProcessId;
 
