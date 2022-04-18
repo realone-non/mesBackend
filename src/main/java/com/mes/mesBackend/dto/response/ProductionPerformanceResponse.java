@@ -61,12 +61,14 @@ public class ProductionPerformanceResponse {
     @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime workOrderEndDate;
 
+    @Schema(description = "지시수량")
+    int orderAmount;
+
     @JsonIgnore
     Long workOrderId;
     @JsonIgnore
     Long workProcessId;
-    @JsonIgnore
-    int orderAmount;
+
 
     public void set(BadItemWorkOrderResponse.subDto subDto) {
         setItemNo(subDto.getItemNo());                        // 품번
