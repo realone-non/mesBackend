@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.ProduceOrderDetailResponse;
+import com.mes.mesBackend.dto.response.ProduceOrderResponse;
 import com.mes.mesBackend.dto.response.ProductionPerformanceResponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.OrderState;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom {
@@ -35,7 +37,7 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
     // 제조 오더 리스트 조회, 검색조건 : 품목그룹 id, 품명|품번, 지시상태, 제조오더번호, 수주번호, 착수예정일 fromDate~toDate, 자재납기일자(보류)
     @Override
     @Transactional(readOnly = true)
-    public List<ProduceOrder> findAllByCondition(
+    public List<ProduceOrderResponse> findAllByCondition(
             Long itemGroupId,
             String itemNoAndName,
             OrderState orderState,
@@ -45,7 +47,31 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
             LocalDate toDate
     ) {
         return jpaQueryFactory
-                .selectFrom(produceOrder)
+                .select(
+                        Projections.fields(
+                                ProduceOrderResponse.class,
+                                produceOrder.id.as("id"),
+                                produceOrder.produceOrderNo.as("produceOrderNo"),
+                                contractItem.id.as("contractItemId"),
+                                item.itemNo.as("contractItemItemNo"),
+                                item.itemName.as("contractItemItemName"),
+                                contractItem.contractType.as("contractItemContractType"),
+                                contract.id.as("contractId"),
+                                contract.contractNo.as("contractNo"),
+                                client.clientName.as("contractCName"),
+                                contract.periodDate.as("contractPeriodDate"),
+                                produceOrder.expectedStartedDate.as("expectedStartedDate"),
+                                produceOrder.expectedCompletedDate.as("expectedCompletedDate"),
+                                produceOrder.orderState.as("orderState"),
+                                produceOrder.rate.as("rate"),
+                                produceOrder.note.as("note")
+                        )
+                )
+                .from(produceOrder)
+                .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
+                .leftJoin(client).on(client.id.eq(contract.client.id))
                 .where(
                         isItemGroupEq(itemGroupId),
                         isItemNoAndItemNameContain(itemNoAndName),
@@ -59,6 +85,43 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
                 .fetch();
     }
 
+    // 제조오더 response 단일 조회
+    @Override
+    public Optional<ProduceOrderResponse> findResponseByProduceOrderId(Long id) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(
+                                Projections.fields(
+                                        ProduceOrderResponse.class,
+                                        produceOrder.id.as("id"),
+                                        produceOrder.produceOrderNo.as("produceOrderNo"),
+                                        contractItem.id.as("contractItemId"),
+                                        item.itemNo.as("contractItemItemNo"),
+                                        item.itemName.as("contractItemItemName"),
+                                        contractItem.contractType.as("contractItemContractType"),
+                                        contract.id.as("contractId"),
+                                        contract.contractNo.as("contractNo"),
+                                        client.clientName.as("contractCName"),
+                                        contract.periodDate.as("contractPeriodDate"),
+                                        produceOrder.expectedStartedDate.as("expectedStartedDate"),
+                                        produceOrder.expectedCompletedDate.as("expectedCompletedDate"),
+                                        produceOrder.orderState.as("orderState"),
+                                        produceOrder.rate.as("rate"),
+                                        produceOrder.note.as("note")
+                                )
+                        )
+                        .from(produceOrder)
+                        .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
+                        .leftJoin(item).on(item.id.eq(contractItem.item.id))
+                        .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
+                        .leftJoin(client).on(client.id.eq(contract.client.id))
+                        .where(
+                                produceOrder.id.eq(id),
+                                isDeleteYnFalse()
+                        )
+                        .fetchOne()
+        );
+    }
 
     // where: produceOrder.contractItem.item = bomMaster.item
     // produceOrder.contractItem.item = bomMaster.item 랑 같은걸 찾으면 ? list로

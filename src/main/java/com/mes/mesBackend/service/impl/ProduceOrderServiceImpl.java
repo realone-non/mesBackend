@@ -51,14 +51,14 @@ public class ProduceOrderServiceImpl implements ProduceOrderService {
 
         produceOrder.setProduceOrderNo(produceOrderNo);
         produceOrderRepo.save(produceOrder);
-        return mapper.toResponse(produceOrder, ProduceOrderResponse.class);
+        return getProduceOrder(produceOrder.getId());
     }
 
     // 제조 오더 단일 조회
     @Override
     public ProduceOrderResponse getProduceOrder(Long produceOrderId) throws NotFoundException {
-        ProduceOrder produceOrder = getProduceOrderOrThrow(produceOrderId);
-        return mapper.toResponse(produceOrder, ProduceOrderResponse.class);
+        return produceOrderRepo.findResponseByProduceOrderId(produceOrderId)
+                .orElseThrow(() -> new NotFoundException("produceOrder does not exist. input id: " + produceOrderId));
     }
 
     // 제조 오더 리스트 조회, 검색조건 : 품목그룹 id, 품명|품번, 지시상태, 제조오더번호, 수주번호, 착수예정일 fromDate~toDate, 자재납기일자(보류)
@@ -72,9 +72,11 @@ public class ProduceOrderServiceImpl implements ProduceOrderService {
             LocalDate fromDate,
             LocalDate toDate
     ) {
-        List<ProduceOrder> produceOrders =
-                produceOrderRepo.findAllByCondition(itemGroupId, itemNoAndName, orderState, produceOrderNo, contractNo, fromDate, toDate);
-        return mapper.toListResponses(produceOrders, ProduceOrderResponse.class);
+        List<ProduceOrderResponse> responses = produceOrderRepo.findAllByCondition(itemGroupId, itemNoAndName, orderState, produceOrderNo, contractNo, fromDate, toDate);
+
+        // 구매요청에서 조회 될 제조오더 번호 ex) 22041313461151/품명
+        responses.forEach(m -> m.setProduceOrderNoAndItemName(m.getProduceOrderNo() + "/" + m.getContractItemItemName()));
+        return responses;
     }
 
     // 제조 오더 수정
@@ -93,7 +95,7 @@ public class ProduceOrderServiceImpl implements ProduceOrderService {
         ProduceOrder newProduceOrder = mapper.toEntity(newProduceOrderRequest, ProduceOrder.class);
         findProduceOrder.update(newProduceOrder, newContract, newContractItem);
         produceOrderRepo.save(findProduceOrder);
-        return mapper.toResponse(findProduceOrder, ProduceOrderResponse.class);
+        return getProduceOrder(findProduceOrder.getId());
     }
 
     // 제조오더에 해당하는 구매요청이 한개라도 진행중이거나 완료일 경우엔 수주품목 필드 수정 불가
@@ -154,7 +156,7 @@ public class ProduceOrderServiceImpl implements ProduceOrderService {
     public List<ProduceOrderDetailResponse> getProduceOrderDetails(Long produceOrderId) throws NotFoundException {
         ProduceOrderResponse produceOrder = getProduceOrder(produceOrderId);
         ContractItem contractItem =
-                contractService.getContractItemOrThrow(produceOrder.getContract().getId(), produceOrder.getContractItem().getId());
+                contractService.getContractItemOrThrow(produceOrder.getContractId(), produceOrder.getContractItemId());
         Long itemId = contractItem.getItem().getId();
 
         List<ProduceOrderDetailResponse> orderDetails = produceOrderRepo.findAllProduceOrderDetail(itemId);
@@ -164,6 +166,7 @@ public class ProduceOrderServiceImpl implements ProduceOrderService {
         return orderDetails;
     }
 
+    // 제조오더에서 수주처 선택할때 쓰이는 api
     // 수주 등록된 제조사 list 조회 api
     @Override
     public List<ClientResponse.CodeAndName> getContractClients() {
