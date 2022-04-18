@@ -24,8 +24,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     public List<Item> findAllByCondition(
             Long itemGroupId,
             Long itemAccountId,
-            String itemNo,
-            String itemName,
+            String itemNoAndItemName,
             String searchWord
     ) {
         return jpaQueryFactory
@@ -33,8 +32,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
                 .where(
                         isItemGroupEq(itemGroupId),
                         isItemAccountEq(itemAccountId),
-                        isItemNoContaining(itemNo),
-                        isItemNameContaining(itemName),
+                        isItemNoOrItemNameToItemNoOrItemName(itemNoAndItemName),
                         isSearchContaining(searchWord),
                         isDeleteYnFalse()
                 )
@@ -69,16 +67,6 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
     // 품목계정 검색
     private BooleanExpression isItemAccountEq(Long itemAccount) {
         return itemAccount != null ? item.itemAccount.id.eq(itemAccount) : null;
-    }
-
-    // 품번 검색
-    private BooleanExpression isItemNoContaining(String itemNo) {
-        return itemNo !=  null ? item.itemNo.contains(itemNo) : null;
-    }
-
-    // 품명 검색
-    private BooleanExpression isItemNameContaining(String itemName) {
-        return itemName != null ? item.itemName.contains(itemName) : null;
     }
 
     // 품목|품명으로 검색

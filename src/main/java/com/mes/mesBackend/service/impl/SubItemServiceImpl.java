@@ -71,8 +71,8 @@ public class SubItemServiceImpl implements SubItemService {
 
     // 대체품 전체 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
     @Override
-    public List<SubItemResponse> getSubItems(Long itemGroupId, Long itemAccountId, String itemNo, String itemName) {
-        List<SubItem> subItems = subItemRepository.findAllCondition(itemGroupId, itemAccountId, itemNo, itemName);
+    public List<SubItemResponse> getSubItems(Long itemGroupId, Long itemAccountId, String itemNoAndItemName) {
+        List<SubItem> subItems = subItemRepository.findAllCondition(itemGroupId, itemAccountId, itemNoAndItemName);
         return mapper.toListResponses(subItems, SubItemResponse.class);
     }
 

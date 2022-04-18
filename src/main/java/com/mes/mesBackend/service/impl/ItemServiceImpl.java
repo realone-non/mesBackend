@@ -84,11 +84,10 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemResponse> getItems(
             Long itemGroupId,
             Long itemAccountId,
-            String itemNo,
-            String itemName,
+            String itemNoAndItemName,
             String searchWord
     ) {
-        List<Item> items = itemRepository.findAllByCondition(itemGroupId, itemAccountId, itemNo, itemName, searchWord);
+        List<Item> items = itemRepository.findAllByCondition(itemGroupId, itemAccountId, itemNoAndItemName, searchWord);
         List<ItemResponse> itemResponses = mapper.toListResponses(items, ItemResponse.class);
         for (ItemResponse res : itemResponses) {
             for (Item item : items) {

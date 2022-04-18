@@ -58,16 +58,15 @@ public class OutsourcingInputController {
     )
     public ResponseEntity<List<OutsourcingInputResponse>> getOutsourcingInputList(
             @RequestParam(required = false) @Parameter(description = "외주사 ID") Long clientId,
-            @RequestParam(required = false) @Parameter(description = "품번") String itemNo,
-            @RequestParam(required = false) @Parameter(description = "품명") String itemName,
+            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoAndItemName,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "시작날짜") LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "종료날짜") LocalDate endDate,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<OutsourcingInputResponse> responseList = outsourcingService.getOutsourcingInputList(clientId, itemNo, itemName, startDate, endDate);
+        List<OutsourcingInputResponse> responseList = outsourcingService.getOutsourcingInputList(clientId, itemNoAndItemName, startDate, endDate);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of clientId: " + clientId +
-                "itemNo " + itemNo + "itemName" + itemName + "startDate and EndDate:" + startDate + "," + endDate + " from getOutsourcingInputList.");
+                "itemNoAndItemName:  " + itemNoAndItemName + "startDate and EndDate:" + startDate + "," + endDate + " from getOutsourcingInputList.");
         return new ResponseEntity<>(responseList, OK);
     }
 
