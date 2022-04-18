@@ -317,6 +317,7 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         lotMaster.enrollmentType.eq(PRODUCTION),
                         lotMaster.lotMasterDivision.eq(REAL_LOT)
                 )
+                .groupBy(item.id)
                 .fetch();
     }
 
