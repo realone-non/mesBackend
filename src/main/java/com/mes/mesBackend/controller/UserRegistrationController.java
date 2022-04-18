@@ -116,9 +116,9 @@ public class UserRegistrationController {
     )
     public ResponseEntity<UserRegistrationResponse> updateUserRegistration(
             @PathVariable Long id,
-            @RequestBody @Valid UserRegistrationRequest userRegistrationRequest,
+            @RequestBody @Valid UserRegistrationRequest.Update userRegistrationRequest,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException, NoSuchAlgorithmException {
+    ) throws NotFoundException, BadRequestException {
         UserRegistrationResponse updateUserRegistration = userService.updateUserRegistration(id, userRegistrationRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modified the " + updateUserRegistration.getId() + " from updateUserRegistration.");

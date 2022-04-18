@@ -113,6 +113,7 @@ public class Estimate extends BaseTimeEntity {
         setForwader(newEstimate.forwader);
         setDestination(newEstimate.destination);
         setUser(newUser);
+        setNote(newEstimate.note);
     }
 
     public void delete() {

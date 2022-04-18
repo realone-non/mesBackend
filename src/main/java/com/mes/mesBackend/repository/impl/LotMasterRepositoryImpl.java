@@ -534,7 +534,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                         lotMaster.badItemAmount.as("badAmount"),
                                         lotMaster.createdAmount.as("createAmount"),
                                         item.itemNo.as("itemNo"),
-                                        item.itemName.as("itemName")
+                                        item.itemName.as("itemName"),
+                                        item.unit.unitCode.as("unitCode")
                                 )
                         )
                         .from(lotEquipmentConnect)

@@ -28,9 +28,9 @@ public interface WorkOrderDetailRepositoryCustom {
     );
 
     // 생산계획 수립 조회
-    // 생산계획 수립 전체 조회, 검색조건: 작업라인, 작업예정일
+    // 생산계획 수립 전체 조회, 검색조건: 작업공정, 작업예정일
     List<ProductionPlanResponse> findAllProductionPlanByCondition(
-            Long workLineId,
+            Long workProcessId,
             LocalDate fromDate,
             LocalDate toDate
     );
@@ -69,9 +69,9 @@ public interface WorkOrderDetailRepositoryCustom {
     WorkOrderStateDetailResponse findWorkOrderStateDetailById(Long id);
 
     // =============================================== 8-1. 작지상태 확인 ===============================================
-    // 작업자 투입 리스트 검색 조회, 검색조건: 작업라인 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
+    // 작업자 투입 리스트 검색 조회, 검색조건: 작업공정 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
     List<WorkOrderUserResponse> findWorkOrderUserResponsesByCondition(
-            Long workLineId,
+            Long workProcessId,
             String produceOrderNo,
             Long itemAccountId,
             OrderState orderState,
@@ -102,10 +102,10 @@ public interface WorkOrderDetailRepositoryCustom {
     // 품목에 해당하는 bomDetail 의 라벨링 공정의 bomDetailItem, 포장공정의 원자재 부자재 가져옴
     List<Item> findBomDetailItemByBomMasterItemWorkProcessPackaging(Long bomMasterItemId);
     // =============================================== 8-5. 불량등록 ===============================================
-    // 작업지시 정보 리스트 조회, 검색조건: 작업장 id, 작업라인 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목
+    // 작업지시 정보 리스트 조회, 검색조건: 작업장 id, 작업공정 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목
     List<BadItemWorkOrderResponse> findBadItemWorkOrderResponseByCondition(
             Long workCenterId,
-            Long workLineId,
+            Long inputWorkProcessId,
             Long itemGroupId,
             String produceOrderNo,
             String workOrderNo,
@@ -138,4 +138,8 @@ public interface WorkOrderDetailRepositoryCustom {
     Optional<Long> findOrderStateCountByWorkProcessDivisionAndOrderState(WorkProcessDivision workProcessDivision, OrderState orderState);
     // 작업공절별 생산수량
     Optional<Integer> findProductionAmountByWorkProcessDivision(WorkProcessDivision workProcessDivision);
+
+    // ================================ 생산실적 관리
+    // 생산실적 리스트 조회, 검색조건: 조회기간 fromDate~toDate, 작업공정 id
+    List<ProductionPerformanceResponse> findProductionPerformanceResponseByCondition(LocalDate fromDate, LocalDate toDate, Long workProcessId);
 }

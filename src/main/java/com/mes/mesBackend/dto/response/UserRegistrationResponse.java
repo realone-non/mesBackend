@@ -5,7 +5,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.exception.Message.NOT_EMPTY;
 
 // 18-3. 사용자 등록
 @Getter
@@ -22,14 +25,17 @@ public class UserRegistrationResponse {
     @Schema(description = "이름")
     String korName;
 
-    @Schema(description = "부서 고유아이디")
-    Long deptId;
+    @Schema(description = "메일")
+    String mail;        // 메일
 
-    @Schema(description = "부서코드")
-    int deptCode;
-
-    @Schema(description = "부서명")
-    String deptName;
+//    @Schema(description = "부서 고유아이디")
+//    Long deptId;
+//
+//    @Schema(description = "부서코드")
+//    int deptCode;
+//
+//    @Schema(description = "부서명")
+//    String deptName;
 
     @Schema(description = "사용여부")
     boolean useYn;

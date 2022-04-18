@@ -3,6 +3,7 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
 import com.mes.mesBackend.dto.response.ItemResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.*;
+import static com.mes.mesBackend.entity.enumeration.GoodsType.PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.InputTestState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 
@@ -315,8 +317,10 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         lotMaster.stockAmount.ne(0),
                         lotMaster.createdAmount.ne(lotMaster.checkRequestAmount),
                         lotMaster.enrollmentType.eq(PRODUCTION),
-                        lotMaster.lotMasterDivision.eq(REAL_LOT)
+                        lotMaster.lotMasterDivision.eq(REAL_LOT),
+                        lotMaster.item.itemAccount.goodsType.eq(PRODUCT)
                 )
+                .groupBy(item.id)
                 .fetch();
     }
 
@@ -436,7 +440,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         lotMaster.inputAmount.eq(0),
                         lotMaster.lotMasterDivision.eq(REAL_LOT),
                         lotMaster.stockAmount.ne(0),
-                        lotMaster.enrollmentType.eq(PRODUCTION)
+                        lotMaster.enrollmentType.eq(PRODUCTION),
+                        lotMaster.item.itemAccount.goodsType.eq(PRODUCT)
                 )
                 .fetch();
     }

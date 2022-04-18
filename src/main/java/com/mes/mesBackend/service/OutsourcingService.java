@@ -13,7 +13,7 @@ public interface OutsourcingService {
     OutsourcingProductionResponse createOutsourcingProduction(OutsourcingProductionRequestRequest outsourcingProductionRequestRequest) throws NotFoundException, BadRequestException;
 
     //외주생산의뢰 리스트조회
-    List<OutsourcingProductionResponse> getOutsourcingProductions(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate) throws BadRequestException;
+    List<OutsourcingProductionResponse> getOutsourcingProductions(Long clientId, String itemNoAndItemName, LocalDate startDate, LocalDate endDate) throws BadRequestException;
 
     //외주생산의뢰 조회
     OutsourcingProductionResponse getOutsourcingProductionResponseOrThrow(Long id) throws NotFoundException, BadRequestException;
@@ -43,7 +43,7 @@ public interface OutsourcingService {
 //    OutsourcingInputResponse createOutsourcingInput(OutsourcingInputRequest request) throws NotFoundException;
 
     //외주 입고정보 리스트조회
-    List<OutsourcingInputResponse> getOutsourcingInputList(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate);
+    List<OutsourcingInputResponse> getOutsourcingInputList(Long clientId, String itemNoAndItemName, LocalDate startDate, LocalDate endDate);
 
     //외주 입고정보 조회
     OutsourcingInputResponse getOutsourcingInputResponseOrThrow(Long id) throws NotFoundException;
@@ -73,7 +73,7 @@ public interface OutsourcingService {
     OutsourcingReturnResponse createOutsourcingReturn(OutsourcingReturnRequest request) throws NotFoundException, BadRequestException;
 
     //외주 반품 리스트조회
-    List<OutsourcingReturnResponse> getOutsourcingReturnList(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate);
+    List<OutsourcingReturnResponse> getOutsourcingReturnList(Long clientId, String itemNoAndItemName, LocalDate startDate, LocalDate endDate);
 
     //외주 반품 조회
     OutsourcingReturnResponse getOutsourcingReturn(Long returnId) throws NotFoundException;
@@ -85,5 +85,5 @@ public interface OutsourcingService {
     void deleteOutsourcingReturn(Long id) throws NotFoundException;
 
     //외주 현황 조회
-    List<OutsourcingStatusResponse> getOutsourcingStatusList(Long clientId, String itemNo, String itemName);
+    List<OutsourcingStatusResponse> getOutsourcingStatusList(Long clientId, String itemNoAndItemName);
 }

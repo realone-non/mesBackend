@@ -88,11 +88,10 @@ public class SubItemController {
     public ResponseEntity<List<SubItemResponse>> getSubItems(
             @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
             @RequestParam(required = false) @Parameter(description = "품목계정 id") Long itemAccountId,
-            @RequestParam(required = false) @Parameter(description = "품번") String itemNo,
-            @RequestParam(required = false) @Parameter(description = "품명") String itemName,
+            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoAndItemName,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<SubItemResponse> subItems = subItemService.getSubItems(itemGroupId, itemAccountId, itemNo, itemName);
+        List<SubItemResponse> subItems = subItemService.getSubItems(itemGroupId, itemAccountId, itemNoAndItemName);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of itemGroupId: " + itemGroupId +
                 ", itemAccountId: " + itemAccountId + " from getSubItems.");

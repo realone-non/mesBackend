@@ -177,8 +177,8 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
     }
 
     //재고현황 조회
-    public JSONArray getMaterialStock(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Long warehouseId){
-        List<Item> items = itemRepository.findAllByCondition(itemGroupId, itemAccountId, itemNo, itemName, null);
+    public JSONArray getMaterialStock(Long itemGroupId, Long itemAccountId, String itemNoAndItemName, Long warehouseId){
+        List<Item> items = itemRepository.findAllByCondition(itemGroupId, itemAccountId, itemNoAndItemName, null);
         JSONArray materialStocks = new JSONArray();
 
         for (Item item:items) {

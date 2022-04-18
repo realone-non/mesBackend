@@ -47,12 +47,12 @@ public class ProductionPlanController {
             description = "검색조건: 작업라인 id, 작업예정일 fromDate~toDate"
     )
     public ResponseEntity<List<ProductionPlanResponse>> getProductionPlans(
-            @RequestParam(required = false) @Parameter(description = "작업라인 id") Long workLineId,
+            @RequestParam(required = false) @Parameter(description = "작업공정 id") Long workProcessId,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업예정일 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업예정일 toDate") LocalDate toDate,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        List<ProductionPlanResponse> productionPlans = productionPlanService.getProductionPlans(workLineId, fromDate, toDate);
+        List<ProductionPlanResponse> productionPlans = productionPlanService.getProductionPlans(workProcessId, fromDate, toDate);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProductionPlans.");
         return new ResponseEntity<>(productionPlans, OK);

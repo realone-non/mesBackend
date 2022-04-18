@@ -128,7 +128,7 @@ public class LotMasterServiceImpl implements LotMasterService {
 
     //당일 재고 생성(Test)
     public void getItemStock() {
-        List<Item> itemList = itemRepository.findAllByCondition(null, null, null, null, null);
+        List<Item> itemList = itemRepository.findAllByCondition(null, null, null, null);
         for (Item item : itemList) {
             List<MaterialStockReponse> stockList = lotMasterRepo.findStockAmountByItemId(item.getId(), null);
             for (MaterialStockReponse response : stockList) {

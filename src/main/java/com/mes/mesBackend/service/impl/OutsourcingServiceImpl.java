@@ -54,8 +54,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     }
 
     //외주생산의뢰 리스트조회
-    public List<OutsourcingProductionResponse> getOutsourcingProductions(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate) throws BadRequestException {
-        List<OutsourcingProductionResponse> responses = outsourcingProductionRepository.findAllByCondition(clientId, itemNo, itemName, startDate, endDate);
+    public List<OutsourcingProductionResponse> getOutsourcingProductions(Long clientId, String itemNoAndItemName, LocalDate startDate, LocalDate endDate) throws BadRequestException {
+        List<OutsourcingProductionResponse> responses = outsourcingProductionRepository.findAllByCondition(clientId, itemNoAndItemName, startDate, endDate);
         for (OutsourcingProductionResponse r : responses) {
             Long bomMasterId = bomMasterRepository.findByItemIdAndDeleteYnFalse(r.getItemId()).orElseThrow(() -> new BadRequestException("품목에 해당하는 BOM 정보가 존재하지 않습니다."));
             r.setBomMasterId(bomMasterId);
@@ -204,8 +204,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
 //    }
 
     //외주 입고정보 리스트조회
-    public List<OutsourcingInputResponse> getOutsourcingInputList(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
-        List<OutsourcingInputResponse> responses = outsourcingInputRepository.findAllByCondition(clientId, itemNo, itemName, startDate, endDate);
+    public List<OutsourcingInputResponse> getOutsourcingInputList(Long clientId, String itemNoAndItemName, LocalDate startDate, LocalDate endDate){
+        List<OutsourcingInputResponse> responses = outsourcingInputRepository.findAllByCondition(clientId, itemNoAndItemName, startDate, endDate);
 
         for (OutsourcingInputResponse r : responses) {
             List<OutSourcingInput> inputs = outsourcingInputRepository.findOutsourcingInputByRequestId(r.getId());
@@ -525,8 +525,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     }
 
     //외주 반품 리스트조회
-    public List<OutsourcingReturnResponse> getOutsourcingReturnList(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
-        return outsourcingReturnRepository.findAllByCondition(clientId, itemNo, itemName, startDate, endDate);
+    public List<OutsourcingReturnResponse> getOutsourcingReturnList(Long clientId, String itemNoAndItemName, LocalDate startDate, LocalDate endDate){
+        return outsourcingReturnRepository.findAllByCondition(clientId, itemNoAndItemName, startDate, endDate);
     }
 
     //외주 반품 조회
@@ -567,8 +567,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
     }
 
     //외주 현황 조회
-    public List<OutsourcingStatusResponse> getOutsourcingStatusList(Long clientId, String itemNo, String itemName){
-        return outsourcingInputRepository.findStatusByCondition(clientId, itemNo, itemName);
+    public List<OutsourcingStatusResponse> getOutsourcingStatusList(Long clientId, String itemNoAndItemName){
+        return outsourcingInputRepository.findStatusByCondition(clientId, itemNoAndItemName);
     }
 
     //외주 입고정보 조회

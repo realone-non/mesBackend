@@ -132,7 +132,8 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                                 contract.periodDate.as("periodDate"),
                                 purchaseRequest.inputTestYn.as("inputTestYn"),
                                 purchaseRequest.stockUnitRequestAmount.as("stockUnitRequestAmount"),
-                                purchaseRequest.stockUnitOrderAmount.as("stockUnitOrderAmount")
+                                purchaseRequest.stockUnitOrderAmount.as("stockUnitOrderAmount"),
+                                contractItem.item.itemName.as("contractItemItemName")
                         )
                 )
                 .from(purchaseRequest)

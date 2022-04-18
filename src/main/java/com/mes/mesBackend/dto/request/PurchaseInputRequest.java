@@ -66,7 +66,7 @@ public class PurchaseInputRequest {
         @Schema(description = "유효일자")
         LocalDate validDate;
 
-        @Schema(description = "긴급여부")
+        @Schema(description = "수입검사여부")
         @NotNull(message = NOT_NULL)
         boolean inputTestYn;
 
@@ -77,5 +77,8 @@ public class PurchaseInputRequest {
         @Schema(description = "COC")
         @NotNull(message = NOT_NULL)
         boolean coc = false;
+
+        @Schema(description = "거래처 LOT 번호")
+        String clientLotNo;
     }
 }

@@ -16,7 +16,7 @@ public interface SubItemService {
     // 대체품 단일 조회
     SubItemResponse getSubItem(Long id) throws NotFoundException;
     // 대체품 전체 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
-    List<SubItemResponse> getSubItems(Long itemGroupId, Long itemAccountId, String itemNo, String itemName);
+    List<SubItemResponse> getSubItems(Long itemGroupId, Long itemAccountId, String itemNoAndItemName);
     // 대체품 페이징 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
 //    Page<SubItemResponse> getSubItems(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Pageable pageable);
     // 대체품 수정
