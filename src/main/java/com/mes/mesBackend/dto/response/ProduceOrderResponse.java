@@ -37,6 +37,9 @@ public class ProduceOrderResponse {
     @Schema(description = "수주품목 수주유형 [DIFFUSION: 방산 , DOMESTIC: 국내, OVERSEAS: 해외 , ODM: ODM]")
     ContractType contractItemContractType;
 
+    @Schema(description = "수주품목 수주수량")
+    int contractItemAmount;
+
     @Schema(description = "수주 고유아이디")
     Long contractId;
 
@@ -51,11 +54,11 @@ public class ProduceOrderResponse {
     LocalDate contractPeriodDate;
 
 
-//    @Schema(description = "수주품목(품번,품명,수주수량,수주유형)")
-//    ContractItemResponse.toProduceOrder contractItem;
+    @Schema(description = "수주품목(품번,품명,수주수량,수주유형)")
+    ContractItemResponse.toProduceOrder contractItem;
 
-//    @Schema(description = "수주(수주번호,수주처,납기일자)")
-//    ContractResponse.toProduceOrder contract;
+    @Schema(description = "수주(수주번호,수주처,납기일자)")
+    ContractResponse.toProduceOrder contract;
 
     @Schema(description = "착수예정일")
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)

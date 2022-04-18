@@ -85,9 +85,9 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     }
 
     // 생산계획 수립 조회
-    // 생산계획 수립 전체 조회, 검색조건: 작업라인, 작업예정일
+    // 생산계획 수립 전체 조회, 검색조건: 작업공정, 작업예정일
     @Override
-    public List<ProductionPlanResponse> findAllProductionPlanByCondition(Long workLineId, LocalDate fromDate, LocalDate toDate) {
+    public List<ProductionPlanResponse> findAllProductionPlanByCondition(Long workProcessId, LocalDate fromDate, LocalDate toDate) {
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -95,7 +95,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.id.as("id"),
                                 workOrderDetail.orderNo.as("orderNo"),
                                 workOrderDetail.orders.as("orders"),
-                                workLine.workLineName.as("workLine"),
+//                                workLine.workLineName.as("workLine"),
+                                workOrderDetail.workProcess.workProcessName.as("workProcessName"),
                                 workOrderDetail.expectedWorkDate.as("expectedWorkDate"),
                                 workOrderDetail.expectedWorkTime.as("expectedWorkTime"),
                                 workOrderDetail.readyTime.as("readyTime"),
@@ -123,7 +124,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .leftJoin(client).on(client.id.eq(contract.client.id))
                 .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
                 .where(
-                        isWorkLineIdEq(workLineId),
+//                        isWorkLineIdEq(workLineId),
+                        isWorkProcessId(workProcessId),
                         isExpectedWorkDateBetween(fromDate, toDate),
                         isDeleteYnFalse()
                 )
@@ -144,7 +146,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
                                 itemAccount.account.as("itemAccount"),
-                                workLine.workLineName.as("workLine"),
+//                                workLine.workLineName.as("workLine"),
                                 workOrderDetail.expectedWorkDate.as("expectedWorkDate"),
                                 workOrderDetail.expectedWorkTime.as("expectedWorkTime"),
                                 workOrderDetail.readyTime.as("readyTime"),
@@ -157,7 +159,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.productionAmount.as("productionAmount"),
                                 workOrderDetail.startDate.as("startDateTime"),
                                 workOrderDetail.endDate.as("endDateTime"),
-                                workLine.workLineName.as("workLineName")
+//                                workLine.workLineName.as("workLineName"),
+                                workOrderDetail.workProcess.workProcessName.as("workProcessName")
                         )
                 )
                 .from(workOrderDetail)
@@ -167,7 +170,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .leftJoin(item).on(item.id.eq(contractItem.item.id))
                 .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
                 .leftJoin(client).on(client.id.eq(contract.client.id))
-                .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
+//                .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
                 .where(
                         workOrderDetail.id.eq(id),
                         isDeleteYnFalse()
@@ -414,10 +417,10 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     }
 
     // =============================================== 8-2. 작업자 투입 수정 ===============================================
-    // 작업자 투입 리스트 검색 조회, 검색조건: 작업라인 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
+    // 작업자 투입 리스트 검색 조회, 검색조건: 작업공정 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
     @Override
     public List<WorkOrderUserResponse> findWorkOrderUserResponsesByCondition(
-            Long workLineId,
+            Long workProcessId,
             String produceOrderNo,
             Long itemAccountId,
             OrderState orderState,
@@ -435,7 +438,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 user.korName.as("korName"),
                                 workOrderDetail.startDate.as("startDateTime"),
                                 workOrderDetail.endDate.as("endDateTime"),
-                                workLine.workLineName.as("workLine"),
+//                                workLine.workLineName.as("workLine"),
+                                workOrderDetail.workProcess.workProcessName.as("workProcessName"),
                                 workOrderDetail.note.as("note"),
                                 contract.contractNo.as("contractNo"),
                                 produceOrder.produceOrderNo.as("produceOrderNo"),
@@ -453,7 +457,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                 .leftJoin(item).on(item.id.eq(contractItem.item.id))
                 .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
                 .where(
-                        isWorkLineIdEq(workLineId),
+//                        isWorkLineIdEq(workLineId),
+                        isWorkProcessId(workProcessId),
                         isProduceOrderNoContain(produceOrderNo),
 //                        isItemAccountIdEq(itemAccountId),
                         isContractNoContain(contractNo),
@@ -479,15 +484,16 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                         user.korName.as("korName"),
                                         workOrderDetail.startDate.as("startDateTime"),
                                         workOrderDetail.endDate.as("endDateTime"),
-                                        workLine.workLineName.as("workLine"),
+//                                        workLine.workLineName.as("workLine"),
                                         workOrderDetail.note.as("note"),
                                         contract.contractNo.as("contractNo"),
-                                        produceOrder.produceOrderNo.as("produceOrderNo")
+                                        produceOrder.produceOrderNo.as("produceOrderNo"),
+                                        workOrderDetail.workProcess.workProcessName.as("workProcessName")
                                 )
                         )
                         .from(workOrderDetail)
                         .leftJoin(user).on(user.id.eq(workOrderDetail.user.id))
-                        .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
+//                        .leftJoin(workLine).on(workLine.id.eq(workOrderDetail.workLine.id))
                         .leftJoin(produceOrder).on(produceOrder.id.eq(workOrderDetail.produceOrder.id))
                         .leftJoin(contract).on(contract.id.eq(produceOrder.contract.id))
                         .leftJoin(contractItem).on(contractItem.id.eq(produceOrder.contractItem.id))
@@ -914,7 +920,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
 
     // 작업공정
     private BooleanExpression isWorkProcessId(Long workProcessId) {
-        return workOrderDetail.workProcess.id.eq(workProcessId);
+        return workProcessId != null ? workOrderDetail.workProcess.id.eq(workProcessId) : null;
     }
 
     // 작업자

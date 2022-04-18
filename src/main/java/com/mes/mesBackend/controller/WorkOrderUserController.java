@@ -42,15 +42,15 @@ public class WorkOrderUserController {
     private final Logger logger = LoggerFactory.getLogger(WorkOrderUserController.class);
     private CustomLogger cLogger;
 
-    // 작업자 투입 리스트 검색 조회, 검색조건: 작업라인 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
+    // 작업자 투입 리스트 검색 조회, 검색조건: 작업공정 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
     @GetMapping
     @ResponseBody
     @Operation(
             summary = "작업자 투입 리스트 검색 조회",
-            description = "검색조건: 작업라인 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호"
+            description = "검색조건: 작업공정 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호"
     )
     public ResponseEntity<List<WorkOrderUserResponse>> getWorkOrderUsers(
-            @RequestParam(required = false) @Parameter(description = "작업라인 id") Long workLineId,
+            @RequestParam(required = false) @Parameter(description = "작업공정 id") Long workProcessId,
             @RequestParam(required = false) @Parameter(description = "제조오더번호") String produceOrderNo,
             @RequestParam(required = false) @Parameter(description = "품목계정 id") Long itemAccountId,
             @RequestParam(required = false) @Parameter(description = "지시상태 [완료: COMPLETION, 진행중: ONGOING, 예정: SCHEDULE, 취소: CANCEL]") OrderState orderState,
@@ -59,7 +59,7 @@ public class WorkOrderUserController {
             @RequestParam(required = false) @Parameter(description = "수주번호") String contractNo,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<WorkOrderUserResponse> workOrderUsers = workOrderUserService.getWorkOrderUsers(workLineId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
+        List<WorkOrderUserResponse> workOrderUsers = workOrderUserService.getWorkOrderUsers(workProcessId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkOrderUsers.");
         return new ResponseEntity<>(workOrderUsers, OK);

@@ -33,7 +33,7 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
 
     @Override
     public List<WorkOrderUserResponse> getWorkOrderUsers(
-            Long workLineId,
+            Long workProcessId,
             String produceOrderNo,
             Long itemAccountId,
             OrderState orderState,
@@ -42,7 +42,7 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
             String contractNo
     ) {
         List<WorkOrderUserResponse> findWorkOrderUsers =
-                workOrderDetailRepository.findWorkOrderUserResponsesByCondition(workLineId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
+                workOrderDetailRepository.findWorkOrderUserResponsesByCondition(workProcessId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
 
         // 해당 공정에 맞는 bomDetailItem
         for (WorkOrderUserResponse response : findWorkOrderUsers) {

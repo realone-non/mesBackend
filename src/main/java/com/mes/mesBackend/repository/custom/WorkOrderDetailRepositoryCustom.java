@@ -28,9 +28,9 @@ public interface WorkOrderDetailRepositoryCustom {
     );
 
     // 생산계획 수립 조회
-    // 생산계획 수립 전체 조회, 검색조건: 작업라인, 작업예정일
+    // 생산계획 수립 전체 조회, 검색조건: 작업공정, 작업예정일
     List<ProductionPlanResponse> findAllProductionPlanByCondition(
-            Long workLineId,
+            Long workProcessId,
             LocalDate fromDate,
             LocalDate toDate
     );
@@ -69,9 +69,9 @@ public interface WorkOrderDetailRepositoryCustom {
     WorkOrderStateDetailResponse findWorkOrderStateDetailById(Long id);
 
     // =============================================== 8-1. 작지상태 확인 ===============================================
-    // 작업자 투입 리스트 검색 조회, 검색조건: 작업라인 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
+    // 작업자 투입 리스트 검색 조회, 검색조건: 작업공정 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
     List<WorkOrderUserResponse> findWorkOrderUserResponsesByCondition(
-            Long workLineId,
+            Long workProcessId,
             String produceOrderNo,
             Long itemAccountId,
             OrderState orderState,
