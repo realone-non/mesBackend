@@ -1,6 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.ModifiedLog;
 import com.mes.mesBackend.entity.enumeration.TestType;
@@ -30,6 +31,9 @@ public class PurchaseRequestResponse {
 
     @Schema(description = "제조오더번호")
     String produceOrderNo;
+
+    @Schema(description = "제조오더번호 + 수주품목")
+    String produceOrderNoAndItemName;
 
     @Schema(description = "품목 고유아이디")
     Long itemId;
@@ -105,6 +109,9 @@ public class PurchaseRequestResponse {
 
     @Schema(description = "수입검사여부")
     boolean inputTestYn;
+
+    @JsonIgnore
+    String contractItemItemName;
 
     // 수정 기록
     public void modifiedLog(ModifiedLog modifiedLog) {

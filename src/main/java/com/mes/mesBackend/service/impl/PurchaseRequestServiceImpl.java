@@ -101,6 +101,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
             ModifiedLog insertLog = modifiedLogHelper.getInsertLog(PURCHASE_REQUEST, r.getId());
             if (modifiedLog != null) r.modifiedLog(modifiedLog);
             if (insertLog != null) r.insertLog(insertLog);
+            r.setProduceOrderNoAndItemName(r.getProduceOrderNo() + "/" + r.getContractItemItemName());
         }
         return responses;
     }
