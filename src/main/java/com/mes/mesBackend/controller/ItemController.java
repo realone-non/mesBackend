@@ -96,12 +96,11 @@ public class ItemController {
     public ResponseEntity<List<ItemResponse>> getItems(
             @RequestParam(required = false) @Parameter(description = "품목 그룹 id") Long itemGroupId,
             @RequestParam(required = false) @Parameter(description = "품목 계정 id") Long itemAccountId,
-            @RequestParam(required = false) @Parameter(description = "품번") String itemNo,
-            @RequestParam(required = false) @Parameter(description = "품명") String itemName,
+            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoAndItemName,
             @RequestParam(required = false) @Parameter(description = "검색어") String searchWord,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<ItemResponse> items = itemService.getItems(itemGroupId, itemAccountId, itemNo, itemName, searchWord);
+        List<ItemResponse> items = itemService.getItems(itemGroupId, itemAccountId, itemNoAndItemName, searchWord);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of itemGroupId: " + itemGroupId
                 + ", itemAccountId: " + itemGroupId + " from getItems.");

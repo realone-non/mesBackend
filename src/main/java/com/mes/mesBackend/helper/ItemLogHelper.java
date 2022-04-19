@@ -28,7 +28,7 @@ public class ItemLogHelper {
 
     @Scheduled(cron = "0 0 23 * * ?")
     public void getItemLog(){
-        List<Item> itemList = itemRepository.findAllByCondition(null, null, null, null, null);
+        List<Item> itemList = itemRepository.findAllByCondition(null, null, null, null);
         for (Item item : itemList) {
             List<MaterialStockReponse> stockList = lotMasterRepository.findStockAmountByItemId(item.getId(), null);
             for (MaterialStockReponse response : stockList) {

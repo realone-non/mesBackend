@@ -41,23 +41,23 @@ public class User extends BaseTimeEntity implements UserDetails {
     @JoinColumn(name = "DEPARTMENTS_ID", columnDefinition = "bigint COMMENT '부서'")
     private Department department;  // 부서
 
-    @Column(name = "POSITION", nullable = false, columnDefinition = "varchar(255) COMMENT '직위'")
+    @Column(name = "POSITION",  columnDefinition = "varchar(255) COMMENT '직위'")
     private String position;    // 직위
 
-    @Column(name = "JOb", nullable = false, columnDefinition = "varchar(255) COMMENT '직무'")
+    @Column(name = "JOb",  columnDefinition = "varchar(255) COMMENT '직무'")
     private String job;         // 직무
 
     @Column(name = "TEL_NUMBER", columnDefinition = "varchar(255) COMMENT '연락처'")
     private String telNumber;   // 연락처
 
     @Column(name = "ENG_NAME", columnDefinition = "varchar(255) COMMENT '영문이름'")
-    private String engName;     // 영문이름+직위
+    private String engName;     // 영문이름
 
     @Column(name = "MAIL", nullable = false, columnDefinition = "varchar(255) COMMENT '메일'")
     private String mail;        // 메일
 
     @Column(name = "PHONE_NUMBER", columnDefinition = "varchar(255) COMMENT '휴대폰번호'")
-    private String phoneNumber; // 휴대폰 번호(카카오)
+    private String phoneNumber; // 휴대폰 번호
 
     @Column(name = "USE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean useYn = true;  // 사용

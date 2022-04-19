@@ -3,6 +3,7 @@ package com.mes.mesBackend.repository.impl;
 import com.mes.mesBackend.dto.response.InputTestRequestResponse;
 import com.mes.mesBackend.dto.response.ItemResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.GoodsType;
 import com.mes.mesBackend.entity.enumeration.InputTestDivision;
 import com.mes.mesBackend.entity.enumeration.InspectionType;
 import com.mes.mesBackend.entity.enumeration.TestType;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.EnrollmentType.*;
+import static com.mes.mesBackend.entity.enumeration.GoodsType.PRODUCT;
 import static com.mes.mesBackend.entity.enumeration.InputTestState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 
@@ -168,13 +170,13 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     @Transactional(readOnly = true)
     public Integer findLotMasterCreataeAmountByLotMasterId(Long lotMasterId) {
         return jpaQueryFactory
-                        .select(lotMaster.createdAmount)
-                        .from(lotMaster)
-                        .where(
-                                lotMaster.id.eq(lotMasterId),
-                                lotMaster.deleteYn.isFalse()
-                        )
-                        .fetchOne();
+                .select(lotMaster.createdAmount)
+                .from(lotMaster)
+                .where(
+                        lotMaster.id.eq(lotMasterId),
+                        lotMaster.deleteYn.isFalse()
+                )
+                .fetchOne();
     }
 
     // LOT Master 의 재고수량
@@ -230,15 +232,15 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     // 해당 lotMasterId 와 같은 검사 id 가져옴
     @Override
     public boolean findInputTestYnByLotMasterId(Long lotMasterId) {
-         Integer fetchOne = jpaQueryFactory
-                 .selectOne()
-                 .from(inputTestRequest)
-                 .where(
-                         inputTestRequest.deleteYn.isFalse(),
-                         inputTestRequest.inputTestState.eq(COMPLETION)
-                 )
-                 .fetchFirst();
-         return fetchOne != null;
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(inputTestRequest)
+                .where(
+                        inputTestRequest.deleteYn.isFalse(),
+                        inputTestRequest.inputTestState.eq(COMPLETION)
+                )
+                .fetchFirst();
+        return fetchOne != null;
     }
 
     // 검사의뢰 가능한 품목정보 조회(구매입고)
@@ -315,8 +317,10 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         lotMaster.stockAmount.ne(0),
                         lotMaster.createdAmount.ne(lotMaster.checkRequestAmount),
                         lotMaster.enrollmentType.eq(PRODUCTION),
-                        lotMaster.lotMasterDivision.eq(REAL_LOT)
+                        lotMaster.lotMasterDivision.eq(REAL_LOT),
+                        lotMaster.item.itemAccount.goodsType.eq(PRODUCT)
                 )
+                .groupBy(item.id)
                 .fetch();
     }
 
@@ -436,7 +440,8 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
                         lotMaster.inputAmount.eq(0),
                         lotMaster.lotMasterDivision.eq(REAL_LOT),
                         lotMaster.stockAmount.ne(0),
-                        lotMaster.enrollmentType.eq(PRODUCTION)
+                        lotMaster.enrollmentType.eq(PRODUCTION),
+                        lotMaster.item.itemAccount.goodsType.eq(PRODUCT)
                 )
                 .fetch();
     }

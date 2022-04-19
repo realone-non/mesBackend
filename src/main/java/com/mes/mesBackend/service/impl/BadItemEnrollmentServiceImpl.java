@@ -38,7 +38,7 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
     @Override
     public List<BadItemWorkOrderResponse> getWorkOrders(
             Long workCenterId,
-            Long workLineId,
+            Long inputWorkProcessId,
             Long itemGroupId,
             String produceOrderNo,
             String workOrderNo,
@@ -49,7 +49,7 @@ public class BadItemEnrollmentServiceImpl implements BadItemEnrollmentService {
         // 작업지시의 지시상태가 COMPLETION, 공정구분이 출하, 자재입고 제외
         List<BadItemWorkOrderResponse> workOrderResponses = workOrderDetailRepo.findBadItemWorkOrderResponseByCondition(
                 workCenterId,
-                workLineId,
+                inputWorkProcessId,
                 itemGroupId,
                 produceOrderNo,
                 workOrderNo,

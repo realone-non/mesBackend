@@ -75,13 +75,12 @@ public class OutsourcingReturnController {
     )
     public ResponseEntity<List<OutsourcingReturnResponse>> getOutsourcingReturns(
             @RequestParam(required = false) @Parameter(description = "외주사 ID") Long clientId,
-            @RequestParam(required = false) @Parameter(description = "품번") String itemNo,
-            @RequestParam(required = false) @Parameter(description = "품명") String itemName,
+            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoAndItemName,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "시작날짜") LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "종료날짜") LocalDate endDate,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<OutsourcingReturnResponse> responseList = outsourcingService.getOutsourcingReturnList(clientId, itemNo, itemName, startDate, endDate);
+        List<OutsourcingReturnResponse> responseList = outsourcingService.getOutsourcingReturnList(clientId, itemNoAndItemName, startDate, endDate);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         return new ResponseEntity<>(responseList, OK);
     }

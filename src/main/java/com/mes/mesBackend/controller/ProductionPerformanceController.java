@@ -1,6 +1,7 @@
 package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.response.ProductionPerformanceResponse;
+import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
@@ -36,18 +37,17 @@ public class ProductionPerformanceController {
     private final Logger logger = LoggerFactory.getLogger(ProductionPerformanceController.class);
     private CustomLogger cLogger;
 
-    // 생산실적 리스트 조회, 검색조건: 조회기간 fromDate~toDate, 품목그룹 id, 품명|품번
-    @Operation(summary = "생산실적관리 리스트 조회", description = "조회기간 fromDate~toDate, 품목그룹 id, 품명|품번")
+    // 생산실적 리스트 조회, 검색조건: 조회기간 fromDate~toDate, 작업공정 id
+    @Operation(summary = "생산실적관리 리스트 조회", description = "조회기간 fromDate~toDate, 작업공정 id")
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<ProductionPerformanceResponse>> getProductionPerformances(
-            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "조회기간 fromDate") LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "조회기간 toDate") LocalDate toDate,
-            @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
-            @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoOrItemName,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업시작일 fromDate") LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업시작일 toDate") LocalDate toDate,
+            @RequestParam(required = false) @Parameter(description = "작업공정 id") Long workProcessId,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) {
-        List<ProductionPerformanceResponse> productionPerformanceResponses = productionPerformanceService.getProductionPerformances(fromDate, toDate, itemGroupId, itemNoOrItemName);
+    ) throws NotFoundException {
+        List<ProductionPerformanceResponse> productionPerformanceResponses = productionPerformanceService.getProductionPerformances(fromDate, toDate, workProcessId);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProductionPerformances.");
         return new ResponseEntity<>(productionPerformanceResponses, OK);
