@@ -89,7 +89,7 @@ public class ProductionPlanController {
                     @ApiResponse(responseCode = "404", description = "not found resource"),
                     @ApiResponse(responseCode = "400", description = "bad request")
             }
-            )
+    )
     public ResponseEntity<ProductionPlanResponse> createProductionPlanOrder(
             @PathVariable(value = "work-order-id") @Parameter(description = "작업 지시 id") Long workOrderId,
             @RequestParam @Parameter(description = "작업순번") int orders,

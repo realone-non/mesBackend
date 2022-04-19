@@ -232,11 +232,11 @@ public class ProduceOrderRepositoryImpl implements ProduceOrderRepositoryCustom 
     }
 
     /*
-    * > contract.item.itemGroup -> NullPointerException
-    * QueryPath 를 이용해서 쿼리를 빌드할 때 QueryDSL은 기본적으로 현재 엔티티의 속성값에 대해서만 참조 가능.
-    * 즉, Direct Properties 만 BuildPath 에 포함할 수 있으며 Deep Initialize 가 필요한 부분은
-    * @QueryInit 어노테이션을 적용해야함.
-    * */
+     * > contract.item.itemGroup -> NullPointerException
+     * QueryPath 를 이용해서 쿼리를 빌드할 때 QueryDSL은 기본적으로 현재 엔티티의 속성값에 대해서만 참조 가능.
+     * 즉, Direct Properties 만 BuildPath 에 포함할 수 있으며 Deep Initialize 가 필요한 부분은
+     * @QueryInit 어노테이션을 적용해야함.
+     * */
     private BooleanExpression isItemGroupEq(Long itemGroupId) {
         return itemGroupId != null ? produceOrder.contractItem.item.itemGroup.id.eq(itemGroupId) : null;
     }

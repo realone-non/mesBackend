@@ -31,11 +31,11 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
     final QContract contract = QContract.contract;
     final QClient client = QClient.client;
     final QPurchaseOrder purchaseOrder = QPurchaseOrder.purchaseOrder;
-        /*
-        * 구매요청 품목정보는 produceOrder 의 contractItem 의 item 을 찾아서
-        * item 에 해당하는 bomMaster 의 데이터에 해당되는
-        * bomMasterDetail 의 item 만 등록 할 수 있다.
-        */
+    /*
+     * 구매요청 품목정보는 produceOrder 의 contractItem 의 item 을 찾아서
+     * item 에 해당하는 bomMaster 의 데이터에 해당되는
+     * bomMasterDetail 의 item 만 등록 할 수 있다.
+     */
     @Override
     @Transactional(readOnly = true)
     public List<Long> findItemIdByContractItemId(Long itemId) {

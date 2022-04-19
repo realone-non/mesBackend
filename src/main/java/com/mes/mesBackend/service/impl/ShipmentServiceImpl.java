@@ -90,9 +90,9 @@ public class ShipmentServiceImpl implements ShipmentService {
             res.addContractInfo(contract);
         }
 
-         if (userId != null && currencyId != null) {
-             return shipmentResponses.stream().filter(f -> f.getUserId() != null && f.getUserId().equals(userId) && f.getCurrencyId() != null && f.getCurrencyId().equals(currencyId)).collect(Collectors.toList());
-         } else if (userId != null) {
+        if (userId != null && currencyId != null) {
+            return shipmentResponses.stream().filter(f -> f.getUserId() != null && f.getUserId().equals(userId) && f.getCurrencyId() != null && f.getCurrencyId().equals(currencyId)).collect(Collectors.toList());
+        } else if (userId != null) {
             return shipmentResponses.stream().filter(f -> f.getUserId() != null && f.getUserId().equals(userId)).collect(Collectors.toList());
         } else if (currencyId != null) {
             return shipmentResponses.stream().filter(f -> f.getCurrencyId() != null && f.getCurrencyId().equals(currencyId)).collect(Collectors.toList());
@@ -157,11 +157,11 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     // 출하 품목정보 생성
     /*
-    * 등록조건
-    * - 수주품목 중복 등록 불가능(입력한 contractItem 이 이미 있는지 체크)
-    * - 생성된 출하의 거래처가 같은것만 등록 가능
-    * - 출하의 상태가 COMPLETION 이면 추가 불가능
-    * */
+     * 등록조건
+     * - 수주품목 중복 등록 불가능(입력한 contractItem 이 이미 있는지 체크)
+     * - 생성된 출하의 거래처가 같은것만 등록 가능
+     * - 출하의 상태가 COMPLETION 이면 추가 불가능
+     * */
     @Override
     public ShipmentItemResponse createShipmentItem(Long shipmentId, Long contractItemId, String note) throws NotFoundException, BadRequestException {
         Shipment shipment = getShipmentOrThrow(shipmentId);
@@ -201,8 +201,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     // 출하 품목정보 수정
     /*
-    * 수주품목 변경 시 LOT 정보가 있으면 해당 LOT 정보 삭제 후 수정 가능
-    * */
+     * 수주품목 변경 시 LOT 정보가 있으면 해당 LOT 정보 삭제 후 수정 가능
+     * */
     @Override
     public ShipmentItemResponse updateShipmentItem(Long shipmentId, Long shipmentItemId, Long contractItemId, String note) throws NotFoundException, BadRequestException {
         ShipmentItem findShipmentItem = getShipmentItemOrThrow(shipmentId, shipmentItemId);
@@ -223,8 +223,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     // 출하 품목정보 삭제
     /*
-    * LOT 정보가 있으면 해당 LOT 정보 삭제 후 삭제 가능
-    * */
+     * LOT 정보가 있으면 해당 LOT 정보 삭제 후 삭제 가능
+     * */
     @Override
     public void deleteShipmentItem(Long shipmentId, Long shipmentItemId) throws NotFoundException, BadRequestException {
         ShipmentItem shipmentItem = getShipmentItemOrThrow(shipmentId, shipmentItemId);
@@ -237,7 +237,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipmentItemRepo.save(shipmentItem);
     }
 
-// =================================================== 출하 LOT 정보 ====================================================
+    // =================================================== 출하 LOT 정보 ====================================================
     // LOT 정보 생성
     @Override
     public ShipmentLotInfoResponse createShipmentLot(Long shipmentId, Long shipmentItemId, Long lotMasterId) throws NotFoundException, BadRequestException {
@@ -425,7 +425,7 @@ public class ShipmentServiceImpl implements ShipmentService {
                 .orElseThrow(() -> new NotFoundException("workProcess does not exist. input id: " + id));
     }
 
-// ==================================================== 4-7. 출하 현황 ====================================================
+    // ==================================================== 4-7. 출하 현황 ====================================================
     // 출하현황 검색 리스트 조회, 검색조건: 거래처 id, 출하기간 fromDate~toDate, 화폐 id, 담당자 id, 품번|품명
     @Override
     public List<ShipmentStatusResponse> getShipmentStatuses(

@@ -101,19 +101,19 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     @Transactional(readOnly = true)
     public Optional<String> findLotNoByAccountCodeAndDate(GoodsType goodsType, LocalDate now){
         return Optional.ofNullable(jpaQueryFactory
-                    .select(lotMaster.lotNo)
-                    .from(lotMaster)
-                        .leftJoin(item).on(item.id.eq(lotMaster.item.id))
-                        .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
-                    .where(
-                            lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0)),
-                            itemAccount.goodsType.eq(goodsType),
-                            lotMaster.lotMasterDivision.eq(REAL_LOT),
-                            lotMaster.deleteYn.isFalse()
-                    )
-                    .orderBy(lotMaster.createdDate.desc())
-                    .limit(1)
-                    .fetchOne());
+                .select(lotMaster.lotNo)
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                .where(
+                        lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0)),
+                        itemAccount.goodsType.eq(goodsType),
+                        lotMaster.lotMasterDivision.eq(REAL_LOT),
+                        lotMaster.deleteYn.isFalse()
+                )
+                .orderBy(lotMaster.createdDate.desc())
+                .limit(1)
+                .fetchOne());
     }
 
     // 제품분유에 따른 달에 가장 마지막에 생성된 LOT NO
@@ -229,7 +229,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .innerJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
                 .innerJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
                 .where(
-                    outSourcingInput.id.eq(input),
+                        outSourcingInput.id.eq(input),
                         isDeleteYnFalse()
                 )
                 .fetch();
@@ -443,7 +443,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .where(
                         lotMaster.item.id.eq(itemId),
                         lotMaster.workProcess.id.eq(workProcessId),
-                        (lotMaster.badItemAmount.subtract(lotMaster.recycleAmount).gt(0)),
+                        lotMaster.badItemAmount.gt(0),
                         lotMaster.deleteYn.eq(false),
                         lotMaster.useYn.eq(true),
                         lotMaster.lotMasterDivision.eq(division)

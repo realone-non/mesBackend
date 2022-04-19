@@ -170,13 +170,13 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     @Transactional(readOnly = true)
     public Integer findLotMasterCreataeAmountByLotMasterId(Long lotMasterId) {
         return jpaQueryFactory
-                        .select(lotMaster.createdAmount)
-                        .from(lotMaster)
-                        .where(
-                                lotMaster.id.eq(lotMasterId),
-                                lotMaster.deleteYn.isFalse()
-                        )
-                        .fetchOne();
+                .select(lotMaster.createdAmount)
+                .from(lotMaster)
+                .where(
+                        lotMaster.id.eq(lotMasterId),
+                        lotMaster.deleteYn.isFalse()
+                )
+                .fetchOne();
     }
 
     // LOT Master 의 재고수량
@@ -232,15 +232,15 @@ public class InputTestRequestRepositoryImpl implements InputTestRequestRepositor
     // 해당 lotMasterId 와 같은 검사 id 가져옴
     @Override
     public boolean findInputTestYnByLotMasterId(Long lotMasterId) {
-         Integer fetchOne = jpaQueryFactory
-                 .selectOne()
-                 .from(inputTestRequest)
-                 .where(
-                         inputTestRequest.deleteYn.isFalse(),
-                         inputTestRequest.inputTestState.eq(COMPLETION)
-                 )
-                 .fetchFirst();
-         return fetchOne != null;
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(inputTestRequest)
+                .where(
+                        inputTestRequest.deleteYn.isFalse(),
+                        inputTestRequest.inputTestState.eq(COMPLETION)
+                )
+                .fetchFirst();
+        return fetchOne != null;
     }
 
     // 검사의뢰 가능한 품목정보 조회(구매입고)

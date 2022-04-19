@@ -68,7 +68,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 produceOrder.contract.contractNo.as("contractNo"),
                                 produceOrder.contract.periodDate.as("periodDate"),
                                 produceOrder.note.as("note")
-                                )
+                        )
                 )
                 .from(produceOrder)
                 .where(
@@ -473,8 +473,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
     // 작업자 투입 단일 조회
     @Override
     public Optional<WorkOrderUserResponse> findWorkOrderUserResponseByIdAndDeleteYn(Long workOrderId) {
-                return Optional.ofNullable(
-                        jpaQueryFactory
+        return Optional.ofNullable(
+                jpaQueryFactory
                         .select(
                                 Projections.fields(
                                         WorkOrderUserResponse.class,
@@ -503,7 +503,7 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.id.eq(workOrderId),
                                 isDeleteYnFalse()
                         )
-                .fetchOne());
+                        .fetchOne());
     }
 
     // 제조오더에 해당된 작업지시 정보의 지시수량 모두

@@ -10,8 +10,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface MaterialWarehouseService {
-            //수불부 조회
-            List<ReceiptAndPaymentResponse> getReceiptAndPaymentList(Long warehouseId, Long itemAccountId, LocalDate fromDate, LocalDate toDate);
+    //수불부 조회
+    List<ReceiptAndPaymentResponse> getReceiptAndPaymentList(Long warehouseId, Long itemAccountId, LocalDate fromDate, LocalDate toDate);
     //재고실사의뢰 등록
     MaterialStockInspectRequestResponse createMaterialStockInspectRequest(MaterialStockInspectRequestRequest request) throws NotFoundException;
     //재고실사의뢰 조회

@@ -180,22 +180,22 @@ public class OutsourcingInputController {
     // 외주 입고정보 LOT 삭제
     @Operation(summary = "외주 입고정보 LOT 삭제")
     @DeleteMapping("/{request-id}/lot/{id}")
-        @ResponseBody
-        @ApiResponses(
-                value = {
-                        @ApiResponse(responseCode = "200", description = "success"),
-                        @ApiResponse(responseCode = "404", description = "not found resource"),
-                        @ApiResponse(responseCode = "400", description = "bad request")
-                }
-        )
-        public ResponseEntity deleteOutsourcingInputLOT(
-                @PathVariable(value = "request-id") @Parameter(description = "외주생산의뢰 id") Long requestid,
-                @PathVariable(value = "id") @Parameter(description = "외주입고 id") Long inputId,
-                @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    @ResponseBody
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    public ResponseEntity deleteOutsourcingInputLOT(
+            @PathVariable(value = "request-id") @Parameter(description = "외주생산의뢰 id") Long requestid,
+            @PathVariable(value = "id") @Parameter(description = "외주입고 id") Long inputId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-            outsourcingService.deleteOutsourcingInputLOT(requestid, inputId);
-            cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-            cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + inputId + " from deleteOutsourcingInputLOT.");
+        outsourcingService.deleteOutsourcingInputLOT(requestid, inputId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + inputId + " from deleteOutsourcingInputLOT.");
         return new ResponseEntity(NO_CONTENT);
     }
 }

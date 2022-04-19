@@ -509,8 +509,8 @@ public class OutsourcingServiceImpl implements OutsourcingService {
         OutsourcingReturn returning = modelMapper.toEntity(request, OutsourcingReturn.class);
         LotMaster lotMaster = lotMasterRepository.findByIdAndDeleteYnFalse(request.getLotMasterId()).orElseThrow(()-> new NotFoundException("lotinfo not in db:" + request.getLotMasterId()));
         if(request.isReturnDivision() == true && lotMaster.getStockAmount() >= request.getStockReturnAmount() == true){
-                 lotMaster.setStockAmount(lotMaster.getStockAmount() - request.getStockReturnAmount());
-                 lotMaster.setStockReturnAmount(request.getStockReturnAmount());
+            lotMaster.setStockAmount(lotMaster.getStockAmount() - request.getStockReturnAmount());
+            lotMaster.setStockReturnAmount(request.getStockReturnAmount());
         }
         else if(request.isReturnDivision() == false && lotMaster.getBadItemAmount() >= request.getBadItemReturnAmount() == true){
             lotMaster.setBadItemAmount(lotMaster.getBadItemAmount() - request.getBadItemReturnAmount());

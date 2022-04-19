@@ -104,7 +104,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
     public Integer findAmountByRequestId(Long requestId){
         return jpaQueryFactory
                 .select(
-                    request.productionAmount.as("amount")
+                        request.productionAmount.as("amount")
                 )
                 .from(request)
                 .where(
@@ -156,7 +156,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
 //                .innerJoin(master).on(master.id.eq(request.bomMaster.id))
                 .innerJoin(item).on(item.id.eq(master.item.id))
                 .where(
-                    input.id.eq(inputId)
+                        input.id.eq(inputId)
                 )
                 .fetchOne();
     }

@@ -56,11 +56,11 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
 //        );
 
         /*
-        * 구매요청 품목정보는 produceOrder 의 contractItem 의 item 을 찾아서
-        * item 에 해당하는 bomMaster 의 데이터에 해당되는
-        * bomMasterDetail 의 item 만 등록 할 수 있다.
-        * produceOrder.contract.Item: 완재품
-        * bomMasterDetail: 원자재, 부자재 등등
+         * 구매요청 품목정보는 produceOrder 의 contractItem 의 item 을 찾아서
+         * item 에 해당하는 bomMaster 의 데이터에 해당되는
+         * bomMasterDetail 의 item 만 등록 할 수 있다.
+         * produceOrder.contract.Item: 완재품
+         * bomMasterDetail: 원자재, 부자재 등등
          * */
         List<Long> findItemIds = purchaseRequestRepo.findItemIdByContractItemId(produceOrder.getContractItem().getItem().getId());
 
