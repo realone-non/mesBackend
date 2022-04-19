@@ -57,11 +57,11 @@ public class WorkOrderBadItemStatusResponse {
     String badRatePerProductionAmount;
 
     @Schema(description = "작업시작시간")
-    @JsonFormat(pattern = YYYY_MM_DD_HH_MM_SS, timezone = ASIA_SEOUL)
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime workOrderStartDate;
 
     @Schema(description = "작업완료시간")
-    @JsonFormat(pattern = YYYY_MM_DD_HH_MM_SS, timezone = ASIA_SEOUL)
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
     LocalDateTime workOrderEndDate;
 
     public void setRateCalculationAndItem(BadItemWorkOrderResponse.subDto subDto) {
