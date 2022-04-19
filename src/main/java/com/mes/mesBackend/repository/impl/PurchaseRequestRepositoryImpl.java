@@ -285,6 +285,21 @@ public class PurchaseRequestRepositoryImpl implements PurchaseRequestRepositoryC
                 .fetch();
     }
 
+    // 같은 제조오더에 같은 품목이 존재하는지?
+    @Override
+    public boolean existsByPurchaseRequestInProduceOrderAndItem(Long produceOrderId, Long itemId) {
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(purchaseRequest)
+                .where(
+                        purchaseRequest.deleteYn.isFalse(),
+                        purchaseRequest.produceOrder.id.eq(produceOrderId),
+                        purchaseRequest.item.id.eq(itemId)
+                )
+                .fetchFirst();
+        return fetchOne != null;
+    }
+
     // 요청기간
     private BooleanExpression isRequestDateBetween(LocalDate fromDate, LocalDate toDate) {
         if (fromDate != null && toDate != null) {

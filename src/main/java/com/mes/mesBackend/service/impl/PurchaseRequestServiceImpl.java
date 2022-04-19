@@ -11,6 +11,7 @@ import com.mes.mesBackend.entity.enumeration.OrderState;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
+import com.mes.mesBackend.repository.ItemRepository;
 import com.mes.mesBackend.repository.ProduceOrderRepository;
 import com.mes.mesBackend.repository.PurchaseRequestRepository;
 import com.mes.mesBackend.repository.WorkOrderDetailRepository;
@@ -38,6 +39,7 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
     private final ItemService itemService;
     private final ProduceOrderRepository produceOrderRepo;
     private final WorkOrderDetailRepository workOrderDetailRepo;
+    private final ItemRepository itemRepository;
 
     // 구매요청 생성
     @Override
@@ -187,9 +189,23 @@ public class PurchaseRequestServiceImpl implements PurchaseRequestService {
         return responses.stream().filter(f -> !f.getGoodsType().equals(HALF_PRODUCT) && !f.getGoodsType().equals(PRODUCT)).collect(Collectors.toList());
     }
 
+    // 같은 제조오더에 같은 품목이 존재하는지 체크
+    @Override
+    public Boolean checkPurchaseRequestInItem(Long produceOrderId, Long itemId) throws NotFoundException {
+        ProduceOrder produceOrder = getProduceOrderOrThrow(produceOrderId);
+        Item item = getItemOrThrow(itemId);
+        return !purchaseRequestRepo.existsByPurchaseRequestInProduceOrderAndItem(produceOrder.getId(), item.getId());
+    }
+
     // 제조 오더 단일 조회 및 예외
     private ProduceOrder getProduceOrderOrThrow(Long id) throws NotFoundException {
         return produceOrderRepo.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("produceOrder does not exist. id : " + id));
+    }
+
+    // 품목 단일 조회 및 예외
+    private Item getItemOrThrow(Long id) throws NotFoundException {
+        return itemRepository.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("item does not exist. input id: " + id));
     }
 }

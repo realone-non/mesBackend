@@ -25,4 +25,6 @@ public interface PurchaseRequestService {
     PurchaseRequest getPurchaseRequestOrThrow(Long id) throws NotFoundException;
     // 수주품목에 해당하는 원부자재
     List<ProduceRequestBomDetail> getProduceOrderBomDetails(Long produceOrderId) throws NotFoundException;
+    // 같은 제조오더에 같은 품목이 존재하는지 체크
+    Boolean checkPurchaseRequestInItem(Long produceOrderId, Long itemId) throws NotFoundException;
 }

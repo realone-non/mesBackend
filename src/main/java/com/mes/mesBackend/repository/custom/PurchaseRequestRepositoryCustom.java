@@ -40,4 +40,6 @@ public interface PurchaseRequestRepositoryCustom {
     boolean existsPurchaseRequestByPurchaseOrder(Long purchaseOrderId);
     // 제조오더에 해당하는 구매요청의 상태값
     List<OrderState> findOrderStateByPurchaseOrder(Long purchaseOrderId);
+    // 같은 제조오더에 같은 품목이 존재하는지?
+    boolean existsByPurchaseRequestInProduceOrderAndItem(Long produceOrderId, Long itemId);
 }

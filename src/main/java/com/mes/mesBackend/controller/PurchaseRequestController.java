@@ -165,4 +165,20 @@ public class PurchaseRequestController {
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProduceOrderBomDetails.");
         return new ResponseEntity<>(produceRequestBomDetails, OK);
     }
+
+    // 같은 제조오더에 같은 품목이 등록되어 있는지 체크
+    // 수주품목에 해당하는 원부자재
+    @GetMapping("/checks")
+    @ResponseBody
+    @Operation(summary = "같은 제조오더에 같은 품목이 등록되어 있는지 체크", description = "true: 생성가능, false: 생성 불가능")
+    public ResponseEntity<Boolean> checkPurchaseRequestInItem(
+            @RequestParam @Parameter(description = "제조 오더 id") Long produceOrderId,
+            @RequestParam @Parameter(description = "품목 id") Long itemId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    ) throws NotFoundException {
+        Boolean result = purchaseRequestService.checkPurchaseRequestInItem(produceOrderId, itemId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from checkPurchaseRequestInItem.");
+        return new ResponseEntity<>(result, OK);
+    }
 }
