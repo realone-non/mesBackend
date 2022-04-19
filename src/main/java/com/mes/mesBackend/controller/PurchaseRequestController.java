@@ -58,7 +58,7 @@ public class PurchaseRequestController {
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws BadRequestException, NotFoundException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
-        PurchaseRequestResponse purchaseRequest = purchaseRequestService.createPurchaseRequest(purchaseRequestRequest, userCode);
+        PurchaseRequestResponse purchaseRequest = purchaseRequestService.createPurchaseRequest(purchaseRequestRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is created the " + purchaseRequest.getId() + " from createPurchaseRequest.");
         return new ResponseEntity<>(purchaseRequest, OK);
@@ -126,7 +126,7 @@ public class PurchaseRequestController {
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
-        PurchaseRequestResponse purchaseRequest = purchaseRequestService.updatePurchaseRequest(id, purchaseRequestRequest, userCode);
+        PurchaseRequestResponse purchaseRequest = purchaseRequestService.updatePurchaseRequest(id, purchaseRequestRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is modified the " + purchaseRequest.getId() + " from updatePurchaseRequest.");
         return new ResponseEntity<>(purchaseRequest, OK);

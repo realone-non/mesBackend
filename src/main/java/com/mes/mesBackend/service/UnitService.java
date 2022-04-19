@@ -21,7 +21,7 @@ public interface UnitService {
     // 페이징 조회
 //    Page<UnitResponse> getUnits(Pageable pageable);
     // 수정
-    UnitResponse updateUnit(Long id, UnitRequest unitRequest, String userCode) throws NotFoundException;
+    UnitResponse updateUnit(Long id, UnitRequest unitRequest) throws NotFoundException;
     // 삭제
     void deleteUnit(Long id) throws NotFoundException;
     // 예외처리 단일조회

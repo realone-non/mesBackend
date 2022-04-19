@@ -2,10 +2,8 @@ package com.mes.mesBackend.controller;
 
 import com.mes.mesBackend.dto.request.UnitRequest;
 import com.mes.mesBackend.dto.response.UnitResponse;
-import com.mes.mesBackend.entity.enumeration.ModifiedDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.ModifiedLogHelper;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
@@ -25,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-import static com.mes.mesBackend.entity.enumeration.ModifiedDivision.UNIT;
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -39,7 +36,6 @@ import static org.springframework.http.HttpStatus.OK;
 public class UnitController {
     private final UnitService unitService;
     private final LogService logService;
-    private final ModifiedLogHelper modifiedLogHelper;
     private final Logger logger = LoggerFactory.getLogger(UnitController.class);
     private CustomLogger cLogger;
 
@@ -114,7 +110,7 @@ public class UnitController {
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
-        UnitResponse unit = unitService.updateUnit(id, unitRequest, userCode);
+        UnitResponse unit = unitService.updateUnit(id, unitRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is modified the " + unit.getId() + " from updateUnit.");
         return new ResponseEntity<>(unit, OK);

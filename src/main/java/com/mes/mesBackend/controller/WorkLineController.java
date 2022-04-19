@@ -110,7 +110,7 @@ public class WorkLineController {
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
-        WorkLineResponse workLine = workLineService.updateWorkLine(id, workLineRequest, userCode);
+        WorkLineResponse workLine = workLineService.updateWorkLine(id, workLineRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is modified the " + workLine.getId() + " from updateWorkLine.");
         return new ResponseEntity<>(workLine, OK);
