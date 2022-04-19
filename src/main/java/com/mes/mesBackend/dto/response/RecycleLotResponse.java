@@ -31,4 +31,7 @@ public class RecycleLotResponse {
 
     @Schema(description = "공정")
     String workProcess;
+
+    @Schema(description = "라벨프린트 출력 여부")
+    boolean labelPrintYn;
 }

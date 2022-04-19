@@ -485,10 +485,12 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .select(
                         Projections.fields(
                                 LabelPrintResponse.class,
+                                lotMaster.id.as("lotMasterId"),
                                 lotMaster.lotNo.as("lotNo"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
-                                lotMaster.stockAmount.as("amount")
+                                lotMaster.stockAmount.as("amount"),
+                                lotMaster.labelPrintYn.as("labelPrintYn")
                         )
                 )
                 .from(lotMaster)
@@ -826,7 +828,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 item.itemName.as("itemName"),
                                 item.itemNo.as("itemNo"),
                                 lotMaster.stockAmount.as("stockAmount"),
-                                lotMaster.workProcess.workProcessName.as("workProcess")
+                                lotMaster.workProcess.workProcessName.as("workProcess"),
+                                lotMaster.labelPrintYn.as("labelPrintYn")
                         )
                 )
                 .from(lotMaster)
