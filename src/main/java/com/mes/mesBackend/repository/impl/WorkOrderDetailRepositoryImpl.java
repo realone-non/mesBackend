@@ -787,7 +787,9 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workProcess.workProcessName.as("workProcessName"),
                                 user.id.as("userId"),
                                 user.korName.as("userKorName"),
-                                workOrderDetail.productionAmount.as("productionAmount")
+                                workOrderDetail.productionAmount.as("productionAmount"),
+                                workOrderDetail.startDate.as("workOrderStartDate"),
+                                workOrderDetail.endDate.as("workOrderEndDate")
                         )
                 )
                 .from(workOrderDetail)
