@@ -75,6 +75,9 @@ public class Shipment extends BaseTimeEntity {
     @Column(name = "BARCODE_NUMBER", columnDefinition = "varchar(500) COMMENT '바코드 번호'")
     private String barcodeNumber;
 
+    @Column(name = "LABEL_PRINT_YN", columnDefinition = "bit(1) COMMENT '라벨프린트 출력 여부'", nullable = false)
+    private boolean labelPrintYn;
+
     public void create(Client client, String shipmentNo, String barcodeNumber) {
         setClient(client);
         setOrderState(SCHEDULE);

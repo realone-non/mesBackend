@@ -4,8 +4,6 @@ import com.mes.mesBackend.dto.request.EquipmentMaintenanceRequest;
 import com.mes.mesBackend.dto.response.EquipmentMaintenanceResponse;
 import com.mes.mesBackend.entity.EquipmentMaintenance;
 import com.mes.mesBackend.exception.NotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -19,7 +17,7 @@ public interface EquipmentMaintenanceService {
     List<EquipmentMaintenanceResponse> getEquipmentMaintenances();
 //    Page<EquipmentMaintenanceResponse> getEquipmentMaintenances(Pageable pageable);
     // 설비 보전항목 수정
-    EquipmentMaintenanceResponse updateEquipmentMaintenance(Long id, EquipmentMaintenanceRequest equipmentMaintenanceRequest, String userCode) throws NotFoundException;
+    EquipmentMaintenanceResponse updateEquipmentMaintenance(Long id, EquipmentMaintenanceRequest equipmentMaintenanceRequest) throws NotFoundException;
     // 설비 보전항목 삭제
     void deleteEquipmentMaintenance(Long id) throws NotFoundException;
     // 설비 보전항목 단일 조회 및 예외

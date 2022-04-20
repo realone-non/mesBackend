@@ -2,11 +2,12 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.WorkDocumentRequest;
 import com.mes.mesBackend.dto.response.WorkDocumentResponse;
-import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.ModifiedDivision;
+import com.mes.mesBackend.entity.Item;
+import com.mes.mesBackend.entity.WorkDocument;
+import com.mes.mesBackend.entity.WorkLine;
+import com.mes.mesBackend.entity.WorkProcess;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.ModifiedLogHelper;
 import com.mes.mesBackend.helper.impl.S3UploaderImpl;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.WorkDocumentRepository;
@@ -15,14 +16,11 @@ import com.mes.mesBackend.service.WorkDocumentService;
 import com.mes.mesBackend.service.WorkLineService;
 import com.mes.mesBackend.service.WorkProcessService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-
-import static com.mes.mesBackend.entity.enumeration.ModifiedDivision.WORK_DOCUMENT;
 
 @Service
 @RequiredArgsConstructor
@@ -33,19 +31,16 @@ public class WorkDocumentServiceImpl implements WorkDocumentService {
     private final WorkLineService workLineService;
     private final ItemService itemService;
     private final S3UploaderImpl s3Service;
-    private final ModifiedLogHelper modifiedLogHelper;
 
     // 작업표준서 생성
     @Override
-    public WorkDocumentResponse createWorkDocument(WorkDocumentRequest workDocumentRequest, String userCode) throws NotFoundException {
+    public WorkDocumentResponse createWorkDocument(WorkDocumentRequest workDocumentRequest) throws NotFoundException {
         WorkProcess workProcess = workProcessService.getWorkProcessOrThrow(workDocumentRequest.getWorkProcess());
         WorkLine workLine = workLineService.getWorkLineOrThrow(workDocumentRequest.getWorkLine());
         Item item = itemService.getItemOrThrow(workDocumentRequest.getItem());
         WorkDocument workDocument = mapper.toEntity(workDocumentRequest, WorkDocument.class);
         workDocument.addJoin(workProcess, workLine, item);
         workDocumentRepository.save(workDocument);
-
-        modifiedLogHelper.createInsertLog(userCode, WORK_DOCUMENT, workDocument);   // 생성 기록
         return mapper.toResponse(workDocument, WorkDocumentResponse.class);
     }
 
@@ -66,14 +61,7 @@ public class WorkDocumentServiceImpl implements WorkDocumentService {
     @Override
     public List<WorkDocumentResponse> getWorkDocuments(Long itemGroupId, Long itemAccountId, String itemNo, String itemName) {
         List<WorkDocument> workDocuments = workDocumentRepository.findAllByCondition(itemGroupId, itemAccountId, itemNo, itemName);
-        List<WorkDocumentResponse> documentResponses = mapper.toListResponses(workDocuments, WorkDocumentResponse.class);
-        for (WorkDocumentResponse response : documentResponses) {
-            ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(WORK_DOCUMENT, response.getId());
-            ModifiedLog insertLog = modifiedLogHelper.getInsertLog(WORK_DOCUMENT, response.getId());
-            if (modifiedLog != null) response.modifiedLog(modifiedLog);
-            if (insertLog != null) response.insertLog(insertLog);
-        }
-        return documentResponses;
+        return mapper.toListResponses(workDocuments, WorkDocumentResponse.class);
     }
 
     // 작업표준서 페이징 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
@@ -85,7 +73,7 @@ public class WorkDocumentServiceImpl implements WorkDocumentService {
 
     // 작업표준서 수정
     @Override
-    public WorkDocumentResponse updateWorkDocument(Long id, WorkDocumentRequest workDocumentRequest, String userCode) throws NotFoundException {
+    public WorkDocumentResponse updateWorkDocument(Long id, WorkDocumentRequest workDocumentRequest) throws NotFoundException {
         WorkProcess newWorkProcess = workProcessService.getWorkProcessOrThrow(workDocumentRequest.getWorkProcess());
         WorkLine newWorkLine = workLineService.getWorkLineOrThrow(workDocumentRequest.getWorkLine());
         Item newItem = itemService.getItemOrThrow(workDocumentRequest.getItem());
@@ -93,7 +81,6 @@ public class WorkDocumentServiceImpl implements WorkDocumentService {
         WorkDocument newWorkDocument = mapper.toEntity(workDocumentRequest, WorkDocument.class);
         findWorkDocument.update(newWorkDocument, newWorkProcess, newWorkLine, newItem);
         workDocumentRepository.save(findWorkDocument);
-        modifiedLogHelper.createModifiedLog(userCode, WORK_DOCUMENT, findWorkDocument); // 업데이트 로그 생성
         return mapper.toResponse(findWorkDocument, WorkDocumentResponse.class);
     }
 

@@ -273,10 +273,12 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                 .select(
                         Projections.fields(
                                 LabelPrintResponse.class,
+                                lotMaster.id.as("lotMasterId"),
                                 lotMaster.lotNo.as("lotNo"),
                                 lotMaster.item.itemNo.as("itemNo"),
                                 lotMaster.item.itemName.as("itemName"),
-                                lotMaster.createdAmount.as("amount")
+                                lotMaster.createdAmount.as("amount"),
+                                lotMaster.labelPrintYn.as("labelPrintYn")
                         )
                 )
                 .from(purchaseInput)

@@ -28,8 +28,8 @@ public class PopShipmentServiceImpl implements PopShipmentService {
         for (PopShipmentResponse res : responses) {
             // 출하에 해당하는 출하 품목 list
             List<ShipmentItem> shipmentItems = shipmentRepo.findShipmentItemByShipmentId(res.getShipmentId());
-            List<String> itemNos = shipmentItems.stream().map(m -> m.getContractItem().getItem().getItemNo()).collect(Collectors.toList());
-            List<String> itemNames = shipmentItems.stream().map(m -> m.getContractItem().getItem().getItemName()).collect(Collectors.toList());
+            List<String> itemNos = shipmentItems.stream().map(m -> m.getContractItem().getItem().getItemNo()).distinct().collect(Collectors.toList());
+            List<String> itemNames = shipmentItems.stream().map(m -> m.getContractItem().getItem().getItemName()).distinct().collect(Collectors.toList());
             int shipmentAmount = shipmentRepo.findShipmentLotShipmentAmountByShipmentId(res.getShipmentId()).stream().mapToInt(Integer::intValue).sum();
 
             res.setItemName(itemNames);

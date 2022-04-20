@@ -2,10 +2,8 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.WorkProcessRequest;
 import com.mes.mesBackend.dto.response.WorkProcessResponse;
-import com.mes.mesBackend.entity.ModifiedLog;
 import com.mes.mesBackend.entity.WorkProcess;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.ModifiedLogHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.WorkProcessRepository;
 import com.mes.mesBackend.service.WorkProcessService;
@@ -16,7 +14,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.mes.mesBackend.entity.enumeration.ModifiedDivision.WORK_PROCESS;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.NONE;
 
 // 작업공정 & 작업공정 코드 등록
@@ -25,7 +22,6 @@ import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.NONE;
 public class WorkProcessServiceImpl implements WorkProcessService {
     private final WorkProcessRepository workProcessRepository;
     private final ModelMapper mapper;
-    private final ModifiedLogHelper modifiedLogHelper;
 
     // 작업공정 생성
     @Override
@@ -48,10 +44,6 @@ public class WorkProcessServiceImpl implements WorkProcessService {
     public List<WorkProcessResponse> getWorkProcesses() {
         List<WorkProcess> workProcesses = workProcessRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
         List<WorkProcessResponse> responses = mapper.toListResponses(workProcesses, WorkProcessResponse.class);
-        for (WorkProcessResponse r : responses) {
-            ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(WORK_PROCESS, r.getId());
-            if (modifiedLog != null) r.modifiedLog(modifiedLog);
-        }
         return responses.stream().sorted(Comparator.comparing(WorkProcessResponse::getOrders)).collect(Collectors.toList());
     }
 
@@ -64,12 +56,11 @@ public class WorkProcessServiceImpl implements WorkProcessService {
 
     // 작업공정 수정
     @Override
-    public WorkProcessResponse updateWorkProcess(Long workProcessId, WorkProcessRequest workProcessRequest, String userCode) throws NotFoundException {
+    public WorkProcessResponse updateWorkProcess(Long workProcessId, WorkProcessRequest workProcessRequest) throws NotFoundException {
         WorkProcess findWorkProcess = getWorkProcessOrThrow(workProcessId);
         WorkProcess newWorkProcess = mapper.toEntity(workProcessRequest, WorkProcess.class);
         findWorkProcess.put(newWorkProcess);
         workProcessRepository.save(findWorkProcess);
-        modifiedLogHelper.createModifiedLog(userCode, WORK_PROCESS, findWorkProcess);
         return mapper.toResponse(findWorkProcess, WorkProcessResponse.class);
     }
 

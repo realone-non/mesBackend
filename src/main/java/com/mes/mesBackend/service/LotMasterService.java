@@ -6,6 +6,7 @@ import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.WareHouse;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
+import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
 
 import java.util.List;
@@ -34,4 +35,6 @@ public interface LotMasterService {
 
     //라벨프린트용 정보 조회
     List<LabelPrintResponse> getPrints(Long workProcessId, Long equipmentId);
+    // 라벨 프린트 출력 여부
+    void putLabelPrintYn(Long lotMasterId, Long shipmentId) throws NotFoundException, BadRequestException;
 }
