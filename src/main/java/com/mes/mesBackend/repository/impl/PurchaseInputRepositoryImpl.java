@@ -260,7 +260,8 @@ public class PurchaseInputRepositoryImpl implements PurchaseInputRepositoryCusto
                         isInputDateBetween(fromDate, toDate),
                         isClientEq(clientId),
                         isItemNoOrItemNameContain(itemNoAndItemName),
-                        isPurchaseInputDeleteYnFalse()
+                        isPurchaseInputDeleteYnFalse(),
+                        purchaseOrder.deleteYn.isFalse()
                 )
                 .orderBy(purchaseInput.createdDate.desc())
                 .fetch();
