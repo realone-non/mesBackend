@@ -167,7 +167,7 @@ public class DevelopmentServiceImpl implements DevelopmentService {
         DevelopmentState state = developmentStateRepository.findByIdAndDeleteYnFalse(developStateId)
                 .orElseThrow(() -> new NotFoundException("developmentState does not exist. input id: " + developStateId));
         state.setFileName(file.getOriginalFilename());
-        state.setFileUrl(s3Uploader.upload(file, "develop"));
+        state.setFileUrl(s3Uploader.upload(file, "develop/"));
         developmentStateRepository.save(state);
         return developmentRepository.findByIdAndDeleteYn(developId, developStateId);
     }
