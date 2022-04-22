@@ -343,7 +343,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         workProcess.workProcessDivision.eq(PACKAGING),
                         lotMaster.stockAmount.goe(1),
                         lotMaster.stockAmount.loe(notShippedAmount),
-                        lotMaster.deleteYn.isFalse()
+                        lotMaster.deleteYn.isFalse(),
+                        lotMaster.lotMasterDivision.eq(REAL_LOT)
 
                 )
                 .fetch();
