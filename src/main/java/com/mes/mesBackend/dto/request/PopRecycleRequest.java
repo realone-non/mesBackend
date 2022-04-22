@@ -1,5 +1,6 @@
 package com.mes.mesBackend.dto.request;
 
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,4 +17,7 @@ public class PopRecycleRequest {
 
     @Schema(description = "수량")
     int amount;
+
+    @Schema(description = "공정")
+    WorkProcessDivision workProcessDivision;
 }

@@ -1,16 +1,21 @@
 package com.mes.mesBackend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import static com.mes.mesBackend.helper.Constants.DECIMAL_POINT_2;
-import static com.mes.mesBackend.helper.Constants.PERCENT;
+import java.time.LocalDateTime;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.mes.mesBackend.helper.Constants.*;
 
 @Getter
 @Setter
 @Schema(description = "작업지시 불량률 정보")
+@JsonInclude(NON_NULL)
 public class WorkOrderBadItemStatusResponse {
     @Schema(description = "작업지시 고유아이디")
     Long workOrderId;
@@ -50,6 +55,14 @@ public class WorkOrderBadItemStatusResponse {
 
     @Schema(description = "불량률")
     String badRatePerProductionAmount;
+
+    @Schema(description = "작업시작시간")
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
+    LocalDateTime workOrderStartDate;
+
+    @Schema(description = "작업완료시간")
+    @JsonFormat(pattern = YYYY_MM_DD_HH_MM, timezone = ASIA_SEOUL)
+    LocalDateTime workOrderEndDate;
 
     public void setRateCalculationAndItem(BadItemWorkOrderResponse.subDto subDto) {
         setItemNo(subDto.getItemNo());

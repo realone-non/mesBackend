@@ -12,6 +12,9 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Schema(description = "라벨 프린트")
 @JsonInclude(NON_NULL)
 public class LabelPrintResponse {
+    @Schema(description = "LOT 고유아이디")
+    Long lotMasterId;
+
     @Schema(description = "LOT번호")
     String lotNo;
 
@@ -26,4 +29,7 @@ public class LabelPrintResponse {
 
     @Schema(description = "수량")
     int amount;
+
+    @Schema(description = "라벨프린트 출력 여부")
+    boolean labelPrintYn;
 }

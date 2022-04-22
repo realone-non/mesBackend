@@ -58,7 +58,7 @@ public class WorkDocumentController {
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
-        WorkDocumentResponse workDocument = workDocumentService.createWorkDocument(workDocumentRequest, userCode);
+        WorkDocumentResponse workDocument = workDocumentService.createWorkDocument(workDocumentRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is created the " + workDocument.getId() + " from createWorkDocument.");
         return new ResponseEntity<>(workDocument, OK);
@@ -119,7 +119,7 @@ public class WorkDocumentController {
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
-        WorkDocumentResponse workDocument = workDocumentService.updateWorkDocument(id, workDocumentRequest, userCode);
+        WorkDocumentResponse workDocument = workDocumentService.updateWorkDocument(id, workDocumentRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is modified the " + workDocument.getId() + " from updateWorkDocument.");
         return new ResponseEntity<>(workDocument, OK);

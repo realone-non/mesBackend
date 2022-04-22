@@ -153,6 +153,9 @@ public class LotMaster extends BaseTimeEntity {
     @Column(name = "EXHAUST", columnDefinition = "bit(1) COMMENT '폐기 여부'", nullable = false)
     private boolean exhaustYn;
 
+    @Column(name = "LABEL_PRINT_YN", columnDefinition = "bit(1) COMMENT '라벨프린트 출력 여부'", nullable = false)
+    private boolean labelPrintYn;
+
     // 자재입고
     public void createPurchaseInputLot(
             LotMasterRequest request,

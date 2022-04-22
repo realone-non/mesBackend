@@ -21,7 +21,7 @@ import static javax.persistence.EnumType.STRING;
  * 공장(보이진 않고 검색조건)
  * */
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity(name = "WORK_PROCESSES")
 @Data
 public class WorkProcess extends BaseTimeEntity {

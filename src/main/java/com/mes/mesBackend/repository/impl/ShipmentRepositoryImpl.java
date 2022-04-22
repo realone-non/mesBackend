@@ -120,7 +120,8 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
                                 shipment.barcodeNumber.as("barcodeNumber"),
                                 shipment.client.clientName.as("clientName"),
                                 shipment.orderState.as("orderState"),
-                                shipment.shipmentDate.as("shipmentDate")
+                                shipment.shipmentDate.as("shipmentDate"),
+                                shipment.labelPrintYn.as("labelPrintYn")
                         )
                 )
                 .from(shipmentLot)

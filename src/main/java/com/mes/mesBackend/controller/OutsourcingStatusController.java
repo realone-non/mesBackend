@@ -46,11 +46,10 @@ public class OutsourcingStatusController {
     )
     public ResponseEntity<List<OutsourcingStatusResponse>> getOutsourcingStatusList(
             @RequestParam(required = false) @Parameter(description = "외주사 ID") Long clientId,
-            @RequestParam(required = false) @Parameter(description = "품번") String itemNo,
-            @RequestParam(required = false) @Parameter(description = "품명") String itemName,
+            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoAndItemName,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<OutsourcingStatusResponse> responseList = outsourcingService.getOutsourcingStatusList(clientId, itemNo, itemName);
+        List<OutsourcingStatusResponse> responseList = outsourcingService.getOutsourcingStatusList(clientId, itemNoAndItemName);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         return new ResponseEntity<>(responseList, OK);
     }

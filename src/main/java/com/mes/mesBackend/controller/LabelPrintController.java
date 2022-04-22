@@ -1,11 +1,15 @@
 package com.mes.mesBackend.controller;
 
 
+import com.mes.mesBackend.auth.TokenRequest;
+import com.mes.mesBackend.auth.TokenResponse;
 import com.mes.mesBackend.dto.response.LabelPrintResponse;
 import com.mes.mesBackend.dto.response.PopEquipmentResponse;
 import com.mes.mesBackend.dto.response.WorkProcessResponse;
 import com.amazonaws.Response;
 import com.mes.mesBackend.dto.response.*;
+import com.mes.mesBackend.exception.BadRequestException;
+import com.mes.mesBackend.exception.CustomJwtException;
 import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogService;
@@ -15,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -149,6 +154,19 @@ public class LabelPrintController {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info("purchaseInput viewed the list of from getPurchaseInputs!");
         return new ResponseEntity<>(responses, OK);
+    }
+
+    @PutMapping
+    @ResponseBody
+    @Operation(summary = "라벨프린트 출력 여부", description = "쓰임에 맞게 lotMasterId, shipmentId 둘 중 하나 입력")
+    public ResponseEntity putFillingEquipmentOfRealLot(
+            @RequestParam(required = false) @Parameter(description = "lotMaster id") Long lotMasterId,
+            @RequestParam(required = false) @Parameter(description = "shipment id") Long shipmentId
+    ) throws NotFoundException, BadRequestException {
+        lotMasterService.putLabelPrintYn(lotMasterId, shipmentId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info("putFillingEquipmentOfRealLot");
+        return new ResponseEntity<>(OK);
     }
 
 

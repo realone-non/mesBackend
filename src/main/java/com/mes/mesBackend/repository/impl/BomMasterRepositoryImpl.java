@@ -1,9 +1,7 @@
 package com.mes.mesBackend.repository.impl;
 
-import com.mes.mesBackend.entity.BomMaster;
-import com.mes.mesBackend.entity.QBomItemDetail;
-import com.mes.mesBackend.entity.QBomMaster;
-import com.mes.mesBackend.entity.QItem;
+import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.repository.custom.BomMasterRepositoryCustom;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -121,6 +119,22 @@ public class BomMasterRepositoryImpl implements BomMasterRepositoryCustom {
                         )
                         .fetchOne()
         );
+    }
+
+    //itemId, 공정으로 BomItemDetail 조회
+    @Override
+    public List<BomItemDetail> findByItemIdAndWorkProcessDivision(Long itemId, WorkProcessDivision workProcessDivision) {
+        return jpaQueryFactory
+                .select(
+                        bomItemDetail
+                )
+                .from(bomItemDetail)
+                .where(
+                        bomItemDetail.bomMaster.item.id.eq(itemId),
+                        bomItemDetail.bomMaster.workProcess.workProcessDivision.eq(workProcessDivision),
+                        bomItemDetail.bomMaster.deleteYn.isFalse()
+                )
+                .fetch();
     }
 
     // 삭제여부 false만 검색

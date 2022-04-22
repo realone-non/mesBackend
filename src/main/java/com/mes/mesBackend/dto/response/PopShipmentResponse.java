@@ -48,4 +48,7 @@ public class PopShipmentResponse {
     // 상태값
     @Schema(description = "상태값")
     OrderState orderState;
+
+    @Schema(description = "라벨프린트 출력 여부")
+    boolean labelPrintYn;
 }

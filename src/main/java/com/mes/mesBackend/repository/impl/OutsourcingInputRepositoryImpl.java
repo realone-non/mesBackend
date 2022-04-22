@@ -32,7 +32,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
 
 
     //외주 입고 정보 검색 조건:외주처, 품목, 입고기간
-    public List<OutsourcingInputResponse> findAllByCondition(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
+    public List<OutsourcingInputResponse> findAllByCondition(Long clientId, String itemNoAndItemName, LocalDate startDate, LocalDate endDate){
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -51,8 +51,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .where(
                         clientNull(clientId),
-                        isItemNoContaining(itemNo),
-                        isItemNameContaining(itemName),
+                        isItemNoAndItemNameContain(itemNoAndItemName),
                         dateNull(startDate, endDate),
                         request.deleteYn.isFalse()
                 )
@@ -105,7 +104,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
     public Integer findAmountByRequestId(Long requestId){
         return jpaQueryFactory
                 .select(
-                    request.productionAmount.as("amount")
+                        request.productionAmount.as("amount")
                 )
                 .from(request)
                 .where(
@@ -118,7 +117,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
 
     //외주재고현황 전체 조회 검색 조건:외주처, 품목, 의뢰기간
     @Transactional(readOnly = true)
-    public List<OutsourcingStatusResponse> findStatusByCondition(Long clientId, String itemNo, String itemName){
+    public List<OutsourcingStatusResponse> findStatusByCondition(Long clientId, String itemNoAndItemName){
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -138,8 +137,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .where(
                         clientNull(clientId),
-                        isItemNoContaining(itemNo),
-                        isItemNameContaining(itemName),
+                        isItemNoAndItemNameContain(itemNoAndItemName),
                         lotMaster.useYn.eq(true),
                         lotMaster.deleteYn.eq(false),
                         lotMaster.enrollmentType.eq(OUTSOURCING_INPUT)
@@ -158,7 +156,7 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
 //                .innerJoin(master).on(master.id.eq(request.bomMaster.id))
                 .innerJoin(item).on(item.id.eq(master.item.id))
                 .where(
-                    input.id.eq(inputId)
+                        input.id.eq(inputId)
                 )
                 .fetchOne();
     }
@@ -280,6 +278,10 @@ public class OutsourcingInputRepositoryImpl implements OutsourcingInputRepositor
         } else {
             return null;
         }
+    }
+
+    private BooleanExpression isItemNoAndItemNameContain(String itemNoAndName) {
+        return itemNoAndName != null ? item.itemNo.contains(itemNoAndName).or(item.itemName.contains(itemNoAndName)) : null;
     }
 
     // 품번 검색

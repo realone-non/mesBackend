@@ -46,6 +46,28 @@ public class RecycleRepositoryImpl implements RecycleRepositoryCustom {
     }
 
     @Transactional(readOnly = true)
+    public Optional<RecycleResponse> findByFirst(){
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(
+                                Projections.fields(
+                                        RecycleResponse.class,
+                                        workProcess.id.as("workProcessId"),
+                                        recycle.id.as("recycleId"),
+                                        recycle.recycleName.as("recycleName")
+                                )
+                        )
+                        .from(recycle)
+                        .innerJoin(workProcess).on(workProcess.id.eq(recycle.workProcess.id))
+                        .where(
+                                recycle.useYn.eq(true),
+                                recycle.deleteYn.eq(false)
+                        )
+                        .fetchFirst()
+        );
+    }
+
+    @Transactional(readOnly = true)
     public List<RecycleResponse> findRecycles(Long workProcessId){
         return jpaQueryFactory
                 .select(

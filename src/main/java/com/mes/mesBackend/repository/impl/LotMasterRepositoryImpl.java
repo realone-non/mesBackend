@@ -101,19 +101,19 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
     @Transactional(readOnly = true)
     public Optional<String> findLotNoByAccountCodeAndDate(GoodsType goodsType, LocalDate now){
         return Optional.ofNullable(jpaQueryFactory
-                    .select(lotMaster.lotNo)
-                    .from(lotMaster)
-                        .leftJoin(item).on(item.id.eq(lotMaster.item.id))
-                        .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
-                    .where(
-                            lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0)),
-                            itemAccount.goodsType.eq(goodsType),
-                            lotMaster.lotMasterDivision.eq(REAL_LOT),
-                            lotMaster.deleteYn.isFalse()
-                    )
-                    .orderBy(lotMaster.createdDate.desc())
-                    .limit(1)
-                    .fetchOne());
+                .select(lotMaster.lotNo)
+                .from(lotMaster)
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                .where(
+                        lotMaster.createdDate.between(now.atStartOfDay(), LocalDateTime.of(now, LocalTime.MAX).withNano(0)),
+                        itemAccount.goodsType.eq(goodsType),
+                        lotMaster.lotMasterDivision.eq(REAL_LOT),
+                        lotMaster.deleteYn.isFalse()
+                )
+                .orderBy(lotMaster.createdDate.desc())
+                .limit(1)
+                .fetchOne());
     }
 
     // 제품분유에 따른 달에 가장 마지막에 생성된 LOT NO
@@ -229,7 +229,7 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .innerJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
                 .innerJoin(outSourcingInput).on(outSourcingInput.id.eq(lotMaster.outSourcingInput.id))
                 .where(
-                    outSourcingInput.id.eq(input),
+                        outSourcingInput.id.eq(input),
                         isDeleteYnFalse()
                 )
                 .fetch();
@@ -343,7 +343,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                         workProcess.workProcessDivision.eq(PACKAGING),
                         lotMaster.stockAmount.goe(1),
                         lotMaster.stockAmount.loe(notShippedAmount),
-                        lotMaster.deleteYn.isFalse()
+                        lotMaster.deleteYn.isFalse(),
+                        lotMaster.lotMasterDivision.eq(REAL_LOT)
 
                 )
                 .fetch();
@@ -485,10 +486,12 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                 .select(
                         Projections.fields(
                                 LabelPrintResponse.class,
+                                lotMaster.id.as("lotMasterId"),
                                 lotMaster.lotNo.as("lotNo"),
                                 item.itemNo.as("itemNo"),
                                 item.itemName.as("itemName"),
-                                lotMaster.stockAmount.as("amount")
+                                lotMaster.stockAmount.as("amount"),
+                                lotMaster.labelPrintYn.as("labelPrintYn")
                         )
                 )
                 .from(lotMaster)
@@ -534,7 +537,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                         lotMaster.badItemAmount.as("badAmount"),
                                         lotMaster.createdAmount.as("createAmount"),
                                         item.itemNo.as("itemNo"),
-                                        item.itemName.as("itemName")
+                                        item.itemName.as("itemName"),
+                                        item.unit.unitCode.as("unitCode")
                                 )
                         )
                         .from(lotEquipmentConnect)
@@ -825,7 +829,8 @@ public class LotMasterRepositoryImpl implements LotMasterRepositoryCustom {
                                 item.itemName.as("itemName"),
                                 item.itemNo.as("itemNo"),
                                 lotMaster.stockAmount.as("stockAmount"),
-                                lotMaster.workProcess.workProcessName.as("workProcess")
+                                lotMaster.workProcess.workProcessName.as("workProcess"),
+                                lotMaster.labelPrintYn.as("labelPrintYn")
                         )
                 )
                 .from(lotMaster)

@@ -39,6 +39,7 @@ public class LotMasterServiceImpl implements LotMasterService {
     private final ItemRepository itemRepository;
     private final WorkProcessRepository workProcessRepository;
     private final LotLogHelper lotLogHelper;
+    private final ShipmentRepository shipmentRepo;
 
     // lot 번호 생성
     private String createLotNo(Long itemId, Long deleteId) throws BadRequestException {
@@ -128,7 +129,7 @@ public class LotMasterServiceImpl implements LotMasterService {
 
     //당일 재고 생성(Test)
     public void getItemStock() {
-        List<Item> itemList = itemRepository.findAllByCondition(null, null, null, null, null);
+        List<Item> itemList = itemRepository.findAllByCondition(null, null, null, null);
         for (Item item : itemList) {
             List<MaterialStockReponse> stockList = lotMasterRepo.findStockAmountByItemId(item.getId(), null);
             for (MaterialStockReponse response : stockList) {
@@ -160,6 +161,28 @@ public class LotMasterServiceImpl implements LotMasterService {
     //라벨 프린트용 정보 반환
     public List<LabelPrintResponse> getPrints(Long workProcessId, Long equipmentId){
         return lotMasterRepo.findPrintsByWorkProcessAndEquipment(workProcessId, equipmentId);
+    }
+
+    // 라벨 프린트 출력 여부
+    @Override
+    public void putLabelPrintYn(Long lotMasterId, Long shipmentId) throws NotFoundException, BadRequestException {
+        if (lotMasterId != null && shipmentId != null) throw new BadRequestException("lotMasterId, shipmentId 둘 중 하나만 입력할 수 있습니다.");
+        if (lotMasterId == null && shipmentId == null) throw new BadRequestException("lotMasterId, shipmentId 둘 중 하나라도 입력 하지 않으면 안됩니다.");
+        if (lotMasterId != null) {
+            LotMaster lotMaster = getLotMasterOrThrow(lotMasterId);
+            lotMaster.setLabelPrintYn(true);
+            lotMasterRepo.save(lotMaster);
+        } else {
+            Shipment shipment = getShipmentOrThrow(shipmentId);
+            shipment.setLabelPrintYn(true);
+            shipmentRepo.save(shipment);
+        }
+    }
+
+    // 출하 단일 조회 및 예외
+    private Shipment getShipmentOrThrow(Long id) throws NotFoundException {
+        return shipmentRepo.findByIdAndDeleteYnFalse(id)
+                .orElseThrow(() -> new NotFoundException("shipment does not exist. input id: " + id));
     }
 
     // lotMaster 용 wareHouse 찾기

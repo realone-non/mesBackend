@@ -24,8 +24,8 @@ public class ProductionPlanServiceImpl implements ProductionPlanService {
 
     // 생산계획 수립 전체 조회, 검색조건: 작업라인, 작업예정일
     @Override
-    public List<ProductionPlanResponse> getProductionPlans(Long workLineId, LocalDate fromDate, LocalDate toDate) throws NotFoundException {
-        List<ProductionPlanResponse> productionPlans = workOrderDetailRepo.findAllProductionPlanByCondition(workLineId, fromDate, toDate);
+    public List<ProductionPlanResponse> getProductionPlans(Long workProcessId, LocalDate fromDate, LocalDate toDate) throws NotFoundException {
+        List<ProductionPlanResponse> productionPlans = workOrderDetailRepo.findAllProductionPlanByCondition(workProcessId, fromDate, toDate);
 
         for (ProductionPlanResponse response : productionPlans) {
             Item item = response.getWorkProcessDivision().equals(PACKAGING) ? getItemOrNull(response.getItemId())

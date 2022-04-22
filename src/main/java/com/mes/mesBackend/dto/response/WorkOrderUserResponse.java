@@ -69,6 +69,9 @@ public class WorkOrderUserResponse {
     @JsonIgnore
     Long workProcessId;
 
+    @Schema(description = "작업공정")
+    String workProcessName;
+
     // costTime(소요시간)
     public void putCostTime() {
         if (this.startDateTime != null && this.endDateTime != null) {

@@ -28,7 +28,7 @@ public class WarehouseInventoryServiceImpl implements WarehouseInventoryService 
             //responseList = itemLogRepository.findByItemIdAndWarehouseIdGroupBy(itemId, warehouseId);
         }
         else{
-            List<Item> itemList = itemRepository.findAllByCondition(itemGroupId, itemAccountId, null, null, null );
+            List<Item> itemList = itemRepository.findAllByCondition(itemGroupId, itemAccountId, null, null);
             for (Item item:itemList) {
                 //List<WarehouseInventoryResponse> response = itemLogRepository.findByItemIdAndWarehouseIdGroupBy(item.getId(), warehouseId);
                 //responseList.addAll(response);

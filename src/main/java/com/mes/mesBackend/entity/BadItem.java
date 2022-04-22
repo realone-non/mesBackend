@@ -48,16 +48,12 @@ public class BadItem extends BaseTimeEntity {
     @Column(name = "DELETE_YN", nullable = false, columnDefinition = "bit(1) COMMENT '사용여부'")
     private boolean deleteYn = false;  // 삭제여부
 
-    @Column(name = "EXHAUST_ITEM", columnDefinition = "varchar(255) COMMENT '소진 원부자재'", nullable = false)
-    private String exhaustItem;
-
     public void update(BadItem newBadItem, WorkProcess newWorkProcess) {
         setBadItemCode(newBadItem.badItemCode);
         setBadItemName(newBadItem.badItemName);
         setOrders(newBadItem.orders);
         setUseYn(newBadItem.useYn);
         setWorkProcess(newWorkProcess);
-        setExhaustItem(newBadItem.exhaustItem);
     }
 
     public void delete() {

@@ -33,7 +33,7 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
 
     @Override
     public List<WorkOrderUserResponse> getWorkOrderUsers(
-            Long workLineId,
+            Long workProcessId,
             String produceOrderNo,
             Long itemAccountId,
             OrderState orderState,
@@ -42,7 +42,7 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
             String contractNo
     ) {
         List<WorkOrderUserResponse> findWorkOrderUsers =
-                workOrderDetailRepository.findWorkOrderUserResponsesByCondition(workLineId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
+                workOrderDetailRepository.findWorkOrderUserResponsesByCondition(workProcessId, produceOrderNo, itemAccountId, orderState, fromDate, toDate, contractNo);
 
         // 해당 공정에 맞는 bomDetailItem
         for (WorkOrderUserResponse response : findWorkOrderUsers) {
@@ -111,7 +111,7 @@ public class WorkOrderUserServiceImpl implements WorkOrderUserService {
         return getWorkOrderUserResponseOrThrow(workOrderDetailId);
     }
 
-//     시작날짜, 종료날자 둘다 입력 받았을 시 endDate 가 startDate 보다 과거면 badRequestException.
+    //     시작날짜, 종료날자 둘다 입력 받았을 시 endDate 가 startDate 보다 과거면 badRequestException.
     private void checkStartDateAndEndDate(LocalDateTime startDate, LocalDateTime endDateTime) throws BadRequestException {
         if (startDate != null && endDateTime != null) {
             if (endDateTime.isBefore(startDate)) {

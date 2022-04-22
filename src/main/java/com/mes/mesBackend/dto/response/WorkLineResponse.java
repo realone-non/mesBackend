@@ -1,17 +1,11 @@
 package com.mes.mesBackend.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mes.mesBackend.entity.ModifiedLog;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
-import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD_HH_MM_SS;
 
 @Getter
 @Setter
@@ -38,16 +32,6 @@ public class WorkLineResponse {
 
     @Schema(description = "사용여부")
     boolean useYn;
-
-    // ============ 수정 기록1
-    @Schema(description = "사번")
-    String userCode;
-    @Schema(description = "수정일자")
-    @JsonFormat(pattern = YYYY_MM_DD_HH_MM_SS, timezone = ASIA_SEOUL)
-    LocalDateTime updateDate;
-    @Schema(description = "유저권한레벨")
-    int userLevel;
-
 
     @Getter
     @Setter
@@ -76,11 +60,5 @@ public class WorkLineResponse {
 
         @Schema(description = "작업라인명")
         String workLineName;
-    }
-
-    public void modifiedLog(ModifiedLog modifiedLog) {
-        setUserCode(modifiedLog.getUserCode());
-        setUpdateDate(modifiedLog.getDate());
-        setUserLevel(modifiedLog.getUserLevel());
     }
 }
