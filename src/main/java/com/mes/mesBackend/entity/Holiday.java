@@ -44,6 +44,7 @@ public class Holiday extends BaseTimeEntity {
         setDay(request.getDay());
         setType(request.getType());
         setUseYn(request.isUseYn());
+        setNote(request.getNote());
     }
 
     public void delete(){
