@@ -32,8 +32,8 @@ import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.FAMILY;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.*;
 import static com.mes.mesBackend.entity.enumeration.OrderState.*;
-import static com.mes.mesBackend.entity.enumeration.ProcessStatus.MATERIAL_REGISTRATION;
-import static com.mes.mesBackend.entity.enumeration.ProcessStatus.MIDDLE_TEST;
+import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
+import static com.mes.mesBackend.entity.enumeration.ProcessStatus.*;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.*;
 
 @Service
@@ -110,7 +110,17 @@ public class PopServiceImpl implements PopService {
                 .orElseThrow(() -> new NotFoundException("[데이터오류] 작업지시에 해당하는 lotLog 를 찾을 수 없습니다."));
         LotMaster dummyLot = lotLog.getLotMaster();
         // dummyLot 로 lotEquipmentLot 조회
-        return lotEquipmentConnectRepo.findPopWorkOrderStates(dummyLot.getId());
+        List<PopWorkOrderStates> popWorkOrderStates = lotEquipmentConnectRepo.findPopWorkOrderStates(dummyLot.getId());
+        for (PopWorkOrderStates r : popWorkOrderStates) {
+            if (r.getProcessStatus().equals(LOT_DIVIDE)) {
+                List<LotMaster> realLots = lotEquipmentConnectRepo.findRealLotByEquipmentLot(r.getLotMasterId());
+
+                if (realLots.isEmpty()) r.setLotDivideStatus("로트분할 대기");
+                if (!realLots.isEmpty()) r.setLotDivideStatus("로트분할 진행중");
+                if (r.getStockAmount() == 0) r.setLotDivideStatus("로트분할 완료");
+            }
+        }
+        return popWorkOrderStates;
     }
 
     // 작업지시 진행상태 변경

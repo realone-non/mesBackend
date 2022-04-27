@@ -1,6 +1,7 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.ProcessStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,4 +36,10 @@ public class PopWorkOrderStates {
 
     @Schema(description = "원료혼합 공정에서 선택한 충진공정 설비")
     Long fillingEquipmentCode;
+
+    @Schema(description = "로트분할 상태값")
+    String lotDivideStatus;
+
+    @JsonIgnore
+    int stockAmount;    // 로트분할 판단할 재고수량
 }
