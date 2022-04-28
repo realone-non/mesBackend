@@ -18,4 +18,6 @@ public interface LotEquipmentConnectRepositoryCustom {
     // dummyLot 로 조회
     List<WorkOrderDetailResponse> findWorkOrderDetailResponseByDummyLotId(Long dummyLotId);
     Optional<LotMaster> findEquipmentLotByIdAndStockAmount(Long equipmentId, int stockAmount);
+    // 설비 lot 로 분할 된 lot 모두 조회
+    List<LotMaster> findRealLotByEquipmentLot(Long equipmentLotId);
 }
