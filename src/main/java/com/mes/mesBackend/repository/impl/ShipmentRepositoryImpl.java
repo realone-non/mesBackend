@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.ItemResponse;
+import com.mes.mesBackend.dto.response.LabelShipmentResponse;
 import com.mes.mesBackend.dto.response.PopShipmentResponse;
 import com.mes.mesBackend.dto.response.ShipmentResponse;
 import com.mes.mesBackend.entity.*;
@@ -162,6 +163,24 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
     public List<Integer> findShipmentLotShipmentAmountByShipmentId(Long shipmentId) {
         return jpaQueryFactory
                 .select(lotMaster.shipmentAmount)
+                .from(shipmentLot)
+                .innerJoin(shipmentItem).on(shipmentItem.id.eq(shipmentLot.shipmentItem.id))
+                .innerJoin(shipment).on(shipment.id.eq(shipmentItem.shipment.id))
+                .innerJoin(lotMaster).on(lotMaster.id.eq(shipmentLot.lotMaster.id))
+                .where(
+                        shipment.id.eq(shipmentId),
+                        shipmentItem.deleteYn.isFalse(),
+                        shipmentLot.deleteYn.isFalse(),
+                        shipment.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+
+    // 출하에 해당되는 출하 lot 정보의 모든 CreatedDate
+    @Override
+    public List<LocalDateTime> findShipmentLotCreatedDateByShipmentId(Long shipmentId) {
+        return jpaQueryFactory
+                .select(lotMaster.createdDate)
                 .from(shipmentLot)
                 .innerJoin(shipmentItem).on(shipmentItem.id.eq(shipmentLot.shipmentItem.id))
                 .innerJoin(shipment).on(shipment.id.eq(shipmentItem.shipment.id))

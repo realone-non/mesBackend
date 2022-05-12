@@ -1,12 +1,14 @@
 package com.mes.mesBackend.repository.custom;
 
 import com.mes.mesBackend.dto.response.ItemResponse;
+import com.mes.mesBackend.dto.response.LabelShipmentResponse;
 import com.mes.mesBackend.dto.response.PopShipmentResponse;
 import com.mes.mesBackend.dto.response.ShipmentResponse;
 import com.mes.mesBackend.entity.ShipmentItem;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +26,8 @@ public interface ShipmentRepositoryCustom {
     List<ShipmentItem> findShipmentItemByShipmentId(Long shipmentId);
     // 출하에 해당되는 출하 lot 정보의 모든 shipmentAmount
     List<Integer> findShipmentLotShipmentAmountByShipmentId(Long shipmentId);
+    // 출하에 해당되는 출하 lot 정보의 모든 CreatedDate
+    List<LocalDateTime> findShipmentLotCreatedDateByShipmentId(Long shipmentId);
     // 오늘 날짜로 생성 된 shipment 중 barcodeNumber 만 가져옴(내림차순 limit 1)
     Optional<String> findBarcodeNumberByToday(LocalDate now);
     // 출하일자가 오늘인거 갯수
@@ -33,4 +37,5 @@ public interface ShipmentRepositoryCustom {
     List<ItemResponse.noAndName> findSalesRelatedStatusResponseByShipmentItems(LocalDate fromDate, LocalDate toDate);
     // 주 별로 출하 된 품목 갯수
     Optional<Integer> findShipmentAmountByWeekDate(LocalDate fromDate, LocalDate toDate, Long itemId);
+
 }
