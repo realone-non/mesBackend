@@ -36,8 +36,4 @@ public class BadItemRequest {
     @Min(value = ONE_VALUE, message = NOT_ZERO)
     @NotNull(message = NOT_NULL)
     Long workProcessId;
-
-    @Schema(description = "소진 원부자재")
-    @NotBlank(message = NOT_NULL)
-    String exhaustItem;
 }

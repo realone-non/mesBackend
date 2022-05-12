@@ -29,7 +29,4 @@ public class BadItemResponse {
 
     @Schema(description = "작업공정")
     WorkProcessResponse.idAndName workProcess;
-
-    @Schema(description = "소진 원부자재")
-    String exhaustItem;
 }
