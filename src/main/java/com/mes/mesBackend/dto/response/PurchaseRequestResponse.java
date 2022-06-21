@@ -1,18 +1,18 @@
 package com.mes.mesBackend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mes.mesBackend.entity.ModifiedLog;
 import com.mes.mesBackend.entity.enumeration.TestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static com.mes.mesBackend.helper.Constants.*;
+import static com.mes.mesBackend.helper.Constants.ASIA_SEOUL;
+import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 @Getter
 @Setter
@@ -30,6 +30,9 @@ public class PurchaseRequestResponse {
 
     @Schema(description = "제조오더번호")
     String produceOrderNo;
+
+    @Schema(description = "제조오더번호 + 수주품목")
+    String produceOrderNoAndItemName;
 
     @Schema(description = "품목 고유아이디")
     Long itemId;
@@ -60,7 +63,7 @@ public class PurchaseRequestResponse {
     int orderAmount;
 
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
-    @Schema(description = "구매납기일자")
+    @Schema(description = "구매납기일자(구매요청 납기일자)")
     LocalDate purchasePeriodDate;
 
     @Schema(description = "검사유형")
@@ -76,47 +79,12 @@ public class PurchaseRequestResponse {
     String modelItemNo;
 
     @JsonFormat(pattern = YYYY_MM_DD, timezone = ASIA_SEOUL)
-    @Schema(description = "납기일자")
+    @Schema(description = "납기일자(수주의 납기일자)")
     LocalDate periodDate;
-
-    // ============ 수정 기록
-    @Schema(description = "사번")
-    String userCode;
-    @Schema(description = "수정일자")
-    @JsonFormat(pattern = YYYY_MM_DD_HH_MM_SS, timezone = ASIA_SEOUL)
-    LocalDateTime updateDate;
-    @Schema(description = "유저권한레벨")
-    int userLevel;
-
-    // ============ 생성 기록
-    @Schema(description = "사번")
-    String insertUserCode;
-    @Schema(description = "생성일자")
-    @JsonFormat(pattern = YYYY_MM_DD_HH_MM_SS, timezone = ASIA_SEOUL)
-    LocalDateTime insertDate;
-    @Schema(description = "생성 유저권한레벨")
-    int insertUserLevel;
-
-    @Schema(description = "재고단위요청수량")
-    int stockUnitRequestAmount;
-
-    @Schema(description = "재고단위발주수량")
-    int stockUnitOrderAmount;
 
     @Schema(description = "수입검사여부")
     boolean inputTestYn;
 
-    // 수정 기록
-    public void modifiedLog(ModifiedLog modifiedLog) {
-        setUserCode(modifiedLog.getUserCode());
-        setUpdateDate(modifiedLog.getDate());
-        setUserLevel(modifiedLog.getUserLevel());
-    }
-
-    // 생성 기록
-    public void insertLog(ModifiedLog modifiedLog) {
-        setInsertUserCode(modifiedLog.getUserCode());
-        setInsertDate(modifiedLog.getDate());
-        setInsertUserLevel(modifiedLog.getUserLevel());
-    }
+    @JsonIgnore
+    String contractItemItemName;
 }

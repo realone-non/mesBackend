@@ -46,13 +46,13 @@ public class BadItemEnrollmentController {
     // 작업지시 정보 리스트 조회, 검색조건: 작업장 id, 작업라인 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목
     @Operation(
             summary = "작업지시 정보 리스트 조회(지시상태 완료, 진행중만 조회)",
-            description = "현재 완료, 진행중인 작업지시만 조회, 검색조건: 작업장 id, 작업라인 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목"
+            description = "현재 완료, 진행중인 작업지시만 조회(원료혼합 공정 제외), 검색조건: 작업장 id, 작업공정 id, 품목그룹 id, 제조오더번호, JOB NO, 작업기간 fromDate~toDate, 품번|품목"
     )
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<BadItemWorkOrderResponse>> getWorkOrders(
             @RequestParam(required = false) @Parameter(description = "[보류]작업장 id") Long workCenterId,
-            @RequestParam(required = false) @Parameter(description = "작업라인 id") Long workLineId,
+            @RequestParam(required = false) @Parameter(description = "작업공정 id") Long workProcessId,
             @RequestParam(required = false) @Parameter(description = "품목그룹 id") Long itemGroupId,
             @RequestParam(required = false) @Parameter(description = "제조오더번호") String produceOrderNo,
             @RequestParam(required = false) @Parameter(description = "JOB NO(작업지시번호)") String workOrderNo,
@@ -62,7 +62,7 @@ public class BadItemEnrollmentController {
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<BadItemWorkOrderResponse> badItemWorkOrderResponses =
-                badItemEnrollmentService.getWorkOrders(workCenterId, workLineId, itemGroupId, produceOrderNo, workOrderNo, fromDate, toDate, itemNoAndItemName);
+                badItemEnrollmentService.getWorkOrders(workCenterId, workProcessId, itemGroupId, produceOrderNo, workOrderNo, fromDate, toDate, itemNoAndItemName);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getWorkOrders.");
         return new ResponseEntity<>(badItemWorkOrderResponses, OK);

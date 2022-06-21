@@ -47,10 +47,10 @@ public class ProductInputTestScheduleController {
     @ResponseBody
     @Operation(
             summary = "검사대기 현황 조회",
-            description = "검색조건: 검사창고 id, 검사유형, 품명|품번, 거래처, 검사요청기간 fromDate~toDate")
+            description = "검색조건: 검사창고 id, 검사방법, 품명|품번, 거래처, 검사요청기간 fromDate~toDate")
     public ResponseEntity<List<InputTestScheduleResponse>> getProductInputTestSchedules(
             @RequestParam(required = false) @Parameter(description = "검사창고 id") Long wareHouseId,
-            @RequestParam(required = false) @Parameter(description = "검사유형") InspectionType inspectionType,
+            @RequestParam(required = false) @Parameter(description = "검사방법") InspectionType inspectionType,
             @RequestParam(required = false) @Parameter(description = "품명|품번") String itemNoAndName,
             @RequestParam(required = false) @Parameter(description = "거래처 id") Long clientId,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "검사요청기간 fromDate") LocalDate fromDate,

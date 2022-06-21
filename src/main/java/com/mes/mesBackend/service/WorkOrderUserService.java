@@ -11,9 +11,9 @@ import java.util.List;
 
 // 8-2. 작업자 투입 수정
 public interface WorkOrderUserService {
-    // 작업자 투입 리스트 검색 조회, 검색조건: 작업장 id, 작업라인 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
+    // 작업자 투입 리스트 검색 조회, 검색조건: 작업공정 id, 제조오더번호, 품목계정 id, 지시상태, 작업기간 fromDate~toDate, 수주번호
     List<WorkOrderUserResponse> getWorkOrderUsers(
-            Long workLineId,
+            Long workProcessId,
             String produceOrderNo,
             Long itemAccountId,
             OrderState orderState,

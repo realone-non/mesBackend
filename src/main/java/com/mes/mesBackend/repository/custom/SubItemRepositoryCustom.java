@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface SubItemRepositoryCustom {
     // 대체품 전체 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
-    List<SubItem> findAllCondition(Long itemGroupId, Long itemAccountId, String itemNo, String itemName);
+    List<SubItem> findAllCondition(Long itemGroupId, Long itemAccountId, String itemNoAndItemName);
 
     // 대체품 페이징 조회 검색조건: 품목그룹, 품목계정, 품번, 품명
 //    Page<SubItem> findAllCondition(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Pageable pageable);

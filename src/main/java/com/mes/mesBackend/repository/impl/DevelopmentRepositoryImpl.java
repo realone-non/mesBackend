@@ -42,7 +42,7 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                                 DevelopmentResponse.class,
                                 development.id.as("id"),
                                 development.itemNo.as("itemNo"),
-                                development.itemNo.as("itemName"),
+                                development.itemName.as("itemName"),
                                 development.businessName.as("businessName"),
                                 development.startDate.as("startDate"),
                                 development.endDate.as("endDate"),
@@ -77,7 +77,7 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
                                 DevelopmentResponse.class,
                                 development.id.as("id"),
                                 development.itemNo.as("itemNo"),
-                                development.itemNo.as("itemName"),
+                                development.itemName.as("itemName"),
                                 development.businessName.as("businessName"),
                                 development.startDate.as("startDate"),
                                 development.endDate.as("endDate"),
@@ -182,7 +182,15 @@ public class DevelopmentRepositoryImpl implements DevelopmentRepositoryCustom {
 
     //날짜 검색
     private  BooleanExpression dateNull(LocalDate fromDate, LocalDate toDate){
-        return fromDate != null ? development.startDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return development.startDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return development.startDate.after(fromDate).or(development.startDate.eq(fromDate));
+        } else if (toDate != null) {
+            return development.startDate.before(toDate).or(development.startDate.eq(toDate));
+        } else {
+            return null;
+        }
     }
 
     //품번 검색

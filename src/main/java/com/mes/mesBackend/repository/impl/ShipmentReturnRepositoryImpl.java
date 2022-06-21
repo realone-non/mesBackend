@@ -223,11 +223,27 @@ public class ShipmentReturnRepositoryImpl implements ShipmentReturnRepositoryCus
 
     // 반품일시 조회
     private BooleanExpression isReturnDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? shipmentReturn.returnDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return shipmentReturn.returnDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return shipmentReturn.returnDate.after(fromDate).or(shipmentReturn.returnDate.eq(fromDate));
+        } else if (toDate != null) {
+            return shipmentReturn.returnDate.before(toDate).or(shipmentReturn.returnDate.before(toDate));
+        } else {
+            return null;
+        }
     }
 
     private BooleanExpression isShipmentDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? shipment.shipmentDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return shipment.shipmentDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return shipment.shipmentDate.after(fromDate).or(shipment.shipmentDate.eq(fromDate));
+        } else if (toDate != null) {
+            return shipment.shipmentDate.before(toDate).or(shipment.shipmentDate.eq(toDate));
+        } else {
+            return null;
+        }
     }
 
     private BooleanExpression isDeleteYnFalse() {

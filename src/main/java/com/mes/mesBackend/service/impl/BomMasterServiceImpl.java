@@ -12,6 +12,8 @@ import com.mes.mesBackend.exception.NotFoundException;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.BomItemDetailRepository;
 import com.mes.mesBackend.repository.BomMasterRepository;
+import com.mes.mesBackend.repository.OutSourcingProductionRequestRepository;
+import com.mes.mesBackend.repository.OutsourcingInputRepository;
 import com.mes.mesBackend.service.BomMasterService;
 import com.mes.mesBackend.service.ClientService;
 import com.mes.mesBackend.service.ItemService;
@@ -35,6 +37,7 @@ public class BomMasterServiceImpl implements BomMasterService {
     private final ClientService clientService;
     private final WorkProcessService workProcessService;
     private final BomItemDetailRepository bomItemDetailRepository;
+    private final OutSourcingProductionRequestRepository outSourcingProductionRequestRepository;
 
     // BOM 마스터 생성
     @Override
@@ -122,8 +125,16 @@ public class BomMasterServiceImpl implements BomMasterService {
         BomMaster bomMaster = getBomMasterOrThrow(bomMasterId);
         // bomMaster 에 해당되는 BomItemDetail 이 있는지 체크(존재하면 삭제 불가능)
         throwIfBomMasterExistInBomItemDetail(bomMaster);
+        // 해당 품목이 외주입고에 등록되어 있으면 삭제 불가능
+        throwIfOutsourcingProductionRequestItemEqNotDelete(bomMaster.getItem().getId());
         bomMaster.delete();
         bomMasterRepository.save(bomMaster);
+    }
+
+    // 해당 품목이 외주입고에 등록되어 있으면 삭제 불가능
+    private void throwIfOutsourcingProductionRequestItemEqNotDelete(Long itemId) throws BadRequestException {
+        boolean b = outSourcingProductionRequestRepository.existsItemByOutsourcingRequest(itemId);
+        if (b) throw new BadRequestException("해당 BOM 은 외주입고에 등록되어 있으므로 삭제가 불가능 합니다. ");
     }
 
     // BOM 품목 생성

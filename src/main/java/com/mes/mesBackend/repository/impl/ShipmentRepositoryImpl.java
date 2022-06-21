@@ -1,6 +1,7 @@
 package com.mes.mesBackend.repository.impl;
 
 import com.mes.mesBackend.dto.response.ItemResponse;
+import com.mes.mesBackend.dto.response.LabelShipmentResponse;
 import com.mes.mesBackend.dto.response.PopShipmentResponse;
 import com.mes.mesBackend.dto.response.ShipmentResponse;
 import com.mes.mesBackend.entity.*;
@@ -120,7 +121,8 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
                                 shipment.barcodeNumber.as("barcodeNumber"),
                                 shipment.client.clientName.as("clientName"),
                                 shipment.orderState.as("orderState"),
-                                shipment.shipmentDate.as("shipmentDate")
+                                shipment.shipmentDate.as("shipmentDate"),
+                                shipment.labelPrintYn.as("labelPrintYn")
                         )
                 )
                 .from(shipmentLot)
@@ -161,6 +163,24 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
     public List<Integer> findShipmentLotShipmentAmountByShipmentId(Long shipmentId) {
         return jpaQueryFactory
                 .select(lotMaster.shipmentAmount)
+                .from(shipmentLot)
+                .innerJoin(shipmentItem).on(shipmentItem.id.eq(shipmentLot.shipmentItem.id))
+                .innerJoin(shipment).on(shipment.id.eq(shipmentItem.shipment.id))
+                .innerJoin(lotMaster).on(lotMaster.id.eq(shipmentLot.lotMaster.id))
+                .where(
+                        shipment.id.eq(shipmentId),
+                        shipmentItem.deleteYn.isFalse(),
+                        shipmentLot.deleteYn.isFalse(),
+                        shipment.deleteYn.isFalse()
+                )
+                .fetch();
+    }
+
+    // 출하에 해당되는 출하 lot 정보의 모든 CreatedDate
+    @Override
+    public List<LocalDateTime> findShipmentLotCreatedDateByShipmentId(Long shipmentId) {
+        return jpaQueryFactory
+                .select(lotMaster.createdDate)
                 .from(shipmentLot)
                 .innerJoin(shipmentItem).on(shipmentItem.id.eq(shipmentLot.shipmentItem.id))
                 .innerJoin(shipment).on(shipment.id.eq(shipmentItem.shipment.id))
@@ -289,7 +309,15 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom {
     }
     // 출하기간
     private BooleanExpression isShipmentDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? shipment.shipmentDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return shipment.shipmentDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return shipment.shipmentDate.after(fromDate).or(shipment.shipmentDate.eq(fromDate));
+        } else if (toDate != null) {
+            return shipment.shipmentDate.before(toDate).or(shipment.shipmentDate.eq(toDate));
+        } else {
+            return null;
+        }
     }
     // 거래처 명 검색
     private BooleanExpression isClientNameContain(String clientName) {

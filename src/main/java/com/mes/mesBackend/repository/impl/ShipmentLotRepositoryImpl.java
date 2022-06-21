@@ -216,7 +216,15 @@ public class ShipmentLotRepositoryImpl implements ShipmentLotRepositoryCustom {
     }
     // 출하기간 조회
     private BooleanExpression isShipmentDateBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? shipment.shipmentDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return shipment.shipmentDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return shipment.shipmentDate.after(fromDate).or(shipment.shipmentDate.eq(fromDate));
+        } else if (toDate != null) {
+            return shipment.shipmentDate.before(toDate).or(shipment.shipmentDate.eq(toDate));
+        } else {
+            return null;
+        }
     }
     // 화폐로 조회
     private BooleanExpression isCurrencyEq(Long currencyId) {

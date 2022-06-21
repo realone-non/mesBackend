@@ -115,7 +115,15 @@ public class MaterialStockInspectRepositoryImpl implements MaterialStockInspectR
     }
 
     private BooleanExpression dateNull(LocalDate startDate, LocalDate endDate){
-        return startDate != null ? materialStockInspectRequest.inspectDate.between(startDate, endDate) : null;
+        if (startDate != null && endDate != null) {
+            return materialStockInspectRequest.inspectDate.between(startDate, endDate);
+        } else if (startDate != null) {
+            return materialStockInspectRequest.inspectDate.after(startDate).or(materialStockInspectRequest.inspectDate.eq(startDate));
+        } else if (endDate != null) {
+            return materialStockInspectRequest.inspectDate.before(endDate).or(materialStockInspectRequest.inspectDate.eq(endDate));
+        } else {
+            return null;
+        }
     }
 
     private BooleanExpression requestNull(Long requestId){

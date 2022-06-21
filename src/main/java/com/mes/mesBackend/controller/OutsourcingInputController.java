@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -56,16 +58,15 @@ public class OutsourcingInputController {
     )
     public ResponseEntity<List<OutsourcingInputResponse>> getOutsourcingInputList(
             @RequestParam(required = false) @Parameter(description = "외주사 ID") Long clientId,
-            @RequestParam(required = false) @Parameter(description = "품번") String itemNo,
-            @RequestParam(required = false) @Parameter(description = "품명") String itemName,
-            @RequestParam(required = false) @Parameter(description = "시작날짜") LocalDate startDate,
-            @RequestParam(required = false) @Parameter(description = "종료날짜") LocalDate endDate,
+            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoAndItemName,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "시작날짜") LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "종료날짜") LocalDate endDate,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) {
-        List<OutsourcingInputResponse> responseList = outsourcingService.getOutsourcingInputList(clientId, itemNo, itemName, startDate, endDate);
+        List<OutsourcingInputResponse> responseList = outsourcingService.getOutsourcingInputList(clientId, itemNoAndItemName, startDate, endDate);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of clientId: " + clientId +
-                "itemNo " + itemNo + "itemName" + itemName + "startDate and EndDate:" + startDate + "," + endDate + " from getOutsourcingInputList.");
+                "itemNoAndItemName:  " + itemNoAndItemName + "startDate and EndDate:" + startDate + "," + endDate + " from getOutsourcingInputList.");
         return new ResponseEntity<>(responseList, OK);
     }
 
@@ -179,22 +180,22 @@ public class OutsourcingInputController {
     // 외주 입고정보 LOT 삭제
     @Operation(summary = "외주 입고정보 LOT 삭제")
     @DeleteMapping("/{request-id}/lot/{id}")
-        @ResponseBody
-        @ApiResponses(
-                value = {
-                        @ApiResponse(responseCode = "200", description = "success"),
-                        @ApiResponse(responseCode = "404", description = "not found resource"),
-                        @ApiResponse(responseCode = "400", description = "bad request")
-                }
-        )
-        public ResponseEntity deleteOutsourcingInputLOT(
-                @PathVariable(value = "request-id") @Parameter(description = "외주생산의뢰 id") Long requestid,
-                @PathVariable(value = "id") @Parameter(description = "외주입고 id") Long inputId,
-                @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+    @ResponseBody
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "success"),
+                    @ApiResponse(responseCode = "404", description = "not found resource"),
+                    @ApiResponse(responseCode = "400", description = "bad request")
+            }
+    )
+    public ResponseEntity deleteOutsourcingInputLOT(
+            @PathVariable(value = "request-id") @Parameter(description = "외주생산의뢰 id") Long requestid,
+            @PathVariable(value = "id") @Parameter(description = "외주입고 id") Long inputId,
+            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
-            outsourcingService.deleteOutsourcingInputLOT(requestid, inputId);
-            cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-            cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + inputId + " from deleteOutsourcingInputLOT.");
+        outsourcingService.deleteOutsourcingInputLOT(requestid, inputId);
+        cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
+        cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is deleted the " + inputId + " from deleteOutsourcingInputLOT.");
         return new ResponseEntity(NO_CONTENT);
     }
 }

@@ -45,12 +45,13 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
                 .select(
                         Projections.fields(
                                 PopWorkOrderStates.class,
-                                lotEquipmentConnect.childLot.id.as("lotMasterId"),
+                                lotEquipmentConnect.childLot.id.as("lotMasterId"),  // 설비로트
                                 equipment.equipmentName.as("equipmentName"),
                                 lotEquipmentConnect.processStatus.as("processStatus"),
                                 lotEquipmentConnect.modifiedDate.as("updateDateTime"),
                                 lotEquipmentConnect.childLot.createdAmount.as("createdAmount"),
-                                lotEquipmentConnect.childLot.inputEquipment.id.as("fillingEquipmentCode")
+                                lotEquipmentConnect.childLot.inputEquipment.id.as("fillingEquipmentCode"),
+                                lotEquipmentConnect.childLot.stockAmount.as("stockAmount")
                         )
                 )
                 .from(lotEquipmentConnect)
@@ -93,7 +94,8 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
                                 lotMaster.createdAmount.subtract(lotMaster.badItemAmount).as("stockAmount"),
                                 lotMaster.badItemAmount.as("badItemAmount"),
                                 lotMaster.workProcess.workProcessName.as("workProcess"),
-                                lotMaster.workProcess.id.as("workProcessId")
+                                lotMaster.workProcess.id.as("workProcessId"),
+                                lotMaster.recycleAmount.as("recycleAmount")
                         )
                 )
                 .from(lotEquipmentConnect)
@@ -122,5 +124,21 @@ public class LotEquipmentConnectRepositoryImpl implements LotEquipmentConnectRep
                         )
                         .fetchOne()
         );
+    }
+
+    // 설비 lot 로 분할 된 lot 모두 조회
+    @Override
+    public List<LotMaster> findRealLotByEquipmentLot(Long equipmentLotId) {
+        return jpaQueryFactory
+                .select(lotConnect.childLot)
+                .from(lotConnect)
+                .where(
+                        lotConnect.parentLot.childLot.id.eq(equipmentLotId),
+                        lotConnect.parentLot.childLot.lotMasterDivision.eq(EQUIPMENT_LOT),
+                        lotConnect.division.eq(FAMILY),
+                        lotConnect.childLot.deleteYn.isFalse(),
+                        lotConnect.childLot.lotMasterDivision.eq(REAL_LOT)
+                )
+                .fetch();
     }
 }

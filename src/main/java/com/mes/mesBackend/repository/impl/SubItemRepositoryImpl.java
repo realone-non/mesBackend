@@ -24,17 +24,15 @@ public class SubItemRepositoryImpl implements SubItemRepositoryCustom {
     public List<SubItem> findAllCondition(
             Long itemGroupId,
             Long itemAccountId,
-            String itemNo,
-            String itemName
+            String itemNoAndItemName
     ) {
         return jpaQueryFactory
                 .selectFrom(subItem)
                 .where(
                         isItemGroupEq(itemGroupId),
                         isItemAccountEq(itemAccountId),
-                        isItemNoContains(itemNo),
-                        isItemNameContains(itemName),
-                        isDeleteYnFalse()
+                        isDeleteYnFalse(),
+                        isItemNoAndItemNameContain(itemNoAndItemName)
                 )
                 .orderBy(subItem.createdDate.desc())
                 .fetch();
@@ -50,14 +48,8 @@ public class SubItemRepositoryImpl implements SubItemRepositoryCustom {
         return itemAccountId != null ? subItem.item.itemAccount.id.eq(itemAccountId) : null;
     }
 
-    // 품번으로 조회
-    private BooleanExpression isItemNoContains(String itemNo) {
-        return itemNo != null ? subItem.item.itemNo.contains(itemNo) : null;
-    }
-
-    // 품명으로 조회
-    private BooleanExpression isItemNameContains(String itemName) {
-        return itemName != null ? subItem.item.itemName.contains(itemName) : null;
+    private BooleanExpression isItemNoAndItemNameContain(String itemNoAndName) {
+        return itemNoAndName != null ? subItem.item.itemNo.contains(itemNoAndName).or(subItem.item.itemName.contains(itemNoAndName)) : null;
     }
 
     private BooleanExpression isDeleteYnFalse() {

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mes.mesBackend.entity.enumeration.OrderState;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -16,7 +15,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Setter
 @Schema(description = "pop-출하")
 @JsonInclude(NON_NULL)
-public class PopShipmentResponse {
+public class LabelShipmentResponse {
     // 출하 id
     @Schema(description = "출하 고유아이디")
     Long shipmentId;
@@ -29,9 +28,13 @@ public class PopShipmentResponse {
     @Schema(description = "거래처 명")
     String clientName;
 
-    // 출하 일자
-    @Schema(description = "출하일자")
-    LocalDate shipmentDate;
+    // 제조일자1
+    @Schema(description = "제조일자 1")
+    LocalDate createdDate1;
+
+    // 제조일자2
+    @Schema(description = "제조일자 2")
+    LocalDate createdDate2;
 
     // 품번 여러개
     @Schema(description = "품번")

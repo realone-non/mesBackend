@@ -46,7 +46,10 @@ public class DevelopmentServiceImpl implements DevelopmentService {
     S3Uploader s3Uploader;
 
     //개발품목 등록
-    public DevelopmentResponse createDevelopment(DevelopmentRequest request) throws NotFoundException {
+    public DevelopmentResponse createDevelopment(DevelopmentRequest request) throws NotFoundException, BadRequestException {
+        if(request.getStartDate().isAfter(request.getEndDate())){
+            throw new BadRequestException("시작일은 종료일보다 클 수 없습니다.");
+        }
         Development development = mapper.toEntity(request, Development.class);
         User user = userRepository.findByIdAndDeleteYnFalse(request.getUserId())
                 .orElseThrow(() -> new NotFoundException("user does not exist. input id: " + request.getUserId()));
@@ -81,7 +84,10 @@ public class DevelopmentServiceImpl implements DevelopmentService {
     }
 
     //개발품목 수정
-    public DevelopmentResponse modifyDevelopment(Long id, DevelopmentRequest request) throws NotFoundException {
+    public DevelopmentResponse modifyDevelopment(Long id, DevelopmentRequest request) throws NotFoundException, BadRequestException {
+        if(request.getStartDate().isAfter(request.getEndDate())){
+            throw new BadRequestException("시작일은 종료일보다 클 수 없습니다.");
+        }
         Development dbDevelop = developmentRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("development does not exist. input id: " + id));
         User user = userRepository.findByIdAndDeleteYnFalse(request.getUserId())
@@ -161,7 +167,7 @@ public class DevelopmentServiceImpl implements DevelopmentService {
         DevelopmentState state = developmentStateRepository.findByIdAndDeleteYnFalse(developStateId)
                 .orElseThrow(() -> new NotFoundException("developmentState does not exist. input id: " + developStateId));
         state.setFileName(file.getOriginalFilename());
-        state.setFileUrl(s3Uploader.upload(file, "develop"));
+        state.setFileUrl(s3Uploader.upload(file, "develop/"));
         developmentStateRepository.save(state);
         return developmentRepository.findByIdAndDeleteYn(developId, developStateId);
     }

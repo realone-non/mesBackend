@@ -110,7 +110,7 @@ public class ItemGroupController {
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
-        ItemGroupResponse itemGroup = itemGroupService.updateItemGroup(id, itemGroupRequest, userCode);
+        ItemGroupResponse itemGroup = itemGroupService.updateItemGroup(id, itemGroupRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is modified the " + itemGroup.getId() + " from updateItemGroup.");
         return new ResponseEntity<>(itemGroup, OK);

@@ -4,7 +4,6 @@ import com.mes.mesBackend.dto.response.LotTrackingResponse;
 import com.mes.mesBackend.dto.response.PopBomDetailLotMasterResponse;
 import com.mes.mesBackend.dto.response.PopLotMasterResponse;
 import com.mes.mesBackend.entity.*;
-import com.mes.mesBackend.entity.enumeration.LotMasterDivision;
 import com.mes.mesBackend.repository.custom.LotConnectRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -19,7 +18,6 @@ import java.util.Optional;
 
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.EXHAUST;
 import static com.mes.mesBackend.entity.enumeration.LotConnectDivision.FAMILY;
-import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.EQUIPMENT_LOT;
 import static com.mes.mesBackend.entity.enumeration.LotMasterDivision.REAL_LOT;
 
 @RequiredArgsConstructor

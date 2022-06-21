@@ -169,7 +169,7 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
         User user = userRepository.findByUserCode(userCode)
                 .orElseThrow(() -> new NotFoundException("user does not exist. input userCode: " + userCode));
         for (MaterialStockInspect inspect: dbInspect) {
-                inspect.approval(user);
+            inspect.approval(user);
         }
 
         materialStockInspectRepository.saveAll(dbInspect);
@@ -177,8 +177,8 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
     }
 
     //재고현황 조회
-    public JSONArray getMaterialStock(Long itemGroupId, Long itemAccountId, String itemNo, String itemName, Long warehouseId){
-        List<Item> items = itemRepository.findAllByCondition(itemGroupId, itemAccountId, itemNo, itemName, null);
+    public JSONArray getMaterialStock(Long itemGroupId, Long itemAccountId, String itemNoAndItemName, Long warehouseId){
+        List<Item> items = itemRepository.findAllByCondition(itemGroupId, itemAccountId, itemNoAndItemName, null);
         JSONArray materialStocks = new JSONArray();
 
         for (Item item:items) {
@@ -198,7 +198,7 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
             }
             materialStocks.add(itemAmount);
         }
-        
+
         return materialStocks;
     }
 
@@ -272,8 +272,8 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
 
             shortageResponse.setOverLackAmount(
                     shortageResponse.getBeforeDayAmount() +
-                        shortageResponse.getScheduleInputAmount() -
-                        shortageResponse.getProductionCapacity());
+                            shortageResponse.getScheduleInputAmount() -
+                            shortageResponse.getProductionCapacity());
             shortageResponseList.add(shortageResponse);
         }
         return shortageResponseList;
@@ -286,7 +286,7 @@ public class MaterialWarehouseServiceImpl implements MaterialWarehouseService {
                 workAmount = getDetailRecursive(detail, itemId, workAmount);
             }
             else if(detail.getItemId().equals(itemId)){
-               workAmount = Float.parseFloat(String.valueOf(workAmount + detail.getBomAmount()));
+                workAmount = Float.parseFloat(String.valueOf(workAmount + detail.getBomAmount()));
             }
         }
 

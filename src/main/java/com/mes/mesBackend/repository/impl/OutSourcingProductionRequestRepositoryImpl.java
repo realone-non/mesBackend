@@ -24,7 +24,7 @@ public class OutSourcingProductionRequestRepositoryImpl implements OutsourcingRe
     final QItem item = QItem.item;
     final QClient client = QClient.client;
 
-    public List<OutsourcingProductionResponse> findAllByCondition(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
+    public List<OutsourcingProductionResponse> findAllByCondition(Long clientId, String itemNoAndItemName, LocalDate startDate, LocalDate endDate){
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -47,8 +47,7 @@ public class OutSourcingProductionRequestRepositoryImpl implements OutsourcingRe
                 .leftJoin(client).on(client.id.eq(item.manufacturer.id))
                 .where(
                         clientNull(clientId),
-                        isItemNoContaining(itemNo),
-                        isItemNameContaining(itemName),
+                        isItemNoAndItemNameContain(itemNoAndItemName),
                         dateNull(startDate, endDate),
                         request.deleteYn.eq(false)
                 )
@@ -86,6 +85,20 @@ public class OutSourcingProductionRequestRepositoryImpl implements OutsourcingRe
         );
     }
 
+    // 해당 품목이 외주생산의뢰에 등록되어 있는지
+    @Override
+    public boolean existsItemByOutsourcingRequest(Long itemId) {
+        Integer fetchOne = jpaQueryFactory
+                .selectOne()
+                .from(request)
+                .where(
+                        request.deleteYn.isFalse(),
+                        request.item.id.eq(itemId)
+                )
+                .fetchFirst();
+        return fetchOne != null;
+    }
+
     private BooleanExpression clientNull(Long clientId){
 //        return clientId != null ? request.bomMaster.item.manufacturer.id.eq(clientId) : null;
         return clientId != null ? client.id.eq(clientId) : null;
@@ -95,17 +108,19 @@ public class OutSourcingProductionRequestRepositoryImpl implements OutsourcingRe
         return itemId != null ? item.id.eq(itemId) : null;
     }
 
-    // 품번 검색
-    private BooleanExpression isItemNoContaining(String itemNo) {
-        return itemNo !=  null ? item.itemNo.contains(itemNo) : null;
-    }
-
-    // 품명 검색
-    private BooleanExpression isItemNameContaining(String itemName) {
-        return itemName != null ? item.itemName.contains(itemName) : null;
+    private BooleanExpression isItemNoAndItemNameContain(String itemNoAndName) {
+        return itemNoAndName != null ? item.itemNo.contains(itemNoAndName).or(item.itemName.contains(itemNoAndName)) : null;
     }
 
     private  BooleanExpression dateNull(LocalDate startDate, LocalDate endDate){
-        return startDate != null ? request.productionDate.between(startDate, endDate) : null;
+        if (startDate != null && endDate != null) {
+            return request.productionDate.between(startDate, endDate);
+        } else if (startDate != null) {
+            return request.productionDate.after(startDate).or(request.productionDate.eq(startDate));
+        } else if (endDate != null) {
+            return request.productionDate.before(endDate).or(request.productionDate.eq(endDate));
+        } else {
+            return null;
+        }
     }
 }

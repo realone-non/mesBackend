@@ -28,17 +28,11 @@ public class LotHelperImpl implements LotHelper {
     private final static String DUMMY_HEADER = "POP";
     private final static String EQU_HEADER = "EQU";
     private final LotMasterRepository lotMasterRepo;
-    private final PurchaseInputRepository purchaseInputRepo;
     private final EquipmentRepository equipmentRepository;
-    private final OutsourcingInputRepository outsourcingInputRepository;
-    private final WareHouseRepository wareHouseRepository;
     private final LotLogHelper lotLogHelper;
     private final WorkProcessRepository workProcessRepository;
-    private final LotTypeRepository lotTypeRepository;
     private final static String FORMAT_04 = "%04d";
     private final static String FORMAT_03 = "%03d";
-    private final static String DATE_FORMAT_YYMMDD = LocalDate.now().format(DateTimeFormatter.ofPattern(YYMMDD));
-    private final static String DATE_FORMAT_YYMM = LocalDate.now().format(DateTimeFormatter.ofPattern(YYMM));
 
     @Override
     public LotMaster createLotMaster(LotMasterRequest lotMasterRequest) throws NotFoundException, BadRequestException {
@@ -88,14 +82,13 @@ public class LotHelperImpl implements LotHelper {
                     break;
                 case HALF_PRODUCT:
                     // equipment 가 null 일 경우는 외주생산입고일 경우임
-                        lotNo = equipment != null
-                                ? createHalfProductLotNo(beforeRealLotNo, itemAccountCode, equipment.getLotCode())
-                                : createHalfProductLotNo(beforeRealLotNo, itemAccountCode, "");
+                    lotNo = createHalfProductLotNo(beforeRealLotNo, itemAccountCode, equipment != null ? equipment.getLotCode() : "");
                     break;
                 case PRODUCT:
                     // 완제품 중 해당하는 달에 등록된 lot, 조건: 품목계정, 설비, 해당하는 달
+                    // equipment 가 null 일 경우는 외주생산입고일 경우임
                     String beforeProductRealLotNo = lotMasterRepo.findLotNoByAccountCodeAndMonth(goodsType, now).orElse(null);
-                    lotNo = createProductLotNo(beforeProductRealLotNo, itemAccountCode, equipment.getLotCode());
+                    lotNo = createProductLotNo(beforeProductRealLotNo, itemAccountCode, equipment != null ? equipment.getLotCode() : "");
                     break;
                 case NONE: throw new BadRequestException("해당 품목에 대한 품목계정이 존재하지 않습니다.");
             }
@@ -106,29 +99,30 @@ public class LotHelperImpl implements LotHelper {
     // 원부자재 lotNo 생성
     private String createRawAndSubMaterialLotNo(String beforeLotNo, String itemAccountCode) {
         return beforeLotNo != null
-                ? DATE_FORMAT_YYMMDD + itemAccountCode + String.format(FORMAT_04, lotNoSeq(4, beforeLotNo))
-                : DATE_FORMAT_YYMMDD + itemAccountCode + String.format(FORMAT_04, 1);
+                ? getDateFormatYymmdd() + itemAccountCode + String.format(FORMAT_04, lotNoSeq(4, beforeLotNo))
+                : getDateFormatYymmdd() + itemAccountCode + String.format(FORMAT_04, 1);
     }
 
     // 반제품 lotNo 생성
     private String createHalfProductLotNo(String beforeLotNo, String itemAccountCode, String equipmentLotCode) {
         return beforeLotNo != null
-                ? DATE_FORMAT_YYMMDD + itemAccountCode + equipmentLotCode + String.format(FORMAT_03, lotNoSeq(3, beforeLotNo))
-                : DATE_FORMAT_YYMMDD + itemAccountCode + equipmentLotCode + String.format(FORMAT_03, 1);
+                ? getDateFormatYymmdd() + itemAccountCode + equipmentLotCode + String.format(FORMAT_03, lotNoSeq(3, beforeLotNo))
+                : getDateFormatYymmdd() + itemAccountCode + equipmentLotCode + String.format(FORMAT_03, 1);
     }
 
     // 완제품 lotNo 생성
     private String createProductLotNo(String beforeLotNo, String itemAccountCode, String equipmentLotCode) {
         return beforeLotNo != null
-                ? PRODUCT_HEADER + DATE_FORMAT_YYMMDD + itemAccountCode + equipmentLotCode + String.format(FORMAT_04, lotNoSeq(4, beforeLotNo))
-                : PRODUCT_HEADER + DATE_FORMAT_YYMMDD + itemAccountCode + equipmentLotCode + String.format(FORMAT_04, 1);
+                ? PRODUCT_HEADER + getDateFormatYymmdd() + itemAccountCode + equipmentLotCode + String.format(FORMAT_04, lotNoSeq(4, beforeLotNo))
+                : PRODUCT_HEADER + getDateFormatYymmdd() + itemAccountCode + equipmentLotCode + String.format(FORMAT_04, 1);
     }
 
     // dummyLot, equipmentLot 번호 생성
     private String createLotDivisionLotNo(String beforeLotNo, LotMasterDivision division) {
         String headerFormat = division.equals(DUMMY_LOT) ? DUMMY_HEADER : division.equals(EQUIPMENT_LOT) ? EQU_HEADER : null;
-        return beforeLotNo != null ? headerFormat + NOW_YYMMDD + String.format(FORMAT_04, lotNoSeq(4, beforeLotNo))
-                : headerFormat + NOW_YYMMDD + String.format(FORMAT_04, 1);
+        return beforeLotNo != null
+                ? headerFormat + getDateFormatYymmdd() + String.format(FORMAT_04, lotNoSeq(4, beforeLotNo))
+                : headerFormat + getDateFormatYymmdd() + String.format(FORMAT_04, 1);
     }
 
     // seq 생성
@@ -136,6 +130,9 @@ public class LotHelperImpl implements LotHelper {
         return Integer.parseInt(beforeLotNo.substring(beforeLotNo.length() - index)) + 1;
     }
 
+    private String getDateFormatYymmdd() {
+        return LocalDate.now().format(DateTimeFormatter.ofPattern(YYMMDD));
+    }
 
 //    // lot 생성
 //    @Override
@@ -334,33 +331,9 @@ public class LotHelperImpl implements LotHelper {
 //        return createdLotNo;
 //    }
 
-    // lotMaster 용 wareHouse 찾기
-    private WareHouse getLotMasterWareHouseOrThrow() throws NotFoundException {
-        return wareHouseRepository.findByWorkProcessYnIsTrueAndDeleteYnFalse()
-                .orElseThrow(() -> new NotFoundException("공정 용 창고가 없습니다. 공정 용 창고 생성 후 다시 시도해 주세요."));
-    }
-
     private WorkProcess getWorkProcessIdOrThrow(Long id) throws NotFoundException {
         return workProcessRepository.findByIdAndDeleteYnFalse(id)
                 .orElseThrow(() -> new NotFoundException("workProcess does not exist. input id: " + id));
-    }
-
-    // 구매입고 단일 조회 및 예외
-    private PurchaseInput getPurchaseInputOrThrow(Long id) throws NotFoundException {
-        return purchaseInputRepo.findByIdAndDeleteYnFalse(id)
-                .orElseThrow(() -> new NotFoundException("purchaseInput does not exist. input purchaseInput id: " + id));
-    }
-
-    // 외주입고 단일 조회 및 예외
-    private OutSourcingInput getOutsourcingInputOrThrow(Long id) throws NotFoundException {
-        return outsourcingInputRepository.findByIdAndDeleteYnFalse(id)
-                .orElseThrow(() -> new NotFoundException("outsourcingInput does not exist. input outsourcingInput id: " + id));
-    }
-
-    // Lot유형 조회 및 예외
-    private LotType getLotTypeOrThrow(Long id) throws NotFoundException {
-        return lotTypeRepository.findByIdAndDeleteYnFalse(id)
-                .orElseThrow(() -> new NotFoundException("lotType does not exist. input id: " + id));
     }
 
     // 설비 단일 조회 및 예외

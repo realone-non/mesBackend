@@ -64,7 +64,7 @@ public class DevelopmentController {
     public ResponseEntity<DevelopmentResponse> createDevelopment(
             @RequestBody @Valid DevelopmentRequest request,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         DevelopmentResponse response = developmentService.createDevelopment(request);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is created the " + response.getId() + " from createDevelopment.");
@@ -138,7 +138,7 @@ public class DevelopmentController {
             @PathVariable(value = "development-id") @Parameter(description = "개발품목 ID") Long id,
             @RequestBody @Valid DevelopmentRequest request,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
-    ) throws NotFoundException {
+    ) throws NotFoundException, BadRequestException {
         DevelopmentResponse response = developmentService.modifyDevelopment(id, request);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is modify development : " + id + "from modifyDevelopment");

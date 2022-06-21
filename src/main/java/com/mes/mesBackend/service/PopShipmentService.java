@@ -1,5 +1,6 @@
 package com.mes.mesBackend.service;
 
+import com.mes.mesBackend.dto.response.LabelShipmentResponse;
 import com.mes.mesBackend.dto.response.PopShipmentResponse;
 import com.mes.mesBackend.exception.NotFoundException;
 
@@ -11,4 +12,5 @@ public interface PopShipmentService {
     List<PopShipmentResponse> getPopShipments(LocalDate fromDate, LocalDate toDate, String clientName, Boolean completionYn);
     // 출하상태 COMPLETION 으로 변경
     void updateShipmentStateCompletion(Long shipmentId) throws NotFoundException;
+    List<LabelShipmentResponse> getLabelShipments(LocalDate fromDate, LocalDate toDate, String clientName, Boolean completionYn);
 }

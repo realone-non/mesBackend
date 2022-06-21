@@ -116,7 +116,15 @@ public class ItemLogRepositoryImpl implements ItemLogRepositoryCustom {
     }
 
     private BooleanExpression isItemLogBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? itemLog.logDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return itemLog.logDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return itemLog.logDate.after(fromDate).or(itemLog.logDate.eq(fromDate));
+        } else if (toDate != null) {
+            return itemLog.logDate.before(toDate).or(itemLog.logDate.eq(toDate));
+        } else {
+            return null;
+        }
     }
 
     private BooleanExpression isItemAccountNull(Long itemAccountId){
@@ -133,9 +141,5 @@ public class ItemLogRepositoryImpl implements ItemLogRepositoryCustom {
 
     private BooleanExpression isOutNull(Boolean outYn){
         return outYn != null ? itemLog.outsourcingYn.eq(outYn) : null;
-    }
-
-    private BooleanExpression isItemLogBeforeBetween(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? itemLog.logDate.between(fromDate, toDate) : itemLog.logDate.eq(LocalDate.now().minusDays(1));
     }
 }

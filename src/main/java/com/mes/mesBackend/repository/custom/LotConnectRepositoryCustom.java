@@ -4,9 +4,7 @@ import com.mes.mesBackend.dto.response.LotTrackingResponse;
 import com.mes.mesBackend.dto.response.PopBomDetailLotMasterResponse;
 import com.mes.mesBackend.dto.response.PopLotMasterResponse;
 import com.mes.mesBackend.entity.LotConnect;
-import com.mes.mesBackend.entity.LotEquipmentConnect;
 import com.mes.mesBackend.entity.LotMaster;
-import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 
 import java.time.LocalDate;
 import java.util.List;

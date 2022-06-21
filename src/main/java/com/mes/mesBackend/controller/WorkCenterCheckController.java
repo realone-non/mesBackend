@@ -161,7 +161,7 @@ public class WorkCenterCheckController {
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException, BadRequestException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
-        WorkCenterCheckDetailResponse workCenterCheckDetail = workCenterCheckService.createWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailRequest, userCode);
+        WorkCenterCheckDetailResponse workCenterCheckDetail = workCenterCheckService.createWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is created the " + workCenterCheckDetail.getId()
                 + " from createWorkCenterCheckDetail.");
@@ -218,7 +218,7 @@ public class WorkCenterCheckController {
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
-        WorkCenterCheckDetailResponse workCenterCheckDetail = workCenterCheckService.updateWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailId, workCenterCheckDetailRequest, userCode);
+        WorkCenterCheckDetailResponse workCenterCheckDetail = workCenterCheckService.updateWorkCenterCheckDetail(workCenterCheckId, workCenterCheckDetailId, workCenterCheckDetailRequest);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(userCode + " is modified the " + workCenterCheckDetail.getId() + " from updateWorkCenterCheckDetail.");
         return new ResponseEntity<>(workCenterCheckDetail, OK);

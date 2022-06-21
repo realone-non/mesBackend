@@ -27,7 +27,7 @@ public class OutsourcingReturnRepositoryImpl implements OutsourcingReturnReposit
 
     //외주반품 전체 조회 검색 조건:외주처, 품목, 반품기간
     @Transactional(readOnly = true)
-    public List<OutsourcingReturnResponse> findAllByCondition(Long clientId, String itemNo, String itemName, LocalDate startDate, LocalDate endDate){
+    public List<OutsourcingReturnResponse> findAllByCondition(Long clientId, String itemNoAndItemName, LocalDate startDate, LocalDate endDate){
         return jpaQueryFactory
                 .select(
                         Projections.fields(
@@ -57,8 +57,7 @@ public class OutsourcingReturnRepositoryImpl implements OutsourcingReturnReposit
                 .leftJoin(lotType).on(lotType.id.eq(lotMaster.lotType.id))
                 .where(
                         clientNull(clientId),
-                        isItemNoContaining(itemNo),
-                        isItemNameContaining(itemName),
+                        isItemNoAndItemNameContain(itemNoAndItemName),
                         dateNull(startDate, endDate),
                         outsourcingReturn.useYn.eq(true),
                         outsourcingReturn.deleteYn.eq(false)
@@ -115,17 +114,20 @@ public class OutsourcingReturnRepositoryImpl implements OutsourcingReturnReposit
         return itemId != null ? item.id.eq(itemId) : null;
     }
 
-    // 품번 검색
-    private BooleanExpression isItemNoContaining(String itemNo) {
-        return itemNo !=  null ? item.itemNo.contains(itemNo) : null;
-    }
-
-    // 품명 검색
-    private BooleanExpression isItemNameContaining(String itemName) {
-        return itemName != null ? item.itemName.contains(itemName) : null;
+    // 품번|품명
+    private BooleanExpression isItemNoAndItemNameContain(String itemNoAndName) {
+        return itemNoAndName != null ? item.itemNo.contains(itemNoAndName).or(item.itemName.contains(itemNoAndName)) : null;
     }
 
     private  BooleanExpression dateNull(LocalDate startDate, LocalDate endDate) {
-        return startDate != null ? outsourcingReturn.returnDate.between(startDate, endDate) : null;
+        if (startDate != null && endDate != null) {
+            return outsourcingReturn.returnDate.between(startDate, endDate);
+        } else if (startDate != null) {
+            return outsourcingReturn.returnDate.after(startDate).or(outsourcingReturn.returnDate.eq(startDate));
+        } else if (endDate != null) {
+            return outsourcingReturn.returnDate.before(endDate).or(outsourcingReturn.returnDate.eq(endDate));
+        } else {
+            return null;
+        }
     }
 }

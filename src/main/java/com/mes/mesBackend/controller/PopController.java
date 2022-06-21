@@ -20,9 +20,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.mes.mesBackend.helper.Constants.MONGO_TEMPLATE;
+import static com.mes.mesBackend.helper.Constants.YYMMDD;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -57,9 +61,9 @@ public class PopController {
     @Operation(summary = "(pop) 설비 목록 조회", description = "작업공정에 대한 설비 목록 <br /> " +
             "작업공정 구분: [자재입고: MATERIAL_INPUT, 원료혼합: MATERIAL_MIXING, 충진: FILLING, 캡조립: CAP_ASSEMBLY, 라벨링: LABELING, 포장: PACKAGING, 출하: SHIPMENT, 재사용 : RECYCLE]")
     public ResponseEntity<List<PopEquipmentResponse>> getPopEquipments(@RequestParam
-            @Parameter(description = "작업공정 구분 값") WorkProcessDivision workProcessDivision,
-            @RequestParam(required = false) @Parameter(description = "생성가능여부 구분값 (true: 생성가능, false: 생성불가능)") Boolean produceYn,
-            @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
+                                                                       @Parameter(description = "작업공정 구분 값") WorkProcessDivision workProcessDivision,
+                                                                       @RequestParam(required = false) @Parameter(description = "생성가능여부 구분값 (true: 생성가능, false: 생성불가능)") Boolean produceYn,
+                                                                       @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
         List<PopEquipmentResponse> equipments = popService.getPopEquipments(workProcessDivision, produceYn);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
@@ -391,7 +395,7 @@ public class PopController {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
         PopLotMasterResponse popLotMasterResponse = popService.createPopLotMasters(lotMasterId, amount);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(userCode + " is viewed the list of from createPopLotMasters.");
+        cLogger.info(userCode + " is create the realLot from createPopLotMasters. create lotNo: " + popLotMasterResponse.getLotNo() + ", LocalDateTime: " + LocalDate.now().format(DateTimeFormatter.ofPattern(YYMMDD)));
         return new ResponseEntity<>(popLotMasterResponse, OK);
     }
 
@@ -408,7 +412,7 @@ public class PopController {
         String userCode = logService.getUserCodeFromHeader(tokenHeader);
         PopLotMasterResponse popLotMasterResponse = popService.putPopLotMasters(lotMasterId, amount);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
-        cLogger.info(userCode + " is viewed the list of from putPopLotMasters.");
+        cLogger.info(userCode + " is modified the realLot from putPopLotMasters.");
         return new ResponseEntity<>(popLotMasterResponse, OK);
     }
 

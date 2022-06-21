@@ -48,7 +48,15 @@ public class EstimateRepositoryImpl implements EstimateRepositoryCustom {
 
     // 견적기간 조회
     private BooleanExpression isEstimateDate(LocalDate fromDate, LocalDate toDate) {
-        return fromDate != null ? estimate.estimateDate.between(fromDate, toDate) : null;
+        if (fromDate != null && toDate != null) {
+            return estimate.estimateDate.between(fromDate, toDate);
+        } else if (fromDate != null) {
+            return estimate.estimateDate.after(fromDate).or(estimate.estimateDate.eq(fromDate));
+        } else if (toDate != null) {
+            return estimate.estimateDate.before(toDate).or(estimate.estimateDate.eq(toDate));
+        } else {
+            return null;
+        }
     }
 
     // 화폐로 조회

@@ -68,6 +68,7 @@ public class BadItemWorkOrderResponse {
         int createAmount;
         String itemNo;
         String itemName;
+        String unitCode;
     }
 
     public void set(BadItemWorkOrderResponse.subDto subDto) {

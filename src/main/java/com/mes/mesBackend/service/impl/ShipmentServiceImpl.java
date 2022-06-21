@@ -18,15 +18,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.SHIPMENT_AMOUNT;
 import static com.mes.mesBackend.entity.enumeration.ItemLogType.STOCK_AMOUNT;
 import static com.mes.mesBackend.entity.enumeration.OrderState.COMPLETION;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.PACKAGING;
 import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.SHIPMENT;
-import static com.mes.mesBackend.helper.Constants.NOW_YYMMDD;
+import static com.mes.mesBackend.helper.Constants.YYMMDD;
 
 // 4-5. 출하등록
 @Service
@@ -82,33 +83,22 @@ public class ShipmentServiceImpl implements ShipmentService {
             Long userId
     ) {
         List<ShipmentResponse> shipmentResponses = shipmentRepo.findShipmentResponsesByCondition(clientId, fromDate, toDate, currencyId, userId);
-        List<ShipmentResponse> response = new ArrayList<>();
+//        List<ShipmentResponse> response = new ArrayList<>();
         for (ShipmentResponse res : shipmentResponses) {
             // shipmentItem 에 제일 첨에 등록된 contractItem 의  contract 조회
             Contract contract = shipmentItemRepo.findContractsByShipmentId(res.getId()).orElse(null);
             res.addContractInfo(contract);
-
-            // 화폐 id, 담당자 id 검색
-            if (res.getCurrencyId() != null && res.getUserId() != null) {
-                if (currencyId != null && userId != null) {
-                    if (!res.getCurrencyId().equals(currencyId) && !res.getUserId().equals(userId)) res = null;
-                    else if (res.getCurrencyId().equals(currencyId) && !res.getUserId().equals(userId)) res = null;
-                } else if (!res.getCurrencyId().equals(currencyId) && res.getUserId().equals(userId)) {
-                    res = null;
-                } else if (currencyId != null) {
-                    if (!res.getCurrencyId().equals(currencyId)) res = null;
-                } else if (userId != null) {
-                    if (!res.getUserId().equals(userId)) res = null;
-                }
-            } else {
-                if (currencyId != null && userId != null) res = null;
-                else if (currencyId != null) res = null;
-                else if (userId != null) res = null;
-            }
-            response.add(res);
         }
-        response.remove(null);
-        return response;
+
+        if (userId != null && currencyId != null) {
+            return shipmentResponses.stream().filter(f -> f.getUserId() != null && f.getUserId().equals(userId) && f.getCurrencyId() != null && f.getCurrencyId().equals(currencyId)).collect(Collectors.toList());
+        } else if (userId != null) {
+            return shipmentResponses.stream().filter(f -> f.getUserId() != null && f.getUserId().equals(userId)).collect(Collectors.toList());
+        } else if (currencyId != null) {
+            return shipmentResponses.stream().filter(f -> f.getCurrencyId() != null && f.getCurrencyId().equals(currencyId)).collect(Collectors.toList());
+        } else {
+            return shipmentResponses;
+        }
     }
 
     // 출하 수정
@@ -149,7 +139,11 @@ public class ShipmentServiceImpl implements ShipmentService {
         // 오늘 날짜로 생성 된 shipment 중 barcodeNumber 만 가져옴(내림차순 limit 1)
         String beforeNo = shipmentRepo.findBarcodeNumberByToday(LocalDate.now()).orElse(null);
         Integer seq = beforeNo != null ? Integer.parseInt(beforeNo.substring(beforeNo.length() - 3)) + 1 : 1;
-        return BAR + NOW_YYMMDD + String.format(FORMAT_3, seq);
+        return BAR + getDateFormatYymmdd() + String.format(FORMAT_3, seq);
+    }
+
+    private String getDateFormatYymmdd() {
+        return LocalDate.now().format(DateTimeFormatter.ofPattern(YYMMDD));
     }
 
     // =================================================== 출하 품목 ====================================================
@@ -163,11 +157,11 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     // 출하 품목정보 생성
     /*
-    * 등록조건
-    * - 수주품목 중복 등록 불가능(입력한 contractItem 이 이미 있는지 체크)
-    * - 생성된 출하의 거래처가 같은것만 등록 가능
-    * - 출하의 상태가 COMPLETION 이면 추가 불가능
-    * */
+     * 등록조건
+     * - 수주품목 중복 등록 불가능(입력한 contractItem 이 이미 있는지 체크)
+     * - 생성된 출하의 거래처가 같은것만 등록 가능
+     * - 출하의 상태가 COMPLETION 이면 추가 불가능
+     * */
     @Override
     public ShipmentItemResponse createShipmentItem(Long shipmentId, Long contractItemId, String note) throws NotFoundException, BadRequestException {
         Shipment shipment = getShipmentOrThrow(shipmentId);
@@ -207,8 +201,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     // 출하 품목정보 수정
     /*
-    * 수주품목 변경 시 LOT 정보가 있으면 해당 LOT 정보 삭제 후 수정 가능
-    * */
+     * 수주품목 변경 시 LOT 정보가 있으면 해당 LOT 정보 삭제 후 수정 가능
+     * */
     @Override
     public ShipmentItemResponse updateShipmentItem(Long shipmentId, Long shipmentItemId, Long contractItemId, String note) throws NotFoundException, BadRequestException {
         ShipmentItem findShipmentItem = getShipmentItemOrThrow(shipmentId, shipmentItemId);
@@ -229,8 +223,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     // 출하 품목정보 삭제
     /*
-    * LOT 정보가 있으면 해당 LOT 정보 삭제 후 삭제 가능
-    * */
+     * LOT 정보가 있으면 해당 LOT 정보 삭제 후 삭제 가능
+     * */
     @Override
     public void deleteShipmentItem(Long shipmentId, Long shipmentItemId) throws NotFoundException, BadRequestException {
         ShipmentItem shipmentItem = getShipmentItemOrThrow(shipmentId, shipmentItemId);
@@ -243,7 +237,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipmentItemRepo.save(shipmentItem);
     }
 
-// =================================================== 출하 LOT 정보 ====================================================
+    // =================================================== 출하 LOT 정보 ====================================================
     // LOT 정보 생성
     @Override
     public ShipmentLotInfoResponse createShipmentLot(Long shipmentId, Long shipmentItemId, Long lotMasterId) throws NotFoundException, BadRequestException {
@@ -431,7 +425,7 @@ public class ShipmentServiceImpl implements ShipmentService {
                 .orElseThrow(() -> new NotFoundException("workProcess does not exist. input id: " + id));
     }
 
-// ==================================================== 4-7. 출하 현황 ====================================================
+    // ==================================================== 4-7. 출하 현황 ====================================================
     // 출하현황 검색 리스트 조회, 검색조건: 거래처 id, 출하기간 fromDate~toDate, 화폐 id, 담당자 id, 품번|품명
     @Override
     public List<ShipmentStatusResponse> getShipmentStatuses(

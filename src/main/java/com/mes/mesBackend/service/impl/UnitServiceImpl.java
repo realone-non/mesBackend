@@ -2,11 +2,9 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.UnitRequest;
 import com.mes.mesBackend.dto.response.UnitResponse;
-import com.mes.mesBackend.entity.ModifiedLog;
 import com.mes.mesBackend.entity.Unit;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
-import com.mes.mesBackend.helper.ModifiedLogHelper;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.UnitRepository;
 import com.mes.mesBackend.service.UnitService;
@@ -15,14 +13,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.mes.mesBackend.entity.enumeration.ModifiedDivision.UNIT;
-
 @Service
 @RequiredArgsConstructor
 public class UnitServiceImpl implements UnitService {
     private final UnitRepository unitRepository;
     private final ModelMapper modelMapper;
-    private final ModifiedLogHelper modifiedLogHelper;
 
     // 생성
     @Override
@@ -44,12 +39,7 @@ public class UnitServiceImpl implements UnitService {
     @Override
     public List<UnitResponse> getUnits() {
         List<Unit> units = unitRepository.findAllByDeleteYnFalseOrderByCreatedDateDesc();
-        List<UnitResponse> response = modelMapper.toListResponses(units, UnitResponse.class);
-        for (UnitResponse r : response) {
-            ModifiedLog modifiedLog = modifiedLogHelper.getModifiedLog(UNIT, r.getId());
-            if (modifiedLog != null) r.modifiedLog(modifiedLog);
-        }
-        return response;
+        return modelMapper.toListResponses(units, UnitResponse.class);
     }
 
     // 페이징조회
@@ -61,12 +51,11 @@ public class UnitServiceImpl implements UnitService {
 
     // 수정
     @Override
-    public UnitResponse updateUnit(Long id, UnitRequest unitRequest, String userCode) throws NotFoundException {
+    public UnitResponse updateUnit(Long id, UnitRequest unitRequest) throws NotFoundException {
         Unit newUnit = modelMapper.toEntity(unitRequest, Unit.class);
         Unit findUnit = getUnitOrThrow(id);
         findUnit.putUnit(newUnit);
         unitRepository.save(findUnit);
-        modifiedLogHelper.createModifiedLog(userCode, UNIT, findUnit);        // 업데이트 로그 관리
         return modelMapper.toResponse(findUnit, UnitResponse.class);
     }
 

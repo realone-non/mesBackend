@@ -3,6 +3,7 @@ package com.mes.mesBackend.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.mes.mesBackend.exception.Message.NOT_NULL;
+import static com.mes.mesBackend.helper.Constants.YYYY_MM_DD;
 
 @Getter
 @Setter
@@ -32,7 +34,8 @@ public class EquipmentRequest {
     Long client;
 
     @Schema(description = "구매일자")
-    LocalDateTime purchaseDate;
+    @DateTimeFormat(pattern = YYYY_MM_DD)
+    LocalDate purchaseDate;
 
     @Schema(description = "구입금액")
     int purchaseAmount;
@@ -44,7 +47,8 @@ public class EquipmentRequest {
     String serialNo;
 
     @Schema(description = "생산개시일자")
-    LocalDateTime startDate;
+    @DateTimeFormat(pattern = YYYY_MM_DD)
+    LocalDate startDate;
 
     @Schema(description = "작업라인 id")
     Long workLine;
@@ -63,6 +67,7 @@ public class EquipmentRequest {
     String life;
 
     @Schema(description = "최종점검일자")
+    @DateTimeFormat(pattern = YYYY_MM_DD)
     LocalDate lastTestDate;
 
     @Schema(description = "로트 생성 용 코드")

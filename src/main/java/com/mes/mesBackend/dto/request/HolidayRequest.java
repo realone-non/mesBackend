@@ -5,15 +5,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+
+import static com.mes.mesBackend.exception.Message.NOT_NULL;
 
 @Getter
 @Setter
 @Schema(description = "휴일 등록")
 public class HolidayRequest {
-    @Schema(description = "고유아이디")
-    Long id;
-
+    @NotNull(message = NOT_NULL)
     @Schema(description = "휴일일자")
     LocalDate date;
 
