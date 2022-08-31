@@ -33,7 +33,8 @@ public class ProductionPerformanceServiceImpl implements ProductionPerformanceSe
     public List<ProductionPerformanceResponse> getProductionPerformances(
             LocalDate fromDate,
             LocalDate toDate,
-            Long inputWorkProcessId
+            Long inputWorkProcessId,
+            String itemNoOrItemName
     ) throws NotFoundException {
         List<ProductionPerformanceResponse> responses = workOrderDetailRepository.findProductionPerformanceResponseByCondition(fromDate, toDate, inputWorkProcessId);
         for (ProductionPerformanceResponse r : responses) {
@@ -46,7 +47,12 @@ public class ProductionPerformanceServiceImpl implements ProductionPerformanceSe
                     .orElseThrow(() -> new NotFoundException("[데이터오류] lotLog 에 등록된 lotMaster(id: " + dummyLotId + ") 가 lotEquipmentConnect parentLot 로 등록되지 않았습니다."));
             r.set(subDto);
         }
-        return responses;
+
+        if (itemNoOrItemName != null) {
+            return responses.stream().filter(f -> f.getItemNo().contains(itemNoOrItemName) || f.getItemName().contains(itemNoOrItemName)).collect(Collectors.toList());
+        } else
+            return responses;
+
 //        List<ProductionPerformanceResponse> responses = produceOrderRepository.findProductionPerformanceResponseByCondition(fromDate, toDate, itemGroupId, itemNoOrItemName);
 //
 //        for (ProductionPerformanceResponse r : responses) {
