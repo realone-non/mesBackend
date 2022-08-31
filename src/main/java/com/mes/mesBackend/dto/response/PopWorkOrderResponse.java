@@ -38,6 +38,10 @@ public class PopWorkOrderResponse {
     @Schema(description = "완료수량(생산수량)")
     int productAmount;
 
+    // (양품수량 추가)
+    @Schema(description = "양품수량")
+    int stockAmount;
+
     @Schema(description = "단위코드")
     String unitCode;
 

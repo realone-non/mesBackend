@@ -37,11 +37,13 @@ public class ProductionPerformanceServiceImpl implements ProductionPerformanceSe
             String itemNoOrItemName
     ) throws NotFoundException {
         List<ProductionPerformanceResponse> responses = workOrderDetailRepository.findProductionPerformanceResponseByCondition(fromDate, toDate, inputWorkProcessId);
+
         for (ProductionPerformanceResponse r : responses) {
             Long workOrderId = r.getWorkOrderId();
             Long workProcessId = r.getWorkProcessId();
             LotLog lotLog = lotLogRepository.findLotLogByWorkOrderIdAndWorkProcessId(workOrderId, workProcessId)
                     .orElseThrow(() -> new NotFoundException("[데이터오류] 공정 완료된 작업지시가 LotLog 에 등록되지 않았습니다."));
+
             Long dummyLotId = lotLog.getLotMaster().getId();
             BadItemWorkOrderResponse.subDto subDto = lotMasterRepository.findLotMaterByDummyLotIdAndWorkProcessId(dummyLotId, workProcessId)
                     .orElseThrow(() -> new NotFoundException("[데이터오류] lotLog 에 등록된 lotMaster(id: " + dummyLotId + ") 가 lotEquipmentConnect parentLot 로 등록되지 않았습니다."));
