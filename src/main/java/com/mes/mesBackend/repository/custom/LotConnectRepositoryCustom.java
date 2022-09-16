@@ -4,7 +4,9 @@ import com.mes.mesBackend.dto.response.LotTrackingResponse;
 import com.mes.mesBackend.dto.response.PopBomDetailLotMasterResponse;
 import com.mes.mesBackend.dto.response.PopLotMasterResponse;
 import com.mes.mesBackend.entity.LotConnect;
+import com.mes.mesBackend.entity.LotEquipmentConnect;
 import com.mes.mesBackend.entity.LotMaster;
+import com.mes.mesBackend.entity.enumeration.LotConnectDivision;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,4 +35,8 @@ public interface LotConnectRepositoryCustom {
     List<LotTrackingResponse> findByParentLotAndDivisionIsFamily(Long parentLotId);
     // 설비로트로 분할 된 재고수량이 0 이 아닌 최근에 생성된 분할로트
     Optional<LotMaster> findByStockAmountAndCreatedDateDesc(Long equipmentLot, Integer stockAmout, boolean division);
+    // childLotId 로 parentLot 조회, 조건: division,
+    Optional<LotEquipmentConnect> findParentLotByChildLotAndDivision(Long childLotId, LotConnectDivision lotConnectDivision);
+    // parentId 로 childLot 조회, 조건: division, childLot 의 품목의 품목계정이 반제품
+    List<LotMaster> findChildLotByParentLotAndDivision(Long parentLotId, LotConnectDivision lotConnectDivision);
 }
