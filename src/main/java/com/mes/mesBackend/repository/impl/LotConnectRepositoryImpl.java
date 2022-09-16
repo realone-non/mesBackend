@@ -4,6 +4,8 @@ import com.mes.mesBackend.dto.response.LotTrackingResponse;
 import com.mes.mesBackend.dto.response.PopBomDetailLotMasterResponse;
 import com.mes.mesBackend.dto.response.PopLotMasterResponse;
 import com.mes.mesBackend.entity.*;
+import com.mes.mesBackend.entity.enumeration.GoodsType;
+import com.mes.mesBackend.entity.enumeration.LotConnectDivision;
 import com.mes.mesBackend.repository.custom.LotConnectRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -31,6 +33,7 @@ public class LotConnectRepositoryImpl implements LotConnectRepositoryCustom {
     final QWorkOrderDetail workOrderDetail = QWorkOrderDetail.workOrderDetail;
     final QLotLog lotLog = QLotLog.lotLog;
     final QProduceOrder produceOrder = QProduceOrder.produceOrder;
+    final QItemAccount itemAccount = QItemAccount.itemAccount;
 
 //    // 부모 lotMaster 랑 같고, 자식 lotMaster 의 item 이 파라미터 itemId 와 같고, 구분값이 EXHAUST 인것 조회
     @Override
@@ -255,6 +258,40 @@ public class LotConnectRepositoryImpl implements LotConnectRepositoryCustom {
                         .limit(1)
                         .fetchOne()
         );
+    }
+
+    // childLotId 로 parentLot 조회, 조건: division ? EXHAUST,
+    @Override
+    public Optional<LotEquipmentConnect> findParentLotByChildLotAndDivision(Long childLotId, LotConnectDivision lotConnectDivision) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .select(lotConnect.parentLot)
+                        .from(lotConnect)
+                        .where(
+                                lotConnect.childLot.id.eq(childLotId),
+                                lotConnect.division.eq(lotConnectDivision),
+                                lotConnect.childLot.deleteYn.isFalse()
+                        )
+                        .fetchOne()
+        );
+    }
+
+    // parentId 로 childLot 조회, 조건: division,
+    @Override
+    public List<LotMaster> findChildLotByParentLotAndDivision(Long parentLotId, LotConnectDivision lotConnectDivision) {
+        return jpaQueryFactory
+                .select(lotMaster)
+                .from(lotConnect)
+                .leftJoin(lotMaster).on(lotMaster.id.eq(lotConnect.childLot.id))
+                .leftJoin(item).on(item.id.eq(lotMaster.item.id))
+                .leftJoin(itemAccount).on(itemAccount.id.eq(item.itemAccount.id))
+                .where(
+                        lotConnect.parentLot.id.eq(parentLotId),
+                        lotMaster.deleteYn.isFalse(),
+                        lotConnect.division.eq(lotConnectDivision),
+                        itemAccount.goodsType.eq(GoodsType.HALF_PRODUCT)
+                )
+                .fetch();
     }
 
     private BooleanExpression isStockAmountEq(Integer stockAmount) {
