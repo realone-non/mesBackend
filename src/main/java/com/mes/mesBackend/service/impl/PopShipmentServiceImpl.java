@@ -70,7 +70,7 @@ public class PopShipmentServiceImpl implements PopShipmentService {
             labelShipmentResponse.setBarcodeNumber(res.getBarcodeNumber());
             labelShipmentResponse.setClientName(res.getClientName());
             labelShipmentResponse.setCreatedDate1(LocalDate.from(Collections.min(createdDates)));
-            if(createdDates.size() > 1){
+            if(createdDates.size() > 1) {
                 createdDates.remove(Collections.min(createdDates));
             }
             labelShipmentResponse.setCreatedDate2(LocalDate.from(Collections.min(createdDates)));

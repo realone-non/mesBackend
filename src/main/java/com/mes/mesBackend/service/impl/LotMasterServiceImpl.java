@@ -2,11 +2,13 @@ package com.mes.mesBackend.service.impl;
 
 import com.mes.mesBackend.dto.request.LotMasterRequest;
 import com.mes.mesBackend.dto.response.LabelPrintResponse;
+import com.mes.mesBackend.dto.response.LotCreatedResponse;
 import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.dto.response.MaterialStockReponse;
 import com.mes.mesBackend.entity.*;
 import com.mes.mesBackend.entity.enumeration.EnrollmentType;
 import com.mes.mesBackend.entity.enumeration.GoodsType;
+import com.mes.mesBackend.entity.enumeration.LotConnectDivision;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.NotFoundException;
@@ -21,8 +23,11 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static com.mes.mesBackend.entity.enumeration.WorkProcessDivision.*;
 import static com.mes.mesBackend.helper.Constants.LOT_DEFAULT_SEQ;
 import static com.mes.mesBackend.helper.Constants.YYMMDD;
 
@@ -40,6 +45,7 @@ public class LotMasterServiceImpl implements LotMasterService {
     private final WorkProcessRepository workProcessRepository;
     private final LotLogHelper lotLogHelper;
     private final ShipmentRepository shipmentRepo;
+    private final LotConnectRepository lotConnectRepository;
 
     // lot 번호 생성
     private String createLotNo(Long itemId, Long deleteId) throws BadRequestException {
@@ -177,6 +183,74 @@ public class LotMasterServiceImpl implements LotMasterService {
             shipment.setLabelPrintYn(true);
             shipmentRepo.save(shipment);
         }
+    }
+
+    // LOT NO 로 조회
+    // LOT 번호(융착, 포장, 라벨링) 입력 시 해당 LOT 를 생산하는데 투입된 반제품의 가장 오래전인 제조일자 반환
+    // 융착이 아닐 경우 "Invalid LOT NO" 메세지
+    @Override
+    public LotCreatedResponse getHalfLotCreatedDateByLotNo(String lotNo) throws NotFoundException, BadRequestException {
+        LotMaster mainLotMaster = getLotMasterByLotNoOrThrow(lotNo);
+
+        // 입력한 lot 가 (융착, 포장, 라벨링) 인지 체크
+        throwIfWorkProcessDivision(mainLotMaster);
+
+        // lotConnect 에서 mainLotMaster 가 분할 된 부모 lotMaster 조회
+        LotEquipmentConnect lotEquipmentConnect = lotConnectRepository.findParentLotByChildLotAndDivision(mainLotMaster.getId(), LotConnectDivision.FAMILY)
+                .orElseThrow(() -> new NotFoundException("입력한 lot 의 equipmentLot 를 찾을 수 없음."));
+
+        // lotConnect 에서 equipmentLot 가 부모로 있는 division 이 EXHAUST 인걸 조회, childLot 가 반제품인 것만
+        List<LotMaster> exhaustLotMasters = lotConnectRepository.findChildLotByParentLotAndDivision(lotEquipmentConnect.getId(), LotConnectDivision.EXHAUST)
+                .stream().sorted(Comparator.comparing(LotMaster::getCreatedDate))  // 오름차순 정렬
+                .collect(Collectors.toList());
+
+        exhaustLotMasters.forEach(f -> System.out.println(">> Lot No: " + f.getLotNo() + "/, CreatedDate: " + f.getCreatedDate() + "/, Id: " + f.getId()));
+
+        LotMaster lotMaster = exhaustLotMasters.stream().findFirst().orElseThrow(() -> new NotFoundException(lotNo + " 를 생성하는데 투입 된 반제품의 제조일자가 조회되지 않습니다."));
+
+        return new LotCreatedResponse().toResponse(lotMaster.getId(), lotMaster.getLotNo(), lotMaster.getCreatedDate());
+    }
+
+
+
+    // LOT ID 로 조회
+    // LOT 번호(융착, 포장, 라벨링) 입력 시 해당 LOT 를 생산하는데 투입된 반제품의 가장 오래전인 제조일자 반환
+    // 융착이 아닐 경우 "Invalid LOT NO" 메세지
+    @Override
+    public LotCreatedResponse getHalfLotCreatedDateByLotId(Long id) throws NotFoundException, BadRequestException {
+        LotMaster mainLotMaster = getLotMasterOrThrow(id);
+
+        // 입력한 lot 가 (융착, 포장, 라벨링) 인지 체크
+        throwIfWorkProcessDivision(mainLotMaster);
+
+        // lotConnect 에서 mainLotMaster 가 분할 된 부모 lotMaster 조회
+        LotEquipmentConnect lotEquipmentConnect = lotConnectRepository.findParentLotByChildLotAndDivision(mainLotMaster.getId(), LotConnectDivision.FAMILY)
+                .orElseThrow(() -> new NotFoundException("입력한 lot 의 equipmentLot 를 찾을 수 없음."));
+
+        // lotConnect 에서 equipmentLot 가 부모로 있는 division 이 EXHAUST 인걸 조회, childLot 가 반제품인 것만
+        List<LotMaster> exhaustLotMasters = lotConnectRepository.findChildLotByParentLotAndDivision(lotEquipmentConnect.getId(), LotConnectDivision.EXHAUST)
+                .stream().sorted(Comparator.comparing(LotMaster::getCreatedDate))  // 오름차순 정렬
+                .collect(Collectors.toList());
+
+        exhaustLotMasters.forEach(f -> System.out.println(">> Lot No: " + f.getLotNo() + "/, CreatedDate: " + f.getCreatedDate() + "/, Id: " + f.getId()));
+
+        LotMaster lotMaster = exhaustLotMasters.stream().findFirst().orElseThrow(() -> new NotFoundException(mainLotMaster.getLotNo() + " 를 생성하는데 투입 된 반제품의 제조일자가 조회되지 않습니다."));
+
+        return new LotCreatedResponse().toResponse(lotMaster.getId(), lotMaster.getLotNo(), lotMaster.getCreatedDate());
+    }
+
+    // 입력한 lot 가 (융착, 포장, 라벨링) 인지 체크
+    private void throwIfWorkProcessDivision(LotMaster mainLotMaster) throws BadRequestException {
+        WorkProcessDivision mainLotWorkProcessDivision = mainLotMaster.getWorkProcess().getWorkProcessDivision();
+        if (!mainLotWorkProcessDivision.equals(CAP_ASSEMBLY) && !mainLotWorkProcessDivision.equals(LABELING) && !mainLotWorkProcessDivision.equals(PACKAGING)) {
+            throw new BadRequestException("Invalid LOT NO");
+        }
+    }
+
+    // lotNo 로 lotMaster 조회
+    private LotMaster getLotMasterByLotNoOrThrow(String lotNo) throws NotFoundException {
+        return lotMasterRepo.findByLotNoAndDeleteYnFalse(lotNo)
+                .orElseThrow(() -> new NotFoundException("lot does not exist. input lotNo: " + lotNo));
     }
 
     // 출하 단일 조회 및 예외

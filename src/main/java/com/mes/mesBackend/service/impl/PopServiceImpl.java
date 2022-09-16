@@ -59,6 +59,7 @@ public class PopServiceImpl implements PopService {
     private final LotEquipmentConnectRepository lotEquipmentConnectRepo;
     private final LotLogRepository lotLogRepo;
     private final EquipmentBreakdownRepository equipmentBreakdownRepo;
+    private final LotLogRepository lotLogRepository;
 
     // 작업공정 전체 조회
     @Override
@@ -98,6 +99,21 @@ public class PopServiceImpl implements PopService {
             todayWorkOrder.setItemNo(item.getItemNo());
             todayWorkOrder.setItemName(item.getItemName());
             todayWorkOrder.setUnitCode(item.getUnit().getUnitCode());
+
+            // 양품수량 추가..
+            Long workOrderId = todayWorkOrder.getWorkOrderId();
+            if(todayWorkOrder.getOrderState().equals(SCHEDULE)) {
+                todayWorkOrder.setStockAmount(0);
+            } else {
+                LotLog lotLog = lotLogRepository.findLotLogByWorkOrderIdAndWorkProcessId(workOrderId, workProcessId)
+                        .orElseThrow(() -> new NotFoundException("[데이터오류] 공정 완료된 작업지시가 LotLog 에 등록되지 않았습니다."));
+
+                Long dummyLotId = lotLog.getLotMaster().getId();
+                BadItemWorkOrderResponse.subDto subDto = lotMasterRepo.findLotMaterByDummyLotIdAndWorkProcessId(dummyLotId, workProcessId)
+                        .orElseThrow(() -> new NotFoundException("[데이터오류] lotLog 에 등록된 lotMaster(id: " + dummyLotId + ") 가 lotEquipmentConnect parentLot 로 등록되지 않았습니다."));
+                todayWorkOrder.setStockAmount(subDto.getCreateAmount() - subDto.getBadAmount());
+            }
+
         }
         return todayWorkOrders;
     }

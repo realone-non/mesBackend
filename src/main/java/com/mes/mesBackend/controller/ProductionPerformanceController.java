@@ -45,9 +45,10 @@ public class ProductionPerformanceController {
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업시작일 fromDate") LocalDate fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DATE) @Parameter(description = "작업시작일 toDate") LocalDate toDate,
             @RequestParam(required = false) @Parameter(description = "작업공정 id") Long workProcessId,
+            @RequestParam(required = false) @Parameter(description = "품번|품명") String itemNoOrItemName,
             @RequestHeader(value = AUTHORIZATION, required = false) @Parameter(hidden = true) String tokenHeader
     ) throws NotFoundException {
-        List<ProductionPerformanceResponse> productionPerformanceResponses = productionPerformanceService.getProductionPerformances(fromDate, toDate, workProcessId);
+        List<ProductionPerformanceResponse> productionPerformanceResponses = productionPerformanceService.getProductionPerformances(fromDate, toDate, workProcessId, itemNoOrItemName);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info(logService.getUserCodeFromHeader(tokenHeader) + " is viewed the list of from getProductionPerformances.");
         return new ResponseEntity<>(productionPerformanceResponses, OK);

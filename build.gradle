@@ -55,6 +55,7 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+	exclude '**/*'
 }
 
 //querydsl 추가 시작

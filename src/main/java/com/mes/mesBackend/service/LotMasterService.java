@@ -1,6 +1,7 @@
 package com.mes.mesBackend.service;
 
 import com.mes.mesBackend.dto.response.LabelPrintResponse;
+import com.mes.mesBackend.dto.response.LotCreatedResponse;
 import com.mes.mesBackend.dto.response.LotMasterResponse;
 import com.mes.mesBackend.entity.LotMaster;
 import com.mes.mesBackend.entity.WareHouse;
@@ -37,4 +38,7 @@ public interface LotMasterService {
     List<LabelPrintResponse> getPrints(Long workProcessId, Long equipmentId);
     // 라벨 프린트 출력 여부
     void putLabelPrintYn(Long lotMasterId, Long shipmentId) throws NotFoundException, BadRequestException;
+    // LOT 번호(융착, 포장, 라벨링) 입력 시 해당 LOT 를 생산하는데 투입된 반제품의 가장 오래전인 제조일자 반환
+    LotCreatedResponse getHalfLotCreatedDateByLotNo(String lotNo) throws NotFoundException, BadRequestException;
+    LotCreatedResponse getHalfLotCreatedDateByLotId(Long id) throws NotFoundException, BadRequestException;
 }
