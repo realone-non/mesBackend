@@ -31,7 +31,7 @@ spring:
       password: SilverStar01!@
       authentication-database: admin
       port: 27017
-      database: NON
+      database: NON_PROD
       host: ec2-3-35-140-192.ap-northeast-2.compute.amazonaws.com
 
   # log
