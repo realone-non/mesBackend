@@ -35,9 +35,10 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException, ServletException {
+        String requestURI = request.getRequestURI();
         try {
             if (request.getHeader(HEADER) == null) {
-                throw new CustomJwtException("JWT token is null or empty.");
+                throw new CustomJwtException("JWT token is null or empty. requestURL: " + requestURI);
             }
             String token = request.getHeader(HEADER).substring(7);
             // 유효한 자격증명을 제공하지 않고 접근 할때 401
