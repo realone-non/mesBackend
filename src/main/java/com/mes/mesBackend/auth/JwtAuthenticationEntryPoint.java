@@ -1,6 +1,8 @@
 package com.mes.mesBackend.auth;
 
 import com.mes.mesBackend.exception.CustomJwtException;
+import com.mes.mesBackend.helper.ClientIpHelper;
+import com.mes.mesBackend.interceptor.Interceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,8 +29,11 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Autowired @Qualifier("handlerExceptionResolver")
     HandlerExceptionResolver resolver;
+    @Autowired
+    ClientIpHelper clientIpHelper;
 
     private static final String HEADER = AUTHORIZATION;
+    private static final String USER_AGENT = "User-Agent";
 
     @Override
     public void commence(
@@ -38,35 +43,14 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     ) throws IOException, ServletException {
         StringBuffer requestURL = request.getRequestURL();
 
-        String xForwardedForHeader = request.getHeader("X-FORWARDED-FOR");
-        String userAgent = request.getHeader("User-Agent");
-        System.out.println("userAgent::::::: >>>>>>>> " + userAgent);
-        String xforwardedHeader;
-        if (xForwardedForHeader == null) {
-            xforwardedHeader = request.getRemoteAddr();
-            System.out.println("remoteAddr::::::: >>>>>>>> " + xforwardedHeader);
-        } else {
-            xforwardedHeader = xForwardedForHeader;
-            System.out.println("xForwardedForHeader::::::: >>>>>>>> " + xforwardedHeader);
-        }
-
-        String hostName = InetAddress.getLocalHost().getHostName();
-        byte[] address = InetAddress.getLocalHost().getAddress();
-        String hostAddress = InetAddress.getLocalHost().getHostAddress();
-        System.out.println("getHostName::::::: >>>>>>>> " + hostName);
-        System.out.println("getAddress::::::: >>>>>>>> " + address);
-        System.out.println("getHostAddress::::::: >>>>>>>> " + hostAddress);
-
-        String hostName1 = InetAddress.getLoopbackAddress().getHostName();
-        byte[] address1 = InetAddress.getLoopbackAddress().getAddress();
-        String hostAddress1 = InetAddress.getLoopbackAddress().getHostAddress();
-        System.out.println("getLoopbackAddress::getHostName::::: >>>>>>>> " + hostName1);
-        System.out.println("getLoopbackAddress::getAddress::::: >>>>>>>> " + address1);
-        System.out.println("getLoopbackAddress::getHostAddress::::: >>>>>>>> " + hostAddress1);
+        String clientIP = clientIpHelper.getClientIP(request);
+        String userAgent = request.getHeader(USER_AGENT);
+        System.out.println(">> clientIP: " + clientIP);
+        System.out.println(">> userAgent: " + userAgent);
 
         try {
             if (request.getHeader(HEADER) == null) {
-                throw new CustomJwtException("JWT token is null or empty. requestURL: " + requestURL + ", xforwardedHeader: " + xforwardedHeader + ", userAgent: " + userAgent +  "hostName: " + hostName + ", getLocalHost address: " + address + ", getLocalHost hostAddress " + hostAddress + ", getLoopbackAddress hostName: " + hostName1 + ", getLoopbackAddress address " + address1 + ", getLoopbackAddress hostAddress: " + hostAddress1);
+                throw new CustomJwtException("JWT token is null or empty. requestURL: " + requestURL + ", clientIP: " + clientIP + ", userAgent: " + userAgent);
             }
             String token = request.getHeader(HEADER).substring(7);
             // 유효한 자격증명을 제공하지 않고 접근 할때 401

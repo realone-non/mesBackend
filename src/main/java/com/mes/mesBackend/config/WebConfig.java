@@ -1,12 +1,17 @@
 package com.mes.mesBackend.config;
 
+import com.mes.mesBackend.interceptor.Interceptor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
+    private final Interceptor interceptor;
     /*
     * addMapping: 모든 경로에 대해 cors 적용
     * exposedHeaders: 브라우저에 표시할 헤더를 명시, JWT 로그인을 위해서 클라이언트가 헤더에 접근할 수 있게 적용
@@ -29,5 +34,10 @@ public class WebConfig implements WebMvcConfigurer {
                         HttpMethod.PUT.name(),
                         HttpMethod.DELETE.name()
                 );
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(interceptor).addPathPatterns("/**");
     }
 }
