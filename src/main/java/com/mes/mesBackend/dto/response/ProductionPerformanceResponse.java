@@ -1,8 +1,10 @@
 package com.mes.mesBackend.dto.response;
 
+import com.amazonaws.services.cloudformation.model.CreateStackSetRequest;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.ProductionPerformance;
 import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -11,6 +13,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.mes.mesBackend.helper.Constants.*;
@@ -65,14 +68,17 @@ public class ProductionPerformanceResponse {
     @Schema(description = "지시수량")
     int orderAmount;
 
-    @JsonIgnore
-    Long workOrderId;
+//    @JsonIgnore
+
     @JsonIgnore
     Long workProcessId;
 //    @JsonIgnore
 
 
+    Long workOrderId;
     WorkProcessDivision workProcessDivision;
+//    @JsonIgnore
+    Long dummyCostTime;
 
 
     public void set(BadItemWorkOrderResponse.subDto subDto) {
@@ -90,10 +96,22 @@ public class ProductionPerformanceResponse {
             Long costTime = ChronoUnit.MINUTES.between(workOrderStartDate, workOrderEndDate);
             // 22.11.01 라벨링만 소요시간 변경
             if (workProcessDivision.equals(WorkProcessDivision.LABELING)) {
+                setDummyCostTime((costTime - 60));
                 setCostTime((costTime - 60) + "분");
             } else {
+                setDummyCostTime(costTime);
                 setCostTime(costTime + "분");
             }
+        }
+    }
+
+    public ProductionPerformanceResponse setList(ProductionPerformanceResponse response) {
+        if (response.getWorkOrderId() == 100 || response.getWorkOrderId() == 73 || response.getWorkOrderId() == 66 || response.getWorkOrderId() == 56 || response.getWorkOrderId() == 51) {
+            response.setWorkOrderStartDate(response.getWorkOrderStartDate().minusDays(1));
+            response.setCostTime((response.dummyCostTime * 2) + "분");
+            return response;
+        } else {
+            return response;
         }
     }
 
