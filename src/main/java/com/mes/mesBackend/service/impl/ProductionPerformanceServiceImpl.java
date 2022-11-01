@@ -53,38 +53,6 @@ public class ProductionPerformanceServiceImpl implements ProductionPerformanceSe
         if (itemNoOrItemName != null) {
             return responses.stream().filter(f -> f.getItemNo().contains(itemNoOrItemName) || f.getItemName().contains(itemNoOrItemName)).collect(Collectors.toList());
         } else
-            return responses;
-
-//        List<ProductionPerformanceResponse> responses = produceOrderRepository.findProductionPerformanceResponseByCondition(fromDate, toDate, itemGroupId, itemNoOrItemName);
-//
-//        for (ProductionPerformanceResponse r : responses) {
-//            r.setStartMaterialMixing(workOrderDetailRepository.findWorkOrderStartDateByProduceOrderIdAndWorkProcessDivision(r.getId(), MATERIAL_MIXING));
-//            r.setMaterialMixing(workOrderDetailRepository.findWorkOrderEndDateByProduceOrderIdAndWorkProcessDivision(r.getId(), MATERIAL_MIXING));
-//            r.setFilling(workOrderDetailRepository.findWorkOrderEndDateByProduceOrderIdAndWorkProcessDivision(r.getId(), FILLING));
-//            r.setCapAssembly(workOrderDetailRepository.findWorkOrderEndDateByProduceOrderIdAndWorkProcessDivision(r.getId(), CAP_ASSEMBLY));
-//            r.setLabeling(workOrderDetailRepository.findWorkOrderEndDateByProduceOrderIdAndWorkProcessDivision(r.getId(), LABELING));
-//            r.setPackaging(workOrderDetailRepository.findWorkOrderEndDateByProduceOrderIdAndWorkProcessDivision(r.getId(), PACKAGING));
-//            Integer packagingProductAmount = workOrderDetailRepository.findPackagingProductAmountByProduceOrderId(r.getId()).orElse(0);
-//            r.setProductionAmount(packagingProductAmount);
-//        }
-//
-//        // 조회기간 기준: 원료혼합 공정 완료날짜와 충진공정 완료날짜의 사이에 있는거
-//        if (fromDate != null && toDate == null) {
-//            LocalDateTime fromDateTime = fromDate.atStartOfDay();
-//            return responses.stream().filter(f -> f.getStartMaterialMixing() != null && f.getStartMaterialMixing().isAfter(fromDateTime)).collect(Collectors.toList());
-//        } else if (fromDate != null && toDate != null) {
-//            LocalDateTime fromDateTime = fromDate.atStartOfDay();
-//            LocalDateTime toDateTime = LocalDateTime.of(toDate, LocalTime.MAX).withNano(0);
-//            return responses.stream().filter(
-//                    f -> (f.getStartMaterialMixing() != null && f.getStartMaterialMixing().isAfter(fromDateTime)) && (f.getPackaging() != null && f.getPackaging().isBefore(toDateTime))
-//            ).collect(Collectors.toList());
-//        } else if (fromDate == null && toDate != null) {
-//            LocalDateTime toDateTime = LocalDateTime.of(toDate, LocalTime.MAX).withNano(0);
-//            return responses.stream().filter(f -> f.getPackaging() != null && f.getPackaging().isBefore(toDateTime)).collect(Collectors.toList());
-//        } else {
-//            return responses;
-//        }
-//        return productionPerformanceRepository.findProductionPerformanceResponsesByCondition(fromDate, toDate, itemGroupId, itemNoOrItemName);
+            return responses.stream().filter(f -> f.getCostTime() == null).collect(Collectors.toList());        // 221101 costTime null 인건 제외
     }
-
 }

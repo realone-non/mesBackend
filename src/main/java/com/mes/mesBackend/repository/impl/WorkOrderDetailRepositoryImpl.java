@@ -922,7 +922,8 @@ public class WorkOrderDetailRepositoryImpl implements WorkOrderDetailRepositoryC
                                 workOrderDetail.endDate.as("workOrderEndDate"),
                                 workOrderDetail.id.as("workOrderId"),
                                 workProcess.id.as("workProcessId"),
-                                workOrderDetail.orderAmount.as("orderAmount")
+                                workOrderDetail.orderAmount.as("orderAmount"),
+                                workProcess.workProcessDivision.as("workProcessDivision")
                         )
                 )
                 .from(workOrderDetail)

@@ -3,6 +3,7 @@ package com.mes.mesBackend.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mes.mesBackend.entity.enumeration.WorkProcessDivision;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -68,6 +69,10 @@ public class ProductionPerformanceResponse {
     Long workOrderId;
     @JsonIgnore
     Long workProcessId;
+//    @JsonIgnore
+
+
+    WorkProcessDivision workProcessDivision;
 
 
     public void set(BadItemWorkOrderResponse.subDto subDto) {
@@ -83,7 +88,12 @@ public class ProductionPerformanceResponse {
         // 소요시간(분)
         if (workOrderStartDate != null && workOrderEndDate != null) {
             Long costTime = ChronoUnit.MINUTES.between(workOrderStartDate, workOrderEndDate);
-            setCostTime(costTime + "분");
+            // 22.11.01 라벨링만 소요시간 변경
+            if (workProcessDivision.equals(WorkProcessDivision.LABELING)) {
+                setCostTime((costTime - 60) + "분");
+            } else {
+                setCostTime(costTime + "분");
+            }
         }
     }
 
