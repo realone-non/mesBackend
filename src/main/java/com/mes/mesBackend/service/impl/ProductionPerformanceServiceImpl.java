@@ -52,11 +52,9 @@ public class ProductionPerformanceServiceImpl implements ProductionPerformanceSe
 
         if (itemNoOrItemName != null) {
             return responses.stream().filter(f -> f.getItemNo().contains(itemNoOrItemName) || f.getItemName().contains(itemNoOrItemName))
-                    .map(m -> m.setList(m))
                     .collect(Collectors.toList());
         } else
             return responses.stream().filter(f -> f.getCostTime() != null)
-                    .map(m -> m.setList(m))
                     .collect(Collectors.toList());        // 221101 costTime null 인건 제외
     }
 }
