@@ -105,15 +105,15 @@ public class ProductionPerformanceResponse {
         }
     }
 
-    public ProductionPerformanceResponse setList(ProductionPerformanceResponse response) {
-        if (response.getWorkOrderId() == 100 || response.getWorkOrderId() == 73 || response.getWorkOrderId() == 66 || response.getWorkOrderId() == 56 || response.getWorkOrderId() == 51) {
-            response.setWorkOrderStartDate(response.getWorkOrderStartDate().minusDays(1));
-            response.setCostTime((response.dummyCostTime * 2) + "분");
-            return response;
-        } else {
-            return response;
-        }
-    }
+//    public ProductionPerformanceResponse setList(ProductionPerformanceResponse response) {
+//        if (response.getWorkOrderId() == 100 || response.getWorkOrderId() == 73 || response.getWorkOrderId() == 66 || response.getWorkOrderId() == 56 || response.getWorkOrderId() == 51) {
+//            response.setWorkOrderStartDate(response.getWorkOrderStartDate().minusDays(1));
+//            response.setCostTime((response.dummyCostTime * 2) + "분");
+//            return response;
+//        } else {
+//            return response;
+//        }
+//    }
 
 
 //    @Schema(description = "고유아이디")
