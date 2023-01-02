@@ -1,4 +1,4 @@
-package main.java.com.mes.mesBackend.logger;
+package com.mes.mesBackend.logger;
 
 import com.mes.mesBackend.entity.UserLog;
 import com.mes.mesBackend.repository.UserLogRepository;

@@ -1,4 +1,4 @@
-package main.java.com.mes.mesBackend.repository;
+package com.mes.mesBackend.repository;
 
 import com.mes.mesBackend.entity.UserLog;
 import com.mes.mesBackend.repository.custom.JpaCustomRepository;

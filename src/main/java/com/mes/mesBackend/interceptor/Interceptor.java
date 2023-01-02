@@ -2,8 +2,8 @@ package com.mes.mesBackend.interceptor;
 
 import com.mes.mesBackend.helper.ClientIpHelper;
 import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogSender;
 import lombok.RequiredArgsConstructor;
-import main.java.com.mes.mesBackend.logger.LogSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

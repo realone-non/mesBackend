@@ -1,4 +1,4 @@
-package main.java.com.mes.mesBackend.entity;
+package com.mes.mesBackend.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
