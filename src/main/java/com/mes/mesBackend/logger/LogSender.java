@@ -28,7 +28,7 @@ public class LogSender {
         UserLog dbUserLog = userLog.findTop1ByUseMethodOrderByCreatedDateDesc(method);
         String trimMethod = method.trim();
         LocalDateTime nowTime = LocalDateTime.now();
-        if(dbUserLog == null){
+        if(dbUserLog != null){
             isTimeOver = dbUserLog.getCreatedDate().plusMinutes(1).isBefore(nowTime);
         }
 
