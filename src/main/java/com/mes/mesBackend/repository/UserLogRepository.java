@@ -2,7 +2,6 @@ package com.mes.mesBackend.repository;
 
 import com.mes.mesBackend.entity.UserLog;
 import com.mes.mesBackend.repository.custom.JpaCustomRepository;
-import main.java.com.mes.mesBackend.entity.UserLog;
 import org.springframework.stereotype.Repository;
 
 @Repository
