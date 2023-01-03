@@ -6,7 +6,9 @@ import com.mes.mesBackend.dto.response.UserResponse;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.CustomJwtException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.ClientIpHelper;
 import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogSender;
 import com.mes.mesBackend.logger.LogService;
 import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.service.UserService;
@@ -17,11 +19,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import net.minidev.json.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.NoSuchAlgorithmException;
 
@@ -39,6 +43,8 @@ public class AuthController {
     private final LogService logService;
     private final Logger logger = LoggerFactory.getLogger(AuthController.class);
     private CustomLogger cLogger;
+    private final LogSender logSender;
+    private final ClientIpHelper clientIpHelper;
 
     // 직원(작업자) 생성
     @PostMapping("/signup")
@@ -71,11 +77,14 @@ public class AuthController {
             }
     )
     public ResponseEntity<TokenResponse> getLoginInfo(
-            @RequestBody @Valid UserLogin userLogin
-    ) throws NotFoundException, BadRequestException {
+            @RequestBody @Valid UserLogin userLogin,
+            HttpServletRequest httpServletRequest
+    ) throws NotFoundException, BadRequestException, ParseException {
         TokenResponse login = userService.getLogin(userLogin);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info("login user. userCode: " + userLogin.getUserCode() + ". from getLoginInfo");
+        // 로그 보내기
+        logSender.sendLog("POST", clientIpHelper.getClientIP(httpServletRequest), logService.getUserCodeFromToken(login.getAccessToken()));
         return new ResponseEntity<>(login, OK);
     }
 
