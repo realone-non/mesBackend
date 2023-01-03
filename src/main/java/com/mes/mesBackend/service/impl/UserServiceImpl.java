@@ -16,7 +16,9 @@ import com.mes.mesBackend.entity.enumeration.UserType;
 import com.mes.mesBackend.exception.BadRequestException;
 import com.mes.mesBackend.exception.CustomJwtException;
 import com.mes.mesBackend.exception.NotFoundException;
+import com.mes.mesBackend.helper.ClientIpHelper;
 import com.mes.mesBackend.logger.CustomLogger;
+import com.mes.mesBackend.logger.LogSender;
 import com.mes.mesBackend.logger.MongoLogger;
 import com.mes.mesBackend.mapper.ModelMapper;
 import com.mes.mesBackend.repository.RefreshTokenRepository;
@@ -52,6 +54,8 @@ public class UserServiceImpl implements UserService {
     private static final String REFRESH_TOKEN = "refreshToken";
     private final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
     private CustomLogger cLogger;
+    private LogSender logSender;
+    private ClientIpHelper clientIpHelper;
 
     // 직원(작업자) 생성
     public UserResponse createUser(UserCreateRequest userRequest) throws NotFoundException, BadRequestException {

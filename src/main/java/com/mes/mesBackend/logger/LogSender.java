@@ -21,7 +21,7 @@ public class LogSender {
     private String certKey = "$5$API$J0FWWtwLS/CLMLcT9ArNNMsPTmT4m/S6ssxh53kg9g5";
     private final UserLogRepository userLog;
 
-    public void sendLog(String method, String userIp) throws ParseException {
+    public void sendLog(String method, String userIp, String userCode) throws ParseException {
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://log.smart-factory.kr/apisvc/sendLogData.json";
         Boolean isTimeOver = true;
@@ -40,8 +40,7 @@ public class LogSender {
             params.add("crtfcKey", certKey);
             params.add("logDt", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
             params.add("useSe", method);
-            params.add("sysUser", "admin");
-            //params.add("conectIp", "125.247.37.167");
+            params.add("sysUser", userCode);
             params.add("conectIp", userIp);
             params.add("dataUsgqty", "0");
 
@@ -57,7 +56,7 @@ public class LogSender {
             UserLog newUserLog = new UserLog();
             newUserLog.setUserIp(userIp);
             newUserLog.setUseMethod(method);
-            newUserLog.setUserId("admin");
+            newUserLog.setUserId(userCode);
             newUserLog.setResultCode((String)result.get("recptnRsltCd"));
             newUserLog.setResultMsg((String)result.get("recptnRslt"));
 
@@ -71,7 +70,7 @@ public class LogSender {
             params.add("crtfcKey", certKey);
             params.add("logDt", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
             params.add("useSe", method);
-            params.add("sysUser", "admin");
+            params.add("sysUser", userCode);
             //params.add("conectIp", "125.247.37.167");
             params.add("conectIp", userIp);
             params.add("dataUsgqty", "0");
@@ -88,7 +87,7 @@ public class LogSender {
             UserLog newUserLog = new UserLog();
             newUserLog.setUserIp(userIp);
             newUserLog.setUseMethod(method);
-            newUserLog.setUserId("admin");
+            newUserLog.setUserId(userCode);
             newUserLog.setResultCode((String)result.get("recptnRsltCd"));
             newUserLog.setResultMsg((String)result.get("recptnRslt"));
 

@@ -3,6 +3,7 @@ package com.mes.mesBackend.interceptor;
 import com.mes.mesBackend.helper.ClientIpHelper;
 import com.mes.mesBackend.logger.CustomLogger;
 import com.mes.mesBackend.logger.LogSender;
+import com.mes.mesBackend.logger.LogService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 @Component
 @RequiredArgsConstructor
 public class Interceptor implements HandlerInterceptor {
@@ -20,6 +23,7 @@ public class Interceptor implements HandlerInterceptor {
     private CustomLogger customLogger;
     private final ClientIpHelper clientIpHelper;
     private final LogSender logSender;
+    private final LogService logService;
 
 
     // request 가 들어오고, controller 으로 넘어가기 전에 처리
@@ -34,8 +38,13 @@ public class Interceptor implements HandlerInterceptor {
         // mongo db log
 //        customLogger = new MongoLogger(logger, MONGO_TEMPLATE);
 //        customLogger.info("clientIP: " + clientIP + ", url: " + request.getRequestURL());
+        String header = request.getHeader(AUTHORIZATION);
+        String userCode = "";
+        if (header != null) {
+            userCode = logService.getUserCodeFromHeader(header);
+            logSender.sendLog(method, clientIP, userCode);
+        }
 
-        logSender.sendLog(method, clientIP);
 
         return HandlerInterceptor.super.preHandle(request, response, handler);
     }
