@@ -27,12 +27,12 @@ spring:
   # mongoDB
   data:
     mongodb:
-      username: root
+      username: realone
       password: SilverStar01!@
-      authentication-database: admin
+      authentication-database: realone
       port: 27017
-      database: NON_PROD
-      host: ec2-3-35-140-192.ap-northeast-2.compute.amazonaws.com
+      database: NON
+      host: 13.124.80.140
 
   # log
   logging:
