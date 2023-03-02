@@ -25,14 +25,14 @@ spring:
           batch_size: 9999
 
   # mongoDB
-  data:
-    mongodb:
-      username: realone
-      password: SilverStar01!@
-      authentication-database: realone
-      port: 27017
-      database: NON
-      host: 13.124.80.140
+#  data:
+#    mongodb:
+#      username: realone
+#      password: SilverStar01!@
+#      authentication-database: realone
+#      port: 27017
+#      database: NON
+#      host: 13.124.80.140
 
   # log
   logging:

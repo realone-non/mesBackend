@@ -1,21 +1,11 @@
 package com.mes.mesBackend.logger;
 
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 public class MongoLogger extends CustomLogger {
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
+//    @Autowired
+//    private MongoTemplate mongoTemplate;
 
     public MongoLogger(Logger logger, String mongoTemplateBeanName) {
         super(logger);
@@ -33,7 +23,7 @@ public class MongoLogger extends CustomLogger {
         Log log = new Log();
         log.setLevel("TRACE");
         log.setMessage(msg);
-        mongoTemplate.insert(log, "log");
+//        mongoTemplate.insert(log, "log");
     }
 
     @Override
@@ -41,7 +31,7 @@ public class MongoLogger extends CustomLogger {
         Log log = new Log();
         log.setLevel("DEBUG");
         log.setMessage(msg);
-        mongoTemplate.insert(log, "log");
+//        mongoTemplate.insert(log, "log");
     }
 
     @Override
@@ -49,7 +39,7 @@ public class MongoLogger extends CustomLogger {
         Log log = new Log();
         log.setLevel("INFO");
         log.setMessage(msg);
-        mongoTemplate.insert(log, "log");
+//        mongoTemplate.insert(log, "log");
     }
 
     @Override
@@ -57,7 +47,7 @@ public class MongoLogger extends CustomLogger {
         Log log = new Log();
         log.setLevel("WARN");
         log.setMessage(msg);
-        mongoTemplate.insert(log, "log");
+//        mongoTemplate.insert(log, "log");
     }
 
     @Override
@@ -65,7 +55,7 @@ public class MongoLogger extends CustomLogger {
         Log log = new Log();
         log.setLevel("ERROR");
         log.setMessage(msg);
-        mongoTemplate.insert(log, "log");
+//        mongoTemplate.insert(log, "log");
     }
 
     /*
@@ -74,13 +64,13 @@ public class MongoLogger extends CustomLogger {
     * */
     private void setMongoTemplate(String mongoTemplateBeanName) {
         // Request 받지 않고 가져오는 방식
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+//        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
         // mongoContext.xml 을 가져오는 방법
-        HttpSession session = request.getSession();
-        ServletContext context = session.getServletContext();
-        WebApplicationContext webContext = WebApplicationContextUtils.getWebApplicationContext(context);
+//        HttpSession session = request.getSession();
+//        ServletContext context = session.getServletContext();
+//        WebApplicationContext webContext = WebApplicationContextUtils.getWebApplicationContext(context);
 
-        this.mongoTemplate = (MongoTemplate) webContext.getBean(mongoTemplateBeanName);
+//        this.mongoTemplate = (MongoTemplate) webContext.getBean(mongoTemplateBeanName);
     }
 }

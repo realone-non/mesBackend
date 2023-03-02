@@ -12,28 +12,28 @@ public abstract class CustomLogger {
     }
 
     public void info(String msg) {
-        logger.info(msg);
-        writeInfo(msg);
+//        logger.info(msg);
+//        writeInfo(msg);
     }
 
     public void error(String msg) {
-        logger.error(msg);
-        writeError(msg);
+//        logger.error(msg);
+//        writeError(msg);
     }
 
     public void trace(String msg, String userCode, Long resourceId) {
-        logger.trace(msg);
-        writeTrace(msg, userCode, resourceId);
+//        logger.trace(msg);
+//        writeTrace(msg, userCode, resourceId);
     }
 
     public void debug(String msg, String userCode, Long resourceId) {
-        logger.debug(msg);
-        writeDebug(msg, userCode, resourceId);
+//        logger.debug(msg);
+//        writeDebug(msg, userCode, resourceId);
     }
 
     public void warn(String msg, String userCode, Long resourceId) {
-        logger.warn(msg);
-        writeWarn(msg, userCode, resourceId);
+//        logger.warn(msg);
+//        writeWarn(msg, userCode, resourceId);
     }
 
     protected abstract void writeError(String msg);
