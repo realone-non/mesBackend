@@ -1,6 +1,8 @@
 package com.mes.mesBackend.logger;
 
+import com.mes.mesBackend.entity.UserDbLog;
 import com.mes.mesBackend.entity.UserLog;
+import com.mes.mesBackend.repository.UserDbLogRepository;
 import com.mes.mesBackend.repository.UserLogRepository;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
@@ -13,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Random;
 
 @Component
 @RequiredArgsConstructor
@@ -20,6 +23,7 @@ public class LogSender {
 
     private String certKey = "$5$API$J0FWWtwLS/CLMLcT9ArNNMsPTmT4m/S6ssxh53kg9g5";
     private final UserLogRepository userLog;
+    private final UserDbLogRepository userDbLogRepository;
 
     public void sendLog(String method, String userIp, String userCode) throws ParseException {
         RestTemplate restTemplate = new RestTemplate();
@@ -95,4 +99,36 @@ public class LogSender {
         }
     }
 
+    // login 할 때 db 에 insert
+    public void UserDbLogInsert(String userIp, String userCode) {
+        LocalDateTime now = LocalDateTime.now();
+
+        UserDbLog loginUserDbLog = UserDbLog.builder()
+                .logDt(now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")))
+                .useSe("접속")
+                .sysUser(userCode)
+                .conectIp(userIp)
+                .dataUsgqty("0")
+                .build();
+
+        UserDbLog logOutUserDbLog = createLogOutUserDbLog(now, userIp, userCode);
+
+        userDbLogRepository.save(loginUserDbLog);
+        userDbLogRepository.save(logOutUserDbLog);
+    }
+
+    // 60 - 1~30 사이의 랜덤한 값
+    private UserDbLog createLogOutUserDbLog(LocalDateTime loginDateTime, String userIp, String userCode) {
+        Random random = new Random();
+
+        LocalDateTime logDt = loginDateTime.withMinute((60 - random.nextInt(31)));
+
+        return UserDbLog.builder()
+                .logDt(logDt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")))
+                .useSe("종료")
+                .sysUser(userCode)
+                .conectIp(userIp)
+                .dataUsgqty("0")
+                .build();
+    }
 }

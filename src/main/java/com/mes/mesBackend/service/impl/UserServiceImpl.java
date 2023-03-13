@@ -54,8 +54,7 @@ public class UserServiceImpl implements UserService {
     private static final String REFRESH_TOKEN = "refreshToken";
     private final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
     private CustomLogger cLogger;
-    private LogSender logSender;
-    private ClientIpHelper clientIpHelper;
+    private final LogSender logSender;
 
     // 직원(작업자) 생성
     public UserResponse createUser(UserCreateRequest userRequest) throws NotFoundException, BadRequestException {
@@ -120,7 +119,7 @@ public class UserServiceImpl implements UserService {
 
     // 로그인
     @Override
-    public TokenResponse getLogin(UserLogin userLogin) throws NotFoundException, BadRequestException {
+    public TokenResponse getLogin(UserLogin userLogin, String clientIp) throws NotFoundException, BadRequestException {
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info("userCode: " + userLogin.getUserCode() + ", password: " +userLogin.getPassword() + " 으로 로그인을 시도함.");
         User user = userRepository.findByUserCode(userLogin.getUserCode())
@@ -156,6 +155,9 @@ public class UserServiceImpl implements UserService {
         RefreshToken newRefreshToken = new RefreshToken();
         newRefreshToken.save(authenticationToken.getName(), refreshToken);
         refreshTokenRepository.save(newRefreshToken);
+
+        // login db log insert
+        logSender.UserDbLogInsert(clientIp, user.getUserCode());
 
         return tokenDto;
     }

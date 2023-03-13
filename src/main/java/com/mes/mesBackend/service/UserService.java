@@ -38,7 +38,7 @@ public interface UserService {
     void deleteUser(Long id) throws NotFoundException;
 
     // userLogin
-    TokenResponse getLogin(UserLogin userLogin) throws NotFoundException, BadRequestException;
+    TokenResponse getLogin(UserLogin userLogin, String clientIp) throws NotFoundException, BadRequestException;
 
     User getUserOrThrow(Long id) throws NotFoundException;
 

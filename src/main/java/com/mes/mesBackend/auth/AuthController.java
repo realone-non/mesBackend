@@ -80,11 +80,13 @@ public class AuthController {
             @RequestBody @Valid UserLogin userLogin,
             HttpServletRequest httpServletRequest
     ) throws NotFoundException, BadRequestException, ParseException {
-        TokenResponse login = userService.getLogin(userLogin);
+        String clientIP = clientIpHelper.getClientIP(httpServletRequest);
+        TokenResponse login = userService.getLogin(userLogin, clientIP);
         cLogger = new MongoLogger(logger, MONGO_TEMPLATE);
         cLogger.info("login user. userCode: " + userLogin.getUserCode() + ". from getLoginInfo");
         // 로그 보내기
-        logSender.sendLog("POST", clientIpHelper.getClientIP(httpServletRequest), logService.getUserCodeFromToken(login.getAccessToken()));
+
+        logSender.sendLog("POST", clientIP, logService.getUserCodeFromToken(login.getAccessToken()));
         return new ResponseEntity<>(login, OK);
     }
 
