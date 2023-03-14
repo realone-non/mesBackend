@@ -14,4 +14,7 @@ public class Constants {
     public static final String DECIMAL_POINT_2 = "%.2f";
     public static final String PERCENT = "%";
     public final static String FORMAT_02 = "%02d";
+    public static final String LOG_DT_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final String LOG_LOGIN = "접속";
+    public static final String LOG_LOGOUT = "종료";
 }

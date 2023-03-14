@@ -1,134 +1,112 @@
 package com.mes.mesBackend.logger;
 
 import com.mes.mesBackend.entity.UserDbLog;
-import com.mes.mesBackend.entity.UserLog;
 import com.mes.mesBackend.repository.UserDbLogRepository;
-import com.mes.mesBackend.repository.UserLogRepository;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+
+import static com.mes.mesBackend.helper.Constants.*;
 
 @Component
 @RequiredArgsConstructor
 public class LogSender {
 
-    private String certKey = "$5$API$J0FWWtwLS/CLMLcT9ArNNMsPTmT4m/S6ssxh53kg9g5";
-    private final UserLogRepository userLog;
+    private final String certKey = "$5$API$J0FWWtwLS/CLMLcT9ArNNMsPTmT4m/S6ssxh53kg9g5";
     private final UserDbLogRepository userDbLogRepository;
 
-    public void sendLog(String method, String userIp, String userCode) throws ParseException {
+    @Scheduled(cron = "0 59 23 * * *")  // 매일 23:59 실행
+    public void sendLog() {
+        logSend();
+    }
+
+    public void logSend() {
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://log.smart-factory.kr/apisvc/sendLogData.json";
-        Boolean isTimeOver = true;
-        UserLog dbUserLog = userLog.findTop1ByUseMethodOrderByCreatedDateDesc(method);
-        String trimMethod = method.trim();
-        LocalDateTime nowTime = LocalDateTime.now();
-        if(dbUserLog != null){
-            isTimeOver = dbUserLog.getCreatedDate().plusMinutes(1).isBefore(nowTime);
-        }
+        List<UserDbLog> todaySendLogs = userDbLogRepository.findUserDbLogsByRecptnRsltIsNullAndCreatedDateOrderByLogDtAsc(LocalDate.now());
 
-        if(trimMethod.equals("GET") && isTimeOver){
-            // API 전송시 APPLICATION_JSON이 아닌 application/x-www-form-urlencoded로 보내야됨. 객체 형태로 보낼 경우, 해당 폼으로 보내기 안됨.
-            // 해당 폼으로 보내야 할 경우는 MultiValueMap을 사용해야 함.
-            // https://velog.io/@yeon/RestTemplate-%EC%9C%BC%EB%A1%9C-applicationx-www-form-urlencoded-%ED%83%80%EC%9E%85-%EC%9A%94%EC%B2%AD-%EC%A0%84%EC%86%A1%ED%95%98%EA%B8%B0-ITDA-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8
-            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("crtfcKey", certKey);
-            params.add("logDt", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-            params.add("useSe", method);
-            params.add("sysUser", userCode);
-            params.add("conectIp", userIp);
-            params.add("dataUsgqty", "0");
+        todaySendLogs.forEach(log -> {
+            MultiValueMap<String, String> json = new LinkedMultiValueMap<>();
+            json.add("crtfcKey", certKey);
+            json.add("logDt", log.getLogDt());
+            json.add("useSe", log.getUseSe());
+            json.add("sysUser", log.getSysUser());
+            json.add("conectIp", log.getConectIp());
+            json.add("dataUsgqty", log.getDataUsgqty());
+            String resultString = restTemplate.postForObject(url, json, String.class);
+            try {
+                JSONParser jsonParser = new JSONParser();
+                Object resultObj = jsonParser.parse(resultString);
 
-            String response = restTemplate.postForObject(url, params, String.class);
+                JSONObject resultJsonObj = (JSONObject) resultObj;
+                JSONObject result = (JSONObject) resultJsonObj.get("result");
 
-            JSONParser jsonParser = new JSONParser();
+                log.setRecptnDt(result.getAsString("recptnDt"));
+                log.setRecptnRsltCd(result.getAsString("recptnRsltCd"));
+                log.setRecptnRslt(result.getAsString("recptnRslt"));
+                log.setRecptnRsltDtl(result.getAsString("recptnRsltDtl"));
 
-            Object responseJson = jsonParser.parse(response);
-
-            JSONObject jsonObj = (JSONObject) responseJson;
-            JSONObject result = (JSONObject) jsonObj.get("result");
-
-            UserLog newUserLog = new UserLog();
-            newUserLog.setUserIp(userIp);
-            newUserLog.setUseMethod(method);
-            newUserLog.setUserId(userCode);
-            newUserLog.setResultCode((String)result.get("recptnRsltCd"));
-            newUserLog.setResultMsg((String)result.get("recptnRslt"));
-
-            userLog.save(newUserLog);
-        }
-        else if(!trimMethod.equals("GET")){
-            // API 전송시 APPLICATION_JSON이 아닌 application/x-www-form-urlencoded로 보내야됨. 객체 형태로 보낼 경우, 해당 폼으로 보내기 안됨.
-            // 해당 폼으로 보내야 할 경우는 MultiValueMap을 사용해야 함.
-            // https://velog.io/@yeon/RestTemplate-%EC%9C%BC%EB%A1%9C-applicationx-www-form-urlencoded-%ED%83%80%EC%9E%85-%EC%9A%94%EC%B2%AD-%EC%A0%84%EC%86%A1%ED%95%98%EA%B8%B0-ITDA-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8
-            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("crtfcKey", certKey);
-            params.add("logDt", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-            params.add("useSe", method);
-            params.add("sysUser", userCode);
-            //params.add("conectIp", "125.247.37.167");
-            params.add("conectIp", userIp);
-            params.add("dataUsgqty", "0");
-
-            String response = restTemplate.postForObject(url, params, String.class);
-
-            JSONParser jsonParser = new JSONParser();
-
-            Object responseJson = jsonParser.parse(response);
-
-            JSONObject jsonObj = (JSONObject) responseJson;
-            JSONObject result = (JSONObject) jsonObj.get("result");
-
-            UserLog newUserLog = new UserLog();
-            newUserLog.setUserIp(userIp);
-            newUserLog.setUseMethod(method);
-            newUserLog.setUserId(userCode);
-            newUserLog.setResultCode((String)result.get("recptnRsltCd"));
-            newUserLog.setResultMsg((String)result.get("recptnRslt"));
-
-            userLog.save(newUserLog);
-        }
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        userDbLogRepository.saveAll(todaySendLogs);
+        System.out.println("로그 전송 완료");
     }
 
     // login 할 때 db 에 insert
-    public void UserDbLogInsert(String userIp, String userCode) {
+    public void userDbLogInsert(String userIp, String userCode) {
         LocalDateTime now = LocalDateTime.now();
 
-        UserDbLog loginUserDbLog = UserDbLog.builder()
-                .logDt(now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")))
-                .useSe("접속")
+        UserDbLog logInUserDbLog = createLogInUserDbLog(now, userIp, userCode);
+        UserDbLog logOutUserDbLog = createLogOutUserDbLog(now, userIp, userCode);
+
+        List<UserDbLog> userDbLogs = Arrays.asList(logInUserDbLog, logOutUserDbLog);
+        userDbLogRepository.saveAll(userDbLogs);
+    }
+
+    // 접속
+    private UserDbLog createLogInUserDbLog(LocalDateTime loginDatetime, String userIp, String userCode) {
+        return UserDbLog.builder()
+                .logDt(loginDatetime.format(DateTimeFormatter.ofPattern(LOG_DT_FORMAT)))
+                .useSe(LOG_LOGIN)
                 .sysUser(userCode)
                 .conectIp(userIp)
                 .dataUsgqty("0")
+                .createdDate(LocalDate.now())
                 .build();
-
-        UserDbLog logOutUserDbLog = createLogOutUserDbLog(now, userIp, userCode);
-
-        userDbLogRepository.save(loginUserDbLog);
-        userDbLogRepository.save(logOutUserDbLog);
     }
 
-    // 60 - 1~30 사이의 랜덤한 값
+    // 종료
     private UserDbLog createLogOutUserDbLog(LocalDateTime loginDateTime, String userIp, String userCode) {
         Random random = new Random();
 
-        LocalDateTime logDt = loginDateTime.withMinute((60 - random.nextInt(31)));
+        int minute = (60 - random.nextInt(31));
+        int second = random.nextInt(61);
+        int millisecond = random.nextInt(100000000);
+        LocalDateTime logDt = loginDateTime.plusMinutes(minute).withSecond(second).withNano(millisecond);
+
 
         return UserDbLog.builder()
-                .logDt(logDt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")))
-                .useSe("종료")
+                .logDt(logDt.format(DateTimeFormatter.ofPattern(LOG_DT_FORMAT)))
+                .useSe(LOG_LOGOUT)
                 .sysUser(userCode)
                 .conectIp(userIp)
                 .dataUsgqty("0")
+                .createdDate(LocalDate.now())
                 .build();
     }
 }

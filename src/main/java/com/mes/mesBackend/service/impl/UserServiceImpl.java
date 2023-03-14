@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService {
         refreshTokenRepository.save(newRefreshToken);
 
         // login db log insert
-        logSender.UserDbLogInsert(clientIp, user.getUserCode());
+        logSender.userDbLogInsert(clientIp, user.getUserCode());
 
         return tokenDto;
     }

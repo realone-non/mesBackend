@@ -10,6 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import java.time.LocalDate;
+
 import static javax.persistence.GenerationType.AUTO;
 
 @Entity(name = "USER_DB_LOGS")
@@ -32,4 +34,14 @@ public class UserDbLog {
     private String conectIp;
     @Column(name = "DATA_USGQTY", columnDefinition = "varchar(255) COMMENT '데이터 사용량'")
     private String dataUsgqty;
+    @Column(name = "CREATED_DATE", columnDefinition = "date COMMENT '생성 날짜'")
+    private LocalDate createdDate;
+    @Column(name = "RECPTN_DT", columnDefinition = "varchar(255) COMMENT '수신일시'")
+    private String recptnDt;
+    @Column(name = "RECPTN_RSLT_CD", columnDefinition = "varchar(255) COMMENT '수신결과코드'")
+    private String recptnRsltCd;
+    @Column(name = "RECPTN_RSLT", columnDefinition = "varchar(255) COMMENT '수신결과코드설명'")
+    private String recptnRslt;
+    @Column(name = "RECPTN_RSLT_DTL", columnDefinition = "varchar(255) COMMENT '수신결과상세설명'")
+    private String recptnRsltDtl;
 }
