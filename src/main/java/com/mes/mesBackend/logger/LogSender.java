@@ -28,7 +28,7 @@ public class LogSender {
     private final String certKey = "$5$API$J0FWWtwLS/CLMLcT9ArNNMsPTmT4m/S6ssxh53kg9g5";
     private final UserDbLogRepository userDbLogRepository;
 
-    @Scheduled(cron = "0 59 23 * * *")  // 매일 23:59 실행
+    @Scheduled(cron = "0 59 23 * * *")  // 매일 23:59 실행!
     public void sendLog() {
         logSend();
     }
