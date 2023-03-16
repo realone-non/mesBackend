@@ -20,7 +20,6 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 		servers = @Server(url = "/"),
 		info = @Info(
 				title = "Non Mes Backend API"
-//				version = "1",
 //				description = "description",
 //				license = @License(name = "license name", url = "license url"),
 //				contact = @Contact(url = "contract url", name = "contract name", email = "contract email")
